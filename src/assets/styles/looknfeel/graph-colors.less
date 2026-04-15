@@ -1,0 +1,206 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+/* graph colors */
+
+.indigo-100 {
+  background: var(--primary-100);
+  fill: var(--primary-100);
+  stroke: var(--primary-100);
+  color: var(--primary-900);
+}
+.indigo-200 {
+  background: var(--primary-200);
+  fill: var(--primary-200);
+  stroke: var(--primary-200);
+  color: var(--primary-900);
+}
+.indigo-300 {
+  background: var(--primary-300);
+  fill: var(--primary-300);
+  stroke: var(--primary-300);
+  color: var(--primary-900);
+}
+.indigo-400 {
+  background: var(--primary-400);
+  fill: var(--primary-400);
+  stroke: var(--primary-400);
+}
+.indigo-500 {
+  background: var(--primary-500);
+  fill: var(--primary-500);
+  stroke: var(--primary-500);
+}
+.indigo-600 {
+  background: var(--primary-600);
+  fill: var(--primary-600);
+  stroke: var(--primary-600);
+}
+.indigo-700 {
+  background: var(--primary-700);
+  fill: var(--primary-700);
+  stroke: var(--primary-700);
+}
+.dark-mode .indigo-700 {
+  background: var(--primary-50);
+  fill: var(--primary-50);
+  stroke: var(--primary-50);
+  color: var(--primary-900);
+}
+.indigo-800 {
+  background: var(--primary-900);
+  fill: var(--primary-900);
+  stroke: var(--primary-900);
+}
+
+.lilac-100 {
+  background: var(--secondary-100);
+  fill: var(--secondary-100);
+  stroke: var(--secondary-100);
+  color: var(--secondary-900);
+}
+.lilac-200 {
+  background: var(--secondary-200);
+  fill: var(--secondary-200);
+  stroke: var(--secondary-200);
+  color: var(--secondary-900);
+}
+.lilac-300 {
+  background: var(--secondary-300);
+  fill: var(--secondary-300);
+  stroke: var(--secondary-300);
+  color: var(--secondary-900);
+}
+.lilac-400 {
+  background: var(--secondary-400);
+  fill: var(--secondary-400);
+  stroke: var(--secondary-400);
+}
+.lilac-500 {
+  background: var(--secondary-500);
+  fill: var(--secondary-500);
+  stroke: var(--secondary-500);
+}
+.lilac-600 {
+  background: var(--secondary-600);
+  fill: var(--secondary-600);
+  stroke: var(--secondary-600);
+}
+.lilac-700 {
+  background: var(--secondary-700);
+  fill: var(--secondary-700);
+  stroke: var(--secondary-700);
+}
+.lilac-800 {
+  background: var(--secondary-900);
+  fill: var(--secondary-900);
+  stroke: var(--secondary-900);
+}
+.dark-mode .lilac-800 {
+  background: var(--secondary-50);
+  fill: var(--secondary-50);
+  stroke: var(--secondary-50);
+  color: var(--secondary-900);
+}
+
+.mint-100 {
+  background: var(--tertiary-100);
+  fill: var(--tertiary-100);
+  stroke: var(--tertiary-100);
+  color: var(--tertiary-900);
+}
+.mint-200 {
+  background: var(--tertiary-200);
+  fill: var(--tertiary-200);
+  stroke: var(--tertiary-200);
+  color: var(--tertiary-900);
+}
+.mint-300 {
+  background: var(--tertiary-300);
+  fill: var(--tertiary-300);
+  stroke: var(--tertiary-300);
+  color: var(--tertiary-900);
+}
+.mint-400 {
+  background: var(--tertiary-400);
+  fill: var(--tertiary-400);
+  stroke: var(--tertiary-400);
+}
+.mint-500 {
+  background: var(--tertiary-500);
+  fill: var(--tertiary-500);
+  stroke: var(--tertiary-500);
+}
+.mint-600 {
+  background: var(--tertiary-600);
+  fill: var(--tertiary-600);
+  stroke: var(--tertiary-600);
+}
+.mint-700 {
+  background: var(--tertiary-700);
+  fill: var(--tertiary-700);
+  stroke: var(--tertiary-700);
+}
+.mint-800 {
+  background: var(--tertiary-900);
+  fill: var(--tertiary-900);
+  stroke: var(--tertiary-900);
+}
+.dark-mode .mint-800 {
+  background: var(--tertiary-50);
+  fill: var(--tertiary-50);
+  stroke: var(--tertiary-50);
+  color: var(--tertiary-900);
+}
+
+.nvd3.nv-pie path {
+  fill-opacity: 1;
+  stroke-width: 2px;
+}
+
+.dark-mode .nvd3.nv-pie path {
+  stroke: var(--dm-grey-700);
+}
+

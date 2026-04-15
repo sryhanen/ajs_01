@@ -1,0 +1,167 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div id="notebookPage">
+  <!-- Here the controller <NotebookCtrl> is not needed because explicitly set in the app.ts (route) -->
+  <div id="actionbar" ng-include src="'/app/notebook/notebook-actionBar.html'"></div>
+  <div class="container-fluid">
+    <div class="notebook-mt"
+         data-bs-toggle="collapse"
+         data-bs-target="#noteActionCollapse"></div>
+    <!-- revisions comparator-->
+    <div ng-if="showRevisionsComparator" class="row">
+      <div class="col-12">
+        <div class="revisions-comparator mt-5 mb-2">
+          <h2>Version History</h2>
+          <revisions-comparator note-revisions="noteRevisions" class="row"></revisions-comparator>
+        </div>
+      </div>
+    </div>
+    <div id="content" class="notebook-content row">
+      <!-- permissions -->
+      <div ng-if="showPermissions && ticket.principal && !isAnonymous"
+           class="permissions d-flex flex-column">
+        <h2>Notebook Permissions</h2>
+        <div class="overflow-auto permissions-content">
+          <p class="form-text mb-2">
+            Separate users and groups with comma.
+          </p>
+          <button type="button"
+                  class="btn btn-secondary btn-sm active"
+                  ng-class="isNoteRunning() ? 'disabled' : ''"
+                  ng-if="ticket.principal && ticket.principal !== 'anonymous'"
+                  ng-hide="viewOnly || note.config.personalizedMode !== 'true'|| !isOwner"
+                  ng-click="toggleNotePersonalizedMode()"
+                  title="Switch to collaboration mode {{isOwner ? '' : '(owner can change)'}}"
+                  ng-disabled="revisionView">
+            <i class="fas fa-users"></i>
+            Switch to collaboration mode
+          </button>
+          <div class="permissions-form"
+               data-ng-model="permissions">
+            <div class="my-3">
+              <label class="form-label w-100" for="selectOwners">
+                Owners
+                <span class="info"
+                      title="Owners can change permissions, read, run and write the notebook.">
+                </span>
+              </label>
+              <select id="selectOwners"
+                      class="form-control"
+                      multiple="multiple">
+                <option is-select2="false"
+                        ng-repeat="owner in permissions.owners"
+                        selected="selected">
+                  {{owner}}
+                </option>
+              </select>
+            </div>
+            <div class="my-3">
+              <label class="form-label w-100" for="selectWriters">
+                Writers
+                <span class="info"
+                      title="Writers can read, run and write the notebook.">
+                </span>
+              </label>
+              <select id="selectWriters"
+                      class="form-control"
+                      multiple="multiple">
+                <option is-select2="false"
+                        ng-repeat="writers in permissions.writers"
+                        selected="selected">
+                  {{writers}}
+                </option>
+              </select>
+            </div>
+            <div class="my-3">
+              <label class="form-label w-100" for="selectRunners">
+                Runners
+                <span class="info"
+                      title="Runners can read and run the notebook.">
+                </span>
+              </label>
+              <select id="selectRunners"
+                      class="form-control"
+                      multiple="multiple">
+                <option is-select2="false"
+                        ng-repeat="runners in permissions.runners"
+                        selected="selected">
+                  {{runners}}
+                </option>
+              </select>
+            </div>
+            <div class="my-0">
+              <label class="form-label w-100" for="selectReaders">
+                Readers
+                <span class="info"
+                      title="Readers can only read the notebook.">
+                </span>
+              </label>
+              <select id="selectReaders"
+                      class="form-control"
+                      multiple="multiple">
+                <option is-select2="false"
+                        ng-repeat="readers in permissions.readers"
+                        selected="selected">
+                  {{readers}}
+                </option>
+              </select>
+              <div id="readersHelp" class="form-text">
+                Empty field means the notebook is public for anyone.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-end mt-auto settings-save">
+          <button class="btn btn-light mr-2"
+                  ng-click="closePermissionsModal()">
+            Cancel
+          </button>
+          <button class="btn btn-primary"
+                  ng-click="savePermissions()">
+            Save
+          </button>
+        </div>
+      </div>
+      <!-- Include the paragraphs according to the note, pass the note to init function -->
+      <div id="{{currentParagraph.id}}_paragraphColumn_main"
+           ng-hide="currentParagraph.title === 'hideMeSparkPinger' && $index === 0"
+           ng-repeat="currentParagraph in note.paragraphs"
+           ng-controller="ParagraphCtrl"
+           ng-init="init(currentParagraph, note)"
+           ng-class="columnWidthClass(currentParagraph.config.colWidth)">
+        <!-- see ZEPPELIN-2806 viewport-watch> -->
+        <div class="new-paragraph"
+             ng-click="insertNew('above')"
+             ng-hide="viewOnly || asIframe || revisionView"
+             ng-class="{'first-paragraph': $first, 'new-paragraph-disable': isNoteRunning}">
+          Add Paragraph
+        </div>
+        <div id="{{currentParagraph.id}}_paragraphColumn"
+             ng-include src="'/app/notebook/paragraph/paragraph.html'"
+             ng-class="{'paragraph-box': !asIframe, 'focused': paragraphFocused,
+                    'lastEmptyParagraph': !paragraph.text && !paragraph.result}"
+             ng-hide="currentParagraph.config.tableHide && viewOnly"
+             ng-dblclick="paragraphOnDoubleClick(currentParagraph.id);">
+        </div>
+        <div class="new-paragraph last-paragraph mb-5"
+             ng-click="insertNew('below');"
+             ng-hide="!$last || viewOnly || asIframe || revisionView"
+             ng-class="{'new-paragraph-disable': isNoteRunning}">
+          Add Paragraph
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

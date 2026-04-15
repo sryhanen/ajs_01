@@ -1,0 +1,107 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div id="noteImportModal"
+     class="modal fade"
+     role="dialog"
+     tabindex="-1"
+     data-backdrop="static"
+     data-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content"
+         id="NoteImportCtrl"
+         ng-init="NoteImportInit">
+      <div class="modal-header">
+        <h5 class="modal-title">Import a new notebook</h5>
+        <button type="button"
+                class="btn-close"
+                aria-label="Close"
+                ng-click="noteImportCtrl.resetFlags()">
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-3 align-items-center">
+          <div class="col-3">
+            <label for="noteImportName"
+                   class="col-form-label">
+              Import as
+            </label>
+          </div>
+          <div class="col-9">
+            <input class="form-control note-name-input"
+                   id="noteImportName"
+                   placeholder="Insert name for a notebook"
+                   type="text"
+                   ng-model="note.noteImportName" />
+          </div>
+        </div>
+        <div class="row mb-3 align-items-center">
+          <div class="col-3">
+            <label for="noteImportName"
+                   class="col-form-label">
+              From file
+            </label>
+          </div>
+          <div class="col-9">
+            <a class="import-file-upload d-flex align-items-center"
+               ng-click="uploadFile()">
+              <i class="fas fa-cloud-arrow-up me-2"></i>
+              Select JSON File/IPYNB File
+            </a>
+            <div class="d-none">
+              <input id="noteImportFile"
+                     type="file"
+                     files-input
+                     ng-model="importingFile" />
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3 align-items-center">
+          <div class="col-3">
+            <label for="noteImportUrl"
+                   class="col-form-label">
+              From URL
+            </label>
+          </div>
+          <div class="col-9">
+            <div class="input-group">
+              <input placeholder="Note URL"
+                     type="text"
+                     class="form-control"
+                     id="noteImportUrl"
+                     ng-model="note.importUrl" />
+              <button type="button"
+                      id="importNoteButton"
+                      class="btn btn-secondary"
+                      ng-click="noteImportCtrl.importNote()">
+                Import
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="row" ng-show="note.errorText">
+          <div class="col">
+            <div class="alert alert-danger">{{note.errorText}}</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-auto">
+            <span class="form-text">
+              JSON file size cannot exceed {{maxLimit}} MB
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

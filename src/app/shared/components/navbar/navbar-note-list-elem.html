@@ -1,0 +1,45 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<a class="notebook-list-item dropdown-item"
+   ng-if="navbar.isFilterNote(node) && !node.children"
+   href="#/notebook/{{node.id}}">
+  <i class="me-2" ng-class="query.q && node.isTrash ? 'fas fa-trash-alt' : 'fas fa-file'" ></i>
+  {{noteName(node)}}
+</a>
+
+<span class="dropdown-item" ng-if="node.children">
+  <expand-collapse>
+    <div ng-mouseenter="showFolderButton=true" ng-mouseleave="showFolderButton=false">
+      <a class="notebook-list-item" role="button">
+        <div ng-if="node.id !== navbar.TRASH_FOLDER_ID">
+          <i class="fas fa-folder me-2"></i>
+          {{noteName(node)}}
+        </div>
+        <div ng-if="node.id === navbar.TRASH_FOLDER_ID">
+          <i class="fas fa-trash-alt me-2"></i>
+          Trash
+        </div>
+      </a>
+    </div>
+  </expand-collapse>
+  <div class="expandable">
+    <ul class="list-unstyled">
+      <li ng-repeat="node in node.children | orderBy:node:false:navbar.arrayOrderingSrv.noteComparator track by $index"
+          ng-class="{'active' : navbar.isActive(node.id)}"
+          ng-include="'/app/shared/components/navbar/navbar-note-list-elem.html'">
+      </li>
+    </ul>
+  </div>
+</span>

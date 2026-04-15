@@ -1,0 +1,229 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+.ace-teragrep .ace_gutter {
+  background: #ebebeb;
+  color: var(--grey-900);
+  overflow : hidden;
+}
+
+.ace-teragrep .ace_print-margin {
+  width: 1px;
+  background: #e8e8e8;
+}
+
+.ace-teragrep {
+  color: var(--grey-900);
+}
+
+.dark-mode .ace-teragrep {
+  color: white;
+}
+
+.ace-teragrep .ace_invisible {
+  color: rgb(191, 191, 191);
+}
+
+.ace-teragrep .ace_constant.ace_buildin {
+  color: rgb(88, 72, 246);
+}
+
+.ace-teragrep .ace_constant.ace_language {
+  color: #667EEA;
+}
+
+.dark-mode .ace-teragrep .ace_constant.ace_language {
+  color: #CCB8F3;
+}
+
+.ace-teragrep .ace_constant.ace_library {
+  color: rgb(6, 150, 14);
+}
+
+.ace-teragrep .ace_invalid {
+  background-color: #FECACA;
+  color: #394570 !important;
+}
+
+.ace-teragrep .ace_support.ace_function {
+  color: rgb(60, 76, 114);
+}
+
+.ace-teragrep .ace_support.ace_constant {
+  color: rgb(6, 150, 14);
+}
+
+.ace-teragrep .ace_support.ace_type,
+.ace-teragrep .ace_support.ace_class,
+.ace-teragrep .ace_support.ace_other {
+  color: rgb(109, 121, 222);
+}
+
+.ace-teragrep .ace_variable.ace_parameter {
+  font-style:italic;
+  color:#FD971F;
+}
+
+.ace-teragrep .ace_keyword.ace_operator {
+  color: rgb(104, 118, 135);
+}
+
+.dark-mode .ace-teragrep .ace_keyword.ace_operator {
+  color: #CCB8F3;
+}
+
+.ace-teragrep .ace_comment,
+.ace-teragrep .ace_comment.ace_doc,
+.ace-teragrep .ace_comment.ace_doc.ace_tag {
+  color: var(--primary-600);
+}
+
+.dark-mode .ace-teragrep .ace_comment,
+.dark-mode .ace-teragrep .ace_comment.ace_doc,
+.dark-mode .ace-teragrep .ace_comment.ace_doc.ace_tag {
+  color: #CCB8F3;
+}
+
+.ace-teragrep .ace_constant.ace_numeric {
+  color: var(--tertiary-600);
+}
+
+.dark-mode .ace-teragrep .ace_constant.ace_numeric {
+  color: var(--mint-300);
+}
+
+.ace-teragrep .ace_variable {
+  color: rgb(49, 132, 149);
+}
+
+.ace-teragrep .ace_xml-pe {
+  color: rgb(104, 104, 91);
+}
+
+.ace-teragrep .ace_entity.ace_name.ace_function {
+  color: #0000A2;
+}
+
+.dark-mode .ace-teragrep .ace_entity.ace_name.ace_function {
+  color: #CCB8F3;
+}
+
+.ace-teragrep .ace_heading {
+  color: rgb(12, 7, 255);
+}
+
+.ace-teragrep .ace_list {
+  color:rgb(185, 6, 144);
+}
+
+.ace-teragrep .ace_marker-layer .ace_selection {
+  background: rgb(181, 213, 255);
+}
+
+.ace-teragrep .ace_marker-layer .ace_step {
+  background: rgb(252, 255, 0);
+}
+
+.ace-teragrep .ace_marker-layer .ace_stack {
+  background: rgb(164, 229, 101);
+}
+
+.ace-teragrep .ace_marker-layer .ace_bracket {
+  margin: -1px 0 0 -1px;
+  border: 1px solid rgb(192, 192, 192);
+}
+
+.ace-teragrep .ace_marker-layer .ace_active-line {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.ace-teragrep .ace_gutter-active-line {
+  background-color: rgba(114, 127, 222, 0.15);
+}
+
+.ace-teragrep .ace_marker-layer .ace_selected-word {
+  background: rgb(250, 250, 255);
+  border: 1px solid var(--warning-300);
+}
+
+.ace-teragrep .ace_storage,
+.ace-teragrep .ace_keyword,
+.ace-teragrep .ace_meta.ace_tag {
+  color: #667EEA;
+}
+
+.dark-mode .ace-teragrep .ace_storage,
+.dark-mode .ace-teragrep .ace_keyword,
+.dark-mode .ace-teragrep .ace_meta.ace_tag {
+  color: #FECACA;
+}
+
+.ace-teragrep .ace_string.ace_regex {
+  color: rgb(255, 0, 0)
+}
+
+.ace-teragrep .ace_string {
+  color: #394570;
+}
+
+.dark-mode .ace-teragrep .ace_string {
+  color: var(--warning-300);
+}
+
+.ace-teragrep .ace_entity.ace_other.ace_attribute-name {
+  color: #994409;
+}
+
+.ace-teragrep .ace_indent-guide {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;
+}
+
+.ace-teragrep .ace-indentifier {
+  color: var(--primary-900);
+}
+
+.dark-mode .ace-teragrep .ace-indentifier {
+  color: var(--grey-300);
+}

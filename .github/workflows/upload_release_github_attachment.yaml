@@ -1,0 +1,61 @@
+name: Upload Artifact as GitHub Release Attachment
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  upload:
+    name: Upload
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install yarn
+        run: npm install --global yarn
+
+      - name: Get jetty
+        run: mvn --batch-mode dependency:copy -Dartifact=org.eclipse.jetty:jetty-rewrite:9.4.31.v20200723 -Ddest=.
+
+      - name: Prepare RPM GPG signing
+        run: |
+          sudo apt-get install expect pinentry-tty;
+          printf "RPM_SIGNING_KEYNAME=%q\n" "$(echo "${{ secrets.RPM_SIGNING_PUBLIC_KEY }}" | gpg --show-keys --with-colons | awk -F':' '/uid/{print $10}')" >> $GITHUB_ENV;
+          echo "${{ secrets.RPM_SIGNING_PRIVATE_KEY }}" | gpg --batch --import;
+          echo "%_gpg_sign_cmd_extra_args --pinentry-mode loopback --passphrase \"%{getenv:RPM_SIGNING_PASSPHRASE}\"" >> "${HOME}/.rpmmacros";
+
+      - name: Build a war and rpm for release
+        run: mvn --batch-mode -Drevision=${{ github.event.release.tag_name }} -Dsha1= -Dchangelist= package && mvn --batch-mode -Drevision=${{ github.event.release.tag_name }} -Dsha1= -Dchangelist= -f rpm.pom.xml package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RPM_SIGNING_KEYNAME: ${{ env.RPM_SIGNING_KEYNAME }}
+          RPM_SIGNING_PASSPHRASE: ${{ secrets.RPM_SIGNING_PASSPHRASE }}
+
+      - name: Attach rpm to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/rpm/com.teragrep-ajs_01/RPMS/noarch/com.teragrep-ajs_01-*.noarch.rpm
+
+      - name: Update pkg_01 releases repository
+        uses: teragrep/dfg_01@3.3.0
+        with:
+          from_repository: "${{ github.repository }}"
+          from_version: "${{ github.event.release.tag_name }}"
+          to_repository: "${{ github.repository_owner }}/pkg_01"
+          deploy_key: ${{ secrets.PKG_01_DEPLOY_KEY }}
+          files: target/rpm/com.teragrep-ajs_01/RPMS/noarch/com.teragrep-ajs_01-*.noarch.rpm
+          gpg_public_key: "${{ secrets.RPM_SIGNING_PUBLIC_KEY }}"
+          repo_baseurl: "${{ vars.PKG_01_CENTRAL_BASEURL }}"
+        env:
+          has_deploy_key: ${{ secrets.PKG_01_DEPLOY_KEY != '' }}
+        if: ${{ env.has_deploy_key == 'true' }}

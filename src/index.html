@@ -1,0 +1,101 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teragrep</title>
+  <link rel="apple-touch-icon" href="./logo-icon.png" />
+  <link rel="icon" type="image/png" href="./logo-icon.png" />
+</head>
+<body ng-class="bodyClassName">
+<div ng-controller="MainCtrl as mainCtrl">
+  <div id="pre-loader" class="position-absolute top-50 start-50 translate-middle">
+    <div class="d-flex flex-column align-items-center">
+      <div class="loader mb-2"></div>
+      <div>Loading...</div>
+    </div>
+  </div>
+
+  <!--[if IE]>
+  <div class="position-absolute top-50 start-50 translate-middle bg-body py-4 px-5 rounded shadow">
+    You are using an <b>outdated</b> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.
+  </div>
+  <![endif]-->
+
+  <div ng-include src="'/app/shared/components/navbar/navbar.html'"></div>
+  <div id="main">
+    <div ng-view></div>
+  </div>
+
+  <div ng-include src="'/app/notebook/shortcut.html'"></div>
+  <div ng-controller="ServerReloadCtrl">
+    <div ng-include src="'/app/shared/components/server-reload/reload.html'"></div>
+  </div>
+  <div ng-controller="NoteCreateCtrl">
+    <div ng-include src="'/app/shared/components/note-create/note-create.html'"></div>
+  </div>
+  <div ng-controller="NoteCloneCtrl">
+    <div ng-include src="'/app/shared/components/note-clone/note-clone.html'"></div>
+  </div>
+  <div ng-controller="NoteImportCtrl as noteImportCtrl">
+    <div id="note-import-container" ng-include src="'/app/shared/components/note-import/note-import.html'"></div>
+  </div>
+  <div ng-controller="LoginCtrl">
+    <div id="login-container" ng-include src="'/app/shared/components/login/login.html'"></div>
+  </div>
+  <div ng-controller="NoteRenameCtrl">
+    <div ng-include src="'/app/shared/components/note-rename/note-rename.html'"></div>
+  </div>
+  <div ng-controller="NoteClearCtrl">
+    <div ng-include src="'/app/shared/components/note-clear/note-clear.html'"></div>
+  </div>
+  <div ng-controller="NoteDeleteCtrl">
+    <div ng-include src="'/app/shared/components/note-delete/note-delete.html'"></div>
+  </div>
+  <div ng-controller="NoteRestoreCtrl">
+    <div ng-include src="'/app/shared/components/note-restore/note-restore.html'"></div>
+  </div>
+  <div ng-controller="NoteRunAllCtrl">
+    <div ng-include src="'/app/shared/components/note-run-all/note-run-all.html'"></div>
+  </div>
+  <div ng-controller="NoteExportCtrl">
+    <div ng-include src="'/app/shared/components/note-export/note-export.html'"></div>
+  </div>
+  <div ng-controller="InterpreterSettingCtrl">
+    <div ng-include src="'/app/shared/components/interpreter/interpreter-settings.html'"></div>
+  </div>
+  <div ng-controller="NotePermissionsCtrl">
+    <div ng-include src="'/app/shared/components/note-permissions/note-permissions.html'"></div>
+  </div>
+  <div ng-controller="NoteCommitCtrl">
+    <div ng-include src="'/app/shared/components/note-commit/note-commit.html'"></div>
+  </div>
+  <div ng-controller="ParagraphDeleteCtrl">
+    <div ng-include src="'/app/shared/components/note-paragraph-delete/note-paragraph-delete.html'"></div>
+  </div>
+  <div ng-controller="InterpreterPageCtrl">
+    <div ng-include src="'/app/shared/components/interpreter/interpreter-page/interpreter-page-modals.html'"></div>
+  </div>
+  <div ng-controller="JobModalsCtrl">
+    <div ng-include src="'/app/shared/components/job/job-modals.html'"></div>
+  </div>
+  <div ng-controller="BSToastCtrl">
+    <div ng-include src="'/app/shared/components/Toaster/BStoast.html'"></div>
+  </div>
+</div>
+</body>
+</html>

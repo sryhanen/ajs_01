@@ -1,0 +1,95 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div id="noteCreateModal"
+     class="modal fade"
+     targetinput="noteName"
+     aria-hidden="true"
+     aria-labelledby="noteCreateModal"
+     tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header modal-header-note-name">
+        <h5 class="modal-title">
+          Create a new notebook
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="closeNote()"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body modal-body-note-name">
+        <div class="row mb-3">
+          <div class="col-4">
+            <label for="noteName" class="col-form-label">
+              Notebook name
+            </label>
+          </div>
+          <div class="col-8">
+            <input placeholder="Insert Note Name"
+                   name="noteName"
+                   type="text"
+                   class="form-control note-name-create-input"
+                   id="noteName"
+                   ng-click="setName()"
+                   ng-model="note.notename"
+                   ng-keyup="checkEnter($event)"
+                   ng-change="validate()"
+            />
+            <div id="createHelp" class="form-text mt-2">
+              <p class="alert alert-warning" ng-show="!validator && !shortName">
+                Input is not valid. Please, use only letters, numbers and symbols "/" "-" and "_".
+              </p>
+              <p class="alert alert-warning" ng-show="longName">
+                The name of the notebook is too long. Please, use a shorter name.
+              </p>
+              <p class="alert alert-warning" ng-show="shortName">
+                The name of the notebook cannot be empty.
+              </p>
+              Use '/' to create folders. Example: /NoteDirA/Note1
+            </div>
+          </div>
+        </div>
+        <div class="row default-interpreter-select">
+          <div class="col-4">
+            <label for="defaultInterpreter" class="col-form-label">
+              Default interpreter
+            </label>
+          </div>
+          <div class="col-8">
+            <select id="defaultInterpreter"
+                    name="defaultInterpreter"
+                    class="form-select"
+                    ng-model="note.defaultInterpreter"
+                    ng-options="option.name for option in interpreterSettings">
+            </select>
+          </div>
+        </div>
+        <div ng-if="alert" class="alert alert-danger mt-3 mb-0" role="alert">
+          {{alert}}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                id="createNoteButton"
+                class="btn btn-primary"
+                ng-disabled="processing || !validator"
+                ng-click="createNoteClick()">
+          <span>
+            Create
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

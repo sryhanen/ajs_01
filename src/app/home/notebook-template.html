@@ -1,0 +1,197 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+Due to various issues trash folder, delete and rename are out-commented.
+This is a temporary solution which will be reversed after server-side bugs
+has been fixed.
+-->
+
+<div ng-class="note_folder_renderer">
+  <!-- notebook -->
+  <div ng-if="node.children == null && isFilterNote(node)"
+       class="note-folder-item mt-2 d-flex align-items-center">
+    <a href="#/notebook/{{node.id}}"
+       id="{{node.id}}"
+       class="note-truncate">
+      <i class="align-middle me-2"
+         ng-class="query.q && node.isTrash ? 'fas fa-trash-alt' : 'fas fa-file'">
+      </i>
+      {{getNoteName(node)}}
+    </a>
+    <div class="note-folder-item-actions ms-auto">
+      <!-- if note is not in trash -->
+      <!--<a class="align-middle me-1"
+         ng-if="!node.isTrash"
+         data-bs-toggle="modal"
+         data-bs-target="#noteRenameModal"
+         ng-click="node.path ? renameNote(node.id, node.path) : renameNote(node.id, node.name)">
+        <i class="fas fa-pen-to-square notebook-list-btn"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"
+           title="Rename the notebook">
+        </i>
+      </a>-->
+      <a class="align-middle me-2" ng-if="!node.isTrash"
+         ng-click="clearAllParagraphOutput(node.id)">
+        <i class="fas fa-eraser notebook-list-btn"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"
+           title="Clear output">
+        </i>
+      </a>
+      <!--<a class="align-middle" ng-if="!node.isTrash"
+         ng-click="moveNoteToTrash(node.id)">
+        <i class="fas fa-trash-alt notebook-list-btn"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"
+           title="Move the notebook to Trash">
+        </i>
+      </a>-->
+      <!-- if note is in trash -->
+      <!--<a class="align-middle me-2" ng-if="node.isTrash"
+         ng-click="restoreNote(node.id)">
+        <i class="fas fa-undo-alt notebook-list-btn"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"
+           title="Restore the notebook">
+        </i>
+      </a>
+      <a class="align-middle" ng-if="node.isTrash"
+         ng-click="removeNote(node.id)">
+        <i class="fas fa-times notebook-list-btn"
+           data-bs-toggle="tooltip"
+           data-bs-placement="top"
+           title="Remove the notebook permanently">
+        </i>
+      </a>-->
+    </div>
+  </div>
+  <!-- folder -->
+  <div class="mt-2" ng-if="node.children != null && node.id !== TRASH_FOLDER_ID">
+    <div class="note-folder-item d-flex align-items-center">
+      <a data-bs-toggle="collapse"
+         data-bs-target="{{escapeCSS(node.name)}}"
+         role="button"
+         aria-expanded="false"
+         aria-controls="noteFolderItems">
+        <i class="fas fa-folder me-2"></i>
+        {{getNoteName(node)}}
+      </a>
+      <div class="note-folder-item-actions ms-auto">
+        <a class="me-2 align-middle"
+           ng-if="!node.isTrash"
+           href=""
+           ng-click="createNote(node.id)"
+           data-path="{{node.id}}">
+          <i class="fas fa-plus notebook-list-btn"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             title="Create a new notebook">
+          </i>
+        </a>
+        <!--<a class="me-2 align-middle"
+           ng-if="!node.isTrash"
+           data-bs-toggle="modal"
+           data-bs-target="#noteRenameModal"
+           ng-click="renameFolder(node)">
+          <i class="fas fa-pen-to-square notebook-list-btn"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             title="Rename the folder">
+          </i>
+        </a>-->
+        <!-- if folder is not in trash -->
+        <!--<a class="align-middle"
+           ng-if="!node.isTrash"
+           ng-click="moveFolderToTrash(node.id)">
+          <i class="fas fa-trash-alt notebook-list-btn"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             title="Move the folder to Trash">
+          </i>
+        </a>-->
+        <!-- if folder is in trash -->
+        <!--<a class="me-2 align-middle"
+           ng-if="node.isTrash"
+           ng-click="restoreFolder(node.id)">
+          <i class="fas fa-undo-alt notebook-list-btn"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             title="Restore the folder">
+          </i>
+        </a>
+        <a class="align-middle"
+           ng-if="node.isTrash"
+           ng-click="removeFolder(node.id)">
+          <i class="fas fa-times notebook-list-btn"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             title="Remove the folder permanently">
+          </i>
+        </a>-->
+      </div>
+    </div>
+    <div class="collapse ps-4"
+         id="{{node.name}}">
+      <div class="mt-2"
+           ng-repeat="node in node.children | orderBy:node:false:noteComparator"
+           ng-include src="'/app/home/notebook-template.html'"
+           ng-class="'note_folder_renderer'">
+      </div>
+    </div>
+  </div>
+  <!-- trash folder -->
+  <!--<div class="mt-2"
+       ng-if="node.id === TRASH_FOLDER_ID">
+    <div class="note-folder-item d-flex align-items-middle">
+      <a data-bs-toggle="collapse"
+         href="#trashFolderItems"
+         role="button"
+         aria-expanded="false"
+         aria-controls="trashFolderItems">
+        <i class="fas fa-trash-alt me-2"></i>
+        Trash
+      </a>
+      <div class="note-folder-item-actions ms-auto">
+        <a class="align-middle me-2"
+           ng-click="restoreAll()">
+          <i class="fas fa-undo-alt notebook-list-btn"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             title="Restore all">
+          </i>
+        </a>
+        <a class="align-middle"
+           ng-click="emptyTrash()">
+          <i class="fas fa-times notebook-list-btn"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             title="Empty trash">
+          </i>
+        </a>
+      </div>
+    </div>
+    <div class="collapse ps-4"
+         id="trashFolderItems">
+      <div class="mt-2"
+           ng-repeat="node in node.children | orderBy:node:false:noteComparator"
+           ng-include src="'/app/home/notebook-template.html'"
+           ng-class="'note_folder_renderer'">
+      </div>
+    </div>
+  </div>-->
+</div>
+
+

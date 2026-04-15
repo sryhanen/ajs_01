@@ -1,0 +1,425 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+/* Buttons */
+
+.btn {
+  text-transform: uppercase;
+  letter-spacing: 0.02rem;
+  font: 500 16px 'Roboto', sans-serif;
+  &.btn-small, &.btn-sm {
+    padding: 3px 10px;
+    font-size: 14px;
+  }
+  &.btn-dropdown {
+    display: inline-block;
+    text-transform: unset;
+  }
+  &:disabled, &.disabled {
+    opacity: 1;
+  }
+}
+
+.btn-primary {
+  background-color: var(--primary-700);
+  color: var(--primary-100);
+  border-color: var(--primary-700);
+  transition: all 0.1s;
+  .fas, .far {
+    color: var(--primary-300);
+  }
+  &:hover, &:active, &.active, &:focus, &.show {
+    background-color: var(--primary-800);
+    border-color: var(--primary-800);
+    color: var(--primary-100);
+  }
+  &:disabled, &.disabled {
+    background: var(--primary-500);
+    border-color: var(--primary-500);
+    color: var(--primary-200);
+    .fas, .far {
+      color: var(--primary-400) !important;
+    }
+  }
+}
+
+.dark-mode .btn-primary {
+  background: var(--tertiary-300);
+  border-color: var(--tertiary-300);
+  color: var(--tertiary-900);
+  .fas, .far {
+    color: var(--tertiary-600);
+  }
+  &:hover, &:active, &.active, &:focus, &.show {
+    background: var(--tertiary-100);
+    border-color: var(--tertiary-100);
+    color: var(--tertiary-900);
+  }
+  &:disabled, &.disabled {
+    background: var(--tertiary-200);
+    border-color: var(--tertiary-200);
+    color: var(--tertiary-600);
+    .fas, .far {
+      color: var(--tertiary-400) !important;
+    }
+  }
+}
+
+.btn-secondary {
+  background: var(--grey-300);
+  color: var(--grey-900);
+  border-color: var(--grey-300);
+  transition: all 0.1s;
+  .fas, .far {
+    color: var(--grey-600);
+  }
+  &:hover, &:active, &.active, &:focus, &.show {
+    background: var(--grey-400);
+    border-color: var(--grey-400);
+    color: var(--grey-900);
+  }
+  &:disabled, &.disabled {
+    background: var(--grey-200);
+    border-color: var(--grey-200);
+    color: var(--grey-600);
+    .fas, .far {
+      color: var(--grey-500) !important;
+    }
+  }
+}
+
+.dark-mode .btn-secondary {
+  background: var(--dm-grey-500);
+  border-color: var(--dm-grey-500);
+  color: var(--dm-grey-100);
+  .fas, .far {
+    color: var(--dm-grey-300);
+  }
+  &:hover, &:active, &.active, &:focus, &.show {
+    background: var(--dm-grey-400);
+    border-color: var(--dm-grey-400);
+    color: var(--dm-grey-100)
+  }
+  &:disabled, &.disabled {
+    background: var(--dm-grey-600);
+    border-color: var(--dm-grey-600);
+    color: var(--dm-grey-300);
+    .fas, .far {
+      color: var(--dm-grey-400) !important;
+    }
+  }
+}
+
+.btn-outline-secondary {
+  background: var(--grey-000);
+  color: var(--grey-900);
+  border-color: var(--grey-400);
+  transition: all 0.1s;
+  .fas, .far {
+    color: var(--grey-600);
+  }
+  &:hover, &:active, &.active, &:focus, &.show {
+    color: var(--grey-900);
+    background: var(--grey-400);
+    border-color: var(--grey-400);
+  }
+  &:disabled, &.disabled {
+    background: var(--grey-000);
+    border-color: var(--grey-200);
+    color: var(--grey-600);
+    .fas, .far {
+      color: var(--grey-500) !important;
+    }
+  }
+}
+
+.dark-mode .btn-outline-secondary {
+  color: var(--dm-grey-100);
+  border-color: var(--dm-grey-600);
+  background-color: var(--dm-grey-800);
+  .fas, .far {
+    color: var(--dm-grey-300);
+  }
+  &:hover, &:active, &.active, &:focus, &.show {
+    color: var(--dm-grey-100);
+    background: var(--dm-grey-600);
+    border-color: var(--dm-grey-600);
+  }
+  &:disabled, &.disabled {
+    background: var(--dm-grey-700);
+    border-color: var(--dm-grey-600);
+    color: var(--dm-grey-300);
+    .fas, .far {
+      color: var(--dm-grey-400) !important;
+    }
+  }
+}
+
+.btn-light {
+  background: var(--grey-100);
+  border-color: var(--grey-100);
+  color: var(--grey-900);
+  transition: all 0.1s;
+  .fas, .far {
+    color: var(--grey-500);
+  }
+  &:hover, &:active, &.active, &:focus, &.show {
+    background: var(--grey-300);
+    border-color: var(--grey-300);
+    transition: all 0.1s;
+  }
+  &:disabled, &.disabled {
+    background: var(--grey-000);
+    border-color: var(--grey-000);
+    color: var(--grey-600);
+    .fas, .far {
+      color: var(--grey-400);
+    }
+  }
+}
+
+.dark-mode .btn-light {
+  background: var(--dm-grey-800);
+  border-color: var(--dm-grey-800);
+  color: var(--dm-grey-100);
+  .fas, .far {
+    color: var(--dm-grey-400);
+  }
+  &:hover, &:active, &.active, &:focus, &.show {
+    background: var(--dm-grey-900);
+    border-color: var(--dm-grey-900);
+  }
+  &:disabled, &.disabled {
+    background: var(--dm-grey-700);
+    border-color: var(--dm-grey-700);
+    color: var(--dm-grey-400);
+    .fas, .far {
+      color: var(--dm-grey-500);
+    }
+  }
+}
+
+.btn-subtle {
+  font-size: 12px;
+  padding: 5px 10px !important;
+  background: var(--grey-000) !important;
+  border-color: var(--grey-400) !important;
+  color: var(--grey-700);
+  transition: all 0.1s;
+  &:hover, &:active, &.active, &:focus, &.show {
+    color: var(--grey-900);
+    background: var(--grey-400) !important;
+  }
+  &:disabled, &.disabled {
+    border-color: var(--grey-300) !important;
+    color: var(--grey-500);
+    opacity: 1 !important;
+  }
+}
+
+.dark-mode .btn-subtle {
+  background: var(--dm-grey-700) !important;
+  border-color: var(--dm-grey-500) !important;
+  color: var(--dm-grey-200);
+  &:hover, &:active, &.active, &:focus, &.show {
+    color: var(--dm-grey-100);
+    background: var(--dm-grey-500) !important;
+  }
+  &:disabled, &.disabled {
+    border-color: var(--dm-grey-600) !important;
+    color: var(--dm-grey-400);
+  }
+}
+
+.btn-success {
+  background: var(--tertiary-100);
+  border-color: var(--tertiary-300);
+  color: var(--tertiary-700);
+  transition: all 0.1s;
+  .fas, .far {
+    color: var(--tertiary-500);
+  }
+  &:hover, &:focus, &:active, &.active {
+    background: var(--tertiary-200);
+    border-color: var(--tertiary-300);
+    color: var(--tertiary-700);
+  }
+  &:disabled, &.disabled {
+    background: var(--tertiary-100);
+    border-color: var(--tertiary-200);
+    color: var(--tertiary-400);
+    .fas, .far {
+      color: var(--tertiary-300);
+    }
+  }
+}
+
+.dark-mode .btn-success {
+  background: var(--tertiary-400);
+  border-color: var(--tertiary-400);
+  color: var(--tertiary-900);
+  .fas, .far {
+    color: var(--tertiary-600);
+  }
+  &:hover, &:focus, &:active, &.active, &.show {
+    background: var(--tertiary-300);
+    border-color: var(--tertiary-300);
+  }
+  &:disabled, &.disabled {
+    background: var(--tertiary-500);
+    border-color: var(--tertiary-500);
+    color: var(--tertiary-800);
+  }
+}
+
+.btn-danger {
+  background: var(--danger-100);
+  border-color: var(--danger-400);
+  color: var(--danger-700);
+  transition: all 0.1s;
+  .fas, .far {
+    color: var(--danger-600);
+  }
+  &:hover, &:focus, &:active, &.active, &.show {
+    background: var(--danger-200);
+    border-color: var(--danger-400);
+    color: var(--danger-700);
+  }
+  &:disabled, &.disabled {
+    background: var(--danger-100);
+    border-color: var(--danger-300);
+    color: var(--danger-500);
+    .fas, .far {
+      color: var(--danger-400);
+    }
+  }
+}
+
+.dark-mode .btn-danger {
+  background: var(--danger-400);
+  border-color: var(--danger-400);
+  color: var(--danger-800);
+  .fas, .far {
+    color: var(--danger-700);
+  }
+  &:hover, &:focus, &:active, &.active, &.show {
+    background: var(--danger-300);
+    border-color: var(--danger-300);
+  }
+  &:disabled, &.disabled {
+    background: var(--danger-500);
+    border-color: var(--danger-500);
+    color: var(--danger-700);
+    .fas, .far {
+      color: var(--danger-600);
+    }
+  }
+}
+
+.btn-info {
+  background: var(--secondary-100);
+  color: var(--secondary-700);
+  border-color: var(--secondary-300);
+  transition: all 0.1s;
+  .fas, .far {
+    color: var(--secondary-400);
+  }
+  &:hover, &:active, &.active, &:focus, &.show {
+    background: var(--secondary-200);
+    border-color: var(--secondary-300);
+    color: var(--secondary-700);
+  }
+  &:disabled, &.disabled {
+    background: var(--secondary-100);
+    border-color: var(--secondary-200);
+    color: var(--secondary-400);
+    .fas, .far {
+      color: var(--secondary-300);
+    }
+  }
+}
+
+.dark-mode .btn-info {
+  background: var(--secondary-300);
+  border-color: var(--secondary-300);
+  color: var(--secondary-800);
+  .fas, .far {
+    color: var(--secondary-600);
+  }
+  &:hover, &:active, &.active, &:focus, &.show {
+    background: var(--secondary-200);
+    border-color: var(--secondary-200);
+  }
+  &:disabled, &.disabled {
+    background: var(--secondary-300);
+    border-color: var(--secondary-300);
+    color: var(--secondary-600);
+    .fas, .far {
+      color: var(--secondary-500);
+    }
+  }
+}
+
+.btn-link, .btn-link:hover {
+  text-decoration: none;
+  color: var(--primary-700);
+}
+
+.dark-mode .btn-link,
+.dark-mode .btn-link:hover {
+  color: var(--tertiary-300);
+}
+
+.setting-btn {
+  cursor: pointer;
+  .fas, .far {
+    color: var(--primary-600);
+  }
+}
+
+.dark-mode .setting-btn .fas,
+.dark-mode .setting-btn .far {
+  color: var(--tertiary-300);
+}

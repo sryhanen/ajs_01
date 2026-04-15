@@ -1,0 +1,393 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+/* Forms */
+
+.form-text {
+  color: var(--grey-700);
+}
+
+.dark-mode .form-text {
+  color: var(--dm-grey-300);
+}
+
+.form-control {
+  color: var(--grey-900);
+  border: 1px solid var(--grey-400);
+  background: var(--grey-000);
+  font-size: 16px;
+  &::placeholder {
+    color: var(--grey-500);
+  }
+}
+
+.form-control.form-control-sm {
+  font-size: 0.875rem;
+}
+
+.dark-mode .form-control {
+  color: var(--dm-grey-100);
+  border: 1px solid var(--dm-grey-500);
+  background: var(--dm-grey-800);
+  &::placeholder {
+    color: var(--dm-grey-200);
+  }
+}
+
+.form-select, select {
+  color: var(--grey-900);
+  background: white url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%234E5C8F' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") no-repeat right .75rem center;
+  background-size: 16px 12px;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  appearance: none;
+  border: 1px solid var(--grey-400) !important;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+select {
+  padding: 1px 12px;
+}
+
+.form-check-input {
+  position: relative;
+  opacity: 1;
+  z-index: 1;
+  width: 20px !important;
+  height: 20px;
+  padding: 0 !important;
+  margin-top: 0;
+  background: white no-repeat center;
+  background-size: contain;
+  border: 2px solid var(--grey-400) !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-print-color-adjust: exact;
+  color-adjust: exact;
+  cursor: pointer;
+  &:checked {
+    background-color: var(--secondary-300);
+    border-color: var(--secondary-300) !important;
+  }
+  &[type="radio"] {
+    border-radius: 50%;
+    width: 1em !important;
+    height: 1em;
+    margin-top: 0.25em;
+  }
+  &:checked[type="radio"] {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23fff'/%3e%3c/svg%3e");
+  }
+  &:checked[type="checkbox"] {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+  }
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+.form-switch .form-check-input {
+  width: 2em !important;
+  height: 1.1em;
+  transition: .4s;
+  margin-top: 0.15em;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23A0AEC0'/%3e%3c/svg%3e");
+  &:checked {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
+  }
+  &:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23A0AEC0'/%3e%3c/svg%3e");
+  }
+}
+
+.dark-mode .form-switch .form-check-input {
+  border: 2px solid var(--dm-grey-400) !important;
+  background-color: var(--dm-grey-400);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23F0F4FF'/%3e%3c/svg%3e") !important;
+  &:checked {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23212a4b'/%3e%3c/svg%3e") !important;
+  }
+}
+
+.form-check-label {
+  margin-left: 5px;
+  &:after, &:before {
+    content: none;
+    position: relative;
+  }
+}
+
+input, form input {
+  border: 1px solid var(--grey-400);
+  border-radius: 5px;
+  padding: 5px 10px 4px;
+  &[type="file"]:focus, &[type="radio"]:focus, &[type="checkbox"]:focus {
+    outline: none;
+    outline-offset: unset;
+  }
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.dark-mode form input {
+  border: 1px solid var(--dm-grey-500);
+  background: var(--dm-grey-800);
+}
+
+.input-group {
+  .btn {
+    position: relative;
+    z-index: 2;
+  }
+  > .form-control, .input-group > .form-select {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+  }
+  &:not(.has-validation) > .dropdown-toggle:nth-last-child(n+3),
+  &:not(.has-validation) > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+    margin-left: -1px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.input-group-text {
+  color: var(--grey-700);
+  background-color: var(--grey-300);
+  border: 1px solid var(--grey-400);
+}
+
+.dark-mode .input-group-text {
+  color: var(--dm-grey-200);
+  background-color: var(--dm-grey-700);
+  border: 1px solid var(--dm-grey-500);
+}
+
+.dtsp-subRow2 .btn-group {
+  height: 37px;
+}
+
+.form-range {
+  border: 0;
+  &::-moz-range-track {
+    background-color: var(--grey-300);
+  }
+  &::-webkit-slider-runnable-track {
+    background-color: var(--grey-300);
+  }
+  &::-moz-range-thumb {
+    background-color: var(--primary-700);
+  }
+  &::-webkit-slider-thumb {
+    background-color: var(--primary-700);
+  }
+}
+
+.dark-mode .form-range {
+  &::-moz-range-track {
+    background-color: var(--dm-grey-800);
+  }
+  &::-webkit-slider-runnable-track {
+    background-color: var(--dm-grey-800);
+  }
+  &::-moz-range-thumb {
+    background-color: var(--tertiary-300);
+  }
+  &::-webkit-slider-thumb {
+    background-color: var(--tertiary-300);
+  }
+}
+
+form button {
+  background: var(--grey-300);
+  border: 1px solid var(--grey-400);
+  border-radius: 5px;
+  padding: 5px 10px 4px;
+  &:hover {
+    background: var(--grey-400);
+  }
+}
+
+.dark-mode form button {
+  border-color: var(--dm-grey-500);
+  background: var(--dm-grey-800);
+  &:hover {
+    background: var(--dm-grey-600);
+  }
+}
+
+.dark-mode {
+  .form-select, select {
+    border: 1px solid var(--dm-grey-500) !important;
+    background: var(--dm-grey-800) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23CBD5E0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") no-repeat right .75rem center;
+    background-size: 16px 12px;
+    color: white;
+  }
+  .form-check-input {
+    border: 2px solid var(--dm-grey-400) !important;
+    background-color: var(--dm-grey-400);
+    &:checked {
+      background-color: var(--tertiary-300);
+      border-color: var(--tertiary-300) !important;
+    }
+    &:checked[type="radio"] {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23212a4b'/%3e%3c/svg%3e");
+    }
+    &:checked[type="checkbox"] {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23212a4b' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+    }
+  }
+}
+
+.input-group-addon {
+  color: var(--grey-900);
+  background: var(--grey-200);
+  border: 1px solid var(--grey-400);
+}
+
+.dark-mode .input-group-addon {
+  background: var(--dm-grey-600);
+  color: var(--dm-grey-100);
+  border: 1px solid var(--dm-grey-500);
+}
+
+/* searchpane */
+
+table.dataTable > tbody > tr.selected > * {
+  box-shadow: none;
+  background: var(--primary-100);
+  color: var(--primary-500);
+}
+
+table.dataTable > tbody > tr.selected > td > div > .bg-secondary {
+  background: var(--primary-500) !important;
+}
+
+.dark-mode table.dataTable > tbody > tr.selected > * {
+  background: var(--tertiary-400);
+  color: var(--tertiary-900);
+}
+
+.dark-mode table.dataTable > tbody > tr.selected > td > div > .bg-secondary {
+  background: var(--tertiary-700) !important;
+}
+
+.dtsp-nameColumn:hover {
+  background: var(--grey-100);
+}
+
+.dark-mode .dtsp-nameColumn:hover {
+  background: var(--dm-grey-500);
+}
+
+div.dtsp-panesContainer div.dtsp-searchPane div.dataTables_wrapper {
+  border: 1px solid var(--grey-400);
+  border-radius: 5px;
+  &:hover {
+    border: 1px solid var(--grey-400) !important;
+  }
+}
+
+.dark-mode div.dtsp-panesContainer div.dtsp-searchPane div.dataTables_wrapper {
+  border: 1px solid var(--dm-grey-500);
+  &:hover {
+    border: 1px solid var(--dm-grey-500) !important;
+  }
+}
+
+.dark-mode div.dtsp-searchPane div.dataTables_wrapper div.dataTables_scrollBody {
+  background: var(--dm-grey-700) !important;
+}
+
+div.dtsp-topRow {
+  button.dtsp-nameButton span,
+  button.dtsp-countButton span {
+    background-image: none !important;
+    background-repeat: unset;
+    background-position: unset;
+    background-size: unset;
+    vertical-align: unset;
+    &:before {
+      display: inline-block;
+      text-rendering: auto;
+      font: var(--fa-font-solid);
+    }
+  }
+  .dtsp-nameButton span:before {
+    content: "\f15d";
+  }
+  .dtsp-countButton span:before {
+    content: "\f162";
+  }
+  div.dtsp-subRow1 button.dtsp-searchIcon span {
+    background-image: none !important;
+    background-repeat: unset;
+    background-position: unset;
+    background-size: unset;
+    vertical-align: unset;
+    &:before {
+      display: inline-block;
+      text-rendering: auto;
+      font: var(--fa-font-solid);
+      content: "\f002";
+    }
+  }
+  button > span {
+    height: unset;
+    width: unset;
+  }
+}
+
+div.dtsp-panesContainer div.dtsp-searchPane div.dtsp-topRow button {
+  line-height: normal;
+}

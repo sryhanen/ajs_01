@@ -1,0 +1,270 @@
+<!--
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+-->
+<!-- Save notebook permissions -->
+<div id="notePermissionsModal"
+     class="modal fade"
+     aria-labelledby="notePermissionsModalLabel"
+     aria-hidden="true"
+     tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- modal-header -->
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="notePermissionsModalLabel">
+          Permissions saved successfully
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('notePermissionsModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          <b>Owners:</b>
+          <span class="owners">{{permissions.owners}}</span>
+        </p>
+        <p>
+          <b>Writers:</b>
+          <span class="writers">{{permissions.writers}}</span>
+        </p>
+        <p>
+          <b>Runners:</b>
+          <span class="runners">{{permissions.runners}}</span>
+        </p>
+        <p>
+          <b>Readers:</b>
+          <span class="readers">{{permissions.readers}}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Save notebook permissions with empty fields -->
+<div id="noteEmptyPermissionsModal"
+     class="modal fade"
+     aria-labelledby="noteEmptyPermissionsModalLabel"
+     aria-hidden="true"
+     tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- modal-header -->
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="noteEmptyPermissionsModalLabel">
+          No owner set for this notebook
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('noteEmptyPermissionsModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Please, fill the <b>owners'</b> field.
+        </p>
+        <p>
+          If the owners' field is left empty, the current user will be set as an owner.
+        </p>
+        <p>
+          <b>Current user:</b>
+          <span class="current-user">{{currentUser}}</span>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                ng-click="close('noteEmptyPermissionsModal')">
+          Cancel
+        </button>
+        <button type="button"
+                class="btn btn-primary"
+                ng-click="triggerCallback('noteEmptyPermissionsModal')">
+          Set
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Switch to personal mode -->
+<div id="notePersonalModal"
+     class="modal fade"
+     aria-labelledby="notePersonalModalLabel"
+     aria-hidden="true"
+     tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- modal-header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="notePersonalModalLabel">
+          Change collaboration settings
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('notePersonalModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        Do you want to switch to <span class="text-info">personal mode</span>?
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-primary"
+                ng-click="triggerCallback('notePersonalModal')">
+          Accept
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Switch to collab mode -->
+<div id="noteCollabModal"
+     class="modal fade"
+     aria-labelledby="noteCollabModalLabel"
+     aria-hidden="true"
+     tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- modal-header -->
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="noteCollabModalLabel">
+          Change collaboration settings
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('noteCollabModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to switch to <span class="text-info">collaboration mode</span>?</p>
+        <p>Your notebook will be public for everyone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-primary"
+                ng-click="triggerCallback('noteCollabModal')">
+          Accept
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade"
+     id="discardPermissionsSettingsModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="discardPermissionsSettingsModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="discardPermissionsSettingsModalLabel">
+          Discard permissions settings changes
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('discardPermissionsSettingsModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        Do you want to discard permissions settings changes?
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                ng-click="close('discardPermissionsSettingsModal')"
+                class="btn btn-secondary">
+          Cancel
+        </button>
+        <button type="button"
+                ng-click="triggerCallback('discardPermissionsSettingsModal')"
+                class="btn btn-primary">
+          Discard
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Permissions reminder -->
+<div class="modal fade"
+     id="authenticateOwnerModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="authenticateOwnerModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="authenticateOwnerModalLabel">
+          No permission
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('authenticateOwnerModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        Only authenticated users can set and change permissions.
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>

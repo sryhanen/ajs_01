@@ -1,0 +1,207 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+/* Results */
+
+.result-view {
+  margin-bottom: 1.5rem;
+  .btn .fas, .btn .cf {
+    margin-right: 0;
+    color: var(--primary-600);
+  }
+}
+
+.dark-mode .result-view .btn .fas,
+.dark-mode .result-view .btn .cf {
+  color: var(--tertiary-300);
+}
+
+.result-chart {
+  background: var(--grey-100);
+  margin: 0 -40px 1.5rem;
+  padding: 30px 40px;
+}
+
+.dark-mode .result-chart {
+  background: var(--dm-grey-600);
+}
+
+.dark-mode .input-rotate {
+  background: var(--dm-grey-800);
+  border: 1px solid var(--dm-grey-500);
+  border-radius: 4px;
+}
+
+.html-result {
+  ol, ul, dl {
+    padding-left: 20px;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+    width: auto;
+  }
+  table {
+    display: table;
+    tr {
+      border-top: none !important;
+    }
+  }
+  thead {
+    border-bottom: 2px solid var(--grey-300);
+  }
+  th {
+    border: none !important;
+    font-weight: bold;
+    text-align: left !important;
+    padding: 10px 15px !important;
+  }
+  td {
+    border: none !important;
+    padding: 10px 15px !important
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--grey-300);
+    background: transparent;
+    &:nth-child(odd) {
+      background: var(--grey-100);
+    }
+    &:nth-child(even) {
+      background: var(--grey-000);
+    }
+    &:hover {
+      background: var(--grey-200);
+    }
+  }
+}
+
+.dark-mode .html-result {
+  table tr {
+    background-color: var(--dm-grey-700);
+  }
+  thead {
+    border-bottom: 2px solid var(--dm-grey-500);
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--dm-grey-500);
+    &:nth-child(odd) {
+      background: var(--dm-grey-600);
+    }
+    &:nth-child(even) {
+      background: var(--dm-grey-700);
+    }
+    &:hover {
+      background: var(--dm-grey-800);
+    }
+  }
+}
+
+.plain-text {
+  font: 400 14px 'Roboto Mono', monospace;
+  white-space: pre-wrap; /** to preserve white-space and newlines of result */
+}
+
+.graph-container {
+  position: relative;
+  overflow: visible;
+  .table {
+    overflow: hidden;
+    margin-bottom: 5px !important;
+  }
+}
+
+.resizable-helper {
+  border: 3px solid var(--grey-400);
+}
+
+/* D3 Graph Configuration */
+
+marker {
+  fill: var(--grey-400);
+}
+
+.dark-mode marker {
+  fill: var(--dm-grey-400);
+}
+
+path.link {
+  fill: none;
+  stroke-width: 2px;
+  stroke: var(--grey-400);
+}
+
+.dark-mode path.link {
+  stroke: var(--dm-grey-400);
+}
+
+path.textpath {
+  fill: none;
+  stroke: none;
+}
+
+text {
+  font-size: 12px;
+  pointer-events: none;
+  &.shadow {
+    stroke: var(--grey-000);
+    stroke-width: 3px;
+    stroke-opacity: .8;
+  }
+  &.nodeLabel {
+    pointer-events: none;
+  }
+}
+
+.dark-mode text.shadow {
+  stroke: var(--dm-grey-400);
+}
+
+.network {
+  background: var(--grey-100);
+}
+
+.dark-mode .network {
+  background: var(--dm-grey-600);
+}

@@ -1,0 +1,230 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+/* Tables */
+
+table {
+  border-collapse: collapse !important;
+  box-sizing: border-box !important;
+  tbody tr, thead tr {
+    background: var(--grey-000) !important;
+  }
+}
+
+.dark-mode table tbody tr,
+.dark-mode table thead tr {
+  background: var(--dm-grey-700) !important;
+}
+
+thead, tbody, tfoot, tr, td, th {
+  border-color: var(--grey-300);
+}
+
+.dark-mode thead,
+.dark-mode tbody,
+.dark-mode tfoot,
+.dark-mode tr,
+.dark-mode td,
+.dark-mode th {
+  border-color: var(--dm-grey-500);
+}
+
+.table {
+  width: 100% !important;
+  color: var(--grey-900);
+  --bs-table-striped-color: var(--grey-900);
+  --bs-table-striped-bg: var(--grey-100);
+  > thead > tr > th,
+  > tbody > tr > th,
+  > tfoot > tr > th,
+  > thead > tr > td,
+  > tbody > tr > td,
+  > tfoot > tr > td {
+    padding: 10px 15px !important;
+  }
+  > :not(:first-child) {
+    border-top: 2px solid var(--grey-400);
+  }
+}
+
+.dark-mode .table {
+  color: white;
+  --bs-table-striped-color: white;
+  --bs-table-striped-bg: var(--dm-grey-600);
+  > :not(:first-child) {
+    border-top: 2px solid var(--dm-grey-500);
+  }
+}
+
+table.dataTable thead > tr > th.sorting::before,
+table.dataTable thead > tr > th.sorting_asc::before,
+table.dataTable thead > tr > th.sorting_desc::before,
+table.dataTable thead > tr > th.sorting_asc_disabled::before,
+table.dataTable thead > tr > th.sorting_desc_disabled::before,
+table.dataTable thead > tr > td.sorting::before,
+table.dataTable thead > tr > td.sorting_asc::before,
+table.dataTable thead > tr > td.sorting_desc::before,
+table.dataTable thead > tr > td.sorting_asc_disabled::before,
+table.dataTable thead > tr > td.sorting_desc_disabled::before {
+  bottom: 33%;
+  content: "\f0de";
+  font: var(--fa-font-solid);
+  text-rendering: auto;
+}
+
+table.dataTable thead > tr > th.sorting::after,
+table.dataTable thead > tr > th.sorting_asc::after,
+table.dataTable thead > tr > th.sorting_desc::after,
+table.dataTable thead > tr > th.sorting_asc_disabled::after,
+table.dataTable thead > tr > th.sorting_desc_disabled::after,
+table.dataTable thead > tr > td.sorting::after,
+table.dataTable thead > tr > td.sorting_asc::after,
+table.dataTable thead > tr > td.sorting_desc::after,
+table.dataTable thead > tr > td.sorting_asc_disabled::after,
+table.dataTable thead > tr > td.sorting_desc_disabled::after {
+  top: 33%;
+  content: "\f0dd";
+  font: var(--fa-font-solid);
+  text-rendering: auto;
+}
+
+table.dataTable thead > tr > th.sorting::before,
+table.dataTable thead > tr > th.sorting::after,
+table.dataTable thead > tr > th.sorting_asc::before,
+table.dataTable thead > tr > th.sorting_asc::after,
+table.dataTable thead > tr > th.sorting_desc::before,
+table.dataTable thead > tr > th.sorting_desc::after,
+table.dataTable thead > tr > th.sorting_asc_disabled::before,
+table.dataTable thead > tr > th.sorting_asc_disabled::after,
+table.dataTable thead > tr > th.sorting_desc_disabled::before,
+table.dataTable thead > tr > th.sorting_desc_disabled::after,
+table.dataTable thead > tr > td.sorting::before,
+table.dataTable thead > tr > td.sorting::after,
+table.dataTable thead > tr > td.sorting_asc::before,
+table.dataTable thead > tr > td.sorting_asc::after,
+table.dataTable thead > tr > td.sorting_desc::before,
+table.dataTable thead > tr > td.sorting_desc::after,
+table.dataTable thead > tr > td.sorting_asc_disabled::before,
+table.dataTable thead > tr > td.sorting_asc_disabled::after,
+table.dataTable thead > tr > td.sorting_desc_disabled::before,
+table.dataTable thead > tr > td.sorting_desc_disabled::after {
+  opacity: 1;
+  color: var(--grey-500);
+}
+
+.dark-mode table.dataTable thead > tr > th.sorting::before,
+.dark-mode table.dataTable thead > tr > th.sorting::after,
+.dark-mode table.dataTable thead > tr > th.sorting_asc::before,
+.dark-mode table.dataTable thead > tr > th.sorting_asc::after,
+.dark-mode table.dataTable thead > tr > th.sorting_desc::before,
+.dark-mode table.dataTable thead > tr > th.sorting_desc::after,
+.dark-mode table.dataTable thead > tr > th.sorting_asc_disabled::before,
+.dark-mode table.dataTable thead > tr > th.sorting_asc_disabled::after,
+.dark-mode table.dataTable thead > tr > th.sorting_desc_disabled::before,
+.dark-mode table.dataTable thead > tr > th.sorting_desc_disabled::after,
+.dark-mode table.dataTable thead > tr > td.sorting::before,
+.dark-mode table.dataTable thead > tr > td.sorting::after,
+.dark-mode table.dataTable thead > tr > td.sorting_asc::before,
+.dark-mode table.dataTable thead > tr > td.sorting_asc::after,
+.dark-mode table.dataTable thead > tr > td.sorting_desc::before,
+.dark-mode table.dataTable thead > tr > td.sorting_desc::after,
+.dark-mode table.dataTable thead > tr > td.sorting_asc_disabled::before,
+.dark-mode table.dataTable thead > tr > td.sorting_asc_disabled::after,
+.dark-mode table.dataTable thead > tr > td.sorting_desc_disabled::before,
+.dark-mode table.dataTable thead > tr > td.sorting_desc_disabled::after {
+  color: var(--dm-grey-400);
+}
+
+table.dataTable thead > tr > th.sorting_asc::before,
+table.dataTable thead > tr > th.sorting_desc::after,
+table.dataTable thead > tr > td.sorting_asc::before,
+table.dataTable thead > tr > td.sorting_desc::after {
+  opacity: 1;
+  color: var(--grey-900);
+}
+
+.dark-mode table.dataTable thead > tr > th.sorting_asc::before,
+.dark-mode table.dataTable thead > tr > th.sorting_desc::after,
+.dark-mode table.dataTable thead > tr > td.sorting_asc::before,
+.dark-mode table.dataTable thead > tr > td.sorting_desc::after {
+  color: var(--dm-grey-100);
+}
+
+table.dataTable tr.dtrg-group th {
+  background-color: var(--grey-300);
+}
+
+.dark-mode table.dataTable tr.dtrg-group th {
+  background-color: var(--dm-grey-500);
+}
+
+.dark-mode div.dt-scroll-body {
+  --bs-border-color: var(--dm-grey-500);
+}
+
+/*
+.table-bordered,
+.table-bordered > tbody > tr > td,
+.table-bordered > tbody > tr > th,
+.table-bordered > tfoot > tr > td,
+.table-bordered > tfoot > tr > th,
+.table-bordered > thead > tr > td,
+.table-bordered > thead > tr > th {
+  border: 1px solid #CBD5E0 !important;
+}
+
+.dark-mode .table-bordered,
+.dark-mode .table-bordered > tbody > tr > td,
+.dark-mode .table-bordered > tbody > tr > th,
+.dark-mode .table-bordered > tfoot > tr > td,
+.dark-mode .table-bordered > tfoot > tr > th,
+.dark-mode .table-bordered > thead > tr > td,
+.dark-mode .table-bordered > thead > tr > th {
+  border: 1px solid var(--dm-grey-500) !important;
+}
+
+.dark-mode table.dataTable tbody tr {
+  background: transparent;
+}*/

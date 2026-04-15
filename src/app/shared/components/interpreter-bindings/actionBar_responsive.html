@@ -1,0 +1,141 @@
+<!--
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+-->
+<!-- interpreter restart -->
+<div class="dropdown me-2" ng-click="getBindings()">
+  <button class="btn btn-secondary dropdown-toggle"
+          type="button"
+          data-bs-toggle="dropdown"
+          data-bs-auto-close="outside"
+          ng-if="!revisionView"
+          title="Interpreter restart">
+    <i class="fas fa-rotate"></i>
+    <!-- Preload indicator -->
+    <span class="ms-2"
+          ng-show = "note.paragraphs[0].title !== 'hideMeSparkPinger'">
+      No preloading
+    </span>
+    <span class="ms-2"
+          ng-show = "note.paragraphs[0].title === 'hideMeSparkPinger'">
+      <span ng-show = "note.paragraphs[0].status !== 'FINISHED'">
+        Booting Spark...
+      </span>
+      <span ng-show = "note.paragraphs[0].status === 'FINISHED'">
+        Spark is ready
+      </span>
+    </span>
+  </button>
+  <div class="dropdown-menu dropdown-menu-end interpreter-binding">
+    <h2 class="dropdown-header mt-0">
+      Interpreter restart
+    </h2>
+    <div class="px-3"
+         as-sortable="interpreterSelectionListeners"
+         data-ng-model="interpreterBindings">
+      <div class="d-flex mb-2"
+           data-ng-repeat="item in interpreterBindingsUI.clone"
+           as-sortable-item>
+        <div class="w-75">
+          {{item.name}}
+          {{selectedInterpreterForDefaulting ? (selectedInterpreterForDefaulting===$index ? '(default)': '') : ($first? '(default)': '')}}
+          <!-- removed that ugly chunk and moved the logic to controller -->
+          <small class="text-muted"
+                 ng-repeat="UIItem in interpreterBindingsUI.body[$index]">
+            {{UIItem}}&nbsp;
+          </small>
+        </div>
+        <div class="ms-auto">
+          <i ng-click="saveSetting($index)"
+             title="Make this interpreter the default"
+             ng-class="selectedInterpreterForDefaulting ? (selectedInterpreterForDefaulting===$index ? 'fa-circle-dot': 'fa-circle') : ($first? 'fa-circle-dot': 'fa-circle')"
+             class="fa-solid me-2"></i>
+          <i ng-click="newRestartInterpreter(note, item)"
+             title="Restart"
+             class="fa-solid fa-rotate"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- permissions -->
+<button class="btn btn-secondary setting-btn me-2"
+        type="button"
+        ng-click="togglePermissions()"
+        ng-if="!revisionView"
+        title="Notebook permissions">
+  <i class="fas fa-unlock-keyhole">
+  </i>
+</button>
+<!-- notebook view -->
+<div class="dropdown">
+  <button type="button"
+          class="btn btn-secondary dropdown-toggle"
+          data-bs-toggle="dropdown">
+    {{note.config.looknfeel}}
+  </button>
+  <div class="dropdown-menu dropdown-menu-end"
+       role="menu">
+    <a class="dropdown-item"
+       role="button"
+       ng-click="setMode('default-mode', 'default')">
+      Default
+    </a>
+    <a class="dropdown-item"
+       role="button"
+       ng-click="setMode('lite-mode', 'lite')">
+      Lite
+    </a>
+    <a class="dropdown-item"
+       role="button"
+       ng-click="setMode('simple-mode', 'simple')">
+      Simple
+    </a>
+    <a class="dropdown-item"
+       role="button"
+       ng-click="setMode('report-mode', 'report')">
+      Report
+    </a>
+  </div>
+</div>

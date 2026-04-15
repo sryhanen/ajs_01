@@ -1,0 +1,20 @@
+name: CI
+
+on: [ push ]
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: yarn
+      - name: Install yarn
+        run: npm install --global yarn
+      - name: Run CI
+        run: mvn --batch-mode clean verify

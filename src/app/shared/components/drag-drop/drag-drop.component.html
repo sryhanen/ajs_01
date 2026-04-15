@@ -1,0 +1,127 @@
+<!--
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+-->
+<div ng-controller="dragDropController"
+     ng-init="init(config, tableDataColumns, save)">
+  <div class="row">
+    <div class="col-sm-4 col-md-3 col-xl-2">
+      <div class="mb-3">
+        <label class="form-label"
+               for="fieldSelect">Field</label>
+        <select class="form-select form-select-sm"
+                id="fieldSelect"
+                ng-model="selectionToAdd.item"
+                ng-options="item.name for item in inputData">
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label"
+               for="sendToSelect">Send to</label>
+        <select class="form-select form-select-sm"
+                id="sendToSelect"
+                ng-model="selectionToAdd.field"
+                ng-options="zone.id for zone in zoneCollection">
+        </select>
+      </div>
+      <div ng-if="selectionToAdd.field.aggr"
+           class="mb-4">
+        <label class="form-label"
+               for="aggregationSelect">Aggregation</label>
+        <select class="form-select form-select-sm"
+                id="aggregationSelect"
+                ng-model="selectionToAdd.aggr"
+                ng-options="aggr for aggr in aggregationExport">
+        </select>
+      </div>
+      <div class="float-end">
+        <button class="btn btn-secondary btn-sm me-2"
+                ng-click="reset()">
+          Clear all
+        </button>
+        <button class="btn btn-primary btn-sm"
+                ng-click="addSelection()">
+          Add
+        </button>
+      </div>
+    </div>
+    <div class="col-sm-8 col-md-9 col-xl-10">
+      <div class="row h-100">
+        <div class="col-lg-4 mb-3 mb-lg-0"
+             ng-repeat="zone in zoneCollection">
+          <span class="badge bg-info text-info fs-6 mb-2">{{zone.id}}</span>
+          <drop-zone class="d-block w-100 p-3 p-lg-4 rounded-4 drop-column"
+                     zone="zone"
+                     add="dragitem">
+            <draggable ng-repeat="item in zone.content track by $index"
+                       dragdata="item"
+                       class="badge bg-light text-dark me-2 mb-2 dropdown">
+              <span>{{item.name}}</span>
+              <span ng-show="{{zone.aggr}}" class="disabled">| {{item.aggr}}</span>
+              <button class="btn btn-link btn-sm ps-2 pe-0"
+                      ng-click="removeItem(item.UUID)">
+                <i class="fas fa-times"></i>
+              </button>
+              <button class="btn btn-link btn-sm dropdown-toggle px-0"
+                      id="aggrItemDropdownMenuLink"
+                      ng-show="{{zone.aggr}}"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="aggrItemDropdownMenuLink">
+                <li class="dropdown-item mb-2"
+                    ng-repeat="aggr in aggregationExport"
+                    ng-click="changeAggr(zone, aggr, item)">
+                  {{aggr}}
+                </li>
+              </ul>
+            </draggable>
+          </drop-zone>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,80 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<div id="{{paragraph.id}}_container"
+     ng-class="{'paragraph': !asIframe, 'paragraphAsIframe': asIframe}">
+
+  <div ng-include src="'/app/notebook/paragraph/paragraph-control.html'"></div>
+  <!-- TODO: combine these two into one -->
+  <div class="timeset-info" ng-show="contentExist || dirtySwitch > 0">{{TimesetInfo}}</div>
+  <div class="alert alert-primary"
+       ng-show="paragraphWarning">
+    {{paragraphWarning}}
+  </div>
+  <!-- to-do ends -->
+  <div ng-if="paragraph.config.title"
+       ng-controller="ElasticInputCtrl as input"
+       id="{{paragraph.id}}_title"
+       class="paragraph-title mb-2">
+    <input type="text"
+           class="form-control"
+           placeholder="Untitled"
+           ng-model="paragraph.title"
+           ng-if="input.showEditor"
+           ng-escape="input.showEditor = false; paragraph.title = oldTitle;"
+           ng-blur="setTitle(paragraph); input.showEditor = false"
+           ng-enter="setTitle(paragraph); input.showEditor = false"/>
+    <div class="paragraph-title-inactive"
+         ng-click="input.showEditor = !asIframe && !viewOnly && !revisionView; oldTitle = paragraph.title;"
+         ng-show="!input.showEditor"
+         ng-bind-html="paragraph.title || 'Untitled'">
+    </div>
+  </div>
+  <div class="paragraph-editor"
+       ng-if="!paragraph.config.editorHide && !viewOnly && !asIframe">
+    <editor
+      [editor-id]="paragraph.id"
+      [editor-content]="paragraph.text"
+      [show-gutter]="paragraph.config.lineNumbers"
+      [font-size]="paragraph.config.fontSize"
+      [disable-edit]="paragraph.status == 'RUNNING' || paragraph.status == 'PENDING' || revisionView === true"
+      (changed-content)="updateParagraphText($event)"
+      (on-editor-focus)="focusParagraph($event)">
+    </editor>
+  </div>
+  <div ng-include src="'/app/notebook/paragraph/paragraph-progress-bar.html'"></div>
+  <div class="paragraph-output" ng-show="!paragraph.config.tableHide">
+    <div ng-include src="'/app/notebook/paragraph/result/result.html'"></div>
+    <div id="{{paragraph.id}}_error"
+         class="error text"
+         ng-bind="paragraph.errorMessage">
+    </div>
+  </div>
+  <div ng-if="!asIframe" class="paragraph-footer">
+    <div ng-show="!paragraph.config.tableHide && !viewOnly"
+         id="{{paragraph.id}}_executionTime"
+         class="execution-time"
+         ng-bind-html="getExecutionTime(paragraph)">
+    </div>
+    <div class="paragraph-footer-elapsed">
+      <div ng-if="!asIframe" ng-show="message" ng-include src="'/app/notebook/paragraph/DPL-Log.html'"></div>
+      <div ng-if="paragraph.status === 'RUNNING'">
+        <div id="{{paragraph.id}}_elapsedTime"
+             class="elapsed-time"
+             ng-bind-html="getElapsedTime()">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

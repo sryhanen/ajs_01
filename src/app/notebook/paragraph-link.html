@@ -1,0 +1,36 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div id="paragraphLinkPage" class="py-5">
+  <div class="container-fluid">
+    <div id="content" class="notebook-content row">
+      <!-- Include the paragraphs according to the note, pass the note to init function -->
+      <div id="{{currentParagraph.id}}_paragraphColumn_main"
+           ng-hide="currentParagraph.title === 'hideMeSparkPinger' && $index === 0"
+           ng-repeat="currentParagraph in note.paragraphs"
+           ng-controller="ParagraphCtrl"
+           ng-init="init(currentParagraph, note)"
+           ng-class="columnWidthClass(currentParagraph.config.colWidth)">
+        <!-- see ZEPPELIN-2806 viewport-watch> -->
+        <div id="{{currentParagraph.id}}_paragraphColumn"
+             ng-include src="'/app/notebook/paragraph/paragraph.html'"
+             ng-class="{'paragraph-space paragraph-box paragraph-margin': !asIframe, 'focused': paragraphFocused,
+                    'lastEmptyParagraph': !paragraph.text && !paragraph.result}"
+             ng-hide="currentParagraph.config.tableHide && viewOnly"
+             ng-dblclick="paragraphOnDoubleClick(currentParagraph.id);">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

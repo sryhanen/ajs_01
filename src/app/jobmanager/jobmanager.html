@@ -1,0 +1,125 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div id="jobPage" class="container-fluid ">
+  <div id="job-manager-header" class="settings-header mt-5 mb-4">
+    <div class="header-top">
+      <div class="row">
+        <div class="col-md-12">
+          <!-- job icon descriptions -->
+          <div class="job-icon-desc-container float-lg-end mb-4 mb-lg-0">
+            <span class="ms-3" ng-repeat="jobStatus in ['READY', 'FINISHED', 'ABORT', 'ERROR','PENDING','RUNNING']">
+              <i class="job-desc-icon me-1"
+                 ng-class="[getJobColorByStatus(jobStatus), getJobIconByStatus(jobStatus)]">
+              </i>
+              {{jobStatus}}
+            </span>
+          </div>
+          <h1 class="my-0">Jobs</h1>
+        </div>
+      </div>
+    </div>
+    <div class="header-bottom">
+      <!-- search tools (input, drop-down, sorting) -->
+      <div class="job-search-tool row">
+        <div class="col-lg-4 mb-2 mb-lg-0">
+          <div class="input-group">
+          <span class="input-group-text" id="search">
+            <i class="fas fa-magnifying-glass"></i>
+          </span>
+            <input type="text" class="form-control" placeholder="Search jobs"
+                   aria-label="search" aria-describedby="search"
+                   ng-model="filterConfig.noteNameFilterValue"
+                   ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 300, 'blur': 0 } }"
+                   ng-change="filterJobs(jobs, filterConfig)" />
+          </div>
+        </div>
+        <div class="col-lg-auto mb-2 mb-lg-0">
+          <!-- search tool: default interpreter dropdown -->
+          <div class="input-group">
+            <label class="input-group-text" for="selectInterpreter">Interpreter</label>
+            <select class="form-select" id="selectInterpreter">
+              <option ng-repeat="interpreter in defaultInterpreters">
+            <span ng-click="setFilterValue(interpreter.value)"
+                  ng-class="(filterValueToName(interpreter.value) === 'ALL' || filterValueToName(interpreter.value) === 'NONE') ? 'FontWeight500' : '' ">
+              {{filterValueToName(interpreter.value)}}
+            </span>
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="col-lg-auto mb-2 mb-lg-0">
+          <!-- search tool: date dropdown -->
+          <div class="dropdown">
+            <button type="button"
+                    title="Sort time"
+                    class="btn btn-outline-secondary form-control dropdown-toggle"
+                    id="SetDateSortingDropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              {{sorter.currentDateSorter}}
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="setDateSorter">
+              <li ng-repeat="dateSorter in sorter.availableDateSorter">
+                <a class="dropdown-item"
+                   ng-click="setJobDateSorter(dateSorter)">
+                  {{dateSorter}}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-auto d-flex align-items-center">
+          <span class="text-muted me-2">Total:</span>
+          <b>{{filteredJobs.length}}</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-5">
+    <div ng-if="!isFilterLoaded" class="col">
+      <div class="job-space box job-margin text-center">
+        <i class="fas fa-spinner spin-animation me-2"></i>
+        Loading...
+      </div>
+    </div>
+    <div ng-if="filteredJobs.length > 0"
+         ng-repeat="note in getJobsInCurrentPage(filteredJobs)"
+         class="col-12 col-xl-6">
+      <job note="note"></job>
+    </div>
+    <div ng-if="isFilterLoaded === false && filteredJobs.length <= 0"
+         class="col-12">
+      <div class="job-space box job-margin text-center">No jobs found</div>
+    </div>
+
+    <!-- pagination -->
+    <nav class="mt-5" aria-label="Page navigation example">
+      <ul class="pagination justify-content-center"
+          total-items="filteredJobs.length"
+          uib-pagination=""
+          ng-model="pagination.currentPage"
+          items-per-page="pagination.itemsPerPage"
+          boundary-links="true"
+          rotate="false"
+          max-size="pagination.maxPageCount"
+          previous-text="Previous"
+          next-text="Next"
+          first-text="&laquo;"
+          last-text="&raquo;">
+      </ul>
+    </nav>
+  </div>
+</div>
+

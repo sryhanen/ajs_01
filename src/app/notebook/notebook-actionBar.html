@@ -1,0 +1,319 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+Due to various issues trash folder, delete and rename are out-commented.
+This is a temporary solution which will be reversed after server-side bugs
+has been fixed.
+-->
+
+<div class="note-action">
+  <nav class="navbar navbar-expand-xl note-action-container collapse show"
+       id="noteActionCollapse">
+    <div class="container-fluid ">
+      <div class="action-bar_title d-flex me-xl-3"
+           ng-controller="ElasticInputCtrl as input">
+        <input type="text"
+               class="form-control_title-input"
+               placeholder="New name"
+               ng-if="input.showEditor"
+               ng-model="input.value"
+               ng-escape="input.showEditor = false"
+               ng-blur="updateNoteName(input.value);input.showEditor = false;"
+               ng-enter="updateNoteName(input.value);input.showEditor = false;" />
+        <p class="form-control_title"
+           ng-class="{'reverse-ellipsis ellipsis':noteName(note).length > 45}"
+           title={{noteName(note)}}
+           ng-click="input.showEditor = !revisionView; input.value = note.name"
+           ng-show="!input.showEditor">
+          <span>
+            {{noteName(note)}}
+          </span>
+        </p>
+        <!-- visible only on smaller screen sizes -->
+        <div ng-include="smallScreenInclude"
+             class="ms-auto d-flex d-xl-none align-items-center">
+        </div>
+        <button class="navbar-toggler ms-2"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#actionbarContent"
+                aria-controls="actionbarContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      <div class="collapse navbar-collapse mt-3 mt-lg-0"
+           id="actionbarContent">
+        <!-- Play, show/hide code, show/hide output, clear output, clone, export -->
+        <div class="btn-group me-2"
+             role="group"
+             aria-label="button group">
+          <button type="button"
+                  class="btn btn-secondary rm-show"
+                  ng-click="runAllParagraphs(note.id)"
+                  ng-class="{'disabled':isNoteRunning()}"
+                  title="Run all paragraphs"
+                  ng-disabled="revisionView">
+            <i class="fas fa-play"></i>
+          </button>
+          <button type="button"
+                  class="btn btn-secondary"
+                  ng-click="toggleAllEditor()"
+                  ng-if="!viewOnly"
+                  title="Show/hide the code"
+                  ng-disabled="revisionView">
+            <i ng-class="editorToggled ?  'fas fa-expand' :'fas fa-compress'"></i>
+          </button>
+          <button type="button"
+                  class="btn btn-secondary"
+                  ng-click="toggleAllTable()"
+                  ng-if="!viewOnly"
+                  title="Show/hide the output"
+                  ng-disabled="revisionView">
+            <i ng-class="tableToggled ? 'fas fa-book-open' : 'fas fa-book'"></i>
+          </button>
+          <button type="button"
+                  class="btn btn-secondary"
+                  ng-click="clearAllParagraphOutput(note.id)"
+                  ng-if="!viewOnly"
+                  ng-class="{'disabled':isNoteRunning()}"
+                  title="Clear output"
+                  ng-disabled="revisionView">
+            <i class="fas fa-eraser"></i>
+          </button>
+          <button type="button"
+                  class="btn btn-secondary"
+                  ng-if="!viewOnly"
+                  title="Clone this notebook"
+                  ng-click="cloneThisNote(note.name)"
+                  ng-disabled="revisionView">
+            <i class="far fa-copy"></i>
+          </button>
+          <button type="button"
+                  class="btn btn-secondary"
+                  ng-if="!viewOnly"
+                  ng-click="exportNote()"
+                  title="Export this notebook"
+                  ng-disabled="revisionView">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+        <!-- Commit, set revision, compare revisions, view commits -->
+        <div class="btn-group me-2"
+             role="group"
+             aria-label="version control"
+             ng-if="isRevisionSupported()" >
+          <div class="btn-group dropdown"
+               role="group"
+               ng-if="!viewOnly">
+            <button type="button"
+                    title="Save"
+                    class="btn btn-secondary dropdown-toggle"
+                    id="versionControlDropdown"
+                    ng-disabled="revisionView"
+                    data-bs-auto-close="outside"
+                    ng-click="focusOn('saveNameInput')"
+                    data-bs-toggle="dropdown">
+              <i class="fas fa-floppy-disk"></i>
+            </button>
+            <div class="dropdown-menu">
+              <div class="commit-container">
+                <div class="input-group input-group-sm">
+                  <input type="text"
+                         class="form-control"
+                         id="saveNameInput"
+                         ng-model="note.checkpoint.message"
+                         placeholder="Name the save"
+                         aria-label="commit message"
+                         aria-describedby="button-addon2" />
+                  <button class="btn btn-secondary"
+                          type="button"
+                          id="button-addon2"
+                          ng-hide="viewOnly"
+                          ng-click="checkpointNote(note.checkpoint.message)">
+                    Save
+                  </button>
+                </div>
+                <div ng-if="checkpointError"
+                     class="mt-3 alert alert-warning">
+                  {{checkpointError}}
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button"
+                  title="Restore this save file"
+                  class="btn btn-secondary rm-show"
+                  id="setRevision"
+                  ng-if="revisionView"
+                  ng-hide="viewOnly"
+                  ng-click="setNoteRevision()">
+            <i class="far fa-circle-right"></i>
+          </button>
+          <button type="button"
+                  title="Version history"
+                  class="btn btn-secondary rm-show"
+                  ng-if="noteRevisions.length > 0"
+                  ng-click="toggleRevisionsComparator()">
+            <i class="fas fa-exchange-alt"></i>
+          </button>
+          <div class="btn-group rm-show"
+               ng-if="noteRevisions.length > 0"
+               role="group">
+            <button type="button"
+                    title="{{currentRevision}}"
+                    class="btn btn-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    id="revisionsDropdown">
+              {{currentRevision}}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="revisionsDropdown">
+              <li ng-repeat="revision in revisionSort(noteRevisions)"
+                  class="dropdown-item revision">
+                <a class="py-1 d-block"
+                   ng-click="visitRevision(revision)">
+                  {{revision.message}}
+                  <span class="revision-date">
+                    {{formatRevisionDate(revision.time)}}
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- if the note is in the trash, remove note permanently -->
+        <!--<div class="label-btn">
+          <button ng-if="isTrash(note)"
+                  type="button"
+                  class="btn btn-secondary me-3"
+                  ng-click="removeNote(note.id)"
+                  ng-hide="viewOnly"
+                  ng-class="{'disabled':isNoteRunning()}"
+                  title="Remove this notebook permanently"
+                  ng-disabled="revisionView">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>-->
+        <!-- if the note is not in the trash, move to trash -->
+        <!--<div class="label-btn">
+          <button ng-if="!isTrash(note)"
+                  type="button"
+                  class="btn btn-secondary me-3"
+                  ng-click="moveNoteToTrash(note.id)"
+                  ng-hide="viewOnly"
+                  ng-class="{'disabled':isNoteRunning()}"
+                  title="Move this notebook to trash"
+                  ng-disabled="revisionView">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>-->
+        <!-- Cron scheduler -->
+        <div class="cron-scheduler btn-group"
+             ng-if="note.config.isZeppelinNotebookCronEnable"
+             ng-hide="viewOnly">
+          <button class="btn btn-secondary dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                  data-bs-auto-close="false"
+                  ng-click="focusOn('customExpression')"
+                  ng-class="{ 'btn-info' : note.config.cron && !cronSEWarning, 'btn-danger' : cronSEWarning, 'btn-secondary' : !note.config.cron}"
+                  title="Run the notebook with scheduler"
+                  ng-disabled="revisionView || isTrash(note)">
+            <i class="fas fa-clock"></i>
+            <span class="ms-2" ng-if="note.config.cron">{{getCronOptionNameFromValue(note.config.cron)}}</span>
+          </button>
+          <div class="dropdown-menu cron-scheduler" role="menu">
+            <div class="cron-preset-container px-4 py-2">
+              <div class="mb-3">
+                <div class="input-group">
+                  <input type="text"
+                         class="form-control form-control-sm"
+                         id="customExpression"
+                         ng-model="note.config.cronInput"
+                         ng-change="cronParse(note.config.cronInput)"
+                         maxlength="60"
+                         ng-keyup="$event.keyCode == 13 && setCronScheduler(note.config.cronInput)"
+                         placeholder="Write a cron expression" />
+                  <button class="btn btn-sm btn-secondary"
+                          type="button"
+                          ng-click="setCronScheduler(note.config.cronInput)">
+                    Set
+                  </button>
+                </div>
+                <div ng-class="(note.config.cronInput.length >= 60)?'text-danger':''"
+                     class="form-text">
+                  Length: {{note.config.cronInput.length}}/60
+                </div>
+                <div ng-show="note.info.cron"
+                     class="mt-2 text-danger">
+                  {{note.info.cron}}
+                </div>
+                <div ng-show="cronWarning"
+                     class="mt-3 alert alert-warning">
+                  {{cronWarning}}
+                </div>
+                <div ng-show="note.config.cronExecutingUser && !cronWarning" class="mt-3 form-text">
+                  Scheduled by: {{note.config.cronExecutingUser}}
+                </div>
+              </div>
+              <hr>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-secondary"
+                        ng-repeat="cr in cronOption"
+                        type="button"
+                        ng-click="setCronScheduler(cr.value); cronParse()"
+                        dropdown-input
+                        ng-class="{ 'active' : cr.value == note.config.cron}">
+                  {{cr.name}}
+                </button>
+              </div>
+              <hr>
+              <div class="form-text">
+                Write your own
+                <a href="https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/tutorial-lesson-06.html"
+                   target="_blank">
+                  cron expression.
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Watchers -->
+        <div class="text-muted ms-4 fs-6 d-inline-block align-middle"
+             ng-show="collaborativeMode"
+             title="Users who watch this notebook: {{collaborativeModeUsers.join(', ')}}">
+          <i>
+            {{collaborativeModeUsers.length}} watcher(s)
+          </i>
+        </div>
+      </div>
+      <div ng-include="bigScreenInclude"
+           class="ms-auto d-none d-xl-flex align-items-center">
+      </div>
+    </div>
+  </nav>
+  <div class="collapse-button container-fluid  position-relative text-end"
+       ng-if="!showPermissions">
+    <button class="btn btn-collapse"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#noteActionCollapse"
+            aria-expanded="true">
+    </button>
+  </div>
+</div>
+

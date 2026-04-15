@@ -1,0 +1,94 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div id="noteRenameModal"
+     class="modal fade"
+     aria-labelledby="noteRenameModalLabel"
+     aria-hidden="true"
+     tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- modal-header -->
+      <div class="modal-header modal-header-rename">
+        <h5 class="modal-title" id="noteRenameModalLabel">Rename notebook</h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close()"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body modal-body-rename">
+        <label ng-if="isValid"
+               class="form-label">
+          Please enter a new name
+        </label>
+        <label ng-if="!isValid"
+               class="text-danger">
+          Please enter a valid name</label>
+        <div ng-class="{'has-error': !isValid}">
+          <input type="text"
+                 class="form-control"
+                 ng-model="params.newName"
+                 ng-change="validate()"
+                 ng-enter="isValid && rename()" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div>
+          <button type="button"
+                  class="btn btn-primary"
+                  ng-click="rename()"
+                  ng-class="{'disabled': !isValid}">
+            Rename
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- merge folders -->
+<div id="noteRenameFolderMergeModal"
+     class="modal fade"
+     aria-labelledby="noteRenameFolderMergeModalLabel"
+     aria-hidden="true"
+     tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- modal-header -->
+      <div class="modal-header modal-header-rename">
+        <h5 class="modal-title"
+            id="noteRenameFolderMergeModalLabel">
+          This folder will be merged
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="closeMerge()"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body modal-body-rename">
+        This folder will be merged into another with the same name. Do you want to proceed?
+      </div>
+      <div class="modal-footer">
+        <div>
+          <button type="button"
+                  class="btn btn-primary"
+                  ng-click="triggerMerge()">
+            Merge
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

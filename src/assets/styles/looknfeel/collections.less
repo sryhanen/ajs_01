@@ -1,0 +1,360 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+/* settings&collections header */
+
+.settings-header {
+  background: var(--grey-000);
+  border-radius: 20px;
+  box-shadow: 0 2px 4px var(--grey-400);
+  .header-top {
+    padding: 30px 35px;
+  }
+  .header-bottom {
+    background: var(--grey-100);
+    border-radius: 0 0 20px 20px;
+    padding: 30px 35px;
+  }
+}
+
+.dark-mode .settings-header {
+  background: var(--dm-grey-700);
+  box-shadow: 0 2px 4px var(--dm-grey-900);
+  .header-bottom {
+    background: var(--dm-grey-600);
+  }
+}
+
+/* Jobs */
+
+.job {
+  background: var(--grey-000);
+  border-radius: 20px;
+  padding: 20px 35px;
+  box-shadow: 0 2px 4px var(--grey-400);
+  .run-control {
+    height: 4px;
+    .progress {
+      position: relative;
+      width: 100%;
+      height: 4px;
+      z-index: 100;
+      border-radius: 0;
+    }
+  }
+  .control {
+    color: var(--grey-700);
+    font-size: 12px;
+  }
+}
+
+.dark-mode .job {
+  background: var(--dm-grey-700);
+  box-shadow: 0 2px 4px var(--dm-grey-900);
+  .control {
+    color: var(--dm-grey-300);
+  }
+}
+
+.job-types {
+  .fas {
+    font-size: 15px;
+    color: var(--primary-400);
+  }
+  a {
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+}
+
+.dark-mode .job-types .fas {
+  color: var(--tertiary-600);
+}
+
+/* loading animation */
+
+.spin-animation {
+  color: var(--grey-500);
+  animation-name: spinnerRotateAnimation;
+  -webkit-animation-name: spinnerRotateAnimation;
+  -moz-animation-name: spinnerRotateAnimation;
+  -o-animation-name: spinnerRotateAnimation;
+  animation-duration: 1s;
+  -webkit-animation-duration: 1s;
+  -moz-animation-duration: 1s;
+  -o-animation-duration: 1s;
+  animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-iteration-count: infinite;
+  -o-animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  -webkit-animation-timing-function: linear;
+  -moz-animation-timing-function: linear;
+  -o-animation-timing-function: linear;
+}
+
+.dark-mode .spin-animation {
+  color: var(--dm-grey-300);
+}
+
+@keyframes spinnerRotateAnimation {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
+}
+
+@-webkit-keyframes spinnerRotateAnimation {
+  from {-webkit-transform: rotate(0deg);}
+  to {-webkit-transform: rotate(360deg);}
+}
+
+@-moz-keyframes spinnerRotateAnimation {
+  from {-moz-transform: rotate(0deg);}
+  to {-moz-transform: rotate(360deg);}
+}
+
+/* Interpreters */
+
+.properties {
+  textarea {
+    height: 36.5px !important;
+    resize: none;
+  }
+}
+
+.interpreter-binding-mode-info-link {
+  color: var(--grey-500);
+}
+
+.interpreter-name {
+  color: var(--grey-700);
+  background: var(--grey-300);
+}
+
+.dark-mode .interpreter-name {
+  background: var(--dm-grey-800);
+  color: var(--dm-grey-300);
+}
+
+.optional-settings {
+  background: var(--grey-200);
+  padding: 1rem;
+  margin: 20px -1rem -1rem;
+}
+
+.dark-mode .optional-settings {
+  background: var(--dm-grey-600);
+}
+
+/* cluster */
+
+.cluster-col {
+  margin: 0;
+  padding: 0;
+}
+
+.cluster {
+  padding: 2px 8px 4px 8px;
+  min-height: 32px;
+}
+
+.cluster-search-tool {
+  display: inline-block;
+  margin-left: 15px;
+  .dropdown-text-desc {
+    color: gray;
+    font-weight: 400;
+  }
+  .dropdown-text-value {
+    margin-left: 2px;
+  }
+}
+
+#cluster-manager-header .cluster-search-tool {
+  .search-input {
+    margin-right: 7px;
+    min-width: 215px;
+    > input {
+      font-family: 'FontAwesome', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      border-radius: 4px;
+      font-size: 14px;
+      padding-left: 10px;
+    }
+  }
+  .dropdown-toggle {
+    border-radius: 3px;
+    float: none;
+    min-width: 150px;
+    text-align: left;
+    margin-right: 5px;
+  }
+  .date-sort-button {
+    min-width: 180px;
+  }
+}
+
+.search-tool-dropdown-content > li > a {
+  border-bottom: 1px solid #eee;
+}
+
+.search-tool-dropdown-content > li:last-child > a {
+  border-bottom: none;
+}
+
+.cluster-icon-desc-container {
+  display: inline-block;
+  margin-top: 10px;
+  margin-right: 30px;
+  float: right;
+}
+
+.cluster-desc-icon {
+  margin-right: 3px;
+}
+
+.cluster-counter {
+  float: right;
+  clear: both;
+  margin-left: 8px;
+  margin-top: 6px;
+  .cluster-counter-label {
+    color: gray;
+  }
+  .cluster-counter-value {
+    font-size: 15px;
+    font-weight: bold;
+  }
+}
+
+/*
+  node Style
+*/
+
+.node-space {
+  margin-bottom: 5px !important;
+  padding: 10px 10px 10px 10px !important;
+  min-height: 30px;
+}
+
+.node-margin {
+  margin-right: 2px;
+  margin-left: 2px;
+}
+
+.node-types i {
+  font-weight: bold;
+  font-size: 10px;
+}
+
+/*
+  node Controls CSS
+*/
+
+.node .runControl {
+  font-size: 1px;
+  color: #AAAAAA;
+  height:4px;
+  margin: 0;
+  .progress {
+    position: relative;
+    width: 100%;
+    height: 4px;
+    z-index: 100;
+    border-radius: 0;
+  }
+}
+
+.node .control {
+  background: rgba(255,255,255,0.85);
+  float: right;
+  color: #999;
+  margin-top: 1px;
+  margin-right: 5px;
+  position: absolute;
+  clear: both;
+  right: 15px;
+  text-align: right;
+  font-size: 12px;
+  padding: 4px;
+  span {
+    margin-left: 4px;
+  }
+  li {
+    margin-bottom: 4px;
+    color: #333333;
+  }
+  .tooltip {
+    z-index: 10003;
+  }
+  .node-control-btn {
+    cursor: pointer;
+    color: #3071A9;
+  }
+}
+
+.sortable-row {
+  .as-sortable-item-handle {
+    width: 35px;
+    height: 30px;
+  }
+  .as-sortable-item svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.localPkgInfo {
+  margin-right: 0;
+  p {
+    margin: 10px 0 0;
+    font-size: 11px;
+    font-style: italic;
+    color: var(--grey-700);
+    text-align: right;
+  }
+}
+
+.dark-mode .localPkgInfo p {
+  color: var(--grey-400);
+}

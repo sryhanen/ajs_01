@@ -1,0 +1,29 @@
+name: audit
+
+on: [ push ]
+
+jobs:
+  audit:
+    name: Audit
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        groups: [ "dependencies", "devDependencies" ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: yarn
+      - name: Install yarn
+        run: npm install --global yarn
+      - name: Run audit
+        run: |
+          set +e;
+          yarn audit --groups "${{ matrix.groups }}";
+          if [[ $? -ge 8 ]]; then
+            echo "High/Critical issues found, failing";
+            exit 1;
+          fi;

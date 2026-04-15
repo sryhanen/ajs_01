@@ -1,0 +1,328 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+/* home */
+
+.home-some {
+  .fas, .fab {
+    color: var(--primary-400);
+  }
+  a {
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+}
+
+.dark-mode .home-some {
+  .fas, .fab {
+    color: var(--tertiary-400);
+  }
+  a {
+    color: var(--tertiary-200);
+  }
+}
+
+/* Notebook buttons */
+
+.btn-import, .btn-create {
+  background: var(--primary-700);
+  color: var(--primary-100);
+  border-color: var(--primary-700);
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  text-transform: uppercase;
+  font-weight: 500;
+  transition: all 0.1s;
+  &:hover, &:active, &:focus {
+    background: var(--primary-800);
+    border-color: var(--primary-800);
+    color: var(--grey-000);
+    text-decoration: none;
+  }
+  .fas {
+    font-size: 16px;
+    line-height: normal;
+    color: var(--primary-300);
+  }
+}
+
+.dark-mode .btn-import,
+.dark-mode .btn-create {
+  background: var(--tertiary-200);
+  border-color: var(--tertiary-200);
+  color: var(--tertiary-900);
+  transition: all 0.1s;
+  &:hover, &:active, &:focus {
+    background: var(--tertiary-300);
+    border-color: var(--tertiary-300);
+  }
+  .fas {
+    color: var(--tertiary-600);
+  }
+}
+
+/* Sidebar */
+
+.sidebar {
+  background: var(--grey-200);
+  padding: 30px 35px 20px;
+  border-radius: 20px;
+  .fas, .far, .fab {
+    margin-right: 10px;
+    color: var(--primary-400);
+  }
+  p {
+    line-height: 22px;
+  }
+}
+
+.dark-mode .sidebar {
+  background: var(--dm-grey-600);
+  .fas, .far, .fab {
+    color: var(--tertiary-500);
+  }
+}
+
+/* Home's notebook list */
+
+.notebook-reload {
+  font-size: 0.7em;
+  cursor: pointer;
+  color: var(--primary-500);
+  &:hover {
+    color: var(--primary-600);
+  }
+  .fas {
+    color: var(--primary-300);
+  }
+}
+
+.dark-mode .notebook-reload {
+  color: var(--tertiary-400);
+  &:hover {
+    color: var(--tertiary-300);
+  }
+  .fas {
+    color: var(--tertiary-500);
+  }
+}
+
+.home-body-text {
+  .filter-names .form-control-search {
+    position: absolute;
+    margin: 14px 0 0 16px;
+    font-size: 14px;
+    color: var(--grey-500);
+  }
+  .filter-names input {
+    padding: 10px 15px 10px 40px;
+    border-radius: 30px;
+  }
+}
+
+.dark-mode .home-body-text {
+  .filter-names .form-control-search {
+    color: var(--dm-grey-100);
+  }
+  .filter-names input {
+    border: 2px solid var(--dm-grey-500);
+    &::placeholder {
+      color: var(--dm-grey-300);
+    }
+  }
+}
+
+.notebook-list-btn {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.note-folder-item {
+  background: var(--secondary-200);
+  padding: 10px 15px;
+  border-radius: 5px;
+  a {
+    color: var(--secondary-900);
+    font-weight: 500;
+    &:hover {
+      color: var(--secondary-700);
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
+  .note-truncate {
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fa-folder, .fa-folder-open {
+    color: var(--secondary-400);
+  }
+  .fa-trash-alt {
+    color: var(--secondary-500);
+  }
+}
+
+.fa-folder-open {
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.fa-file {
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.dark-mode .note-folder-item {
+  background: var(--tertiary-800);
+  a {
+    color: var(--tertiary-100);
+    &:hover {
+      color: var(--tertiary-300);
+    }
+  }
+  .fa-folder, .fa-folder-open {
+    color: var(--tertiary-500);
+  }
+  .fa-trash-alt {
+    color: var(--secondary-300);
+  }
+}
+
+.note-folder-item.ng-scope {
+  background: var(--grey-200);
+  a {
+    color: var(--grey-900);
+    &:hover {
+      color: var(--grey-700);
+    }
+  }
+  .fa-file {
+    color: var(--grey-500);
+  }
+}
+
+.dark-mode .note-folder-item.ng-scope {
+  background: var(--dm-grey-800);
+  a {
+    color: var(--dm-grey-100);
+    &:hover {
+      color: var(--dm-grey-300);
+    }
+  }
+  .fa-file {
+    color: var(--dm-grey-500);
+  }
+}
+
+.note-folder-item-actions {
+  .fas {
+    color: var(--secondary-700);
+    font-size: 15px;
+  }
+  a:hover .fas {
+    color: var(--secondary-500);
+  }
+}
+
+.dark-mode .note-folder-item-actions {
+  .fas {
+    color: var(--tertiary-300);
+  }
+  a:hover .fas {
+    color: var(--tertiary-100);
+  }
+}
+
+.note-folder-item-actions .fa-trash-alt,
+.note-folder-item-actions .fa-times {
+  color: var(--primary-600);
+}
+
+.note-folder-item-actions a:hover .fa-trash-alt,
+.note-folder-item-actions a:hover .fa-times {
+  color: var(--primary-900);
+}
+
+.dark-mode .note-folder-item-actions .fa-trash-alt,
+.dark-mode .note-folder-item-actions .fa-times {
+  color: var(--tertiary-300);
+}
+
+.fa-refresh {
+  vertical-align: middle;
+}
+
+.notebook-list-item .fas {
+  color: var(--grey-500) !important;
+}
+
+.dark-mode .notebook-list-item .fas {
+  color: var(--dm-grey-300) !important;
+}
+
+/* Box */
+
+.box {
+  border-style: solid;
+  min-height: 20px;
+  padding: 40px 35px;
+  margin-bottom: 20px;
+  background: var(--grey-000);
+  border-color: var(--grey-300);
+  border-width: 1px 1px 2px;
+  border-radius: 20px;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.dark-mode .box {
+  background: var(--dm-grey-700);
+  border-color: var(--dm-grey-700);
+}
+
+

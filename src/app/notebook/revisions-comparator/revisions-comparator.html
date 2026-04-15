@@ -1,0 +1,150 @@
+<!--
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+-->
+<div class="col-md-4">
+  <!-- choose commits -->
+  <div class="revisions-comparator-bar d-flex align-items-center my-2">
+    <div class="dropdown">
+      <button type="button"
+              ng-if="$ctrl.noteRevisions.length > 0"
+              class="btn btn-outline-secondary revisions-comparator-dropdown dropdown-toggle"
+              data-bs-toggle="dropdown"
+              id="firstRevisionDropdown"
+              title="{{currentFirstRevisionForCompare}}">
+        {{currentFirstRevisionForCompare}}
+      </button>
+      <ul class="dropdown-menu"
+          aria-labelledby="firstRevisionDropdown">
+        <li></li>
+        <li ng-repeat="revision in $ctrl.noteRevisions | orderBy:'time':true"
+            class="dropdown-item revision">
+          <a class="py-1 d-block"
+             role="button"
+             ng-click="getNoteRevisionForReview(revision, 'first')">
+            {{revision.message}}
+          </a>
+          <span class="revision-date">
+            {{formatRevisionDate(revision.time)}}
+          </span>
+        </li>
+      </ul>
+    </div>
+    <span class="mx-2">compare with</span>
+    <div class="dropdown">
+      <button type="button"
+              ng-if="$ctrl.noteRevisions.length > 0"
+              class="btn btn-outline-secondary revisions-comparator-dropdown dropdown-toggle"
+              ng-disabled="firstNoteRevisionForCompare === null"
+              data-bs-toggle="dropdown"
+              id="secondRevisionDropdown"
+              title="{{currentSecondRevisionForCompare}}">
+        {{currentSecondRevisionForCompare}}
+      </button>
+      <ul class="dropdown-menu"
+          aria-labelledby="secondRevisionDropdown">
+        <li ng-repeat="revision in $ctrl.noteRevisions | orderBy:'time':true"
+            class="dropdown-item revision">
+          <a class="py-1 d-block"
+             role="button"
+             ng-click="getNoteRevisionForReview(revision, 'second')">
+            {{revision.message}}
+          </a>
+          <span class="revision-date">
+            {{formatRevisionDate(revision.time)}}
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- choose a paragraph -->
+  <div id="diffPanel" class="paragraphs-div">
+    <div class="revisions-comparator-panel" data-ng-repeat="p in mergeNoteRevisionsForCompare | orderBy:'time':true"
+         ng-class="{'revisions-comparator-panel-selected' : currentParagraphDiffDisplay.paragraph.id === p.paragraph.id}"
+         ng-click="changeCurrentParagraphDiffDisplay(p.paragraph.id)">
+      <span class="panel-id">{{p.paragraph.id}}</span>
+      <h3 class="revisions-comparator-paragraph-title mt-0">
+        <span ng-if="p.paragraph.title">{{p.paragraph.title}}</span>
+        <span ng-hide="p.paragraph.title">Untitled</span>
+        <span ng-if="p.type === 'added'" class="revisions-comparator-status badge rounded-pill bg-secondary">added</span>
+        <span ng-if="p.type === 'deleted'" class="revisions-comparator-status badge rounded-pill bg-secondary">deleted</span>
+        <span ng-if="p.type === 'compared' && !(p.identical)" class="revisions-comparator-status badge rounded-pill bg-secondary">
+          there are differences
+        </span>
+      </h3>
+      <i class="revisions-comparator-first-string">{{p.firstString}}</i>
+    </div>
+    <div class="d-table w-100 h-100"
+         ng-if="currentSecondRevisionForCompare === 'Choose...'">
+      <div class="empty-paragraph-message">Please select a save file</div>
+    </div>
+  </div>
+</div>
+
+<!-- view the code -->
+<div id="revisions-comparator-code-panel-id center-block"
+     class="panel col-md-8">
+  <span class="revisions-comparator-code-panel-title my-2 w-100 float-start">
+    Comparing:
+    <strong>{{currentFirstRevisionForCompare}}</strong>
+    <i class="fas fa-long-arrow-alt-right"></i>
+    <strong>{{currentSecondRevisionForCompare}}</strong>
+  </span>
+  <pre ng-if="currentParagraphDiffDisplay.type === 'added'"
+       class="revisions-comparator-code-panel color-green-row">
+    {{currentParagraphDiffDisplay.paragraph.text}}
+  </pre>
+  <pre ng-if="currentParagraphDiffDisplay.type === 'deleted'"
+       class="revisions-comparator-code-panel color-red-row">
+    {{currentParagraphDiffDisplay.paragraph.text}}
+  </pre>
+  <pre ng-if="currentParagraphDiffDisplay.type === 'compared'"
+       class="revisions-comparator-code-panel" ng-bind-html="currentParagraphDiffDisplay.diff">
+  </pre>
+  <div ng-if="currentParagraphDiffDisplay === null"
+       class="revisions-comparator-code-panel empty-code-panel d-flex align-items-center justify-content-center">
+    Nothing to display
+  </div>
+</div>

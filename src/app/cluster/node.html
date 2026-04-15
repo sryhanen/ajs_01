@@ -1,0 +1,105 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<div id="nodePage" class="container-fluid ">
+  <div class="node-head mt-5">
+    <div class="header">
+      <div class="row">
+        <div class="col-md-12">
+          <h1>{{nodeName}}</h1>
+          <p>The interpreter process of {{nodeName}}.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <div class="input-group">
+            <input type="text"
+                   ng-model="searchNode"
+                   class="form-control"
+                   ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 300, 'blur': 0 } }"
+                   placeholder="Search a process" />
+            <button type="submit"
+                    class="btn btn-primary"
+                    ng-disabled="!navbar.connected">
+              <i class="fas fa-magnifying-glass"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div interpreter-item
+       class="box"
+       ng-repeat="intpProcess in getProgressInCurrentPage(intpProcesses | filter: nodeFilter)">
+    <div id="{{intpProcess.properties.INTP_PROCESS_NAME}}">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="interpreter-title">
+            {{intpProcess.properties.INTP_PROCESS_NAME}}
+            <span class="ms-2 fs-6"
+                  ng-switch="intpProcess.properties.STATUS">
+              <i style="color: #70EDD9;"
+                 ng-switch-when="ONLINE"
+                 class="fas fa-circle"
+                 title="online">
+              </i>
+              <i style="color: #FECACA;"
+                 ng-switch-when="OFFLINE"
+                 class="fas fa-circle"
+                 title="offline">
+              </i>
+            </span>
+          </h2>
+        </div>
+      </div>
+
+      <div class="row properties">
+        <div ng-show="_.isEmpty(intpProcess.properties)"
+             class="col-md-12 text-muted">
+          <i>Currently there are no properties set for this progress.</i>
+        </div>
+        <div class="col-md-12" ng-show="!_.isEmpty(intpProcess.properties)">
+          <h3>Properties</h3>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="w-25">Name</th>
+                <th class="w-75">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="key in intpProcess.properties | sortByKey" >
+                <td class="align-middle">{{key}}</td>
+                <td class="align-middle">{{intpProcess.properties[key]}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- pagination -->
+  <div class="cluster-pagination-container my-5">
+    <ul uib-pagination
+        class="pagination justify-content-center"
+        total-items="filteredProcesses.length"
+        ng-model="pagination.currentPage"
+        items-per-page="pagination.itemsPerPage"
+        boundary-links="true" rotate="false"
+        max-size="pagination.maxPageCount"
+        previous-text="Previous" next-text="Next"
+        first-text="&laquo;" last-text="&raquo;"></ul>
+  </div>
+</div>
+

@@ -1,0 +1,627 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div id="interpreterPage" class="container-fluid ">
+  <div class="my-5">
+    <!-- interpreter head section -->
+    <div class="settings-header mb-4">
+      <div class="header-top">
+        <div class="row">
+          <div class="col-md-12">
+            <h1 class="float-start me-3">
+              Interpreters
+              <i class="fas fa-question-circle fs-6 align-text-top"
+                 title="You can create and save multiple different settings for each interpreter. Settings can be used on a per-notebook basis; bind settings to a notebook to use them."></i>
+            </h1>
+            <div class="mb-4">
+              <button type="button"
+                      class="btn btn-sm btn-primary"
+                      ng-click="openModal('interpreterModal')">
+                <i class="fas fa-plus me-2"></i>
+                Create
+              </button>
+              <div ng-include src="'/app/interpreter/interpreter-create.html'"></div>
+            </div>
+            <div class="row">
+              <div class="col-7">
+                <div class="input-group">
+                  <span class="input-group-text"
+                        id="basic-addon1">
+                    <i class="fas fa-magnifying-glass"></i>
+                  </span>
+                  <input type="text"
+                         class="form-control ng-pristine ng-untouched ng-valid ng-empty"
+                         placeholder="Search interpreters"
+                         aria-label="search"
+                         aria-describedby="basic-addon1"
+                         ng-model="searchInterpreter"
+                         ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 300, 'blur': 0 } }">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- an existing interpreter and its settings -->
+    <div interpreter-item class="box width-full"
+         ng-repeat="setting in interpreterSettings | orderBy: 'name' | filter: {name:searchInterpreter}"
+         ng-init="sectionIndex = $index">
+      <div id="{{setting.name | lowercase}}">
+        <div class="row interpreter">
+          <div class="col-md-12">
+            <span class="float-end" ng-show="visibleSetting !==sectionIndex">
+              <button class="btn btn-light btn-sm me-2"
+                      ng-click="visibleSetting =sectionIndex;
+                      copyOriginInterpreterSettingProperties(setting.id)">
+                <i class="fas fa-pen-to-square me-2"></i> Edit
+              </button>
+              <button class="btn btn-light btn-sm me-2"
+                      ng-click="restartInterpreterSetting(setting.id)">
+                <i class="fas fa-sync-alt me-2"></i> Restart
+              </button>
+              <button class="btn btn-danger btn-sm"
+                      ng-click="removeInterpreterSetting(setting.id)">
+                <i class="fas fa-trash-alt me-2"></i> Remove
+              </button>
+            </span>
+            <form class="float-end"
+                  ng-show="visibleSetting ===sectionIndex">
+              <button type="button"
+                      class="btn btn-light btn-sm me-2"
+                      ng-disabled="waiting"
+                      ng-click="resetInterpreterSetting(setting.id)">
+                Cancel
+              </button>
+              <button type="submit"
+                      class="btn btn-primary btn-sm"
+                      ng-click="updateInterpreterSetting(setting.id)">
+                Save
+              </button>
+            </form>
+            <h2 class="interpreter-title">
+              {{setting.name}}
+              <small class="align-top" ng-switch="setting.status">
+                <small ng-switch-when="READY">
+                  <i class="status-ready fas fa-circle ms-2"
+                     title="Ready">
+                  </i>
+                </small>
+                <small ng-switch-when="ERROR">
+                  <i class="status-error fas fa-circle ms-2"
+                     ng-click="showErrorMessage(setting)"
+                     title="Error downloading dependencies">
+                  </i>
+                </small>
+                <small ng-switch-default>
+                  <i class="status-waiting fas fa-spinner spin-animation ms-2"
+                     title="Dependencies are downloading">
+                  </i>
+                </small>
+              </small>
+            </h2>
+            <div class="mb-4">
+            <span class="badge rounded-pill interpreter-name me-2"
+                  ng-repeat="interpreter in setting.interpreterGroup"
+                  title="{{interpreter.class}}">
+              %<span ng-show="!$parent.$first || $first">{{setting.name}}</span>
+              <span ng-show="(!$parent.$first || $first) && !$first">.</span>
+              <span ng-show="!$first">{{interpreter.name}}</span>
+            </span>
+            </div>
+          </div>
+        </div>
+        <h3>
+          Options
+          <a class="fas fa-info-circle align-text-top fs-6 interpreter-binding-mode-info-link"
+             aria-hidden="true"
+             title="You can manage interpreter sessions differently via instantiating the interpreter. Click to learn more."
+             ng-href="{{getInterpreterBindingModeDocsLink()}}"
+             target="_blank"></a>
+        </h3>
+        <!-- interpreter settings for notebooks and users -->
+        <div class="row my-2">
+          <div class="col-auto">
+            <button type="button"
+                    class="btn btn-sm btn-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    ng-disabled="visibleSetting !==sectionIndex">
+              {{getInterpreterRunningOption(setting.id)}}
+            </button>
+            <div class="dropdown-menu" role="menu">
+              <a role="button"
+                 class="dropdown-item"
+                 ng-click="setInterpreterRunningOption(setting.id, 'shared', 'shared')">
+                Globally
+              </a>
+              <a role="button"
+                 class="dropdown-item"
+                 ng-click="setInterpreterRunningOption(setting.id, 'scoped', '')">
+                Per Note
+              </a>
+              <a role="button"
+                 class="dropdown-item"
+                 ng-if="ticket.principal !== 'anonymous'"
+                 ng-click="setInterpreterRunningOption(setting.id, 'shared', 'scoped')">
+                Per User
+              </a>
+            </div>
+          </div>
+          <div class="col-auto dpl-center-center">in</div>
+          <div class="col-auto">
+            <button type="button"
+                    class="btn btn-sm btn-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    ng-disabled="visibleSetting !==sectionIndex
+                                 || getInterpreterRunningOption(setting.id) === 'Globally'">
+              <span ng-if="getInterpreterRunningOption(setting.id) !== 'Per User'">
+                {{getPerNoteOption(setting.id)}}
+              </span>
+              <span ng-if="getInterpreterRunningOption(setting.id) === 'Per User'">
+                {{getPerUserOption(setting.id)}}
+              </span>
+            </button>
+            <div class="dropdown-menu" role="menu">
+              <a role="button" class="dropdown-item"
+                 ng-if="getInterpreterRunningOption(setting.id) === 'Globally'"
+                 title="Single interpreter instance are shared across notes"
+                 ng-click="setPerNoteOption(setting.id, 'shared')">
+                shared per note
+              </a>
+              <a role="button" class="dropdown-item"
+                 ng-if="getInterpreterRunningOption(setting.id) === 'Per Note'"
+                 title="Separate Interpreter instance for each note"
+                 ng-click="setPerNoteOption(setting.id, 'scoped')">
+                scoped per note
+              </a>
+              <a role="button" class="dropdown-item"
+                 ng-if="getInterpreterRunningOption(setting.id) === 'Per User'"
+                 title="Separate Interpreter instance for each note"
+                 ng-click="setPerUserOption(setting.id, 'scoped')">
+                scoped per user
+              </a>
+              <a role="button" class="dropdown-item"
+                 ng-if="getInterpreterRunningOption(setting.id) === 'Per Note'"
+                 title="Separate Interpreter process for each note"
+                 ng-click="setPerNoteOption(setting.id, 'isolated')">
+                isolated per note
+              </a>
+              <a role="button" class="dropdown-item"
+                 ng-if="getInterpreterRunningOption(setting.id) === 'Per User'"
+                 title="Separate Interpreter process for each note"
+                 ng-click="setPerUserOption(setting.id, 'isolated')">
+                isolated per user
+              </a>
+            </div>
+          </div>
+          <div class="col-auto dpl-left-center">process.</div>
+          <div class="col-auto">
+              <span ng-if="getInterpreterRunningOption(setting.id) === 'Per User' && ticket.principal !== 'anonymous'">
+                <span ng-if="getPerNoteOption(setting.id) === 'shared'">
+                  <button type="button" class="btn btn-success btn-sm"
+                          ng-click="setPerNoteOption(setting.id, 'scoped')"
+                          ng-disabled="visibleSetting !==sectionIndex"
+                          data-bs-toggle="dropdown">
+                    <i class="fas fa-plus me-2"></i> Add
+                  </button>
+                </span>
+              </span>
+          </div>
+        </div>
+        <div class="row my-2"
+             ng-if="getInterpreterRunningOption(setting.id) === 'Per User'&& ticket.principal !== 'anonymous'&& getPerNoteOption(setting.id) !== 'shared'">
+          <div class="col-auto">
+            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    ng-disabled="true">
+              Per Note
+            </button>
+          </div>
+          <div class="col-auto dpl-center-center">in</div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    ng-disabled="visibleSetting !==sectionIndex">
+              {{getPerNoteOption(setting.id)}}
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <a role="button" class="dropdown-item"
+                 title="Separate Interpreter instance for each note"
+                 ng-click="setPerNoteOption(setting.id, 'scoped')">
+                scoped per note
+              </a>
+              <a role="button" class="dropdown-item"
+                 title="Separate Interpreter process for each note"
+                 ng-click="setPerNoteOption(setting.id, 'isolated')">
+                isolated per note
+              </a>
+            </ul>
+          </div>
+          <div class="col-auto dpl-left-center">process.</div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-danger btn-sm"
+                    ng-disabled="visibleSetting !==sectionIndex"
+                    ng-click="setPerNoteOption(setting.id, 'shared')"
+                    data-bs-toggle="dropdown">
+              <i class="fas fa-minus me-2"></i> Remove
+            </button>
+          </div>
+        </div>
+        <!-- checkbox options -->
+        <div class="row interpreter"
+             ng-show="getInterpreterRunningOption(setting.id)=='Per User' && getPerUserOption(setting.id)=='isolated'">
+          <div class="col-sm-4">
+            <div class="form-check">
+              <input class="form-check-input"
+                     type="checkbox"
+                     ng-model="setting.option.isUserImpersonate"
+                     ng-disabled="visibleSetting !==sectionIndex" />
+              <label class="form-check-label">User Impersonate</label>
+            </div>
+          </div>
+        </div>
+        <div class="row interpreter">
+          <div class="col-sm-4">
+            <div class="form-check">
+              <input class="form-check-input"
+                     type="checkbox"
+                     id="isExistingProcess"
+                     ng-model="setting.option.isExistingProcess"
+                     ng-disabled="visibleSetting !==sectionIndex" />
+              <label class="form-check-label"
+                     for="isExistingProcess">
+                Connect to existing process
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="row interpreter mb-4"
+             ng-if="setting.option.isExistingProcess">
+          <div class="col-sm-2">
+            <label class="form-label" for="newInterpreterSettingHost">Host</label>
+            <input id="newInterpreterSettingHost"
+                   class="form-control"
+                   ng-model="setting.option.host"
+                   ng-disabled="visibleSetting !==sectionIndex"  />
+          </div>
+          <div class="col-sm-1">
+            <label class="form-label"
+                   for="newInterpreterSettingPort">
+              Port
+            </label>
+            <input id="newInterpreterSettingPort"
+                   class="form-control"
+                   ng-model="setting.option.port"
+                   ng-disabled="visibleSetting !==sectionIndex" />
+          </div>
+        </div>
+        <div class="row interpreter">
+          <div class="col-sm-4">
+            <div class="form-check">
+              <input class="form-check-input"
+                     type="checkbox"
+                     id="idShowPermission"
+                     ng-click="togglePermissions(setting.name)"
+                     ng-model="setting.option.setPermission"
+                     ng-disabled="visibleSetting !==sectionIndex" />
+              <label class="form-check-label"
+                     for="idShowPermission">
+                Set permission
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="row interpreter">
+          <div class="col-md-12">
+            <!-- permissions -->
+            <div ng-show="setting.option.setPermission"
+                 class="permissions-form">
+              <div>
+                <p>
+                  Enter comma separated users and groups in the fields. Empty field (*) implies anyone can run this interpreter.
+                </p>
+                <div>
+
+                  <span class="owners">Owners</span>
+                  <select id="{{setting.name}}Owners"
+                          class="form-control"
+                          multiple="multiple"
+                          ng-disabled="visibleSetting !==sectionIndex">
+                    <option ng-repeat="owner in setting.option.owners"
+                            selected="selected">
+                      {{owner}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row interpreter mt-4">
+          <div ng-show="_.isEmpty(setting.properties) && _.isEmpty(setting.dependencies) && visibleSetting !==sectionIndex"
+               class="col-md-12 text-muted">
+            <i>Currently, there are no properties and dependencies set for this interpreter.</i>
+          </div>
+          <div class="col-md-12"
+               ng-show="!_.isEmpty(setting.properties) || visibleSetting ===sectionIndex">
+            <h3>Properties</h3>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="text-start w-25">Name</th>
+                  <th class="text-start">Value</th>
+                  <th class="text-start w-25">Description</th>
+                  <th class="text-start">Type</th>
+                  <th class="text-end"
+                      ng-if="visibleSetting ===sectionIndex">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="property in setting.properties">
+                  <td class="align-top text-start">{{property.name}}</td>
+                  <td class="align-top text-start">
+                    <span ng-if="property.type === 'textarea'">
+                      <textarea class="form-control"
+                                ng-model="property.value"
+                                ng-if="visibleSetting ===sectionIndex"
+                                value="{{property.value | breakFilter}}"
+                                >
+                      </textarea>
+                      <span ng-if="visibleSetting !==sectionIndex">
+                        {{property.value | breakFilter}}
+                      </span>
+                    </span>
+                    <span ng-if="property.type === 'string'">
+                      <input class="form-control"
+                             type="text"
+                             ng-model="property.value"
+                             ng-if="visibleSetting ===sectionIndex"
+                             value="{{property.value}}"
+                      />
+                      <span ng-if="visibleSetting !==sectionIndex">
+                        {{property.value}}
+                      </span>
+                    </span>
+                    <span ng-if="property.type === 'number'">
+                      <input class="form-control"
+                             type="number"
+                             ng-model="property.value"
+                             ng-if="visibleSetting ===sectionIndex"
+                             value="{{property.value}}"
+                      />
+                      <span ng-if="visibleSetting !==sectionIndex">
+                        {{property.value}}
+                      </span>
+                    </span>
+                    <span ng-if="property.type === 'url'">
+                      <input class="form-control"
+                             type="url"
+                             ng-model="property.value"
+                             ng-if="visibleSetting ===sectionIndex"
+                             value="{{property.value}}"
+                      />
+                      <a ng-if="visibleSetting !==sectionIndex"
+                         ng-href="{{property.value}}">
+                        {{property.value}}
+                      </a>
+                    </span>
+                    <span ng-if="property.type === 'password'">
+                      <input class="form-control"
+                             type="password"
+                             ng-model="property.value"
+                             ng-if="visibleSetting ===sectionIndex"
+                             value="{{property.value}}"
+                      />
+                      <span ng-if="visibleSetting !==sectionIndex">
+                        {{property.value ? '***' : ''}}
+                      </span>
+                    </span>
+                    <span ng-if="property.type === 'checkbox'">
+                      <span class="form-check"
+                            ng-if="visibleSetting ===sectionIndex">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               ng-model="property.value"
+                               value="{{property.value}}"
+                        />
+                      </span>
+                      <span ng-if="visibleSetting !==sectionIndex">
+                        {{property.value}}
+                      </span>
+                    </span>
+                  </td>
+                  <td class="align-top text-start">
+                    <input class="form-control"
+                           type="text"
+                           value="{{property.description}}"
+                           ng-model="property.description"
+                           ng-if="visibleSetting ===sectionIndex" />
+                    <span ng-if="visibleSetting !==sectionIndex">{{property.description}}</span>
+                  </td>
+                  <td>
+                    {{property.type}}
+                  </td>
+                  <td class="align-top text-end"
+                      ng-if="visibleSetting ===sectionIndex">
+                    <button class="btn btn-secondary"
+                            ng-click="removeInterpreterProperty(property.name, setting.id)">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr ng-if="visibleSetting ===sectionIndex">
+                  <td class="align-top">
+                    <input class="form-control"
+                           ng-model="setting.propertyKey"
+                           required />
+                    <span class="form-text">
+                      This field is required
+                    </span>
+                  </td>
+                  <td class="align-top" ng-switch on="setting.propertyType">
+                    <textarea class="form-control"
+                              rows="1"
+                              ng-switch-default
+                              ng-model="setting.propertyValue"></textarea>
+                    <input class="form-control"
+                           type="text"
+                           ng-switch-when="string"
+                           ng-model="setting.propertyValue" />
+                    <input class="form-control"
+                           type="number"
+                           ng-switch-when="number"
+                           ng-model="setting.propertyValue" />
+                    <input class="form-control"
+                           type="text"
+                           ng-switch-when="url"
+                           ng-model="setting.propertyValue" />
+                    <input class="form-control"
+                           type="password"
+                           ng-switch-when="password"
+                           ng-model="setting.propertyValue" />
+                    <span class="form-check"
+                          ng-switch-when="checkbox">
+                      <input class="form-check-input"
+                             type="checkbox"
+                             ng-model="setting.propertyValue" />
+                    </span>
+                  </td>
+                  <td class="align-top">
+                    <!-- Check out what the heck is going on with this -->
+                    <input class="form-control"
+                           ng-model="setting.description" />
+                  </td>
+                  <td >
+                    <div class="input-group">
+                      <select class="form-select"
+                              ng-model="setting.propertyType"
+                              ng-init="setting.propertyType=interpreterPropertyTypes[0]"
+                              ng-options="item for item in interpreterPropertyTypes"
+                              ng-change="defaultValueByType(setting)"></select>
+
+                    </div>
+                  </td>
+                  <td class="text-end">
+                    <button class="btn btn-primary" type="button"
+                            ng-click="addNewInterpreterProperty(setting.id)">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="row interpreter mt-4">
+          <div class="col-md-12"
+               ng-show="!_.isEmpty(setting.dependencies) || visibleSetting ===sectionIndex">
+            <h3>Dependencies</h3>
+            <p class="text-muted"
+               ng-show="visibleSetting ===sectionIndex">
+              These dependencies will be added to classpath when interpreter process starts.
+            </p>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="text-start">Artifact</th>
+                  <th class="text-start">Exclude</th>
+                  <th class="text-end"
+                      ng-if="visibleSetting ===sectionIndex">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="dep in setting.dependencies">
+                  <td>
+                    <input class="form-control"
+                           ng-if="visibleSetting ===sectionIndex"
+                           ng-model="dep.groupArtifactVersion"
+                           placeholder="groupId:artifactId:version or local file path"
+                    />
+                    <span ng-if="visibleSetting !==sectionIndex">
+                      {{dep.groupArtifactVersion | breakFilter}}
+                    </span>
+                  </td>
+                  <td>
+                    <input class="form-control"
+                           ng-if="visibleSetting ===sectionIndex"
+                           ng-model="dep.exclusions"
+                           placeholder="Separate with comma groupId:artifactId list"
+                    />
+                    <span class="form-text"
+                          ng-if="visibleSetting ===sectionIndex">
+                      Optional field
+                    </span>
+                    <span ng-if="visibleSetting !==sectionIndex">{{dep.exclusions.join()}}</span>
+                  </td>
+                  <td class="text-end"
+                      ng-if="visibleSetting ===sectionIndex">
+                    <button class="btn btn-secondary"
+                          ng-click="removeInterpreterDependency(dep.groupArtifactVersion, setting.id)">
+                      <i class="fas fa-times"></i>
+                  </button>
+                  </td>
+                </tr>
+                <tr ng-if="visibleSetting ===sectionIndex">
+                  <td>
+                    <input class="form-control"
+                           ng-model="setting.depArtifact"
+                           placeholder="groupId:artifactId:version or local file path" />
+                  </td>
+                  <td>
+                    <input class="form-control"
+                           ng-model="setting.depExclude"
+                           placeholder="Separate with comma groupId:artifactId list"
+                           ng-list="" />
+                    <span class="form-text"
+                          ng-if="visibleSetting ===sectionIndex">
+                      Optional field
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    <button class="btn btn-primary"
+                            ng-click="addNewInterpreterDependency(setting.id)">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="row interpreter"
+             ng-show="visibleSetting ===sectionIndex">
+          <div class="col-md-12">
+            <form class="float-end">
+              <button type="button"
+                      class="btn btn-light btn-sm me-2"
+                      ng-disabled="waiting"
+                      ng-click="resetInterpreterSetting(setting.id)">
+                Cancel
+              </button>
+              <button type="submit"
+                      class="btn btn-primary btn-sm"
+                      ng-click="updateInterpreterSetting(setting.id)">
+                Save
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+

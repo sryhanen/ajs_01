@@ -1,0 +1,155 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+/* Alerts */
+
+.alert-danger {
+  background-color: var(--danger-100);
+  color: var(--danger-800);
+  border: 1px solid var(--danger-300);
+}
+
+.dark-mode .alert-danger {
+  background-color: var(--danger-800);
+  border-color: var(--danger-700);
+  color: var(--danger-100);
+}
+
+.alert-warning {
+  background-color: var(--warning-100);
+  color: var(--warning-700);
+  border-color: var(--warning-300)
+}
+
+.dark-mode .alert-warning {
+  background-color: var(--warning-300);
+  border-color: var(--warning-200);
+  color: var(--warning-700);
+}
+
+.alert-info {
+  color: var(--secondary-700);
+  background-color: var(--secondary-100);
+  border-color: var(--secondary-200);
+}
+
+.dark-mode .alert-info {
+  color: var(--secondary-100);
+  background-color: var(--secondary-700);
+  border-color: var(--secondary-600);
+}
+
+/* modals */
+
+.modal-title {
+  margin-top: 0;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.modal-footer button {
+  margin: 0 0 0 10px !important;
+}
+
+.btn-close {
+  opacity: 1;
+  background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23718096'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+}
+
+.dark-mode {
+  .modal-content {
+    background-color: var(--dm-grey-700);
+  }
+  .modal-header {
+    border-bottom: 1px solid var(--dm-grey-500);
+  }
+  .modal-footer {
+    border-top: 1px solid var(--dm-grey-500);
+  }
+  .btn-close {
+    opacity: 1;
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23B8C5F7'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+  }
+}
+
+/* About Modal */
+
+.modal-body-about-version {
+  font-weight: 500;
+}
+
+.logo {
+  width: 100px;
+}
+
+.dark-mode .logo {
+  filter: brightness(100);
+}
+
+/* toasts */
+
+.toast {
+  background-color: var(--grey-100);
+  border: 1px solid var(--grey-300);
+  box-shadow: 0 0.5rem 1rem var(--grey-400);
+}
+
+.dark-mode .toast {
+  background-color: var(--dm-grey-800);
+  border: 1px solid var(--dm-grey-700);
+  box-shadow: 0 0.5rem 1rem var(--dm-grey-900);
+}
+
+.toast-header {
+  color: var(--grey-700);
+  background-color: var(--grey-000);
+  border-bottom: 1px solid var(--grey-200);
+}
+
+.dark-mode .toast-header {
+  color: var(--dm-grey-200);
+  background-color: var(--dm-grey-700);
+  border-bottom: 1px solid var(--dm-grey-700);
+}

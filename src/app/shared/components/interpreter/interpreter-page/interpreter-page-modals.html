@@ -1,0 +1,238 @@
+<!--
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+-->
+<div class="modal fade"
+     id="restartInterpreterPageModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="restartInterpreterPageModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="restartInterpreterPageModalLabel">
+          Restart the interpreter
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('restartInterpreterPageModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        Do you want to restart this interpreter?
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-primary"
+                ng-click="triggerCallback('restartInterpreterPageModal')">
+          Restart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete interpreter -->
+<div class="modal fade"
+     id="deleteInterpreterModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="deleteInterpreterSettingsModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="deleteInterpreterSettingsModalLabel">
+          Delete interpreter
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('deleteInterpreterModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        Do you want to remove this interpreter permanently?
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                ng-click="triggerCallback('deleteInterpreterModal')"
+                class="btn btn-primary">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update and restart interpreter -->
+<div class="modal fade"
+     id="updateInterpreterModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="updateInterpreterSettingsModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="updateInterpreterSettingsModalLabel">
+          Save changes
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="updateDeny()"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        Do you want to save changes and restart the interpreter?
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                ng-click="updateDeny()">
+          Cancel
+        </button>
+        <button type="button"
+                ng-click="triggerCallback('updateInterpreterModal')"
+                class="btn btn-primary">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Empty interpreter name -->
+<div class="modal fade"
+     id="interpreterNameModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="interpreterNameModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="interpreterNameModalLabel">
+          Write a correct interpreter name
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('interpreterNameModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        The interpreter must have a name. Following characters are allowed: a-z, A-Z, 0-9, -, and _.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Empty interpreter group -->
+<div class="modal fade"
+     id="interpreterGroupModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="interpreterGroupModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="interpreterGroupModalLabel">
+          Choose a group for the interpreter
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('interpreterGroupModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        The interpreter must have a group.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Interpreter name exists -->
+<div class="modal fade"
+     id="interpreterNameExistsModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="interpreterNameExistsModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="interpreterNameExistsModalLabel">
+          Interpreter's name already exists
+        </h5>
+        <button type="button"
+                class="btn-close"
+                ng-click="close('interpreterNameExistsModal')"
+                aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        The name already exists. Please, choose a different name.
+      </div>
+    </div>
+  </div>
+</div>
+

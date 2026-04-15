@@ -1,0 +1,105 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<div id="clusterPage" class="container-fluid ">
+  <div id="cluster-manager-header"
+       class="settings-header mt-5">
+    <div class="header-top">
+      <h1>Cluster</h1>
+      <p>You can monitor the status of cluster and navigate to nodes.</p>
+    </div>
+  </div>
+
+  <div class="mb-5">
+    <div ng-if="!isFilterLoaded"
+         class="paragraph-col">
+      <div class="cluster-space box cluster-margin text-center">
+        <i class="fas fa-spinner spin-animation me-2 text-muted"></i>
+        Loading...
+      </div>
+    </div>
+    <div ng-if="filteredNodes.length > 0"
+         ng-repeat="node in getNodesInCurrentPage(filteredNodes)"
+         class="paragraph-col">
+      <div class="cluster-space box cluster-margin">
+        <h2 class="d-flex align-items-center" style="line-height:0;">
+          <a ng-href="#/cluster/{{node.NODE_NAME}}/all">
+            {{node.NODE_NAME}}
+          </a>
+          <span class="ms-2 fs-6" ng-switch="node.properties.STATUS">
+            <i style="color: #70EDD9;"
+               ng-switch-when="ONLINE"
+               class="fas fa-circle"
+               title="online"></i>
+            <i style="color: #FECACA;"
+               ng-switch-when="OFFLINE"
+               class="fas fa-circle"
+               title="offline"></i>
+          </span>
+        </h2>
+        <div class="row properties mt-3">
+          <div ng-show="_.isEmpty(node.properties)"
+               class="col-md-12 text-muted">
+            <i>Currently there are no properties for this node.</i>
+          </div>
+          <div class="col-md-12"
+               ng-show="!_.isEmpty(node.properties)">
+            <h3>Properties</h3>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th class="w-25">Name</th>
+                  <th class="w-75">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="key in node.properties | sortByKey">
+                  <td class="align-middle">{{key}}</td>
+                  <td class="align-middle">
+                    <span ng-if="key === 'INTP_PROCESS_LIST'"
+                          ng-repeat="value in node.properties[key]">
+                      <a ng-href="#cluster/{{node.NODE_NAME}}/{{value}}">{{value}}</a>,
+                    </span>
+                    <span ng-if="key !== 'INTP_PROCESS_LIST'">
+                      {{node.properties[key]}}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div ng-if="isFilterLoaded === false && filteredNodes.length <= 0"
+         class="paragraph-col">
+      <div class="cluster-space box cluster-margin text-center">No cluster found.</div>
+    </div>
+
+    <!-- pagination -->
+    <div class="cluster-pagination-container mt-5">
+      <ul uib-pagination
+          class="pagination justify-content-center"
+          total-items="filteredNodes.length"
+          ng-model="pagination.currentPage"
+          items-per-page="pagination.itemsPerPage"
+          boundary-links="true"
+          rotate="false"
+          max-size="pagination.maxPageCount"
+          previous-text="Previous" next-text="Next"
+          first-text="&laquo;" last-text="&raquo;"></ul>
+    </div>
+  </div>
+</div>
+

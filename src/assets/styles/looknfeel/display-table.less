@@ -1,0 +1,185 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+/* Table Display */
+
+.note-name-desc-panel {
+  margin-top: 20px;
+  margin-bottom: 4px;
+}
+
+.default-interpreter-select {
+  margin-top: 12px;
+}
+
+.table-display {
+  .option {
+    padding: 15px 20px;
+    background: var(--grey-100);
+    border-radius: 10px;
+    .panel-default {
+      .panel-available-fields {
+        background: var(--grey-300);
+        padding: 10px 15px;
+        border-radius: 10px;
+      }
+    }
+    .columns {
+      height: 100%;
+      ul {
+        background: var(--grey-000);
+        height: 150px;
+        border: 1px solid var(--grey-400);
+      }
+    }
+  }
+}
+
+.dark-mode .table-display .option {
+  background: var(--dm-grey-600);
+  .panel {
+    background: transparent;
+  }
+  .panel-default .panel-available-fields {
+    background-color: var(--dm-grey-700);
+  }
+  .columns ul {
+    background: var(--dm-grey-800);
+    border: 1px solid var(--dm-grey-500);
+  }
+}
+
+.paragraph .table-display .hljs {
+  background: none;
+}
+
+.network-labels {
+  margin: 0.2em;
+}
+
+/* graph customization */
+
+.nvd3 .nv-axis {
+  line {
+    stroke: var(--grey-300);
+  }
+  path {
+    stroke: var(--grey-400);
+  }
+}
+
+.dark-mode .nvd3 .nv-axis {
+  line {
+    stroke: var(--dm-grey-500);
+  }
+  path {
+    stroke: var(--dm-grey-500);
+  }
+}
+
+.nv-controlsWrap .nv-legend-symbol {
+  fill: var(--primary-600) !important;
+  stroke: var(--primary-600) !important;
+}
+
+.dark-mode .nv-controlsWrap .nv-legend-symbol {
+  fill: var(--tertiary-300) !important;
+  stroke: var(--tertiary-300) !important;
+}
+
+.btn.ui-draggable,
+li.ui-draggable > .btn,
+li.ui-draggable > .btn-group > .btn {
+  background: var(--grey-200) !important;
+}
+
+.dark-mode .btn.ui-draggable,
+.dark-mode li.ui-draggable > .btn,
+.dark-mode li.ui-draggable > .btn-group > .btn {
+  background: var(--dm-grey-500) !important;
+}
+
+.dark-mode .ui-draggable .fa-times {
+  color: var(--grey-400);
+}
+
+.ui-draggable .pivot-value-option {
+  color: var(--grey-600);
+  text-transform: uppercase;
+}
+
+.dark-mode .ui-draggable .pivot-value-option {
+  color: var(--dm-grey-300);
+}
+
+.ui-draggable-handle {
+  display: inline-block;
+  margin: 0 5px 5px 0;
+}
+
+/* new drag-and-drop */
+
+.drop-column {
+  background: var(--grey-300);
+  border: 1px solid var(--grey-400);
+  height: 257px;
+  overflow: auto;
+  @media (max-width: 991px) {
+    height: 91px;
+  }
+  &.scatter-chart {
+    height: 62px;
+  }
+  .badge {
+    cursor: pointer;
+    line-height: normal;
+  }
+}
+
+.dark-mode .drop-column {
+  background: var(--dm-grey-500);
+  border: 1px solid var(--dm-grey-400);
+}
+

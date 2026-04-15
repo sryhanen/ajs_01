@@ -1,0 +1,228 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.revisions-comparator {
+  background: var(--grey-000);
+  padding: 25px 35px;
+  box-shadow: 0 2px 4px var(--grey-400);
+  border-bottom: 1px solid var(--grey-300);
+  border-radius: 20px;
+}
+
+.dark-mode .revisions-comparator {
+  background: var(--dm-grey-700);
+  box-shadow: 0 2px 4px var(--dm-grey-900);
+  border-bottom: 2px solid var(--dm-grey-700);
+}
+
+.revisions-comparator-panel {
+  transition: all 0.2s;
+  width: 100%;
+  background-color: var(--grey-200);
+  border-radius: 10px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.dark-mode .revisions-comparator-panel {
+  background-color: var(--dm-grey-800);
+}
+
+.revisions-comparator-panel:first-child {
+  margin-top: 5px;
+}
+
+.revisions-comparator-panel:last-child {
+  margin-bottom: 5px;
+}
+
+.revisions-comparator-panel:hover {
+  background-color: var(--grey-300);
+}
+
+.dark-mode .revisions-comparator-panel:hover {
+  background-color: var(--dm-grey-900);
+}
+
+.revisions-comparator-panel-selected {
+  background-color: var(--secondary-200) !important;
+}
+
+.dark-mode .revisions-comparator-panel-selected {
+  background: var(--dm-grey-500) !important;
+}
+
+.panel-id {
+  word-break: break-all;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 0;
+  color: var(--primary-700);
+}
+
+.dark-mode .panel-id {
+  color: var(--tertiary-300);
+}
+
+.revisions-comparator-panel.ng-enter,
+.revisions-comparator-panel.ng-enter.ng-enter-active ,
+.revisions-comparator-panel.ng-leave,
+.revisions-comparator-panel.ng-leave-active {
+  transition-duration: 0s !important;
+}
+
+.paragraphs-div {
+  overflow: auto;
+  height: 320px;
+  padding: 10px 15px;
+}
+
+pre {
+  background: #F7FAFC;
+  border: 2px solid var(--grey-400);
+  border-radius: 5px;
+}
+
+.dark-mode pre {
+  background: var(--dm-grey-800);
+  border: 2px solid var(--dm-grey-500);
+}
+
+.empty-paragraph-message {
+  font-size: 28px;
+  color: var(--dm-grey-500);
+  margin: 0 auto;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.revisions-comparator-bar .btn-group {
+  margin: 0;
+}
+
+.revisions-comparator-bar .btn-default {
+  text-transform: none;
+}
+
+.revisions-comparator-code-panel {
+  display: block;
+  clear: both;
+  width: 100%;
+  float: left;
+  height: 322px;
+  overflow-y: auto;
+}
+
+.revisions-comparator-code-panel.empty-code-panel {
+  text-align: center;
+  font-size: 28px;
+  color: var(--dm-grey-500);
+  height: 317px;
+  background: #F7FAFC;
+  border: 2px solid var(--grey-400);
+  border-radius: 5px;
+}
+
+.revisions-comparator-bar {
+  width: 100%;
+}
+
+.revisions-comparator-status {
+  word-break: break-word;
+}
+
+.revisions-comparator-paragraph-title {
+  word-break: break-word;
+  margin-bottom: 0;
+  color: var(--primary-900);
+  font-size: 14px;
+}
+
+.dark-mode .revisions-comparator-paragraph-title {
+  color: var(--grey-300);
+}
+
+#diffPanel {
+  border: 2px solid var(--grey-400);
+  border-radius: 5px !important;
+}
+
+.dark-mode #diffPanel {
+  border: 2px solid var(--dm-grey-500);
+}
+
+.revision-name-for-compare {
+  cursor: default;
+  overflow: hidden;
+  vertical-align: bottom;
+  display: inline-block;
+  max-width: 100px;
+  padding: 1px 5px;
+}
+
+.revisions-comparator-caret {
+  padding-bottom: 5px;
+}
+
+.revisions-comparator-link, .revisions-comparator-link:hover,
+.revisions-comparator-link:visited, .revisions-comparator-link:focus {
+  text-decoration: none;
+  outline: none;
+  color: #000;
+}
+
+.revisions-comparator-first-string {
+  display: block;
+  height: auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  color: var(--grey-700);
+}
+
+.dark-mode .revisions-comparator-first-string {
+  color: var(--dm-grey-200);
+}
+
+.revisions-comparator-dropdown {
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+.color-green-row {
+  background-color: rgba(112, 237, 217, 0.5);
+  display: block;
+  color: var(--grey-900);
+}
+
+.dark-mode .color-green-row {
+  color: #F7FAFC;
+  background: rgba(112, 237, 217, 0.4);
+}
+
+.color-red-row {
+  background-color: #FECACA;
+  display: block;
+  color: var(--grey-900);
+}
+
+.dark-mode .color-red-row {
+  color: #F7FAFC;
+  background-color: rgba(254, 202, 202, 0.6);
+}

@@ -1,0 +1,79 @@
+<!--
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div id="configurationPage" class="container-fluid ">
+  <div class="settings-header mt-5 mb-4">
+    <div class="header-top">
+      <div class="row">
+        <div class="col-md-12">
+          <h1>Configurations</h1>
+          <p>Shows current configurations for Zeppelin Server.</p>
+          <div class="alert alert-info"
+               role="alert">
+            <b>Note:</b> For security reasons, some key/value pairs including passwords would not be shown.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box mb-3">
+    <h2>Console Debug</h2>
+    <div class="row">
+      <div class="col-auto">
+        <label for="consoleRange"
+               class="form-label">
+          Console debug level
+        </label>
+      </div>
+      <div class="col">
+        <p>{{consoleTitle}}</p>
+        <input ng-change="consoleChanged()"
+               ng-model="consoleLVL"
+               type="range"
+               class="form-range"
+               min="0"
+               max="4"
+               step="1"
+               id="consoleRange" />
+        <div id="consoleRangeHelp" class="form-text">
+          Refreshing the page will reset the range's setting.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box mb-5">
+    <div>
+      <div class="row configuration">
+        <div class="col-md-12">
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="key in configurations | sortByKey" >
+              <td>{{key}}</td>
+              <td class="overflow-auto">{{configurations[key]}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
