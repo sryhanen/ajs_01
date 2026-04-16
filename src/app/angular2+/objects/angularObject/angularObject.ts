@@ -44,16 +44,9 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
-import Stubable from '../../../shared/interfaces/stubable';
-import {OutputPlugin} from './plugins/outputPlugin';
-import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
-import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
 
-export interface Output extends Stubable {
-  toDataTablesPlugin(channel:Channel): DataTablesPlugin;
-  toTextPlugin(): OutputPlugin;
-  touPlotPlugin(): OutputPlugin;
-  toAngularPlugin(): AngularPlugin;
-  isAggregated(): boolean;
-  type():string;
+export interface AngularObject<T> extends Channel{
+  name(): string;
+  value():T;
+  update(value:T):void;
 }

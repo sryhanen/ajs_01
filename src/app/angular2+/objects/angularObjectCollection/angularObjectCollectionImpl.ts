@@ -43,47 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputContainer} from './outputContainer';
-import {Channel} from '../../channel/channel';
-import {OutputFormat} from '../format/outputFormat';
-import {OutputSwitcherImpl} from '../switcher/outputSwitcherImpl';
-import {OutputSwitcher} from '../switcher/outputSwitcher';
-import {TextFormat} from '../format/text/textFormat';
-import {DataTablesFormat} from '../format/dataTables/dataTablesFormat';
-import {uPlotFormat} from '../format/uPlot/uPlotFormat';
-import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
-import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/interpreterErrorListenerImpl';
-import {AngularFormat} from '../format/angular/angularFormat';
-import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
+import {AngularObjectCollection} from './angularObjectCollection';
+import {Channel} from '../channel/channel';
+import {MessageDTO} from '../message/messageDTO';
+import {AngularObjectUpdateMessageImpl} from '../message/angularObjectUpdateMessage/angularObjectUpdateMessageImpl';
+import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
+import {PushValue} from '../pushValue/pushValue';
+import {AngularObjectRemoveDTO} from '../message/angularObjectRemoveMessage/angularObjectRemoveDTO';
+import {AngularObject} from '../angularObject/angularObject';
 
-export class OutputContainerImpl implements OutputContainer{
-  private readonly _channel:Channel;
-  private readonly _outputFormats:OutputFormat[];
-  private readonly _outputSwitcher:OutputSwitcher;
-  private readonly _errorListener: InterpreterErrorListener;
+export class AngularObjectCollectionImpl implements AngularObjectCollection {
+  private readonly _channel: Channel;
+  private readonly _angularObjects: AngularObject<unknown>[];
+  private readonly _pushValues: PushValue<AngularObject<unknown>[]>[];
 
-  constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
+  constructor(channel: Channel) {
     this._channel = channel;
-    this._outputFormats = [
-      new DataTablesFormat(this),
-      new uPlotFormat(this),
-      new TextFormat(this),
-      new AngularFormat(this, angularObjectCollection),
-    ];
-    this._outputSwitcher = new OutputSwitcherImpl(this, this._outputFormats);
-    this._errorListener = new InterpreterErrorListenerImpl(this);
-  }
-
-  errorListener(): InterpreterErrorListener {
-    return this._errorListener;
-  }
-
-  outputSwitcher(): OutputSwitcher {
-    return this._outputSwitcher;
-  }
-
-  outputFormats(): OutputFormat[] {
-    return this._outputFormats;
+    this._angularObjects = [];
+    this._pushValues = [];
   }
 
   request(data: object): void {
@@ -91,7 +68,29 @@ export class OutputContainerImpl implements OutputContainer{
   }
 
   response(data: object): void {
-    this._outputSwitcher.response(data);
-    this._errorListener.response(data);
+    const message = data as MessageDTO<unknown>;
+    if(message.op === 'ANGULAR_OBJECT_UPDATE'){
+      const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(message.data as AngularObjectUpdateDTO);
+      const angularObject = angularObjectUpdateMessage.toAngularObject(this);
+      const existingAngularObject = this._angularObjects.find(ao => ao.name() === angularObject.name());
+      if(existingAngularObject){
+        existingAngularObject.response(data);
+      }
+      else{
+        this._angularObjects.push(angularObject);
+        this._pushValues.forEach(value => value.update(this._angularObjects));
+      }
+    }
+    else if(message.op === 'ANGULAR_OBJECT_REMOVE'){
+      const objectToRemove = message.data as AngularObjectRemoveDTO;
+      const objectIndex = this._angularObjects.findIndex(ao => ao.name() === objectToRemove.name);
+      this._angularObjects.splice(objectIndex, 1);
+      this._pushValues.forEach(value => value.update(this._angularObjects));
+    }
+  }
+
+  angularObjects(value: PushValue<AngularObject<unknown>[]>): void {
+    value.update(this._angularObjects);
+    this._pushValues.push(value);
   }
 }

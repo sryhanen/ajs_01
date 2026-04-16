@@ -52,7 +52,6 @@ import {ParagraphDTO} from '../paragraph/paragraphDTO';
 import {MessageDTO} from '../message/messageDTO';
 import {Paragraph} from '../paragraph/paragraph';
 import {PushValueImpl} from '../pushValue/pushValueImpl';
-import {FakeChangeDetectorRef} from '../pushValue/fakeCdr/fakeChangeDetectorRef';
 import {PushValue} from '../pushValue/pushValue';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 
@@ -113,7 +112,7 @@ describe('Notebook', () => {
     let noteResponse: MessageDTO<NotebookDTO>;
     beforeEach(() => {
       notebook = new NotebookImpl(channel, partialNote);
-      paragraphs = new PushValueImpl<Paragraph[]>(new FakeChangeDetectorRef());
+      paragraphs = new PushValueImpl<Paragraph[]>();
       paragraphDtos = [{id: 'paragraph 1'}, {id: 'paragraph 2'}];
       notebook.paragraphs(paragraphs);
       noteResponse = {

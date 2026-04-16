@@ -43,17 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
-import Stubable from '../../../shared/interfaces/stubable';
-import {OutputPlugin} from './plugins/outputPlugin';
-import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
-import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
+import {AngularPluginImpl} from './angularPluginImpl';
 
-export interface Output extends Stubable {
-  toDataTablesPlugin(channel:Channel): DataTablesPlugin;
-  toTextPlugin(): OutputPlugin;
-  touPlotPlugin(): OutputPlugin;
-  toAngularPlugin(): AngularPlugin;
-  isAggregated(): boolean;
-  type():string;
-}
+describe('Angular plugin', () => {
+  const template = '<h1>Test Template</h1>';
+  const angularPlugin = new AngularPluginImpl(template);
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(angularPlugin).toBeInstanceOf(AngularPluginImpl);
+    });
+
+    it('Should have template', () => {
+      expect(angularPlugin.template()).toEqual(template);
+    });
+
+    it('Should not be stub', () => {
+      expect(angularPlugin.isStub()).toBe(false);
+    });
+
+    it('Attach method should throw', () => {
+      const element = document.createElement('a');
+      expect(() => angularPlugin.attach(element)).toThrow();
+    });
+  });
+});

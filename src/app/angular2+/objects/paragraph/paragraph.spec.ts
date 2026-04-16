@@ -52,6 +52,7 @@ import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {MessageDTO} from '../message/messageDTO';
 import {ParagraphOutputRequestDTO} from '../output/paragraphOutputRequest/paragraphOutputRequestDTO';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
+import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 
 describe('Paragraph', () => {
   const paragraphId = 'paragraphId';
@@ -67,7 +68,7 @@ describe('Paragraph', () => {
 
   describe('Birth', () => {
     beforeEach(() => {
-      paragraph = new ParagraphImpl(channel, paragraphData);
+      paragraph = new ParagraphImpl(channel, paragraphData, {} as AngularObjectCollection);
     });
 
     it('Should initialize', () => {
@@ -87,7 +88,7 @@ describe('Paragraph', () => {
     let spy;
     beforeEach(() => {
       spy = vi.spyOn(channel, 'request');
-      paragraph = new ParagraphImpl(channel, paragraphData);
+      paragraph = new ParagraphImpl(channel, paragraphData, {} as AngularObjectCollection);
     });
 
     it('Should decorate PARAGRAPH_OUTPUT_REQUEST', () => {
@@ -126,7 +127,7 @@ describe('Paragraph', () => {
   describe('Response', () => {
     let spy;
     beforeEach(() => {
-      paragraph = new ParagraphImpl(channel, paragraphData);
+      paragraph = new ParagraphImpl(channel, paragraphData, {} as AngularObjectCollection);
       const container = paragraph.outputContainer();
       spy = vi.spyOn(container, 'response');
       expect(spy).toHaveBeenCalledTimes(0);

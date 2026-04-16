@@ -49,6 +49,7 @@ import {ParagraphView} from '../paragraph/paragraphView';
 import {PushValueImpl} from '../../objects/pushValue/pushValueImpl';
 import {Paragraph} from '../../objects/paragraph/paragraph';
 import {PushValue} from '../../objects/pushValue/pushValue';
+import {PushValueWithChangeDetection} from '../../objects/pushValue/pushValueWithChangeDetection';
 
 @Component({
   selector: 'notebook',
@@ -71,7 +72,7 @@ export class NotebookView implements OnInit {
   protected paragraphs: PushValue<Paragraph[]>;
 
   ngOnInit() {
-    this.paragraphs = new PushValueImpl<Paragraph[]>(this.cdr);
+    this.paragraphs = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
     this.notebook.paragraphs(this.paragraphs);
   }
 }

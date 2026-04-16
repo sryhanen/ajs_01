@@ -52,16 +52,17 @@ import {MessageDTO} from '../message/messageDTO';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ParagraphOutputRequestDTO} from '../output/paragraphOutputRequest/paragraphOutputRequestDTO';
+import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
   private readonly _paragraph: ParagraphDTO;
 
-  constructor(channel: Channel, paragraph: ParagraphDTO) {
+  constructor(channel: Channel, paragraph: ParagraphDTO, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._paragraph = paragraph;
-    this._outputContainer = new OutputContainerImpl(this);
+    this._outputContainer = new OutputContainerImpl(this, angularObjectCollection);
 
     const paragraphOutputMessage: MessageDTO<ParagraphOutputDTO> = {
       op:'PARAGRAPH_OUTPUT',

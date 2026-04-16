@@ -50,6 +50,7 @@ import {webAppRoot} from '../../objects/webAppRoot/webAppRootImpl';
 import {PushValue} from '../../objects/pushValue/pushValue';
 import {Notebook} from '../../objects/notebook/notebook';
 import {PushValueImpl} from '../../objects/pushValue/pushValueImpl';
+import {PushValueWithChangeDetection} from '../../objects/pushValue/pushValueWithChangeDetection';
 
 @Component({
   selector: 'notebook-collection',
@@ -67,11 +68,11 @@ export class NotebookCollectionView implements OnInit {
   @Input({required:true}) paragraphId: string;
   private cdr = inject(ChangeDetectorRef);
   private collection: NotebookCollection;
-  protected notebookList:PushValue<Notebook[]>;
+  protected notebookList: PushValue<Notebook[]>;
 
   ngOnInit() {
     this.collection = webAppRoot.rootObject();
-    this.notebookList = new PushValueImpl(this.cdr);
+    this.notebookList = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
     this.collection.notebooks(this.notebookList);
   }
 }

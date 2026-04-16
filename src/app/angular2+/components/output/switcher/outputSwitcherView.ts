@@ -54,6 +54,7 @@ import {OutputSwitcherButtonView} from './button/outputSwitcherButtonView';
 import {OutputSwitcherButton} from '../../../objects/output/switcher/button/outputSwitcherButton';
 import {PushValue} from '../../../objects/pushValue/pushValue';
 import {PushValueImpl} from '../../../objects/pushValue/pushValueImpl';
+import {PushValueWithChangeDetection} from '../../../objects/pushValue/pushValueWithChangeDetection';
 
 @Component({
   selector: 'output-switcher',
@@ -82,8 +83,8 @@ export class OutputSwitcherView implements OnInit{
   protected isLoading:PushValue<boolean>;
 
   ngOnInit(): void {
-    this.isSwitchable = new PushValueImpl(this.cdr);
-    this.isLoading = new PushValueImpl(this.cdr);
+    this.isSwitchable = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
+    this.isLoading = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
     this.outputSwitcher.pushIsSwitchable(this.isSwitchable);
     this.outputSwitcher.pushIsLoading(this.isLoading);
   }
