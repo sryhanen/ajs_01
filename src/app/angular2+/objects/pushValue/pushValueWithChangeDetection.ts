@@ -43,17 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
-import Stubable from '../../../shared/interfaces/stubable';
-import {OutputPlugin} from './plugins/outputPlugin';
-import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
-import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
+import {PushValue} from './pushValue';
+import {ChangeDetectorRef} from '@angular/core';
 
-export interface Output extends Stubable {
-  toDataTablesPlugin(channel:Channel): DataTablesPlugin;
-  toTextPlugin(): OutputPlugin;
-  touPlotPlugin(): OutputPlugin;
-  toAngularPlugin(channel:Channel): AngularPlugin;
-  isAggregated(): boolean;
-  type():string;
+export class PushValueWithChangeDetection<T> implements PushValue<T> {
+  private readonly _pushValue:PushValue<T>;
+  private readonly _changeDetectorRef:ChangeDetectorRef;
+
+  constructor(pushValue:PushValue<T>, changeDetectorRef:ChangeDetectorRef) {
+    this._pushValue = pushValue;
+    this._changeDetectorRef = changeDetectorRef;
+  }
+
+  update(value:T):void{
+    this._pushValue.update(value);
+    this._changeDetectorRef.detectChanges();
+  }
+
+  value(): T {
+    return this._pushValue.value();
+  }
 }

@@ -1,0 +1,176 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+import angular, {IPostLink, IScope} from 'angular';
+import {AngularObjectCollection} from '../angular2+/objects/angularObjectCollection/angularObjectCollection';
+import {PushValue} from '../angular2+/objects/pushValue/pushValue';
+import {PushValueImpl} from '../angular2+/objects/pushValue/pushValueImpl';
+import {AngularObject} from '../angular2+/objects/angularObject/angularObject';
+import {MessageDTO} from '../angular2+/objects/message/messageDTO';
+import {RunParagraphDTO} from '../angular2+/objects/message/runParagraphMessage/runParagraphDTO';
+import {AngularPlugin} from '../angular2+/objects/output/plugins/angularPlugin/angularPlugin';
+import {
+  AngularObjectClientBindDTO
+} from '../angular2+/objects/message/angularObjectClientBindMessage/angularObjectClientBindDTO';
+import {
+  AngularObjectClientUnbindDTO
+} from '../angular2+/objects/message/angularObjectClientUnbindMessage/angularObjectClientUnbindDTO';
+
+export class AngularPluginAjs implements IPostLink{
+  static $inject = ['$compile', '$scope', '$element'];
+  private readonly $compile;
+  readonly $scope: IScope;
+  private readonly $element;
+  plugin!: AngularPlugin;
+  angularObjectCollection!: AngularObjectCollection;
+
+  private _angularObjects: PushValue<AngularObject<unknown>[]>;
+
+  constructor($compile, $scope: IScope, $element) {
+    this.$compile = $compile;
+    this.$scope = $scope;
+    this.$scope['z'] = {};
+    this.$scope['z']['runParagraph'] = (paragraphId:string) => this.runParagraph(paragraphId);
+    this.$scope['z']['angularBind'] = (name:string, value:string, paragraphId:string) => this.angularBind(name, value, paragraphId);
+    this.$scope['z']['angularUnbind'] = (name:string, paragraphId:string) => this.angularUnbind(name, paragraphId);
+    this.$element = $element;
+  }
+
+  $postLink() {
+    this._angularObjects = new PushValueImpl();
+    this.angularObjectCollection.angularObjects(this._angularObjects);
+    this.watchAngularObjects();
+    this.render();
+  };
+
+  private runParagraph(paragraphId:string) {
+    const runParagraphMessage:MessageDTO<RunParagraphDTO> = {
+      op: 'RUN_PARAGRAPH',
+      data: {
+        id: paragraphId,
+        paragraph: '',
+        config: {},
+        params: {}
+      },
+    };
+    this.plugin.request(runParagraphMessage);
+  }
+
+  private angularBind(name:string, value:string, paragraphId:string) {
+    const angularObjectClientBindMessage:MessageDTO<AngularObjectClientBindDTO> = {
+      op: 'ANGULAR_OBJECT_CLIENT_BIND',
+      data: {
+        noteId: '',
+        name: name,
+        value: value,
+        paragraphId: paragraphId
+      },
+    };
+    this.plugin.request(angularObjectClientBindMessage);
+
+  }
+
+  private angularUnbind(name:string, paragraphId:string) {
+    const angularObjectClientUnbindMessage:MessageDTO<AngularObjectClientUnbindDTO> = {
+      op: 'ANGULAR_OBJECT_CLIENT_UNBIND',
+      data: {
+        noteId: '',
+        name: name,
+        paragraphId: paragraphId
+      },
+    };
+    this.plugin.request(angularObjectClientUnbindMessage);
+  }
+
+  private watchAngularObjects() {
+    const variableAlias = this._angularObjects;
+    this.$scope.$watchCollection(
+      function() { return variableAlias.value(); },
+      (newValue, oldValue) => {
+        if(oldValue !== newValue) {
+          this.render();
+        }
+      }
+    );
+  }
+
+  private render(){
+    this.bindVariablesToScope();
+    this.compile();
+  }
+
+  private compile(): void {
+    const compiledElements = this.$compile(this.plugin.template())(this.$scope);
+    const targetDiv = this.$element[0].querySelector('#anchor');
+    angular.element(targetDiv).empty();
+    angular.element(targetDiv).append(compiledElements);
+  }
+
+  private bindVariablesToScope(): void {
+    for(const angularObject of this._angularObjects.value()){
+      const key = angularObject.name();
+      this.$scope[key] = angularObject.value();
+      this.$scope.$watch(key, function(newValue, oldValue){
+        if(newValue !== oldValue){
+          angularObject.update(newValue);
+        }
+      });
+    }
+  }
+}
+
+export const angularPluginAjs = {
+  template: `
+      <div id="anchor"></div>
+    `,
+  bindings: {
+    plugin: '=',
+    angularObjectCollection: '=',
+  },
+  controller: AngularPluginAjs
+};
+
+angular.module('zeppelinWebApp')
+  .component('angularPluginAjs', angularPluginAjs);

@@ -43,20 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ChangeDetectorRef} from '@angular/core';
 import {PushValue} from './pushValue';
 
 export class PushValueImpl<T> implements PushValue<T> {
   private _value:T;
-  private readonly _cdr: ChangeDetectorRef;
-
-  constructor(cdr:ChangeDetectorRef) {
-    this._cdr = cdr;
-  }
 
   update(value:T):void{
     this._value = value;
-    this._cdr.detectChanges();
   }
 
   value():T {

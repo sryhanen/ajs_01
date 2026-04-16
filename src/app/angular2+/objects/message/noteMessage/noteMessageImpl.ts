@@ -47,8 +47,9 @@ import {NoteMessage} from './noteMessage';
 import {Paragraph} from '../../paragraph/paragraph';
 import {NotebookDTO} from './notebookDTO';
 import {Channel} from '../../channel/channel';
-import {ParagraphDTO} from '../../paragraph/paragraphDTO';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
+import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
+import {ParagraphDTO} from '../paragraphMessage/paragraphDTO';
 
 export class NoteMessageImpl implements NoteMessage{
   private readonly _data:NotebookDTO;
@@ -57,9 +58,9 @@ export class NoteMessageImpl implements NoteMessage{
     this._data = data;
   }
 
-  paragraphs(channel: Channel): Paragraph[] {
+  paragraphs(channel: Channel, angularObjectCollection:AngularObjectCollection): Paragraph[] {
     const paragraphDTOs: ParagraphDTO[] = this._data.paragraphs;
-    return paragraphDTOs.map(paragraphDTO => new ParagraphImpl(channel, paragraphDTO));
+    return paragraphDTOs.map(paragraphDTO => new ParagraphImpl(channel, paragraphDTO, angularObjectCollection));
   }
 
   id():string {

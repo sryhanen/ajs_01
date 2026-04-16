@@ -43,23 +43,34 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphDTO} from './paragraphDTO';
 import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {ParagraphImpl} from './paragraphImpl';
 import {Paragraph} from './paragraph';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {MessageDTO} from '../message/messageDTO';
-import {ParagraphOutputRequestDTO} from '../output/paragraphOutputRequest/paragraphOutputRequestDTO';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
+import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
+import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
+import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
 
 describe('Paragraph', () => {
   const paragraphId = 'paragraphId';
+  const paragraphText = 'test';
+  const paragraphConfig = {
+    configValue:'config value1'
+  };
+  const paragraphParams = {
+    paramsValue:'params value1'
+  };
   let paragraphData: ParagraphDTO;
   let channel: Channel;
   let paragraph: Paragraph;
   beforeEach(() => {
     paragraphData = {
+      config: paragraphConfig,
+      params: paragraphParams,
+      text: paragraphText,
       id:paragraphId
     };
     channel = new FakeChannel();
@@ -67,7 +78,7 @@ describe('Paragraph', () => {
 
   describe('Birth', () => {
     beforeEach(() => {
-      paragraph = new ParagraphImpl(channel, paragraphData);
+      paragraph = new ParagraphImpl(channel, paragraphData, {} as AngularObjectCollection);
     });
 
     it('Should initialize', () => {
@@ -81,36 +92,43 @@ describe('Paragraph', () => {
     it('Should return OutputContainer', () => {
       expect(paragraph.outputContainer()).toBeInstanceOf(OutputContainerImpl);
     });
+
+    it('Should print itself', ()=> {
+      expect(paragraph.print()).toEqual(paragraphData);
+    });
   });
 
   describe('Request', () => {
     let spy;
     beforeEach(() => {
       spy = vi.spyOn(channel, 'request');
-      paragraph = new ParagraphImpl(channel, paragraphData);
+      paragraph = new ParagraphImpl(channel, paragraphData, {} as AngularObjectCollection);
     });
 
-    it('Should decorate PARAGRAPH_OUTPUT_REQUEST', () => {
-      const requestData: MessageDTO<ParagraphOutputRequestDTO> = {
-        op: 'PARAGRAPH_OUTPUT_REQUEST',
+    it('Should decorate request with paragraphId', () => {
+      const requestData: MessageDTO<unknown> = {
+        op: '',
         data:{
-          noteId:'',
           paragraphId:'',
-          type:'',
-          requestOptions:{}
         }
       };
-      const expectedData: MessageDTO<ParagraphOutputRequestDTO> = {
-        op: 'PARAGRAPH_OUTPUT_REQUEST',
+      const expectedData: MessageDTO<unknown> = {
+        op: '',
         data:{
-          noteId:'',
           paragraphId:paragraphId,
-          type:'',
-          requestOptions:{}
         }
       };
       paragraph.request(requestData);
       expect(spy).toHaveBeenCalledWith(expectedData);
+    });
+
+    it('Should not decorate request with paragraphId', () => {
+      const requestData: MessageDTO<unknown> = {
+        op: '',
+        data:{}
+      };
+      paragraph.request(requestData);
+      expect(spy).toHaveBeenCalledWith(requestData);
     });
 
     it('Should send requests to channel', () => {
@@ -126,7 +144,7 @@ describe('Paragraph', () => {
   describe('Response', () => {
     let spy;
     beforeEach(() => {
-      paragraph = new ParagraphImpl(channel, paragraphData);
+      paragraph = new ParagraphImpl(channel, paragraphData, {} as AngularObjectCollection);
       const container = paragraph.outputContainer();
       spy = vi.spyOn(container, 'response');
       expect(spy).toHaveBeenCalledTimes(0);
@@ -136,6 +154,9 @@ describe('Paragraph', () => {
       const message: MessageDTO<ParagraphDTO>  = {
         op:'PARAGRAPH',
         data: {
+          config: {},
+          params: {},
+          text: '',
           id:paragraphId,
         }
       };

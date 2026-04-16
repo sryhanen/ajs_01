@@ -43,17 +43,68 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
-import Stubable from '../../../shared/interfaces/stubable';
-import {OutputPlugin} from './plugins/outputPlugin';
-import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
-import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
+import {AngularObject} from './angularObject';
+import {AngularObjectImpl} from './angularObjectImpl';
+import {FakeChannel} from '../channel/fakeChannel';
+import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
+import {MessageDTO} from '../message/messageDTO';
+import {AngularObjectUpdatedDTO} from '../message/angularObjectUpdatedMessage/angularObjectUpdatedDTO';
 
-export interface Output extends Stubable {
-  toDataTablesPlugin(channel:Channel): DataTablesPlugin;
-  toTextPlugin(): OutputPlugin;
-  touPlotPlugin(): OutputPlugin;
-  toAngularPlugin(channel:Channel): AngularPlugin;
-  isAggregated(): boolean;
-  type():string;
-}
+describe('AngularObject', () => {
+  const channel = new FakeChannel();
+  const name = 'Object 1';
+  const value = 'test';
+  let data:AngularObjectUpdateDTO;
+  let angularObject: AngularObject<string>;
+
+  beforeEach(() => {
+    data = {
+      angularObject: {
+        name: name,
+        noteId: '',
+        object: value
+      },
+      interpreterGroupId: '',
+      noteId: ''
+    };
+    angularObject = new AngularObjectImpl(channel,data);
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(angularObject).toBeInstanceOf(AngularObjectImpl);
+    });
+
+    it('Should have name', () => {
+      expect(angularObject.name()).toEqual(name);
+    });
+
+    it('Should have value', () => {
+      expect(angularObject.value()).toEqual(value);
+    });
+
+    it('Response should throw', () => {
+      expect(() => angularObject.response({})).toThrow();
+    });
+  });
+
+  describe('Update', () => {
+    it('Should create request', () => {
+      const newValue = 'New value';
+      const updateRequest: MessageDTO<AngularObjectUpdatedDTO> = {
+        op: 'ANGULAR_OBJECT_UPDATED',
+        data: {
+          noteId: '',
+          name: name,
+          value: newValue,
+          interpreterGroupId: ''
+        },
+      };
+      const spy = vi.spyOn(angularObject, 'request');
+      expect(spy).toHaveBeenCalledTimes(0);
+      angularObject.update(newValue);
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledWith(updateRequest);
+    });
+  });
+});

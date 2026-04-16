@@ -43,17 +43,57 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {AngularObject} from './angularObject';
 import {Channel} from '../channel/channel';
-import Stubable from '../../../shared/interfaces/stubable';
-import {OutputPlugin} from './plugins/outputPlugin';
-import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
-import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
+import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
+import {MessageDTO} from '../message/messageDTO';
+import {AngularObjectUpdatedDTO} from '../message/angularObjectUpdatedMessage/angularObjectUpdatedDTO';
 
-export interface Output extends Stubable {
-  toDataTablesPlugin(channel:Channel): DataTablesPlugin;
-  toTextPlugin(): OutputPlugin;
-  touPlotPlugin(): OutputPlugin;
-  toAngularPlugin(channel:Channel): AngularPlugin;
-  isAggregated(): boolean;
-  type():string;
+export class AngularObjectImpl<T> implements AngularObject<T>{
+  private readonly _channel:Channel;
+  private readonly _notebookId:string;
+  private readonly _interpreterGroupId:string;
+  private readonly _name: string;
+  private _value: T;
+
+  constructor(channel:Channel, data:AngularObjectUpdateDTO) {
+    this._channel = channel;
+    this._notebookId = data.noteId;
+    this._interpreterGroupId = data.interpreterGroupId;
+    this._name = data.angularObject.name;
+    this._value = data.angularObject.object as T;
+  }
+
+  request(data: object): void {
+    this._channel.request(data);
+  }
+
+  response(data: object): void {
+    throw new Error('AngularObjectImpl: Method not implemented.');
+  }
+
+  update(value: T): void {
+    this._value = value;
+    this.request(this.updateRequest(this._value));
+  }
+
+  name(): string {
+    return this._name;
+  }
+
+  value(): T {
+    return this._value;
+  }
+
+  private updateRequest(value:T): MessageDTO<AngularObjectUpdatedDTO> {
+    return {
+      op: 'ANGULAR_OBJECT_UPDATED',
+      data: {
+        noteId: this._notebookId,
+        name: this._name,
+        value: value,
+        interpreterGroupId: this._interpreterGroupId
+      },
+    };
+  }
 }

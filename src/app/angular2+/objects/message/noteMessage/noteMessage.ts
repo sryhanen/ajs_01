@@ -45,8 +45,9 @@
  */
 import {Paragraph} from '../../paragraph/paragraph';
 import {Channel} from '../../channel/channel';
+import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 
 export interface NoteMessage{
-  paragraphs(channel: Channel):Paragraph[];
+  paragraphs(channel: Channel, angularObjectCollection:AngularObjectCollection):Paragraph[];
   id():string;
 }

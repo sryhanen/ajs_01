@@ -43,17 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
-import Stubable from '../../../shared/interfaces/stubable';
-import {OutputPlugin} from './plugins/outputPlugin';
-import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
-import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
+import {Component, Input} from '@angular/core';
+import {AngularViewUpgradeModule} from './angularViewUpgradeModule';
+import {AngularPlugin} from '../../../../objects/output/plugins/angularPlugin/angularPlugin';
+import {AngularObjectCollection} from '../../../../objects/angularObjectCollection/angularObjectCollection';
 
-export interface Output extends Stubable {
-  toDataTablesPlugin(channel:Channel): DataTablesPlugin;
-  toTextPlugin(): OutputPlugin;
-  touPlotPlugin(): OutputPlugin;
-  toAngularPlugin(channel:Channel): AngularPlugin;
-  isAggregated(): boolean;
-  type():string;
+@Component({
+  selector: 'angular-view',
+  imports: [
+    AngularViewUpgradeModule
+  ],
+  template: `
+    <ajs-angular-view [plugin]="plugin" [angularObjectCollection]="angularObjectCollection"></ajs-angular-view>
+  `
+})
+export class AngularView {
+  @Input({required:true}) plugin: AngularPlugin;
+  @Input({required:true}) angularObjectCollection: AngularObjectCollection;
 }

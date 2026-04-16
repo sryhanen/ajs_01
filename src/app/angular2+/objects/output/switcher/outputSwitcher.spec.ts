@@ -54,13 +54,11 @@ import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {FakeOutputSwitcherButton} from './button/fakeOutputSwitcherButton';
 import {PushValue} from '../../pushValue/pushValue';
 import {PushValueImpl} from '../../pushValue/pushValueImpl';
-import {FakeChangeDetectorRef} from '../../pushValue/fakeCdr/fakeChangeDetectorRef';
 
 describe('OutputSwitcher', () => {
   let channel:Channel;
   let outputSwitcher: OutputSwitcher;
   let outputFormats: Channel[];
-  const cdr = new FakeChangeDetectorRef();
   let isSwitchable: PushValue<boolean>;
   let isLoading: PushValue<boolean>;
   beforeEach(() => {
@@ -70,8 +68,8 @@ describe('OutputSwitcher', () => {
       new FakeChannel(),
     ];
     outputSwitcher = new OutputSwitcherImpl(channel, outputFormats);
-    isSwitchable = new PushValueImpl(cdr);
-    isLoading = new PushValueImpl(cdr);
+    isSwitchable = new PushValueImpl();
+    isLoading = new PushValueImpl();
     outputSwitcher.pushIsSwitchable(isSwitchable);
     outputSwitcher.pushIsLoading(isLoading);
   });
