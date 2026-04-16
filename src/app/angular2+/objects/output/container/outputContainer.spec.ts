@@ -48,6 +48,7 @@ import {Channel} from '../../channel/channel';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {OutputContainerImpl} from './outputContainerImpl';
 import {MessageDTO} from '../../message/messageDTO';
+import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 
 describe('OutputContainer', () => {
   let channel:Channel;
@@ -55,7 +56,7 @@ describe('OutputContainer', () => {
 
   beforeEach(() => {
     channel = new FakeChannel();
-    outputContainer = new OutputContainerImpl(channel);
+    outputContainer = new OutputContainerImpl(channel, {} as AngularObjectCollection);
   });
 
   describe('Birth', () => {
@@ -68,7 +69,7 @@ describe('OutputContainer', () => {
     });
 
     it('Should have outputFormats', () =>{
-      expect(outputContainer.outputFormats()).toHaveLength(3);
+      expect(outputContainer.outputFormats()).toHaveLength(4);
     });
 
     it('Should have error listener', () =>{

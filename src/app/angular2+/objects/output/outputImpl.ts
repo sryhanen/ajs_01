@@ -59,6 +59,9 @@ import {uPlotPluginImpl} from './plugins/uPlotPlugin/uPlotPluginImpl';
 import {uPlotPluginStub} from './plugins/uPlotPlugin/uPlotPluginStub';
 import {OutputPlugin} from './plugins/outputPlugin';
 import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
+import {AngularPluginImpl} from './plugins/angularPlugin/angularPluginImpl';
+import {AngularPluginStub} from './plugins/angularPlugin/angularPluginStub';
+import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
 
 export class OutputImpl implements Output {
   private readonly _data: OutputDTO<unknown>;
@@ -73,6 +76,17 @@ export class OutputImpl implements Output {
 
   isAggregated(): boolean {
     return this._data.isAggregated !== undefined && this._data.isAggregated;
+  }
+
+  toAngularPlugin(channel:Channel): AngularPlugin {
+    let angularPlugin:AngularPlugin;
+    if(this._data.type === OutputType.angular){
+      angularPlugin = new AngularPluginImpl(channel, this._data.data as string);
+    }
+    else{
+      angularPlugin = new AngularPluginStub();
+    }
+    return angularPlugin;
   }
 
   toDataTablesPlugin(channel:Channel): DataTablesPlugin {

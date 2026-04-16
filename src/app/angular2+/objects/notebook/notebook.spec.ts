@@ -48,13 +48,13 @@ import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {Notebook} from './notebook';
 import {NotebookImpl} from './notebookImpl';
-import {ParagraphDTO} from '../paragraph/paragraphDTO';
 import {MessageDTO} from '../message/messageDTO';
 import {Paragraph} from '../paragraph/paragraph';
 import {PushValueImpl} from '../pushValue/pushValueImpl';
-import {FakeChangeDetectorRef} from '../pushValue/fakeCdr/fakeChangeDetectorRef';
 import {PushValue} from '../pushValue/pushValue';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
+import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
+import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
 
 describe('Notebook', () => {
   const noteId = 'noteId';
@@ -97,13 +97,59 @@ describe('Notebook', () => {
     it('Should not decorate with id', () => {
       const data = {
         op: 'RANDOM_OPERATION',
-        data: {
-          noteId:''
-        }
+        data: {}
       };
       const spy = vi.spyOn(channel, 'request');
       notebook.request(data);
       expect(spy).toHaveBeenCalledWith(data);
+    });
+
+    it('Should decorate run paragraph request', () => {
+      const paragraphId = 'paragraphId';
+      const paragraphText = 'paragraph text';
+      const paragraphConfig = {
+        configProp:'configProp value'
+      };
+      const paragraphParams = {
+        paramsProp:'paramsProp value'
+      };
+      const paragraph: ParagraphDTO = {
+        id: paragraphId,
+        config: paragraphConfig,
+        params: paragraphParams,
+        text: paragraphText
+      };
+      const requestData: MessageDTO<RunParagraphDTO> = {
+        op: 'RUN_PARAGRAPH',
+        data: {
+          id: paragraphId,
+          paragraph: '',
+          config: {},
+          params: {}
+        }
+      };
+      const expectedData: MessageDTO<RunParagraphDTO> = {
+        op: 'RUN_PARAGRAPH',
+        data: {
+          id: paragraphId,
+          paragraph: paragraphText,
+          config: paragraphConfig,
+          params: paragraphParams
+        }
+      };
+      const noteResponse: MessageDTO<NotebookDTO> = {
+        op:'NOTE',
+        data: {
+          id:noteId,
+          paragraphs:[
+            paragraph
+          ]
+        }
+      };
+      notebook.response(noteResponse);
+      const spy = vi.spyOn(channel, 'request');
+      notebook.request(requestData);
+      expect(spy).toHaveBeenCalledWith(expectedData);
     });
   });
 
@@ -113,8 +159,21 @@ describe('Notebook', () => {
     let noteResponse: MessageDTO<NotebookDTO>;
     beforeEach(() => {
       notebook = new NotebookImpl(channel, partialNote);
-      paragraphs = new PushValueImpl<Paragraph[]>(new FakeChangeDetectorRef());
-      paragraphDtos = [{id: 'paragraph 1'}, {id: 'paragraph 2'}];
+      paragraphs = new PushValueImpl<Paragraph[]>();
+      paragraphDtos = [
+        {
+          id: 'paragraph 1',
+          text: '',
+          config: {},
+          params: {}
+        },
+        {
+          id: 'paragraph 2',
+          text: '',
+          config: {},
+          params: {}
+        }
+      ];
       notebook.paragraphs(paragraphs);
       noteResponse = {
         op: 'NOTE',
@@ -146,7 +205,7 @@ describe('Notebook', () => {
         paragraphAddedResponse = {
           op: 'PARAGRAPH_ADDED',
           data: {
-            paragraph: {id: 'paragraph 3'},
+            paragraph: {id: 'paragraph 3', text: '', config: {}, params: {}},
             index: 0
           }
         };

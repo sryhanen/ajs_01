@@ -43,17 +43,34 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
-import Stubable from '../../../shared/interfaces/stubable';
-import {OutputPlugin} from './plugins/outputPlugin';
-import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
-import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
+import {AngularPlugin} from './angularPlugin';
+import {Channel} from '../../../channel/channel';
 
-export interface Output extends Stubable {
-  toDataTablesPlugin(channel:Channel): DataTablesPlugin;
-  toTextPlugin(): OutputPlugin;
-  touPlotPlugin(): OutputPlugin;
-  toAngularPlugin(channel:Channel): AngularPlugin;
-  isAggregated(): boolean;
-  type():string;
+export class AngularPluginImpl implements AngularPlugin{
+  private readonly _channel: Channel;
+  private readonly _template:string;
+
+  constructor(channel: Channel, template:string) {
+    this._channel = channel;
+    this._template = template;
+  }
+
+  attach(anchorElement: HTMLElement): void {
+    throw new Error('AngularPluginImpl: Method not implemented.');
+  }
+
+  isStub(): boolean {
+    return false;
+  }
+
+  template(): string {
+    return this._template;
+  }
+
+  request(data: object): void {
+    this._channel.request(data);
+  }
+
+  response(data: object): void {
+  }
 }
