@@ -43,24 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphDTO} from './paragraphDTO';
 import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {ParagraphImpl} from './paragraphImpl';
 import {Paragraph} from './paragraph';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {MessageDTO} from '../message/messageDTO';
-import {ParagraphOutputRequestDTO} from '../output/paragraphOutputRequest/paragraphOutputRequestDTO';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
+import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
+import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
 
 describe('Paragraph', () => {
   const paragraphId = 'paragraphId';
+  const paragraphText = 'test';
   let paragraphData: ParagraphDTO;
   let channel: Channel;
   let paragraph: Paragraph;
   beforeEach(() => {
     paragraphData = {
+      config: {},
+      params: {},
+      text: paragraphText,
       id:paragraphId
     };
     channel = new FakeChannel();
@@ -91,23 +95,40 @@ describe('Paragraph', () => {
       paragraph = new ParagraphImpl(channel, paragraphData, {} as AngularObjectCollection);
     });
 
-    it('Should decorate PARAGRAPH_OUTPUT_REQUEST', () => {
-      const requestData: MessageDTO<ParagraphOutputRequestDTO> = {
-        op: 'PARAGRAPH_OUTPUT_REQUEST',
+    it('Should decorate request with paragraphId', () => {
+      const requestData: MessageDTO<unknown> = {
+        op: '',
         data:{
-          noteId:'',
           paragraphId:'',
-          type:'',
-          requestOptions:{}
         }
       };
-      const expectedData: MessageDTO<ParagraphOutputRequestDTO> = {
-        op: 'PARAGRAPH_OUTPUT_REQUEST',
+      const expectedData: MessageDTO<unknown> = {
+        op: '',
         data:{
-          noteId:'',
           paragraphId:paragraphId,
-          type:'',
-          requestOptions:{}
+        }
+      };
+      paragraph.request(requestData);
+      expect(spy).toHaveBeenCalledWith(expectedData);
+    });
+
+    it('Should decorate run paragraph request', () => {
+      const requestData: MessageDTO<RunParagraphDTO> = {
+        op: 'RUN_PARAGRAPH',
+        data: {
+          id: '',
+          paragraph: '',
+          config: {},
+          params: {}
+        }
+      };
+      const expectedData: MessageDTO<RunParagraphDTO> = {
+        op: 'RUN_PARAGRAPH',
+        data: {
+          id: '',
+          paragraph: paragraphText,
+          config: {},
+          params: {}
         }
       };
       paragraph.request(requestData);
@@ -137,6 +158,9 @@ describe('Paragraph', () => {
       const message: MessageDTO<ParagraphDTO>  = {
         op:'PARAGRAPH',
         data: {
+          config: {},
+          params: {},
+          text: '',
           id:paragraphId,
         }
       };
