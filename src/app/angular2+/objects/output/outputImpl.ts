@@ -78,10 +78,10 @@ export class OutputImpl implements Output {
     return this._data.isAggregated !== undefined && this._data.isAggregated;
   }
 
-  toAngularPlugin(): AngularPlugin {
+  toAngularPlugin(channel:Channel): AngularPlugin {
     let angularPlugin:AngularPlugin;
     if(this._data.type === OutputType.angular){
-      angularPlugin = new AngularPluginImpl(this._data.data as string);
+      angularPlugin = new AngularPluginImpl(channel, this._data.data as string);
     }
     else{
       angularPlugin = new AngularPluginStub();

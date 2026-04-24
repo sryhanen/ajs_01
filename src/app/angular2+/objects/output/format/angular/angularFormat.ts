@@ -97,7 +97,7 @@ export class AngularFormat implements OutputFormat {
       }
       else {
         this._containerRefs.forEach(containerRef => containerRef.clear());
-        this._plugin = output.toAngularPlugin();
+        this._plugin = output.toAngularPlugin(this._channel);
         if(!this._plugin.isStub()){
           this._containerRefs.forEach(containerRef => containerRef.createComponent(this._viewComponent, this.componentInputs()));
         }

@@ -44,7 +44,8 @@
  * a licensee so wish it.
  */
 import {OutputPlugin} from '../outputPlugin';
+import {Channel} from '../../../channel/channel';
 
-export interface AngularPlugin extends OutputPlugin {
+export interface AngularPlugin extends OutputPlugin, Channel {
   template():string;
 }

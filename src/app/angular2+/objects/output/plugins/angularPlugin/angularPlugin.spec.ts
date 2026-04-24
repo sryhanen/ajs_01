@@ -44,10 +44,13 @@
  * a licensee so wish it.
  */
 import {AngularPluginImpl} from './angularPluginImpl';
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {Channel} from '../../../channel/channel';
 
 describe('Angular plugin', () => {
   const template = '<h1>Test Template</h1>';
-  const angularPlugin = new AngularPluginImpl(template);
+  const channel:Channel = new FakeChannel();
+  const angularPlugin = new AngularPluginImpl(channel, template);
 
   describe('Birth', () => {
     it('Should be initialized', () => {
@@ -65,6 +68,17 @@ describe('Angular plugin', () => {
     it('Attach method should throw', () => {
       const element = document.createElement('a');
       expect(() => angularPlugin.attach(element)).toThrow();
+    });
+  });
+
+  describe('Request', () => {
+    it('Should request channel', () => {
+      const request = {
+        test:'test'
+      };
+      const spy = vi.spyOn(channel, 'request');
+      angularPlugin.request(request);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
     });
   });
 });

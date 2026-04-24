@@ -54,7 +54,7 @@ import {AngularObjectCollection} from '../../../../objects/angularObjectCollecti
     AngularViewUpgradeModule
   ],
   template: `
-    <ajs-angular-view [template]="plugin.template()" [angularObjectCollection]="angularObjectCollection"></ajs-angular-view>
+    <ajs-angular-view [plugin]="plugin" [angularObjectCollection]="angularObjectCollection"></ajs-angular-view>
   `
 })
 export class AngularView {

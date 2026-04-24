@@ -53,7 +53,7 @@ export interface Output extends Stubable {
   toDataTablesPlugin(channel:Channel): DataTablesPlugin;
   toTextPlugin(): OutputPlugin;
   touPlotPlugin(): OutputPlugin;
-  toAngularPlugin(): AngularPlugin;
+  toAngularPlugin(channel:Channel): AngularPlugin;
   isAggregated(): boolean;
   type():string;
 }

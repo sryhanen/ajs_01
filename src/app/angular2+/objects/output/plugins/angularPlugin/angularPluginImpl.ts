@@ -44,11 +44,14 @@
  * a licensee so wish it.
  */
 import {AngularPlugin} from './angularPlugin';
+import {Channel} from '../../../channel/channel';
 
 export class AngularPluginImpl implements AngularPlugin{
+  private readonly _channel: Channel;
   private readonly _template:string;
 
-  constructor(template:string) {
+  constructor(channel: Channel, template:string) {
+    this._channel = channel;
     this._template = template;
   }
 
@@ -62,5 +65,12 @@ export class AngularPluginImpl implements AngularPlugin{
 
   template(): string {
     return this._template;
+  }
+
+  request(data: object): void {
+    this._channel.request(data);
+  }
+
+  response(data: object): void {
   }
 }
