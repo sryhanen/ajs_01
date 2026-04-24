@@ -48,20 +48,33 @@ import {AngularObjectCollection} from '../angular2+/objects/angularObjectCollect
 import {PushValue} from '../angular2+/objects/pushValue/pushValue';
 import {PushValueImpl} from '../angular2+/objects/pushValue/pushValueImpl';
 import {AngularObject} from '../angular2+/objects/angularObject/angularObject';
+import {MessageDTO} from '../angular2+/objects/message/messageDTO';
+import {RunParagraphDTO} from '../angular2+/objects/message/runParagraphMessage/runParagraphDTO';
+import {AngularPlugin} from '../angular2+/objects/output/plugins/angularPlugin/angularPlugin';
+import {
+  AngularObjectClientBindDTO
+} from '../angular2+/objects/message/angularObjectClientBindMessage/angularObjectClientBindDTO';
+import {
+  AngularObjectClientUnbindDTO
+} from '../angular2+/objects/message/angularObjectClientUnbindMessage/angularObjectClientUnbindDTO';
 
 export class AngularPluginAjs implements IPostLink{
   static $inject = ['$compile', '$scope', '$element'];
   private readonly $compile;
-  private readonly $scope: IScope;
+  readonly $scope: IScope;
   private readonly $element;
-  template!: string;
+  plugin!: AngularPlugin;
   angularObjectCollection!: AngularObjectCollection;
 
   private _angularObjects: PushValue<AngularObject<unknown>[]>;
 
-  constructor($compile, $scope, $element) {
+  constructor($compile, $scope: IScope, $element) {
     this.$compile = $compile;
     this.$scope = $scope;
+    this.$scope['z'] = {};
+    this.$scope['z']['runParagraph'] = this.runParagraph;
+    this.$scope['z']['angularBind'] = this.angularBind;
+    this.$scope['z']['angularUnbind'] = this.angularUnbind;
     this.$element = $element;
   }
 
@@ -71,6 +84,45 @@ export class AngularPluginAjs implements IPostLink{
     this.watchAngularObjects();
     this.render();
   };
+
+  private runParagraph(paragraphId:string) {
+    const runParagraphMessage:MessageDTO<RunParagraphDTO> = {
+      op: 'RUN_PARAGRAPH',
+      data: {
+        id: paragraphId,
+        paragraph: '',
+        config: {},
+        params: {}
+      },
+    };
+    this.plugin.request(runParagraphMessage);
+  }
+
+  private angularBind(name:string, value:string, paragraphId:string) {
+    const angularObjectClientBindMessage:MessageDTO<AngularObjectClientBindDTO> = {
+      op: 'ANGULAR_OBJECT_CLIENT_BIND',
+      data: {
+        noteId: '',
+        name: name,
+        value: value,
+        paragraphId: paragraphId
+      },
+    };
+    this.plugin.request(angularObjectClientBindMessage);
+
+  }
+
+  private angularUnbind(name:string, paragraphId:string) {
+    const angularObjectClientUnbindMessage:MessageDTO<AngularObjectClientUnbindDTO> = {
+      op: 'ANGULAR_OBJECT_CLIENT_UNBIND',
+      data: {
+        noteId: '',
+        name: name,
+        paragraphId: paragraphId
+      },
+    };
+    this.plugin.request(angularObjectClientUnbindMessage);
+  }
 
   private watchAngularObjects() {
     const variableAlias = this._angularObjects;
@@ -94,7 +146,7 @@ export class AngularPluginAjs implements IPostLink{
   }
 
   private compile(): void {
-    const compiledElements = this.$compile(this.template)(this.$scope);
+    const compiledElements = this.$compile(this.plugin.template())(this.$scope);
     const targetDiv = this.$element[0].querySelector('#anchor');
     angular.element(targetDiv).empty();
     angular.element(targetDiv).append(compiledElements);

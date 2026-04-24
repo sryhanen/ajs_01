@@ -52,6 +52,8 @@ import {PushValue} from '../angular2+/objects/pushValue/pushValue';
 import {PushValueImpl} from '../angular2+/objects/pushValue/pushValueImpl';
 import {AngularObjectUpdateDTO} from '../angular2+/objects/message/angularObjectUpdateMessage/angularObjectUpdateDTO';
 import {MessageDTO} from '../angular2+/objects/message/messageDTO';
+import {AngularPluginImpl} from '../angular2+/objects/output/plugins/angularPlugin/angularPluginImpl';
+import {AngularPlugin} from '../angular2+/objects/output/plugins/angularPlugin/angularPlugin';
 
 describe('AngularPluginAjs', () => {
   const $element = [
@@ -83,6 +85,7 @@ describe('AngularPluginAjs', () => {
   describe('AngularJs component lifecycle $postLink-hook ', () => {
     const template = '<h1>Test Template</h1>';
     const channel = new FakeChannel();
+    const angularPlugin:AngularPlugin = new AngularPluginImpl(channel, template);
     let angularObjectCollection: AngularObjectCollection;
     let angularObjects: PushValue<AngularObject<unknown>[]>;
     const angularObject1 = {
@@ -117,7 +120,7 @@ describe('AngularPluginAjs', () => {
       angularObjectCollection.angularObjects(angularObjects);
       angularObjectCollection.response(angularObjectResponse1);
       angularObjectCollection.response(angularObjectResponse2);
-      angularPluginAjs.template = template;
+      angularPluginAjs.plugin = angularPlugin;
       angularPluginAjs.angularObjectCollection = angularObjectCollection;
       angularPluginAjs.$postLink();
     });
