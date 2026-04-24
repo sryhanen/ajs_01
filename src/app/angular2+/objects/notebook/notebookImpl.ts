@@ -85,11 +85,9 @@ export class NotebookImpl implements Notebook {
   }
 
   request(data: object): void {
-    let message = data as MessageDTO<unknown>;
-    if(message.op === 'PARAGRAPH_OUTPUT_REQUEST') {
-      const paragraphOutputRequestMessage = data as MessageDTO<ParagraphOutputRequestDTO>;
-      paragraphOutputRequestMessage.data.noteId = this.id();
-      message = paragraphOutputRequestMessage;
+    const message = data as MessageDTO<unknown>;
+    if(message.data['noteId'] !== undefined){
+      message.data['noteId'] = this.id();
     }
     this._channel.request(message);
   }
