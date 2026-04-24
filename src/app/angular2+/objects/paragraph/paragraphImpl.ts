@@ -84,11 +84,9 @@ export class ParagraphImpl implements Paragraph{
   }
 
   request(data: object): void {
-    let message = data as MessageDTO<unknown>;
-    if(message.op === 'PARAGRAPH_OUTPUT_REQUEST') {
-      const paragraphOutputRequestMessage = data as MessageDTO<ParagraphOutputRequestDTO>;
-      paragraphOutputRequestMessage.data.paragraphId = this.id();
-      message = paragraphOutputRequestMessage;
+    const message = data as MessageDTO<unknown>;
+    if(message.data['paragraphId'] !== undefined) {
+      message.data['paragraphId'] = this.id();
     }
     this._channel.request(message);
   }
