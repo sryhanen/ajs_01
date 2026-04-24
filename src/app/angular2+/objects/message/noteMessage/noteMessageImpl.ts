@@ -47,9 +47,9 @@ import {NoteMessage} from './noteMessage';
 import {Paragraph} from '../../paragraph/paragraph';
 import {NotebookDTO} from './notebookDTO';
 import {Channel} from '../../channel/channel';
-import {ParagraphDTO} from '../../paragraph/paragraphDTO';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
 import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
+import {ParagraphDTO} from '../paragraphMessage/paragraphDTO';
 
 export class NoteMessageImpl implements NoteMessage{
   private readonly _data:NotebookDTO;

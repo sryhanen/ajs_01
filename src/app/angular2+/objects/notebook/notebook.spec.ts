@@ -48,12 +48,12 @@ import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {Notebook} from './notebook';
 import {NotebookImpl} from './notebookImpl';
-import {ParagraphDTO} from '../paragraph/paragraphDTO';
 import {MessageDTO} from '../message/messageDTO';
 import {Paragraph} from '../paragraph/paragraph';
 import {PushValueImpl} from '../pushValue/pushValueImpl';
 import {PushValue} from '../pushValue/pushValue';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
+import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
 
 describe('Notebook', () => {
   const noteId = 'noteId';
@@ -113,7 +113,20 @@ describe('Notebook', () => {
     beforeEach(() => {
       notebook = new NotebookImpl(channel, partialNote);
       paragraphs = new PushValueImpl<Paragraph[]>();
-      paragraphDtos = [{id: 'paragraph 1'}, {id: 'paragraph 2'}];
+      paragraphDtos = [
+        {
+          id: 'paragraph 1',
+          text: '',
+          config: {},
+          params: {}
+        },
+        {
+          id: 'paragraph 2',
+          text: '',
+          config: {},
+          params: {}
+        }
+      ];
       notebook.paragraphs(paragraphs);
       noteResponse = {
         op: 'NOTE',
@@ -145,7 +158,7 @@ describe('Notebook', () => {
         paragraphAddedResponse = {
           op: 'PARAGRAPH_ADDED',
           data: {
-            paragraph: {id: 'paragraph 3'},
+            paragraph: {id: 'paragraph 3', text: '', config: {}, params: {}},
             index: 0
           }
         };

@@ -51,14 +51,13 @@ import {MessageDTO} from '../message/messageDTO';
 import {NoteMessageImpl} from '../message/noteMessage/noteMessageImpl';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ParagraphOutputRequestDTO} from '../output/paragraphOutputRequest/paragraphOutputRequestDTO';
-import {ParagraphDTO} from '../paragraph/paragraphDTO';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {PushValue} from '../pushValue/pushValue';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 import {AngularObjectUpdateMessageImpl} from '../message/angularObjectUpdateMessage/angularObjectUpdateMessageImpl';
 import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
+import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
