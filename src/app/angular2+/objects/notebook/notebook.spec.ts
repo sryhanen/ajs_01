@@ -96,9 +96,7 @@ describe('Notebook', () => {
     it('Should not decorate with id', () => {
       const data = {
         op: 'RANDOM_OPERATION',
-        data: {
-          noteId:''
-        }
+        data: {}
       };
       const spy = vi.spyOn(channel, 'request');
       notebook.request(data);

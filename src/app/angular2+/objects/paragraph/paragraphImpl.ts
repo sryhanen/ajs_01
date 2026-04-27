@@ -92,6 +92,7 @@ export class ParagraphImpl implements Paragraph{
     }
     else if(message.op === 'RUN_PARAGRAPH'){
       const runParagraphMessage = data as MessageDTO<RunParagraphDTO>;
+      runParagraphMessage.data.id = this.id();
       runParagraphMessage.data.paragraph = this._paragraph.text;
       runParagraphMessage.data.config = this._paragraph.config;
       runParagraphMessage.data.params = this._paragraph.params;

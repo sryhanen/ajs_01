@@ -57,13 +57,19 @@ import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
 describe('Paragraph', () => {
   const paragraphId = 'paragraphId';
   const paragraphText = 'test';
+  const paragraphConfig = {
+    configValue:'config value1'
+  };
+  const paragraphParams = {
+    paramsValue:'params value1'
+  };
   let paragraphData: ParagraphDTO;
   let channel: Channel;
   let paragraph: Paragraph;
   beforeEach(() => {
     paragraphData = {
-      config: {},
-      params: {},
+      config: paragraphConfig,
+      params: paragraphParams,
       text: paragraphText,
       id:paragraphId
     };
@@ -112,6 +118,15 @@ describe('Paragraph', () => {
       expect(spy).toHaveBeenCalledWith(expectedData);
     });
 
+    it('Should not decorate request with paragraphId', () => {
+      const requestData: MessageDTO<unknown> = {
+        op: '',
+        data:{}
+      };
+      paragraph.request(requestData);
+      expect(spy).toHaveBeenCalledWith(requestData);
+    });
+
     it('Should decorate run paragraph request', () => {
       const requestData: MessageDTO<RunParagraphDTO> = {
         op: 'RUN_PARAGRAPH',
@@ -125,10 +140,10 @@ describe('Paragraph', () => {
       const expectedData: MessageDTO<RunParagraphDTO> = {
         op: 'RUN_PARAGRAPH',
         data: {
-          id: '',
+          id: paragraphId,
           paragraph: paragraphText,
-          config: {},
-          params: {}
+          config: paragraphConfig,
+          params: paragraphParams
         }
       };
       paragraph.request(requestData);
