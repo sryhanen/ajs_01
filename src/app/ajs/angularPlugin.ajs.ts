@@ -57,7 +57,7 @@ import {
 import {
   AngularObjectClientUnbindDTO
 } from '../angular2+/objects/message/angularObjectClientUnbindMessage/angularObjectClientUnbindDTO';
-import {PushValueWithAngularJsApply} from '../angular2+/objects/pushValue/pushValueWithAngularJsApply';
+import {PushValueWithAngularJsEvalAsync} from '../angular2+/objects/pushValue/pushValueWithAngularJsEvalAsync';
 
 export class AngularPluginAjs implements IPostLink{
   static $inject = ['$compile', '$scope', '$element'];
@@ -80,7 +80,7 @@ export class AngularPluginAjs implements IPostLink{
   }
 
   $postLink() {
-    this._angularObjects = new PushValueWithAngularJsApply(new PushValueImpl(), this.$scope.$apply);
+    this._angularObjects = new PushValueWithAngularJsEvalAsync(new PushValueImpl(), this.$scope.$evalAsync);
     this.angularObjectCollection.angularObjects(this._angularObjects);
     this.watchAngularObjects();
     this.render();

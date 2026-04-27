@@ -45,18 +45,18 @@
  */
 import {PushValue} from './pushValue';
 
-export class PushValueWithAngularJsApply<T> implements PushValue<T> {
+export class PushValueWithAngularJsEvalAsync<T> implements PushValue<T> {
   private readonly _pushValue:PushValue<T>;
-  private readonly _$apply: () => unknown;
+  private readonly _$evalAsync: () => void;
 
-  constructor(pushValue:PushValue<T>, $apply:() => unknown) {
+  constructor(pushValue:PushValue<T>, $evalAsync:() => void) {
     this._pushValue = pushValue;
-    this._$apply = $apply;
+    this._$evalAsync = $evalAsync;
   }
 
   update(value: T): void {
     this._pushValue.update(value);
-    this._$apply();
+    this._$evalAsync();
   }
 
   value(): T {
