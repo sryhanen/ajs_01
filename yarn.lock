@@ -8954,7 +8954,7 @@ update-browserslist-db@^1.1.4:
 
 uplot@^1.6.32:
   version "1.6.32"
-  resolved "https://scrapyard.xnet.fi/repository/public-npm/uplot/-/uplot-1.6.32.tgz#c800a63b432bad692d6d746f44f0882aa73a49ae"
+  resolved "https://registry.yarnpkg.com/uplot/-/uplot-1.6.32.tgz#c800a63b432bad692d6d746f44f0882aa73a49ae"
   integrity sha512-KIMVnG68zvu5XXUbC4LQEPnhwOxBuLyW1AHtpm6IKTXImkbLgkMy+jabjLgSLMasNuGGzQm/ep3tOkyTxpiQIw==
 
 uri-js@^4.2.2:
