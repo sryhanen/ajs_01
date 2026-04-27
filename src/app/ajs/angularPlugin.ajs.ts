@@ -72,9 +72,9 @@ export class AngularPluginAjs implements IPostLink{
     this.$compile = $compile;
     this.$scope = $scope;
     this.$scope['z'] = {};
-    this.$scope['z']['runParagraph'] = this.runParagraph;
-    this.$scope['z']['angularBind'] = this.angularBind;
-    this.$scope['z']['angularUnbind'] = this.angularUnbind;
+    this.$scope['z']['runParagraph'] = (paragraphId:string) => this.runParagraph(paragraphId);
+    this.$scope['z']['angularBind'] = (name:string, value:string, paragraphId:string) => this.angularBind(name, value, paragraphId);
+    this.$scope['z']['angularUnbind'] = (name:string, paragraphId:string) => this.angularUnbind(name, paragraphId);
     this.$element = $element;
   }
 
