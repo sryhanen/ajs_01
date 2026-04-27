@@ -95,15 +95,15 @@ describe('angularObjectCollection', () => {
       expect(angularObjects.value()[0].name()).toEqual(angularObject1.name);
     });
 
-    it('Should respond object on updates', () => {
+    it('Should update collection', () => {
       angularObjectCollection.response(angularObjectUpdateMessage);
       expect(angularObjects.value()).toHaveLength(1);
-
-      const spy = vi.spyOn(angularObjects.value()[0], 'response');
+      expect(angularObjects.value()[0].value()).toEqual(angularObject1.object);
+      const newValue = 'new value';
+      angularObjectUpdateMessage.data.angularObject.object = newValue;
       angularObjectCollection.response(angularObjectUpdateMessage);
       expect(angularObjects.value()).toHaveLength(1);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(angularObjectUpdateMessage);
+      expect(angularObjects.value()[0].value()).toEqual(newValue);
     });
 
     it('Should remove object from collection', () => {

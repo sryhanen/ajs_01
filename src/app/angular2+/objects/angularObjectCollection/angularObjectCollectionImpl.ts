@@ -72,14 +72,12 @@ export class AngularObjectCollectionImpl implements AngularObjectCollection {
     if(message.op === 'ANGULAR_OBJECT_UPDATE'){
       const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(message.data as AngularObjectUpdateDTO);
       const angularObject = angularObjectUpdateMessage.toAngularObject(this);
-      const existingAngularObject = this._angularObjects.find(ao => ao.name() === angularObject.name());
-      if(existingAngularObject){
-        existingAngularObject.response(data);
+      const existingAngularObjectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObject.name());
+      if(existingAngularObjectIndex !== -1){
+        this._angularObjects.splice(existingAngularObjectIndex, 1);
       }
-      else{
-        this._angularObjects.push(angularObject);
-        this._pushValues.forEach(value => value.update(this._angularObjects));
-      }
+      this._angularObjects.push(angularObject);
+      this._pushValues.forEach(value => value.update(this._angularObjects));
     }
     else if(message.op === 'ANGULAR_OBJECT_REMOVE'){
       const objectToRemove = message.data as AngularObjectRemoveDTO;

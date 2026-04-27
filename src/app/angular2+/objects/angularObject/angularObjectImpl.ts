@@ -48,7 +48,6 @@ import {Channel} from '../channel/channel';
 import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
 import {MessageDTO} from '../message/messageDTO';
 import {AngularObjectUpdatedDTO} from '../message/angularObjectUpdatedMessage/angularObjectUpdatedDTO';
-import {AngularObjectUpdateMessageImpl} from '../message/angularObjectUpdateMessage/angularObjectUpdateMessageImpl';
 
 export class AngularObjectImpl<T> implements AngularObject<T>{
   private readonly _channel:Channel;
@@ -70,13 +69,7 @@ export class AngularObjectImpl<T> implements AngularObject<T>{
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    if(message.op === 'ANGULAR_OBJECT_UPDATE'){
-      const angularObject = new AngularObjectUpdateMessageImpl(message.data as AngularObjectUpdateDTO).toAngularObject(this);
-      if(angularObject.name() === this._name){
-        this._value = angularObject.value() as T;
-      }
-    }
+    throw new Error('AngularObjectImpl: Method not implemented.');
   }
 
   update(value: T): void {

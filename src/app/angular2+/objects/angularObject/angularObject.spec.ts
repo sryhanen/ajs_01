@@ -82,38 +82,9 @@ describe('AngularObject', () => {
     it('Should have value', () => {
       expect(angularObject.value()).toEqual(value);
     });
-  });
 
-  describe('Response', () => {
-    const newValue = 'New value';
-    const response: MessageDTO<AngularObjectUpdateDTO> = {
-      op: 'ANGULAR_OBJECT_UPDATE',
-      data: {
-        angularObject: {
-          name: name,
-          object: newValue,
-          noteId: '',
-        },
-        noteId: '',
-        interpreterGroupId: ''
-      },
-    };
-
-    it('Should update value', () => {
-      angularObject.response(response);
-      expect(angularObject.value()).toEqual(newValue);
-    });
-
-    it('Should not update value', () => {
-      response.op = 'DEFAULT';
-      angularObject.response(response);
-      expect(angularObject.value()).toEqual(value);
-    });
-
-    it('Should not update value', () => {
-      response.data.angularObject.name = 'wrong name';
-      angularObject.response(response);
-      expect(angularObject.value()).toEqual(value);
+    it('Response should throw', () => {
+      expect(() => angularObject.response({})).toThrow();
     });
   });
 
