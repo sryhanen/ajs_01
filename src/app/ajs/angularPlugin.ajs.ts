@@ -57,7 +57,6 @@ import {
 import {
   AngularObjectClientUnbindDTO
 } from '../angular2+/objects/message/angularObjectClientUnbindMessage/angularObjectClientUnbindDTO';
-import {PushValueWithAngularJsEvalAsync} from '../angular2+/objects/pushValue/pushValueWithAngularJsEvalAsync';
 
 export class AngularPluginAjs implements IPostLink{
   static $inject = ['$compile', '$scope', '$element'];
@@ -80,7 +79,7 @@ export class AngularPluginAjs implements IPostLink{
   }
 
   $postLink() {
-    this._angularObjects = new PushValueWithAngularJsEvalAsync(new PushValueImpl(), this.$scope.$evalAsync);
+    this._angularObjects = new PushValueImpl();
     this.angularObjectCollection.angularObjects(this._angularObjects);
     this.watchAngularObjects();
     this.render();
@@ -127,16 +126,12 @@ export class AngularPluginAjs implements IPostLink{
 
   private watchAngularObjects() {
     const variableAlias = this._angularObjects;
-    const renderAlias = this.render;
-    this.$scope.$watch(
+    this.$scope.$watchCollection(
       function() { return variableAlias.value(); },
-      function(newValue, oldValue) {
-        newValue.forEach(newAoValue => {
-          const oldAoValue = oldValue.find(ao => ao.name() === newAoValue.name());
-          if(oldAoValue.value() !== newAoValue.value()){
-            renderAlias();
-          }
-        });
+      (newValue, oldValue) => {
+        if(oldValue !== newValue) {
+          this.render();
+        }
       }
     );
   }
@@ -172,7 +167,7 @@ export const angularPluginAjs = {
     `,
   bindings: {
     plugin: '=',
-    angularObjects: '=',
+    angularObjectCollection: '=',
   },
   controller: AngularPluginAjs
 };
