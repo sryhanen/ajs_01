@@ -54,6 +54,7 @@ import {PushValueImpl} from '../pushValue/pushValueImpl';
 import {PushValue} from '../pushValue/pushValue';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
+import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
 
 describe('Notebook', () => {
   const noteId = 'noteId';
@@ -101,6 +102,54 @@ describe('Notebook', () => {
       const spy = vi.spyOn(channel, 'request');
       notebook.request(data);
       expect(spy).toHaveBeenCalledWith(data);
+    });
+
+    it('Should decorate run paragraph request', () => {
+      const paragraphId = 'paragraphId';
+      const paragraphText = 'paragraph text';
+      const paragraphConfig = {
+        configProp:'configProp value'
+      };
+      const paragraphParams = {
+        paramsProp:'paramsProp value'
+      };
+      const paragraph: ParagraphDTO = {
+        id: paragraphId,
+        config: paragraphConfig,
+        params: paragraphParams,
+        text: paragraphText
+      };
+      const requestData: MessageDTO<RunParagraphDTO> = {
+        op: 'RUN_PARAGRAPH',
+        data: {
+          id: paragraphId,
+          paragraph: '',
+          config: {},
+          params: {}
+        }
+      };
+      const expectedData: MessageDTO<RunParagraphDTO> = {
+        op: 'RUN_PARAGRAPH',
+        data: {
+          id: paragraphId,
+          paragraph: paragraphText,
+          config: paragraphConfig,
+          params: paragraphParams
+        }
+      };
+      const noteResponse: MessageDTO<NotebookDTO> = {
+        op:'NOTE',
+        data: {
+          id:noteId,
+          paragraphs:[
+            paragraph
+          ]
+        }
+      };
+      notebook.response(noteResponse);
+      const spy = vi.spyOn(channel, 'request');
+      notebook.request(requestData);
+      expect(spy).toHaveBeenCalledWith(expectedData);
     });
   });
 

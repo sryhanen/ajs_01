@@ -45,8 +45,10 @@
  */
 import {Channel} from '../channel/channel';
 import {OutputContainer} from '../output/container/outputContainer';
+import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
 
 export interface Paragraph extends Channel {
   outputContainer(): OutputContainer;
   id(): string;
+  print(): ParagraphDTO;
 }

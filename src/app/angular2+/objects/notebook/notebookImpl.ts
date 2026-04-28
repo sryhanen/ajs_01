@@ -58,6 +58,7 @@ import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObj
 import {AngularObjectUpdateMessageImpl} from '../message/angularObjectUpdateMessage/angularObjectUpdateMessageImpl';
 import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
 import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
+import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
@@ -87,6 +88,14 @@ export class NotebookImpl implements Notebook {
     const message = data as MessageDTO<unknown>;
     if(message.data['noteId'] !== undefined){
       message.data['noteId'] = this.id();
+    }
+    else if(message.op === 'RUN_PARAGRAPH'){
+      const runParagraphMessage = data as MessageDTO<RunParagraphDTO>;
+      const paragraphDto = this._paragraphs.find(paragraph => paragraph.id() === runParagraphMessage.data.id).print();
+      runParagraphMessage.data.paragraph = paragraphDto.text;
+      runParagraphMessage.data.config = paragraphDto.config;
+      runParagraphMessage.data.params = paragraphDto.params;
+      this._channel.request(runParagraphMessage);
     }
     this._channel.request(message);
   }

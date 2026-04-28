@@ -92,6 +92,10 @@ describe('Paragraph', () => {
     it('Should return OutputContainer', () => {
       expect(paragraph.outputContainer()).toBeInstanceOf(OutputContainerImpl);
     });
+
+    it('Should print itself', ()=> {
+      expect(paragraph.print()).toEqual(paragraphData);
+    });
   });
 
   describe('Request', () => {
@@ -125,29 +129,6 @@ describe('Paragraph', () => {
       };
       paragraph.request(requestData);
       expect(spy).toHaveBeenCalledWith(requestData);
-    });
-
-    it('Should decorate run paragraph request', () => {
-      const requestData: MessageDTO<RunParagraphDTO> = {
-        op: 'RUN_PARAGRAPH',
-        data: {
-          id: '',
-          paragraph: '',
-          config: {},
-          params: {}
-        }
-      };
-      const expectedData: MessageDTO<RunParagraphDTO> = {
-        op: 'RUN_PARAGRAPH',
-        data: {
-          id: paragraphId,
-          paragraph: paragraphText,
-          config: paragraphConfig,
-          params: paragraphParams
-        }
-      };
-      paragraph.request(requestData);
-      expect(spy).toHaveBeenCalledWith(expectedData);
     });
 
     it('Should send requests to channel', () => {

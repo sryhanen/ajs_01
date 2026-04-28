@@ -53,7 +53,6 @@ import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOut
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {ParagraphMessageImpl} from '../message/paragraphMessage/paragraphMessageImpl';
-import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
@@ -84,19 +83,15 @@ export class ParagraphImpl implements Paragraph{
     return this._outputContainer;
   }
 
+  print():ParagraphDTO {
+    return this._paragraph;
+  }
+
   request(data: object): void {
     const message = data as MessageDTO<unknown>;
     if(message.data['paragraphId'] !== undefined) {
       message.data['paragraphId'] = this.id();
       this._channel.request(message);
-    }
-    else if(message.op === 'RUN_PARAGRAPH'){
-      const runParagraphMessage = data as MessageDTO<RunParagraphDTO>;
-      runParagraphMessage.data.id = this.id();
-      runParagraphMessage.data.paragraph = this._paragraph.text;
-      runParagraphMessage.data.config = this._paragraph.config;
-      runParagraphMessage.data.params = this._paragraph.params;
-      this._channel.request(runParagraphMessage);
     }
     else {
       this._channel.request(data);
