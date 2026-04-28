@@ -64,14 +64,17 @@ describe('AngularPluginAjs', () => {
   const mockLinkFunction = vi.fn().mockReturnValue($element);
   let $compile;
   let watchSpy;
+  let watchCollectionSpy;
   let $scope;
 
   let angularPluginAjs: AngularPluginAjs;
   beforeEach(() => {
     $compile  = vi.fn().mockReturnValue(mockLinkFunction);
     watchSpy = vi.fn();
+    watchCollectionSpy = vi.fn();
     $scope = {
       $watch: watchSpy,
+      $watchCollection: watchCollectionSpy,
     };
     angularPluginAjs = new AngularPluginAjs($compile,$scope,$element);
   });
@@ -133,7 +136,8 @@ describe('AngularPluginAjs', () => {
     });
 
     it('Should have set watchers to scope', () => {
-      expect(watchSpy).toHaveBeenCalledTimes(3);
+      expect(watchSpy).toHaveBeenCalledTimes(2);
+      expect(watchCollectionSpy).toHaveBeenCalledTimes(1);
     });
 
     it('Should have compiled', () => {
