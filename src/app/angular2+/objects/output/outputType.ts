@@ -47,5 +47,6 @@ export enum OutputType {
   dataTables = 'dataTables',
   uPlot = 'uPlot',
   angular = 'angular',
-  text = 'text'
+  text = 'text',
+  html = 'html',
 }
