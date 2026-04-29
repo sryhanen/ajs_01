@@ -4,7 +4,7 @@ import {HtmlPlugin} from '../../../../objects/output/plugins/htmlPlugin/htmlPlug
 @Component({
   selector:'html',
   template: `
-  <div #anchor class="plain-text"></div>
+  <div #anchor></div>
   `
 })
 export class HtmlView implements AfterViewInit{
