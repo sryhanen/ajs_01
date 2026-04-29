@@ -55,6 +55,7 @@ import {InterpreterErrorListener} from '../../interpreterErrorListener/interpret
 import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/interpreterErrorListenerImpl';
 import {AngularFormat} from '../format/angular/angularFormat';
 import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
+import {HTMLFormat} from '../format/html/htmlFormat';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
@@ -69,6 +70,7 @@ export class OutputContainerImpl implements OutputContainer{
       new uPlotFormat(this),
       new TextFormat(this),
       new AngularFormat(this, angularObjectCollection),
+      new HTMLFormat(this)
     ];
     this._outputSwitcher = new OutputSwitcherImpl(this, this._outputFormats);
     this._errorListener = new InterpreterErrorListenerImpl(this);
