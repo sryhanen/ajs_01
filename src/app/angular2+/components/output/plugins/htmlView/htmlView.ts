@@ -8,10 +8,10 @@ import {HtmlPlugin} from '../../../../objects/output/plugins/htmlPlugin/htmlPlug
   `
 })
 export class HtmlView implements AfterViewInit{
-  @Input({required:true}) htmlPlugin: HtmlPlugin;
+  @Input({required:true}) plugin: HtmlPlugin;
   @ViewChild('anchor') anchor: ElementRef;
 
   ngAfterViewInit(){
-    this.anchor.nativeElement.innerHTML = this.htmlPlugin.unsanitizedHtmlString();
+    this.anchor.nativeElement.innerHTML = this.plugin.unsanitizedHtmlString();
   }
 }

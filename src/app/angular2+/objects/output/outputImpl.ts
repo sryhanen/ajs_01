@@ -81,7 +81,7 @@ export class OutputImpl implements Output {
     return this._data.isAggregated !== undefined && this._data.isAggregated;
   }
 
-  toHtmlOutput(): HtmlPlugin {
+  toHtmlPlugin(): HtmlPlugin {
     let htmlOutput: HtmlPlugin;
     if(this._data.type === OutputType.html){
       htmlOutput = new HtmlPluginImpl(this._data.data as string);

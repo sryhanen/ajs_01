@@ -55,7 +55,7 @@ export interface Output extends Stubable {
   toTextPlugin(): OutputPlugin;
   touPlotPlugin(): OutputPlugin;
   toAngularPlugin(channel:Channel): AngularPlugin;
-  toHtmlOutput(): HtmlPlugin;
+  toHtmlPlugin(): HtmlPlugin;
   isAggregated(): boolean;
   type():string;
 }
