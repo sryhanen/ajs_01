@@ -62,6 +62,9 @@ import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
 import {AngularPluginImpl} from './plugins/angularPlugin/angularPluginImpl';
 import {AngularPluginStub} from './plugins/angularPlugin/angularPluginStub';
 import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
+import {HtmlPlugin} from './plugins/htmlPlugin/htmlPlugin';
+import {HtmlPluginImpl} from './plugins/htmlPlugin/htmlPluginImpl';
+import {HtmlPluginStub} from './plugins/htmlPlugin/htmlPluginStub';
 
 export class OutputImpl implements Output {
   private readonly _data: OutputDTO<unknown>;
@@ -76,6 +79,17 @@ export class OutputImpl implements Output {
 
   isAggregated(): boolean {
     return this._data.isAggregated !== undefined && this._data.isAggregated;
+  }
+
+  toHtmlOutput(): HtmlPlugin {
+    let htmlOutput: HtmlPlugin;
+    if(this._data.type === OutputType.html){
+      htmlOutput = new HtmlPluginImpl(this._data.data as string);
+    }
+    else {
+      htmlOutput = new HtmlPluginStub();
+    }
+    return htmlOutput;
   }
 
   toAngularPlugin(channel:Channel): AngularPlugin {
