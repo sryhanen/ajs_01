@@ -47,10 +47,20 @@ import angular from 'angular';
 import {downgradeComponent, downgradeInjectable} from '@angular/upgrade/static';
 import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
 import {EditorComponent} from './editor/editor.component';
+import {WebSocketServiceImpl} from './angular2+/objects/webSocket/service/webSocketServiceImpl';
+import {NotebookCollectionView} from './angular2+/components/notebookCollection/notebookCollectionView';
 
 angular.module('zeppelinWebApp').factory('authenticationServiceImpl', downgradeInjectable(AuthenticationServiceImpl));
 angular.module('zeppelinWebApp')
   .directive(
     'editor',
     downgradeComponent({ component: EditorComponent }) as angular.IDirectiveFactory
+  );
+
+angular.module('zeppelinWebApp').factory('webSocketService', downgradeInjectable(WebSocketServiceImpl));
+
+angular.module('zeppelinWebApp')
+  .directive(
+    'notebookCollection',
+    downgradeComponent({ component: NotebookCollectionView }) as angular.IDirectiveFactory
   );
