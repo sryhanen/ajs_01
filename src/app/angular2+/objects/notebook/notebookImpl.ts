@@ -48,7 +48,6 @@ import {NotebookDTO} from '../message/noteMessage/notebookDTO';
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
 import {MessageDTO} from '../message/messageDTO';
-import {NoteMessageImpl} from '../message/noteMessage/noteMessageImpl';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
@@ -63,16 +62,24 @@ import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
   private _notebook: Partial<NotebookDTO>;
-  private _paragraphs: Paragraph[];
+  private readonly _paragraphs: Paragraph[];
   private readonly _pushParagraphs: PushValue<Paragraph[]>[];
   private readonly _angularObjectCollection: AngularObjectCollection;
 
   constructor(channel: Channel, notebook: Partial<NotebookDTO>) {
     this._channel = channel;
     this._notebook = notebook;
-    this._paragraphs = [];
+    this._paragraphs = notebook.paragraphs ? this.paragraphsFromNotebookDTO(notebook.paragraphs) : [];
     this._pushParagraphs = [];
     this._angularObjectCollection = new AngularObjectCollectionImpl(this);
+  }
+
+  private paragraphsFromNotebookDTO(paragraphDTOs: ParagraphDTO[]): Paragraph[] {
+    const paragraphs: Paragraph[] = [];
+    for(const paragraphDto of paragraphDTOs) {
+      paragraphs.push(new ParagraphImpl(this, paragraphDto, this._angularObjectCollection));
+    }
+    return paragraphs;
   }
 
   paragraphs(value:PushValue<Paragraph[]>):void{
@@ -103,14 +110,7 @@ export class NotebookImpl implements Notebook {
   response(data: object): void {
     const message = data as MessageDTO<unknown>;
     const op = message.op;
-    if(op === 'NOTE'){
-      const noteMessage = new NoteMessageImpl(message.data as NotebookDTO);
-      if(noteMessage.id() === this.id()){
-        this._paragraphs = noteMessage.paragraphs(this, this._angularObjectCollection);
-        this._pushParagraphs.forEach(value => value.update(this._paragraphs));
-      }
-    }
-    else if(op === 'PARAGRAPH_ADDED'){
+    if(op === 'PARAGRAPH_ADDED'){
       const paragraphAddedMessage = message.data as {paragraph:ParagraphDTO, index:number};
       const paragraph = new ParagraphImpl(this, paragraphAddedMessage.paragraph, this._angularObjectCollection);
       this._paragraphs.splice(paragraphAddedMessage.index,0, paragraph);

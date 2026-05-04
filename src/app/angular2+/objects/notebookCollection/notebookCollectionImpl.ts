@@ -47,9 +47,10 @@ import {NotebookCollection} from './notebookCollection';
 import {Notebook} from '../notebook/notebook';
 import {Channel} from '../channel/channel';
 import {MessageDTO} from '../message/messageDTO';
-import {NotesInfoDTO} from '../message/notesInfoMessage/notesInfoDTO';
 import {NotesInfoMessageImpl} from '../message/notesInfoMessage/notesInfoMessageImpl';
 import {PushValue} from '../pushValue/pushValue';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
+import {NoteMessageImpl} from '../message/noteMessage/noteMessageImpl';
 
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;
@@ -72,14 +73,27 @@ export class NotebookCollectionImpl implements NotebookCollection{
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    if(message.op === 'NOTES_INFO'){
-      this._collection = new NotesInfoMessageImpl(message.data as NotesInfoDTO).notebooks(this);
+    const message = data as MessageDTO<object>;
+    if(message.op === 'NOTES_INFO') {
+      const notesInfoMessage = new NotesInfoMessageImpl(new SafeJsonImpl(message.data));
+      this._collection = notesInfoMessage.notebooks(this);
       this._pushCollection.forEach(value => value.update(this._collection));
+    }
+    else if(message.op === 'NOTE'){
+      const noteMessage = new NoteMessageImpl(new SafeJsonImpl(message.data));
+      const noteMessageNotebook = noteMessage.notebook(this);
+      const notebookIndex = this._collection.findIndex(collectionNotebook =>
+        collectionNotebook.id() === noteMessageNotebook.id()
+      );
+      if(notebookIndex === -1){
+        this._collection.push(noteMessageNotebook);
+      }
+      else{
+        this._collection.splice(notebookIndex, 1, noteMessageNotebook);
+      }
     }
     this._collection.forEach((notebook: Notebook) => {
       notebook.response(data);
     });
   }
 }
-

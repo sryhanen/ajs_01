@@ -52,6 +52,8 @@ import {PushValue} from '../pushValue/pushValue';
 import {PushValueImpl} from '../pushValue/pushValueImpl';
 import {MessageDTO} from '../message/messageDTO';
 import {NotesInfoDTO} from '../message/notesInfoMessage/notesInfoDTO';
+import {NotebookDTO} from '../message/noteMessage/notebookDTO';
+import {Paragraph} from '../paragraph/paragraph';
 
 describe('NotebookCollection', () => {
   let channel: Channel;
@@ -81,51 +83,110 @@ describe('NotebookCollection', () => {
   });
 
   describe('Response', ()=> {
-    let notesInfoMessage:MessageDTO<NotesInfoDTO>;
-    let defaultMessage:MessageDTO<unknown>;
-    beforeEach(() => {
-      notesInfoMessage = {
-        op:'NOTES_INFO',
-        data: {
-          notes: [
-            {
-              id:'note 1',
-            },
-            {
-              id:'note 2',
-            }
-          ]
-        }
-      };
-      defaultMessage = {
-        op:'DEFAULT',
-        data: {}
-      };
-      notebookCollection.notebooks(pushCollection);
-    });
+    describe('Notebook collection updates', ()=> {
+      const noteId1 = 'note 1';
+      const noteId2 = 'note 2';
+      const noteId3 = 'note 3';
+      let notesInfoMessage:MessageDTO<NotesInfoDTO>;
+      beforeEach(() => {
+        notesInfoMessage = {
+          op:'NOTES_INFO',
+          data: {
+            notes: [
+              {id:noteId1,},
+              {id:noteId2,}
+            ]
+          }
+        };
+      });
 
-    it('Should update notebooks', () => {
-      expect(pushCollection.value()).toHaveLength(0);
-      notebookCollection.response(notesInfoMessage);
-      expect(pushCollection.value()).toHaveLength(2);
-    });
+      it('Should update notebooks on response', () => {
+        notebookCollection.notebooks(pushCollection);
+        expect(pushCollection.value()).toHaveLength(0);
+        notebookCollection.response(notesInfoMessage);
+        expect(pushCollection.value()).toHaveLength(2);
+        expect(pushCollection.value().find(notebook => notebook.id()===noteId1)).toBeDefined();
+        expect(pushCollection.value().find(notebook => notebook.id()===noteId2)).toBeDefined();
+      });
 
-    it('Should not update notebooks', () => {
-      expect(pushCollection.value()).toHaveLength(0);
-      notebookCollection.response(defaultMessage);
-      expect(pushCollection.value()).toHaveLength(0);
-    });
+      it('Should have notebooks after response', () => {
+        notebookCollection.response(notesInfoMessage);
+        notebookCollection.notebooks(pushCollection);
+        expect(pushCollection.value()).toHaveLength(2);
+        expect(pushCollection.value().find(notebook => notebook.id()===noteId1)).toBeDefined();
+        expect(pushCollection.value().find(notebook => notebook.id()===noteId2)).toBeDefined();
+      });
 
-    it('Should evoke response for each notebook', () =>{
-      notebookCollection.response(notesInfoMessage);
-      const spies = pushCollection.value().map(note => vi.spyOn(note, 'response'));
-      expect(spies).toHaveLength(2);
-      expect(spies[0]).toHaveBeenCalledTimes(0);
-      expect(spies[1]).toHaveBeenCalledTimes(0);
+      it('Should overwrite previous notebooks', () =>{
+        notebookCollection.notebooks(pushCollection);
+        notebookCollection.response(notesInfoMessage);
+        notesInfoMessage.data.notes = [{id:noteId3}];
+        notebookCollection.response(notesInfoMessage);
+        expect(pushCollection.value()).toHaveLength(1);
+        expect(pushCollection.value().find(notebook => notebook.id()===noteId3)).toBeDefined();
+      });
 
-      notebookCollection.response(defaultMessage);
-      expect(spies[0]).toHaveBeenCalledTimes(1);
-      expect(spies[1]).toHaveBeenCalledTimes(1);
+      it('Should append notebook to collection', () => {
+        notebookCollection.notebooks(pushCollection);
+        notebookCollection.response(notesInfoMessage);
+        expect(pushCollection.value()).toHaveLength(2);
+        const noteId4 = 'note 4';
+        const notebookMessage:MessageDTO<NotebookDTO> = {
+          op:'NOTE',
+          data: {
+            id: noteId4,
+            paragraphs: []
+          }
+        };
+        notebookCollection.response(notebookMessage);
+        expect(pushCollection.value()).toHaveLength(3);
+        expect(pushCollection.value().find(notebook => notebook.id()===noteId4)).toBeDefined();
+      });
+
+      it('Should update notebook in collection', () => {
+        notebookCollection.notebooks(pushCollection);
+        notebookCollection.response(notesInfoMessage);
+        expect(pushCollection.value()).toHaveLength(2);
+        const oldNote2 = pushCollection.value().find(notebook => notebook.id()===noteId2);
+        const oldNote2Paragraphs = new PushValueImpl<Paragraph[]>();
+        oldNote2.paragraphs(oldNote2Paragraphs);
+        expect(oldNote2Paragraphs.value()).toHaveLength(0);
+        const notebookMessage:MessageDTO<NotebookDTO> = {
+          op:'NOTE',
+          data: {
+            id: noteId2,
+            paragraphs: [
+              {
+                id: 'para1',
+                text: '',
+                config: undefined,
+                params: undefined
+              }
+            ]
+          }
+        };
+        notebookCollection.response(notebookMessage);
+        const newNote2 = pushCollection.value().find(notebook => notebook.id()===noteId2);
+        const newNote2Paragraphs = new PushValueImpl<Paragraph[]>();
+        newNote2.paragraphs(newNote2Paragraphs);
+        expect(newNote2Paragraphs.value()).toHaveLength(1);
+      });
+
+      it('Should evoke response for each notebook', () =>{
+        notebookCollection.notebooks(pushCollection);
+        notebookCollection.response(notesInfoMessage);
+        const spies = pushCollection.value().map(note => vi.spyOn(note, 'response'));
+        expect(spies).toHaveLength(2);
+        expect(spies[0]).toHaveBeenCalledTimes(0);
+        expect(spies[1]).toHaveBeenCalledTimes(0);
+        const defaultMessage:MessageDTO<object>= {
+          op:'default',
+          data:{}
+        };
+        notebookCollection.response(defaultMessage);
+        expect(spies[0]).toHaveBeenCalledTimes(1);
+        expect(spies[1]).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });
