@@ -69,7 +69,7 @@ describe('OutputContainer', () => {
     });
 
     it('Should have outputFormats', () =>{
-      expect(outputContainer.outputFormats()).toHaveLength(4);
+      expect(outputContainer.outputFormats()).toHaveLength(5);
     });
 
     it('Should have error listener', () =>{

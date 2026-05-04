@@ -10,7 +10,7 @@ describe('HtmlView', () => {
     htmlPlugin = new HtmlPluginImpl(htmlString);
     await render(HtmlView, {
       inputs:{
-        htmlPlugin: htmlPlugin,
+        plugin: htmlPlugin,
       }
     });
   });
