@@ -46,17 +46,19 @@
 import {NotesInfoMessage} from './notesInfoMessage';
 import {Notebook} from '../../notebook/notebook';
 import {Channel} from '../../channel/channel';
-import {NotesInfoDTO} from './notesInfoDTO';
+import {NotesInfoDTO, NotesInfoDTOStub} from './notesInfoDTO';
 import {NotebookImpl} from '../../notebook/notebookImpl';
+import {SafeJson} from '../../safeJson/safeJson';
 
 export class NotesInfoMessageImpl implements NotesInfoMessage{
-  private readonly _data: NotesInfoDTO;
+  private readonly _safeJson:SafeJson<NotesInfoDTO>;
 
-  constructor(data:NotesInfoDTO) {
-    this._data = data;
+  constructor(safeJson:SafeJson<NotesInfoDTO>) {
+    this._safeJson = safeJson;
   }
 
   notebooks(channel: Channel): Notebook[] {
-    return this._data.notes.map(notebookDTO => new NotebookImpl(channel, notebookDTO));
+    const data = this._safeJson.deserialized(NotesInfoDTOStub);
+    return data.notes.map(notebookDTO => new NotebookImpl(channel, notebookDTO));
   }
 }

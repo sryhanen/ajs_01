@@ -48,6 +48,7 @@ import {NotesInfoDTO} from './notesInfoDTO';
 import {NotesInfoMessageImpl} from './notesInfoMessageImpl';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {Channel} from '../../channel/channel';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
 describe('NotesInfoData', () => {
   let channel: Channel;
@@ -63,7 +64,7 @@ describe('NotesInfoData', () => {
     data = {
       notes: notes
     };
-    notesInfoData = new NotesInfoMessageImpl(data);
+    notesInfoData = new NotesInfoMessageImpl(new SafeJsonImpl(data));
   });
 
   describe('Birth', () => {
@@ -83,7 +84,7 @@ describe('NotesInfoData', () => {
   describe('Empty notebooks', () => {
     it('Should have empty list', () => {
       data.notes = [];
-      notesInfoData = new NotesInfoMessageImpl(data);
+      notesInfoData = new NotesInfoMessageImpl(new SafeJsonImpl(data));
       expect(notesInfoData.notebooks(channel)).toEqual([]);
     });
   });

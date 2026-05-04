@@ -49,3 +49,8 @@ export interface NotebookDTO {
   id: string,
   paragraphs: ParagraphDTO[],
 }
+
+export const NotebookDTOStub: NotebookDTO = {
+  id:undefined,
+  paragraphs: undefined
+};

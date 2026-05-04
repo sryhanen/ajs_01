@@ -44,26 +44,21 @@
  * a licensee so wish it.
  */
 import {NoteMessage} from './noteMessage';
-import {Paragraph} from '../../paragraph/paragraph';
-import {NotebookDTO} from './notebookDTO';
+import {NotebookDTO, NotebookDTOStub} from './notebookDTO';
 import {Channel} from '../../channel/channel';
-import {ParagraphImpl} from '../../paragraph/paragraphImpl';
-import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
-import {ParagraphDTO} from '../paragraphMessage/paragraphDTO';
+import {Notebook} from '../../notebook/notebook';
+import {NotebookImpl} from '../../notebook/notebookImpl';
+import {SafeJson} from '../../safeJson/safeJson';
 
 export class NoteMessageImpl implements NoteMessage{
-  private readonly _data:NotebookDTO;
+  private readonly _safeJson:SafeJson<NotebookDTO>;
 
-  constructor(data:NotebookDTO) {
-    this._data = data;
+  constructor(safeJson:SafeJson<NotebookDTO>) {
+    this._safeJson = safeJson;
   }
 
-  paragraphs(channel: Channel, angularObjectCollection:AngularObjectCollection): Paragraph[] {
-    const paragraphDTOs: ParagraphDTO[] = this._data.paragraphs;
-    return paragraphDTOs.map(paragraphDTO => new ParagraphImpl(channel, paragraphDTO, angularObjectCollection));
-  }
-
-  id():string {
-    return this._data.id;
+  notebook(channel:Channel): Notebook{
+    const data = this._safeJson.deserialized(NotebookDTOStub);
+    return new NotebookImpl(channel, data);
   }
 }

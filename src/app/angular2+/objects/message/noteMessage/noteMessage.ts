@@ -43,11 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Paragraph} from '../../paragraph/paragraph';
 import {Channel} from '../../channel/channel';
-import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
+import {Notebook} from '../../notebook/notebook';
 
 export interface NoteMessage{
-  paragraphs(channel: Channel, angularObjectCollection:AngularObjectCollection):Paragraph[];
-  id():string;
+  notebook(channel:Channel): Notebook;
 }

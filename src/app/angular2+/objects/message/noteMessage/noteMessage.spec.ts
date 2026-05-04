@@ -46,9 +46,11 @@
 import {NoteMessage} from './noteMessage';
 import {NotebookDTO} from './notebookDTO';
 import {NoteMessageImpl} from './noteMessageImpl';
-import {ParagraphDTO} from '../../paragraph/paragraphDTO';
+import {ParagraphDTO} from '../paragraphMessage/paragraphDTO';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {Channel} from '../../channel/channel';
+import {NotebookImpl} from '../../notebook/notebookImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
 describe('Note message', () => {
   let channel: Channel;
@@ -58,15 +60,18 @@ describe('Note message', () => {
   beforeEach(() => {
     channel = new FakeChannel();
     paragraphs = [
-      {id:'para1'},
-      {id:'para2'},
-      {id:'para3'}
+      {
+        id: 'para1',
+        text: '',
+        config: {},
+        params: {}
+      }
     ];
     data = {
       id:'noteid',
       paragraphs:paragraphs
     };
-    noteMessage = new NoteMessageImpl(data);
+    noteMessage = new NoteMessageImpl(new SafeJsonImpl(data));
   });
 
   describe('Birth', () => {
@@ -74,18 +79,9 @@ describe('Note message', () => {
       expect(noteMessage).toBeInstanceOf(NoteMessageImpl);
     });
 
-    it('Should have paragraphs', () => {
-      const paragraphObjects = noteMessage.paragraphs(channel);
-      expect(paragraphObjects).toHaveLength(3);
-      expect(paragraphObjects[0].id()).toEqual(paragraphs[0].id);
-      expect(paragraphObjects[1].id()).toEqual(paragraphs[1].id);
-      expect(paragraphObjects[2].id()).toEqual(paragraphs[2].id);
-    });
-
-    it('Should have no paragraphs', () => {
-      data.paragraphs = [];
-      noteMessage = new NoteMessageImpl(data);
-      expect(noteMessage.paragraphs(channel)).toEqual([]);
+    it('Should have notebook', () => {
+      const notebook = noteMessage.notebook(channel);
+      expect(notebook).toBeInstanceOf(NotebookImpl);
     });
   });
 });
