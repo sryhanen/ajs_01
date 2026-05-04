@@ -50,5 +50,7 @@ export interface NotesInfoDTO {
 }
 
 export const NotesInfoDTOStub: NotesInfoDTO = {
-  notes: undefined
+  get notes(): Partial<NotebookDTO>[] {
+    throw new Error('NotesInfoDTOStub: Property not defined');
+  }
 };

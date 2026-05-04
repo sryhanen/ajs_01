@@ -51,6 +51,10 @@ export interface NotebookDTO {
 }
 
 export const NotebookDTOStub: NotebookDTO = {
-  id:undefined,
-  paragraphs: undefined
+  get id():string {
+    throw new Error('NotebookDTOStub: Property not defined');
+  },
+  get paragraphs(): ParagraphDTO[] {
+    throw new Error('NotebookDTOStub: Property not defined');
+  }
 };
