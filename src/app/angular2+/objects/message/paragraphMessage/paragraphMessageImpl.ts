@@ -1,30 +1,28 @@
 import {ParagraphMessage} from './paragraphMessage';
 import {MessageDTO} from '../messageDTO';
 import {ParagraphOutputDTO} from '../paragraphOutputMessage/paragraphOutputDTO';
-import {ParagraphDTO} from './paragraphDTO';
+import {ParagraphDTO, ParagraphDTOStub} from './paragraphDTO';
+import {SafeJson} from '../../safeJson/safeJson';
 
 export class ParagraphMessageImpl implements ParagraphMessage {
-  private readonly _data:ParagraphDTO;
+  private readonly _safeJson:SafeJson<ParagraphDTO>;
 
-  constructor(data:ParagraphDTO) {
-    this._data = data;
+  constructor(safeJson:SafeJson<ParagraphDTO>) {
+    this._safeJson = safeJson;
   }
 
-  id():string {
-    return this._data.id;
-  }
-
-  toParagraphData(): ParagraphDTO {
-    return this._data;
+  toParagraphDTO(): ParagraphDTO {
+    return this._safeJson.deserialized(ParagraphDTOStub);
   }
 
   printAsParagraphOutputMessage(): MessageDTO<ParagraphOutputDTO> {
+    const paragraphDTO = this._safeJson.deserialized(ParagraphDTOStub);
     return {
       op:'PARAGRAPH_OUTPUT',
       data: {
         noteId:'',
-        paragraphId: this._data.id,
-        output: this._data.output,
+        paragraphId: paragraphDTO.id,
+        output: paragraphDTO.output,
       }
     };
   }

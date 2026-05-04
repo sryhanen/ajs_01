@@ -3,6 +3,7 @@ import {ParagraphMessage} from './paragraphMessage';
 import {ParagraphMessageImpl} from './paragraphMessageImpl';
 import {ParagraphOutputDTO} from '../paragraphOutputMessage/paragraphOutputDTO';
 import {MessageDTO} from '../messageDTO';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
 describe('Paragraph Message', () => {
   const paragraphId = 'paragraphId';
@@ -23,7 +24,7 @@ describe('Paragraph Message', () => {
       params: paragraphParams,
       text: paragraphText
     };
-    paragraphMessage = new ParagraphMessageImpl(data);
+    paragraphMessage = new ParagraphMessageImpl(new SafeJsonImpl(data));
   });
 
   describe('Birth', () => {
@@ -31,12 +32,8 @@ describe('Paragraph Message', () => {
       expect(paragraphMessage).toBeInstanceOf(ParagraphMessageImpl);
     });
 
-    it('Should have id', () => {
-      expect(paragraphMessage.id()).toEqual(paragraphId);
-    });
-
-    it('Should have paragraphData', () => {
-      expect(paragraphMessage.toParagraphData()).toEqual(data);
+    it('Should have ParagraphDTO', () => {
+      expect(paragraphMessage.toParagraphDTO()).toEqual(data);
     });
   });
 
@@ -67,7 +64,7 @@ describe('Paragraph Message', () => {
         }
       };
       data.output = output;
-      paragraphMessage = new ParagraphMessageImpl(data);
+      paragraphMessage = new ParagraphMessageImpl(new SafeJsonImpl(data));
       expect(paragraphMessage.printAsParagraphOutputMessage()).toEqual(expectedMessageWithOutput);
     });
   });

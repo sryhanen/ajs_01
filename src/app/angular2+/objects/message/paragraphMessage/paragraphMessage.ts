@@ -3,7 +3,6 @@ import {ParagraphOutputDTO} from '../paragraphOutputMessage/paragraphOutputDTO';
 import {ParagraphDTO} from './paragraphDTO';
 
 export interface ParagraphMessage {
-  id():string;
   printAsParagraphOutputMessage(): MessageDTO<ParagraphOutputDTO>;
-  toParagraphData(): ParagraphDTO;
+  toParagraphDTO(): ParagraphDTO;
 }
