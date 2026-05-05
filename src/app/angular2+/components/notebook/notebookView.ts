@@ -58,7 +58,7 @@ import {PushValueWithChangeDetection} from '../../objects/pushValue/pushValueWit
   ],
   template: `
     @if(noteId === notebook.id()){
-      @for(paragraph of this.paragraphs.value(); track paragraph.id()){
+      @for(paragraph of this.paragraphs.value(); track paragraph.print()){
         <paragraph [paragraphId]="paragraphId" [paragraph]="paragraph"></paragraph>
       }
     }
