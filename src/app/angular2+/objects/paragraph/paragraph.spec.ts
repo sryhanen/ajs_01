@@ -52,7 +52,6 @@ import {MessageDTO} from '../message/messageDTO';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
-import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
 
 describe('Paragraph', () => {
   const paragraphId = 'paragraphId';
@@ -148,29 +147,6 @@ describe('Paragraph', () => {
       const container = paragraph.outputContainer();
       spy = vi.spyOn(container, 'response');
       expect(spy).toHaveBeenCalledTimes(0);
-    });
-
-    describe('PARAGRAPH response', () => {
-      const message: MessageDTO<ParagraphDTO>  = {
-        op:'PARAGRAPH',
-        data: {
-          config: {},
-          params: {},
-          text: '',
-          id:paragraphId,
-        }
-      };
-      it('Should send response to outputContainer', () => {
-        expect(spy).toHaveBeenCalledTimes(0);
-        paragraph.response(message);
-        expect(spy).toHaveBeenCalledTimes(1);
-      });
-
-      it('Should not send response to outputContainer', () => {
-        message.data.id = 'wrong id';
-        paragraph.response(message);
-        expect(spy).toHaveBeenCalledTimes(0);
-      });
     });
 
     describe('PARAGRAPH_OUTPUT response', () => {

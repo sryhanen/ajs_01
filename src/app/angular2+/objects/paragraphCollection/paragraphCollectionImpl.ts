@@ -37,7 +37,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       const paragraphDto = this._paragraphs.find(paragraph => paragraph.id() === runParagraphDto.id).print();
       runParagraphDto.paragraph = paragraphDto.text;
       runParagraphDto.config = paragraphDto.config;
-      runParagraphDto.params = paragraphDto.params;
+      runParagraphDto.params = paragraphDto.settings.params;
       message.data = runParagraphDto;
       this._channel.request(message);
     }
@@ -55,6 +55,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       const paragraphToReplaceIndex = this._paragraphs.findIndex(paragraph => paragraph.id() === paragraphDTO.id);
       const newParagraph = new ParagraphImpl(this, paragraphDTO, this._angularObjectCollection);
       this._paragraphs.splice(paragraphToReplaceIndex, 1, newParagraph);
+      this._pushParagraphs.forEach(value => value.update(this._paragraphs));
     }
     if(op === 'PARAGRAPH_ADDED'){
       const paragraphAddedMessage = new ParagraphAddedMessageImpl(new SafeJsonImpl(message.data));

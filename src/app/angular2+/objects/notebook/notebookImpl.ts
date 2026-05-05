@@ -48,8 +48,6 @@ import {NotebookDTO} from '../message/noteMessage/notebookDTO';
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
 import {MessageDTO} from '../message/messageDTO';
-import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
-import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {PushValue} from '../pushValue/pushValue';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
@@ -57,21 +55,23 @@ import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObj
 import {AngularObjectUpdateMessageImpl} from '../message/angularObjectUpdateMessage/angularObjectUpdateMessageImpl';
 import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
 import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
-import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
+import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
+import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
+import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
+import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
   private _notebook: Partial<NotebookDTO>;
-  private readonly _paragraphs: Paragraph[];
-  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
+  private readonly _paragraphCollection: ParagraphCollection;
   private readonly _angularObjectCollection: AngularObjectCollection;
 
   constructor(channel: Channel, notebook: Partial<NotebookDTO>) {
     this._channel = channel;
     this._notebook = notebook;
-    this._paragraphs = notebook.paragraphs ? this.paragraphsFromNotebookDTO(notebook.paragraphs) : [];
-    this._pushParagraphs = [];
     this._angularObjectCollection = new AngularObjectCollectionImpl(this);
+    const paragraphs = notebook.paragraphs ? this.paragraphsFromNotebookDTO(notebook.paragraphs) : [];
+    this._paragraphCollection = new ParagraphCollectionImpl(this, paragraphs, this._angularObjectCollection);
   }
 
   private paragraphsFromNotebookDTO(paragraphDTOs: ParagraphDTO[]): Paragraph[] {
@@ -83,8 +83,7 @@ export class NotebookImpl implements Notebook {
   }
 
   paragraphs(value:PushValue<Paragraph[]>):void{
-    value.update(this._paragraphs);
-    this._pushParagraphs.push(value);
+    this._paragraphCollection.paragraphs(value);
   }
 
   id(): string {
@@ -96,50 +95,26 @@ export class NotebookImpl implements Notebook {
     if(message.data['noteId'] !== undefined){
       message.data['noteId'] = this.id();
     }
-    else if(message.op === 'RUN_PARAGRAPH'){
-      const runParagraphMessage = data as MessageDTO<RunParagraphDTO>;
-      const paragraphDto = this._paragraphs.find(paragraph => paragraph.id() === runParagraphMessage.data.id).print();
-      runParagraphMessage.data.paragraph = paragraphDto.text;
-      runParagraphMessage.data.config = paragraphDto.config;
-      runParagraphMessage.data.params = paragraphDto.params;
-      this._channel.request(runParagraphMessage);
-    }
     this._channel.request(message);
   }
 
   response(data: object): void {
     const message = data as MessageDTO<unknown>;
     const op = message.op;
-    if(op === 'PARAGRAPH_ADDED'){
-      const paragraphAddedMessage = message.data as {paragraph:ParagraphDTO, index:number};
-      const paragraph = new ParagraphImpl(this, paragraphAddedMessage.paragraph, this._angularObjectCollection);
-      this._paragraphs.splice(paragraphAddedMessage.index,0, paragraph);
-      this._pushParagraphs.forEach(value => value.update(this._paragraphs));
-    }
-    else if(op === 'PARAGRAPH_REMOVED'){
-      const paragraphRemovedMessage = message.data as {id:string};
-      const index = this._paragraphs.findIndex(paragraph => paragraph.id() === paragraphRemovedMessage.id);
-      this._paragraphs.splice(index, 1);
-      this._pushParagraphs.forEach(value => value.update(this._paragraphs));
-    }
-    else if(op === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
-      if(paragraphOutputMessage.noteId() === this.id()){
-        this._paragraphs.forEach(paragraph => {
-          paragraph.response(message);
-        });
-      }
-    }
-    else if(op === 'ANGULAR_OBJECT_UPDATE'){
+    if(op === 'ANGULAR_OBJECT_UPDATE'){
       const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(message.data as AngularObjectUpdateDTO);
       if(angularObjectUpdateMessage.noteId() === this.id()){
         this._angularObjectCollection.response(data);
       }
     }
+    else if (op === 'PARAGRAPH_OUTPUT'){
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
+      if(paragraphOutputMessage.noteId() === this.id()){
+        this._paragraphCollection.response(data);
+      }
+    }
     else {
-      this._paragraphs.forEach(paragraph => {
-        paragraph.response(data);
-      });
+      this._paragraphCollection.response(data);
     }
   }
 }

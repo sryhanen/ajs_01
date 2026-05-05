@@ -4,7 +4,9 @@ export interface ParagraphDTO {
   id:string;
   text: string;
   config:object;
-  params:object;
+  settings: {
+    params:object;
+  }
   output?: OutputDTO<unknown>,
 }
 
@@ -18,7 +20,7 @@ export const ParagraphDTOStub: ParagraphDTO = {
   get config(): object {
     throw new Error('ParagraphDTOStub: Method not implemented.');
   },
-  get params(): object {
+  get settings(): {params:object} {
     throw new Error('ParagraphDTOStub: Method not implemented.');
   },
 };

@@ -52,18 +52,16 @@ import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
-import {ParagraphMessageImpl} from '../message/paragraphMessage/paragraphMessageImpl';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
-  private _paragraph: ParagraphDTO;
+  private readonly _paragraph: ParagraphDTO;
 
   constructor(channel: Channel, paragraph: ParagraphDTO, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._paragraph = paragraph;
     this._outputContainer = new OutputContainerImpl(this, angularObjectCollection);
-
     const paragraphOutputMessage: MessageDTO<ParagraphOutputDTO> = {
       op:'PARAGRAPH_OUTPUT',
       data: {
@@ -101,14 +99,7 @@ export class ParagraphImpl implements Paragraph{
   response(data: object): void {
     const message = data as MessageDTO<unknown>;
     const op = message.op;
-    if(op === 'PARAGRAPH'){
-      const paragraphMessage = new ParagraphMessageImpl(message.data as ParagraphDTO);
-      if(paragraphMessage.id() === this.id()){
-        this._paragraph = paragraphMessage.toParagraphData();
-        this._outputContainer.response(paragraphMessage.printAsParagraphOutputMessage());
-      }
-    }
-    else if(op === 'PARAGRAPH_OUTPUT'){
+    if(op === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
       if(paragraphOutputMessage.paragraphId() === this.id()){
         this._outputContainer.response(message);
