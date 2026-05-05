@@ -21,7 +21,9 @@ describe('Paragraph Message', () => {
     data = {
       id: paragraphId,
       config: paragraphConfig,
-      params: paragraphParams,
+      settings:{
+        params:paragraphParams
+      },
       text: paragraphText
     };
     paragraphMessage = new ParagraphMessageImpl(new SafeJsonImpl(data));

@@ -12,7 +12,7 @@ import {MessageDTO} from '../message/messageDTO';
 import {PushValueImpl} from '../pushValue/pushValueImpl';
 import {PushValue} from '../pushValue/pushValue';
 import {ParagraphAddedDTO} from '../message/paragraphAddedMessage/paragraphAddedMessageDTO';
-import {ParagraphRemovedMessageDTO} from "../message/paragraphRemovedMessage/paragraphRemovedMessageDTO";
+import {ParagraphRemovedMessageDTO} from '../message/paragraphRemovedMessage/paragraphRemovedMessageDTO';
 
 describe('ParagraphCollection', () => {
   let channel:Channel;
@@ -26,7 +26,9 @@ describe('ParagraphCollection', () => {
     id: paragraphId,
     text: paragraphText,
     config: paragraphConfig,
-    params: paragraphParams
+    settings:{
+      params: paragraphParams
+    }
   };
   let paragraphs: Paragraph[];
 
@@ -102,7 +104,9 @@ describe('ParagraphCollection', () => {
           id: paragraphId,
           text: '',
           config: {},
-          params: {}
+          settings:{
+            params: {}
+          }
         },
       };
       expect(pushParagraphs.value()).toHaveLength(1);
@@ -123,7 +127,9 @@ describe('ParagraphCollection', () => {
             id: '',
             text: '',
             config: {},
-            params: {}
+            settings:{
+              params: {}
+            }
           }
         },
       };
