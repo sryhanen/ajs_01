@@ -20,5 +20,7 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Run vitest
         run: yarn run vitest
+      - name: Run karma tests
+        run: yarn run karma-test
       - name: Run CI
         run: mvn --batch-mode clean verify
