@@ -43,9 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
+import {uPlotOutputData} from './uPlotOutputData';
+import {OutputDTO} from '../../../outputDTO';
+import {uPlotOutputOptions} from './uPlotOutputOptions';
+
+export interface uPlotOutputDTO extends OutputDTO<uPlotOutputData, uPlotOutputOptions> {
+  data: uPlotOutputData;
+  options: uPlotOutputOptions;
+  type: string;
+  isAggregated: boolean;
 }

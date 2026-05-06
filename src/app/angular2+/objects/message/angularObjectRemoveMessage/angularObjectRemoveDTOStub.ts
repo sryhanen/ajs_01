@@ -43,9 +43,16 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
-}
+import {AngularObjectRemoveDTO} from './angularObjectRemoveDTO';
+
+export const AngularObjectRemoveDTOStub: AngularObjectRemoveDTO = {
+  get name(): string {
+    throw new Error('AngularObjectRemoveDTOStub: Property not defined');
+  },
+  get noteId(): string {
+    throw new Error('AngularObjectRemoveDTOStub: Property not defined');
+  },
+  get paragraphId(): string {
+    throw new Error('AngularObjectRemoveDTOStub: Property not defined');
+  }
+};

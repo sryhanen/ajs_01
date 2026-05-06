@@ -43,9 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
+import {OutputDTO} from '../../../outputDTO';
+
+export interface HtmlOutputDTO extends OutputDTO<string> {
+  data:string;
+  type:string;
 }

@@ -43,18 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphDTO} from '../paragraphMessage/paragraphDTO';
+import {AngularOutputDTO} from './angularOutputDTO';
 
-export interface ParagraphAddedDTO {
-  paragraph:ParagraphDTO;
-  index:number;
-}
-
-export const ParagraphAddedDTOStub: ParagraphAddedDTO = {
-  get paragraph(): ParagraphDTO {
-    throw new Error('ParagraphAddedDTOStub: Property not defined');
+export const AngularOutputDTOStub:AngularOutputDTO = {
+  get data(): string{
+    throw new Error('AngularOutputDTOStub: Property not defined');
   },
-  get index(): number {
-    throw new Error('ParagraphAddedDTOStub: Property not defined');
-  },
+  get type(): string {
+    throw new Error('AngularOutputDTOStub: Property not defined');
+  }
 };

@@ -43,9 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
-}
+import {NotebookDTO} from '../noteMessage/notebookDTO';
+import {NotesInfoDTO} from './notesInfoDTO';
+
+export const NotesInfoDTOStub: NotesInfoDTO = {
+  get notes(): Partial<NotebookDTO>[] {
+    throw new Error('NotesInfoDTOStub: Property not defined');
+  }
+};

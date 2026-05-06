@@ -49,12 +49,3 @@ export interface NotebookDTO {
   id: string,
   paragraphs: ParagraphDTO[],
 }
-
-export const NotebookDTOStub: NotebookDTO = {
-  get id():string {
-    throw new Error('NotebookDTOStub: Property not defined');
-  },
-  get paragraphs(): ParagraphDTO[] {
-    throw new Error('NotebookDTOStub: Property not defined');
-  }
-};

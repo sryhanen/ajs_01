@@ -43,9 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
-}
+import {AngularObjectUpdateDTO} from './angularObjectUpdateDTO';
+
+export const AngularObjectUpdateDTOStub:AngularObjectUpdateDTO = {
+  get angularObject(): {
+    name: string,
+    object: unknown,
+    noteId: string,
+    paragraphId?: string
+  }{
+    throw new Error('AngularObjectUpdateDTOStub: property not implemented');
+  },
+  get noteId(): string{
+    throw new Error('AngularObjectUpdateDTOStub: property not implemented');
+  },
+  get interpreterGroupId(): string{
+    throw new Error('AngularObjectUpdateDTOStub: property not implemented');
+  },
+};

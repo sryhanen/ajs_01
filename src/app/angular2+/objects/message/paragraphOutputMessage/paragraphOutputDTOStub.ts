@@ -43,9 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
-}
+import {ParagraphOutputDTO} from './paragraphOutputDTO';
+
+export const ParagraphOutputDTOStub: ParagraphOutputDTO = {
+  get noteId():string{
+    throw new Error('ParagraphOutputDTOStub: property not implemented');
+  },
+  get paragraphId():string{
+    throw new Error('ParagraphOutputDTOStub: property not implemented');
+  },
+};

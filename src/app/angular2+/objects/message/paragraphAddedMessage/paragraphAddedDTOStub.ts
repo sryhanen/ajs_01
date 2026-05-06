@@ -43,9 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
-}
+import {ParagraphDTO} from '../paragraphMessage/paragraphDTO';
+import {ParagraphAddedDTO} from './paragraphAddedDTO';
+
+export const ParagraphAddedDTOStub: ParagraphAddedDTO = {
+  get paragraph(): ParagraphDTO {
+    throw new Error('ParagraphAddedDTOStub: Property not defined');
+  },
+  get index(): number {
+    throw new Error('ParagraphAddedDTOStub: Property not defined');
+  },
+};

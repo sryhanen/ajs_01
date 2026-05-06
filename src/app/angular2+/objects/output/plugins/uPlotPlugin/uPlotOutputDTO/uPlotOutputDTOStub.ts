@@ -43,9 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
-}
+import {uPlotOutputDTO} from './uPlotOutputDTO';
+import {uPlotOutputData} from './uPlotOutputData';
+import {uPlotOutputOptions} from './uPlotOutputOptions';
+
+export const uPlotOutputDTOStub:uPlotOutputDTO = {
+  get data():uPlotOutputData {
+    throw new Error('uPlotOutputDTOStub: property not defined');
+  },
+  get options(): uPlotOutputOptions{
+    throw new Error('uPlotOutputDTOStub: property not defined');
+  },
+  get isAggregated(): boolean{
+    throw new Error('uPlotOutputDTOStub: property not defined');
+  },
+  get type(): string {
+    throw new Error('uPlotOutputDTOStub: property not defined');
+  }
+};

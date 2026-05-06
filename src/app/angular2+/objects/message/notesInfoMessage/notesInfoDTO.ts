@@ -48,9 +48,3 @@ import {NotebookDTO} from '../noteMessage/notebookDTO';
 export interface NotesInfoDTO {
   notes: Partial<NotebookDTO>[];
 }
-
-export const NotesInfoDTOStub: NotesInfoDTO = {
-  get notes(): Partial<NotebookDTO>[] {
-    throw new Error('NotesInfoDTOStub: Property not defined');
-  }
-};

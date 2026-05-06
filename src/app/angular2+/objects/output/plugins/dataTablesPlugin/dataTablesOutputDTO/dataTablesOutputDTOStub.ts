@@ -43,9 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
-}
+import {DataTablesOutputOptions} from './dataTablesOutputOptions';
+import {DataTablesOutputData} from './dataTablesOutputData';
+import {DataTablesOutputDTO} from './dataTablesOutputDTO';
+
+export const DataTablesOutputDTOStub: DataTablesOutputDTO = {
+  get data(): DataTablesOutputData {
+    throw new Error('DataTablesOutputDTOStub: Property not defined');
+  },
+  get options(): DataTablesOutputOptions {
+    throw new Error('DataTablesOutputDTOStub: Property not defined');
+  },
+  get type(): string {
+    throw new Error('DataTablesOutputDTOStub: Property not defined');
+  },
+  get isAggregated(): boolean {
+    throw new Error('DataTablesOutputDTOStub: Property not defined');
+  },
+};

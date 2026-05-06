@@ -43,9 +43,19 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
-}
+import {ParagraphDTO} from './paragraphDTO';
+
+export const ParagraphDTOStub: ParagraphDTO = {
+  get id(): string {
+    throw new Error('ParagraphDTOStub: Method not implemented.');
+  },
+  get text(): string {
+    throw new Error('ParagraphDTOStub: Method not implemented.');
+  },
+  get config(): object {
+    throw new Error('ParagraphDTOStub: Method not implemented.');
+  },
+  get settings(): {params:object} {
+    throw new Error('ParagraphDTOStub: Method not implemented.');
+  },
+};

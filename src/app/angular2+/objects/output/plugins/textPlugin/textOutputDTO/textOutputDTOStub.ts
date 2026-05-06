@@ -43,9 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface RunParagraphDTO {
-  id:string;
-  paragraph: string;
-  config:object;
-  params:object;
-}
+import {TextOutputDTO} from './textOutputDTO';
+
+export const TextOutputDTOStub: TextOutputDTO = {
+  get data(): string {
+    throw new Error('TextOutputDTOStub: Property not defined');
+  },
+  get type(): string {
+    throw new Error('TextOutputDTOStub: Property not defined');
+  }
+};
