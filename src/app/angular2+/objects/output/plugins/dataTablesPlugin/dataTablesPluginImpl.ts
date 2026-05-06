@@ -65,11 +65,15 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
     this._dataTablesAjax = new DataTablesAjaxImpl(this);
   }
 
+  print(): DataTablesOutputDTO {
+    return this._safeJson.deserialized(DataTablesOutputDTOStub);
+  }
+
   request(data: object): void {
     this._channel.request(data);
   }
 
-  response(data:DataTablesOutputData): void {
+  response(data:object): void {
     this._dataTablesAjax.response(data);
   }
 

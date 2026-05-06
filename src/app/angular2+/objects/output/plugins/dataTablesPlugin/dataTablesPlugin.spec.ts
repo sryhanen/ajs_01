@@ -83,6 +83,10 @@ describe('DataTablesOutput', () => {
     it('Should be initialized', () => {
       expect(dataTablesPlugin).toBeInstanceOf(DataTablesPluginImpl);
     });
+
+    it('Should have data', () => {
+      expect(dataTablesPlugin.print()).toEqual(output);
+    });
   });
 
   describe('Request', () => {

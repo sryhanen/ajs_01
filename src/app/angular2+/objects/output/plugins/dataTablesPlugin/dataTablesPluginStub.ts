@@ -45,10 +45,14 @@
  */
 import { Api } from 'datatables.net';
 import {DataTablesPlugin} from './dataTablesPlugin';
+import { DataTablesOutputDTO } from './dataTablesOutputDTO/dataTablesOutputDTO';
 
 export class DataTablesPluginStub implements DataTablesPlugin {
   isStub(): boolean {
     return true;
+  }
+  print(): DataTablesOutputDTO {
+    throw new Error('DataTablesResultStub: Method not implemented.');
   }
   request(data: object): void {
     throw new Error('DataTablesResultStub: Method not implemented.');

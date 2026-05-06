@@ -98,6 +98,8 @@ describe('dataTablesFormat', () => {
           paragraphId:'',
           output: {
             data: {},
+            options: {},
+            isAggregated: false,
             type: OutputType.dataTables,
           }
         }

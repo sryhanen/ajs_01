@@ -45,5 +45,8 @@
  */
 import {OutputPlugin} from '../outputPlugin';
 import {Channel} from '../../../channel/channel';
+import {DataTablesOutputDTO} from './dataTablesOutputDTO/dataTablesOutputDTO';
 
-export interface DataTablesPlugin extends OutputPlugin, Channel {}
+export interface DataTablesPlugin extends OutputPlugin, Channel {
+  print(): DataTablesOutputDTO;
+}

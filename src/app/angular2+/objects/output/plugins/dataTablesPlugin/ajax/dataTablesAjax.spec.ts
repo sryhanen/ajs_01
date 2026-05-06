@@ -48,10 +48,19 @@ import {DataTablesAjaxImpl} from './dataTablesAjaxImpl';
 import {FakeChannel} from '../../../../channel/fakeChannel';
 import {DataTablesAjax} from './dataTablesAjax';
 import {DataTablesOutputData} from '../dataTablesOutputDTO/dataTablesOutputData';
+import {MessageDTO} from '../../../../message/messageDTO';
+import {ParagraphOutputDTO} from '../../../../message/paragraphOutputMessage/paragraphOutputDTO';
+import {OutputType} from '../../../outputType';
 
 describe('Ajax', () => {
   let channel:Channel;
   let dataTablesAjax:DataTablesAjax;
+  const dataTablesOutputData:DataTablesOutputData = {
+    data: [{test:'test'}],
+    draw: 1,
+    recordsTotal: 1,
+    recordsFiltered: 1,
+  };
 
   beforeEach(() => {
     channel = new FakeChannel();
@@ -67,19 +76,12 @@ describe('Ajax', () => {
   describe('configFunction', () => {
     let configFunction: (data: {draw: number, start: number, length: number}, callback: (data: object) => void) => void;
     let requestData:{draw:number, start:number, length:number};
-    let initialData: DataTablesOutputData;
     let callback;
 
     beforeEach(() => {
       callback = vi.fn();
       requestData = {draw:1, start:0, length:50};
-      initialData = {
-        data: [{test:'test'}],
-        draw: 1,
-        recordsTotal: 1,
-        recordsFiltered: 1,
-      };
-      configFunction = dataTablesAjax.configFunction(initialData);
+      configFunction = dataTablesAjax.configFunction(dataTablesOutputData);
     });
     describe('Birth', () => {
       it('Should be defined', () => {
@@ -96,23 +98,36 @@ describe('Ajax', () => {
         expect(callback).toHaveBeenCalledTimes(0);
         configFunction(requestData, callback);
         expect(callback).toHaveBeenCalledTimes(1);
-        expect(callback).toHaveBeenCalledWith(initialData);
+        expect(callback).toHaveBeenCalledWith(dataTablesOutputData);
       });
     });
 
     describe('Data updates', () => {
+      const response:MessageDTO<ParagraphOutputDTO> = {
+        op:'PARAGRAPH_OUTPUT',
+        data: {
+          noteId: '',
+          paragraphId: '',
+          output: {
+            data: dataTablesOutputData,
+            options:{},
+            type: OutputType.dataTables,
+            isAggregated: true,
+          }
+        }
+      };
       it('Should not evoke callback on response if config function not evoked', () =>{
         expect(callback).toHaveBeenCalledTimes(0);
-        dataTablesAjax.response(initialData);
+        dataTablesAjax.response(response);
         expect(callback).toHaveBeenCalledTimes(0);
       });
 
       it('Should evoke callback on response', () => {
         expect(callback).toHaveBeenCalledTimes(0);
         configFunction(requestData, callback);
-        dataTablesAjax.response(initialData);
+        dataTablesAjax.response(response);
         expect(callback).toHaveBeenCalledTimes(2);
-        expect(callback).toHaveBeenCalledWith(initialData);
+        expect(callback).toHaveBeenCalledWith(dataTablesOutputData);
       });
     });
   });

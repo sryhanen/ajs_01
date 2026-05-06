@@ -49,6 +49,8 @@ import {ParagraphOutputRequestDTO} from '../../../paragraphOutputRequest/paragra
 import {OutputType} from '../../../outputType';
 import {DataTablesOutputData} from '../dataTablesOutputDTO/dataTablesOutputData';
 import {DataTablesAjax} from './dataTablesAjax';
+import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';
+import {ParagraphOutputMessageImpl} from '../../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 
 export class DataTablesAjaxImpl implements DataTablesAjax {
   private readonly _channel: Channel;
@@ -62,9 +64,14 @@ export class DataTablesAjaxImpl implements DataTablesAjax {
     this._channel.request(data);
   }
 
-  response(data: DataTablesOutputData): void {
+  response(data: object): void {
+    const message = data as MessageDTO<object>;
+    const paragraphOutputMessage = new ParagraphOutputMessageImpl(new SafeJsonImpl(message.data));
+    const output = paragraphOutputMessage.toOutput();
+    const dataTablesOutput = output.toDataTablesPlugin(this);
+    const dataTablesOutputData = dataTablesOutput.print();
     if(this._callback) {
-      this._callback(data);
+      this._callback(dataTablesOutputData.data);
     }
   }
 
