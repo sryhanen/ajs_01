@@ -48,8 +48,8 @@ import {render} from '@testing-library/angular';
 import {uPlotPluginImpl} from '../../../../objects/output/plugins/uPlotPlugin/uPlotPluginImpl';
 import {uPlotPluginStub} from '../../../../objects/output/plugins/uPlotPlugin/uPlotPluginStub';
 import {OutputDTO} from '../../../../objects/output/outputDTO';
-import {uPlotOutputOptions} from '../../../../objects/output/plugins/uPlotPlugin/uPlotOutputOptions';
-import {uPlotOutputData} from '../../../../objects/output/plugins/uPlotPlugin/uPlotOutputData';
+import {uPlotOutputOptions} from '../../../../objects/output/plugins/uPlotPlugin/uPlotOutputDTO/uPlotOutputOptions';
+import {uPlotOutputData} from '../../../../objects/output/plugins/uPlotPlugin/uPlotOutputDTO/uPlotOutputData';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
 describe('uPlotView', () => {

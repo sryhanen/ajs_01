@@ -46,7 +46,8 @@
 import {NotesInfoMessage} from './notesInfoMessage';
 import {Notebook} from '../../notebook/notebook';
 import {Channel} from '../../channel/channel';
-import {NotesInfoDTO, NotesInfoDTOStub} from './notesInfoDTO';
+import {NotesInfoDTO} from './notesInfoDTO';
+import {NotesInfoDTOStub} from './notesInfoDTOStub';
 import {NotebookImpl} from '../../notebook/notebookImpl';
 import {SafeJson} from '../../safeJson/safeJson';
 

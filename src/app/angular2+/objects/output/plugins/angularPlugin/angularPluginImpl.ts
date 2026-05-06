@@ -45,14 +45,17 @@
  */
 import {AngularPlugin} from './angularPlugin';
 import {Channel} from '../../../channel/channel';
+import {SafeJson} from '../../../safeJson/safeJson';
+import {AngularOutputDTOStub} from './angularOutputDTO/angularOutputDTOStub';
+import {AngularOutputDTO} from './angularOutputDTO/angularOutputDTO';
 
 export class AngularPluginImpl implements AngularPlugin{
   private readonly _channel: Channel;
-  private readonly _template:string;
+  private readonly _safeJson: SafeJson<AngularOutputDTO>;
 
-  constructor(channel: Channel, template:string) {
+  constructor(channel: Channel, safeJson: SafeJson<AngularOutputDTO>) {
     this._channel = channel;
-    this._template = template;
+    this._safeJson = safeJson;
   }
 
   attach(anchorElement: HTMLElement): void {
@@ -64,7 +67,8 @@ export class AngularPluginImpl implements AngularPlugin{
   }
 
   template(): string {
-    return this._template;
+    const angularOutput = this._safeJson.deserialized(AngularOutputDTOStub);
+    return angularOutput.data;
   }
 
   request(data: object): void {

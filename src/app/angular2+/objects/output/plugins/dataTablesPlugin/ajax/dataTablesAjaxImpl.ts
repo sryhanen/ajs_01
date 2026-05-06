@@ -47,7 +47,7 @@ import {Channel} from '../../../../channel/channel';
 import {MessageDTO} from '../../../../message/messageDTO';
 import {ParagraphOutputRequestDTO} from '../../../paragraphOutputRequest/paragraphOutputRequestDTO';
 import {OutputType} from '../../../outputType';
-import {DataTablesOutputData} from '../dataTablesOutputData';
+import {DataTablesOutputData} from '../dataTablesOutputDTO/dataTablesOutputData';
 import {DataTablesAjax} from './dataTablesAjax';
 
 export class DataTablesAjaxImpl implements DataTablesAjax {

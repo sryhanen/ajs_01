@@ -47,10 +47,11 @@ import {AngularObjectCollection} from './angularObjectCollection';
 import {Channel} from '../channel/channel';
 import {MessageDTO} from '../message/messageDTO';
 import {AngularObjectUpdateMessageImpl} from '../message/angularObjectUpdateMessage/angularObjectUpdateMessageImpl';
-import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
 import {PushValue} from '../pushValue/pushValue';
 import {AngularObjectRemoveDTO} from '../message/angularObjectRemoveMessage/angularObjectRemoveDTO';
 import {AngularObject} from '../angularObject/angularObject';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
+import {AngularObjectRemoveDTOStub} from '../message/angularObjectRemoveMessage/angularObjectRemoveDTOStub';
 
 export class AngularObjectCollectionImpl implements AngularObjectCollection {
   private readonly _channel: Channel;
@@ -68,9 +69,9 @@ export class AngularObjectCollectionImpl implements AngularObjectCollection {
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
+    const message = data as MessageDTO<object>;
     if(message.op === 'ANGULAR_OBJECT_UPDATE'){
-      const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(message.data as AngularObjectUpdateDTO);
+      const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(new SafeJsonImpl(message.data));
       const angularObject = angularObjectUpdateMessage.toAngularObject(this);
       const existingAngularObjectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObject.name());
       if(existingAngularObjectIndex !== -1){
@@ -80,8 +81,9 @@ export class AngularObjectCollectionImpl implements AngularObjectCollection {
       this._pushValues.forEach(value => value.update(this._angularObjects));
     }
     else if(message.op === 'ANGULAR_OBJECT_REMOVE'){
-      const objectToRemove = message.data as AngularObjectRemoveDTO;
-      const objectIndex = this._angularObjects.findIndex(ao => ao.name() === objectToRemove.name);
+      const safeJson = new SafeJsonImpl<AngularObjectRemoveDTO>(message.data);
+      const angularObjectRemoveData = safeJson.deserialized(AngularObjectRemoveDTOStub);
+      const objectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObjectRemoveData.name);
       this._angularObjects.splice(objectIndex, 1);
       this._pushValues.forEach(value => value.update(this._angularObjects));
     }

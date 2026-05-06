@@ -52,6 +52,7 @@ import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
@@ -97,10 +98,10 @@ export class ParagraphImpl implements Paragraph{
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
+    const message = data as MessageDTO<object>;
     const op = message.op;
     if(op === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(new SafeJsonImpl(message.data));
       if(paragraphOutputMessage.paragraphId() === this.id()){
         this._outputContainer.response(message);
       }

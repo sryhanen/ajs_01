@@ -45,22 +45,24 @@
  */
 import {AngularObjectUpdateMessage} from './angularObjectUpdateMessage';
 import {AngularObjectUpdateDTO} from './angularObjectUpdateDTO';
+import {AngularObjectUpdateDTOStub} from './angularObjectUpdateDTOStub';
 import {Channel} from '../../channel/channel';
 import {AngularObject} from '../../angularObject/angularObject';
 import {AngularObjectImpl} from '../../angularObject/angularObjectImpl';
+import {SafeJson} from '../../safeJson/safeJson';
 
 export class AngularObjectUpdateMessageImpl implements AngularObjectUpdateMessage {
-  private readonly _data:AngularObjectUpdateDTO;
+  private readonly _safeJson:SafeJson<AngularObjectUpdateDTO>;
 
-  constructor(data:AngularObjectUpdateDTO) {
-    this._data = data;
+  constructor(safeJson:SafeJson<AngularObjectUpdateDTO>) {
+    this._safeJson = safeJson;
   }
 
   toAngularObject<T>(channel:Channel):AngularObject<T> {
-    return new AngularObjectImpl(channel, this._data);
+    return new AngularObjectImpl(channel, this._safeJson.deserialized(AngularObjectUpdateDTOStub));
   }
 
   noteId(): string {
-    return this._data.noteId;
+    return this._safeJson.deserialized(AngularObjectUpdateDTOStub).noteId;
   }
 }

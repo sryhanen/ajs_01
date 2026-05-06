@@ -49,12 +49,8 @@ import {DataTablesPluginStub} from './plugins/dataTablesPlugin/dataTablesPluginS
 import {OutputType} from './outputType';
 import {Channel} from '../channel/channel';
 import {DataTablesPluginImpl} from './plugins/dataTablesPlugin/dataTablesPluginImpl';
-import {DataTablesOutputData} from './plugins/dataTablesPlugin/dataTablesOutputData';
-import {DataTablesOutputOptions} from './plugins/dataTablesPlugin/dataTablesOutputOptions';
 import {TextPluginStub} from './plugins/textPlugin/textPluginStub';
 import {TextPluginImpl} from './plugins/textPlugin/textPluginImpl';
-import {uPlotOutputData} from './plugins/uPlotPlugin/uPlotOutputData';
-import {uPlotOutputOptions} from './plugins/uPlotPlugin/uPlotOutputOptions';
 import {uPlotPluginImpl} from './plugins/uPlotPlugin/uPlotPluginImpl';
 import {uPlotPluginStub} from './plugins/uPlotPlugin/uPlotPluginStub';
 import {OutputPlugin} from './plugins/outputPlugin';
@@ -65,6 +61,7 @@ import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
 import {HtmlPlugin} from './plugins/htmlPlugin/htmlPlugin';
 import {HtmlPluginImpl} from './plugins/htmlPlugin/htmlPluginImpl';
 import {HtmlPluginStub} from './plugins/htmlPlugin/htmlPluginStub';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 
 export class OutputImpl implements Output {
   private readonly _data: OutputDTO<unknown>;
@@ -84,7 +81,7 @@ export class OutputImpl implements Output {
   toHtmlPlugin(): HtmlPlugin {
     let htmlOutput: HtmlPlugin;
     if(this._data.type === OutputType.html){
-      htmlOutput = new HtmlPluginImpl(this._data.data as string);
+      htmlOutput = new HtmlPluginImpl(new SafeJsonImpl(this._data));
     }
     else {
       htmlOutput = new HtmlPluginStub();
@@ -95,7 +92,7 @@ export class OutputImpl implements Output {
   toAngularPlugin(channel:Channel): AngularPlugin {
     let angularPlugin:AngularPlugin;
     if(this._data.type === OutputType.angular){
-      angularPlugin = new AngularPluginImpl(channel, this._data.data as string);
+      angularPlugin = new AngularPluginImpl(channel, new SafeJsonImpl( this._data));
     }
     else{
       angularPlugin = new AngularPluginStub();
@@ -106,8 +103,7 @@ export class OutputImpl implements Output {
   toDataTablesPlugin(channel:Channel): DataTablesPlugin {
     let tablesPlugin: DataTablesPlugin;
     if(this._data.type === OutputType.dataTables) {
-      const data = this._data as OutputDTO<DataTablesOutputData, DataTablesOutputOptions>;
-      tablesPlugin = new DataTablesPluginImpl(channel, data);
+      tablesPlugin = new DataTablesPluginImpl(channel, new SafeJsonImpl(this._data));
     }
     else{
       tablesPlugin = new DataTablesPluginStub();
@@ -118,8 +114,7 @@ export class OutputImpl implements Output {
   toTextPlugin(): OutputPlugin {
     let textPlugin: OutputPlugin;
     if(this._data.type === OutputType.text) {
-      const data = this._data as OutputDTO<string>;
-      textPlugin = new TextPluginImpl(data);
+      textPlugin = new TextPluginImpl(new SafeJsonImpl( this._data));
     }
     else{
       textPlugin = new TextPluginStub();
@@ -130,8 +125,7 @@ export class OutputImpl implements Output {
   touPlotPlugin(): OutputPlugin {
     let microPlotPlugin: OutputPlugin;
     if(this._data.type === OutputType.uPlot) {
-      const data = this._data as OutputDTO<uPlotOutputData, uPlotOutputOptions>;
-      microPlotPlugin = new uPlotPluginImpl(data);
+      microPlotPlugin = new uPlotPluginImpl(new SafeJsonImpl( this._data));
     }
     else{
       microPlotPlugin = new uPlotPluginStub();

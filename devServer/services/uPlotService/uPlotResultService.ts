@@ -43,8 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {uPlotOutputOptions} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputOptions';
-import {uPlotOutputData} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputData';
+import {uPlotOutputOptions} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputDTO/uPlotOutputOptions';
+import {uPlotOutputData} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputDTO/uPlotOutputData';
 
 export interface uPlotResultService {
   outputData(): uPlotOutputData;

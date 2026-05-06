@@ -53,12 +53,11 @@ import {PushValue} from '../pushValue/pushValue';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 import {AngularObjectUpdateMessageImpl} from '../message/angularObjectUpdateMessage/angularObjectUpdateMessageImpl';
-import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
 import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
@@ -99,16 +98,16 @@ export class NotebookImpl implements Notebook {
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
+    const message = data as MessageDTO<object>;
     const op = message.op;
     if(op === 'ANGULAR_OBJECT_UPDATE'){
-      const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(message.data as AngularObjectUpdateDTO);
+      const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(new SafeJsonImpl(message.data));
       if(angularObjectUpdateMessage.noteId() === this.id()){
         this._angularObjectCollection.response(data);
       }
     }
     else if (op === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(new SafeJsonImpl(message.data));
       if(paragraphOutputMessage.noteId() === this.id()){
         this._paragraphCollection.response(data);
       }

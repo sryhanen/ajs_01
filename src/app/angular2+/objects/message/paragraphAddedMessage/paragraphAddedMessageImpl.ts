@@ -48,7 +48,8 @@ import {AngularObjectCollection} from '../../angularObjectCollection/angularObje
 import {Channel} from '../../channel/channel';
 import {Paragraph} from '../../paragraph/paragraph';
 import {SafeJson} from '../../safeJson/safeJson';
-import {ParagraphAddedDTO, ParagraphAddedDTOStub} from './paragraphAddedMessageDTO';
+import {ParagraphAddedDTO} from './paragraphAddedDTO';
+import {ParagraphAddedDTOStub} from './paragraphAddedDTOStub';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
 
 export class ParagraphAddedMessageImpl implements ParagraphAddedMessage {

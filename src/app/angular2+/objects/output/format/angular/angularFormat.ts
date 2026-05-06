@@ -55,6 +55,7 @@ import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragr
 import { ContainerRef } from '../../../containerRef/containerRef';
 import {AngularPlugin} from '../../plugins/angularPlugin/angularPlugin';
 import {AngularPluginStub} from '../../plugins/angularPlugin/angularPluginStub';
+import {SafeJsonImpl} from "../../../safeJson/safeJsonImpl";
 
 export class AngularFormat implements OutputFormat {
   private readonly _channel: Channel;
@@ -87,9 +88,9 @@ export class AngularFormat implements OutputFormat {
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
+    const message = data as MessageDTO<object>;
     if(message.op === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(new SafeJsonImpl(message.data));
       const output = paragraphOutputMessage.toOutput();
       if(output.isStub()){
         this._plugin = this._pluginStub;

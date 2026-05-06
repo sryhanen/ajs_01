@@ -45,30 +45,42 @@
  */
 import {ParagraphOutputMessage} from './paragraphOutputMessage';
 import {ParagraphOutputDTO} from './paragraphOutputDTO';
+import {ParagraphOutputDTOStub} from './paragraphOutputDTOStub';
 import {Output} from '../../output/output';
 import {OutputStub} from '../../output/outputStub';
 import {OutputImpl} from '../../output/outputImpl';
+import {SafeJson} from '../../safeJson/safeJson';
 
 export class ParagraphOutputMessageImpl implements ParagraphOutputMessage{
-  private readonly _data: ParagraphOutputDTO;
+  private readonly _safeJson: SafeJson<ParagraphOutputDTO>;
+  private _deserializedData: ParagraphOutputDTO;
 
-  constructor(data: ParagraphOutputDTO) {
-    this._data = data;
+  constructor(safeJson: SafeJson<ParagraphOutputDTO>) {
+    this._safeJson = safeJson;
   }
 
   noteId():string {
-    return this._data.noteId;
+    this.deserializeData();
+    return this._deserializedData.noteId;
   }
 
   paragraphId():string {
-    return this._data.paragraphId;
+    this.deserializeData();
+    return this._deserializedData.paragraphId;
   }
 
   toOutput(): Output {
+    this.deserializeData();
     let output: Output = new OutputStub();
-    if (this._data.output !== undefined) {
-      output = new OutputImpl(this._data.output);
+    if (this._deserializedData.output !== undefined) {
+      output = new OutputImpl(this._deserializedData.output);
     }
     return output;
+  }
+
+  private deserializeData():void {
+    if(!this._deserializedData){
+      this._deserializedData = this._safeJson.deserialized(ParagraphOutputDTOStub);
+    }
   }
 }

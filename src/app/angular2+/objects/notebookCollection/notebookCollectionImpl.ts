@@ -81,7 +81,7 @@ export class NotebookCollectionImpl implements NotebookCollection{
     }
     else if(message.op === 'NOTE'){
       const noteMessage = new NoteMessageImpl(new SafeJsonImpl(message.data));
-      const noteMessageNotebook = noteMessage.notebook(this);
+      const noteMessageNotebook= noteMessage.notebook(this);
       const notebookIndex = this._collection.findIndex(collectionNotebook =>
         collectionNotebook.id() === noteMessageNotebook.id()
       );

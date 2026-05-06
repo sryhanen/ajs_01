@@ -49,7 +49,7 @@ import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
 import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
 import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
-import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputData';
+import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputDTO/dataTablesOutputData';
 
 export default class ParagraphFactory{
   private readonly _dataTablesService : DataTablesService;

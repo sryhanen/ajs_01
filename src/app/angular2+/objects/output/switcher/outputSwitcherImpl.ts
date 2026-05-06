@@ -47,10 +47,10 @@ import {Channel} from '../../channel/channel';
 import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {OutputSwitcher} from './outputSwitcher';
 import {MessageDTO} from '../../message/messageDTO';
-import {ParagraphOutputDTO} from '../../message/paragraphOutputMessage/paragraphOutputDTO';
 import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {OutputSwitcherButtonStub} from './button/outputSwitcherButtonStub';
 import {PushValue} from '../../pushValue/pushValue';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
 export class OutputSwitcherImpl implements OutputSwitcher {
   private readonly _channel: Channel;
@@ -97,10 +97,10 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
+    const message = data as MessageDTO<object>;
     const op = message.op;
     if(op === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(new SafeJsonImpl(message.data));
       const output = paragraphOutputMessage.toOutput();
       if(output.isStub() || this._activeButton.isStub()) {
         this._outputFormats.forEach(format => format.response(message));

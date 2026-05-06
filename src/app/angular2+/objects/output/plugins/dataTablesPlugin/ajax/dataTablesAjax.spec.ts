@@ -47,7 +47,7 @@ import {Channel} from '../../../../channel/channel';
 import {DataTablesAjaxImpl} from './dataTablesAjaxImpl';
 import {FakeChannel} from '../../../../channel/fakeChannel';
 import {DataTablesAjax} from './dataTablesAjax';
-import {DataTablesOutputData} from '../dataTablesOutputData';
+import {DataTablesOutputData} from '../dataTablesOutputDTO/dataTablesOutputData';
 
 describe('Ajax', () => {
   let channel:Channel;

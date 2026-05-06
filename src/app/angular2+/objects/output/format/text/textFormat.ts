@@ -54,6 +54,7 @@ import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessag
 import {ContainerRef} from '../../../containerRef/containerRef';
 import {TextPluginStub} from '../../plugins/textPlugin/textPluginStub';
 import {OutputPlugin} from '../../plugins/outputPlugin';
+import {SafeJsonImpl} from "../../../safeJson/safeJsonImpl";
 
 export class TextFormat implements OutputFormat {
   private readonly _channel:Channel;
@@ -88,10 +89,10 @@ export class TextFormat implements OutputFormat {
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
+    const message = data as MessageDTO<object>;
     const op = message.op;
     if(op === 'PARAGRAPH_OUTPUT'){
-      const output = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO).toOutput();
+      const output = new ParagraphOutputMessageImpl(new SafeJsonImpl(message.data)).toOutput();
       if(output.isStub()){
         this._plugin = this._pluginStub;
         this._containerRefs.forEach(containerRef => containerRef.clear());

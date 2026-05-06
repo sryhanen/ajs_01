@@ -56,7 +56,7 @@ import {MessageDTO} from '../../../src/app/angular2+/objects/message/messageDTO'
 import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
 import {ParagraphOutputDTO} from '../../../src/app/angular2+/objects/message/paragraphOutputMessage/paragraphOutputDTO';
 import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
-import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputData';
+import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputDTO/dataTablesOutputData';
 
 
 export default class RunParagraphHandler implements Handler<RunParagraphMessage>{

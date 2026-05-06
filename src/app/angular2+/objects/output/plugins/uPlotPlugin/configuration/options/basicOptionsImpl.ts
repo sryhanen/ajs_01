@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import uPlot from 'uplot';
-import {uPlotOutputOptions} from '../../uPlotOutputOptions';
+import {uPlotOutputOptions} from '../../uPlotOutputDTO/uPlotOutputOptions';
 import {GraphSeries} from '../series/graphSeries';
 import {SeriesColor} from '../color/seriesColor';
 import {SeriesColorImpl} from '../color/seriesColorImpl';

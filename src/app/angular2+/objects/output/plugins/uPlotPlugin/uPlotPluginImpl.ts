@@ -43,9 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {uPlotOutputData} from './uPlotOutputData';
-import {OutputDTO} from '../../outputDTO';
-import {uPlotOutputOptions} from './uPlotOutputOptions';
 import uPlot from 'uplot';
 import {ResizeListener} from './configuration/resizeListener/resizeListener';
 import {ResizeListenerImpl} from './configuration/resizeListener/resizeListenerImpl';
@@ -53,17 +50,21 @@ import {GraphType} from '../../format/uPlot/graphType';
 import {BarChartOptionsImpl} from './configuration/options/barChartOptionsImpl';
 import {BasicOptionsImpl} from './configuration/options/basicOptionsImpl';
 import {OutputPlugin} from '../outputPlugin';
+import {SafeJson} from '../../../safeJson/safeJson';
+import {uPlotOutputDTO} from './uPlotOutputDTO/uPlotOutputDTO';
+import {uPlotOutputDTOStub} from './uPlotOutputDTO/uPlotOutputDTOStub';
 
 export class uPlotPluginImpl implements OutputPlugin {
-  private readonly _outputDTO: OutputDTO<uPlotOutputData, uPlotOutputOptions>;
+  private readonly _safeJson: SafeJson<uPlotOutputDTO>;
 
-  constructor(outputDTO: OutputDTO<uPlotOutputData, uPlotOutputOptions>) {
-    this._outputDTO = outputDTO;
+  constructor(safeJson: SafeJson<uPlotOutputDTO>) {
+    this._safeJson = safeJson;
   }
 
   attach(anchorElement: HTMLElement): void {
-    const data = this._outputDTO.data;
-    const options = this._outputDTO.options;
+    const uPlotOutput = this._safeJson.deserialized(uPlotOutputDTOStub);
+    const data = uPlotOutput.data;
+    const options = uPlotOutput.options;
     let uPlotOptions:uPlot.Options;
     const basicOptions = new BasicOptionsImpl(options);
     if(options.graphType === GraphType.bar){

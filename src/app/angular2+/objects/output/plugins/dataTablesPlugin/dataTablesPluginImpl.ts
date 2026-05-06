@@ -43,24 +43,25 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../outputDTO';
-import {DataTablesOutputData} from './dataTablesOutputData';
-import {DataTablesOutputOptions} from './dataTablesOutputOptions';
+import {DataTablesOutputData} from './dataTablesOutputDTO/dataTablesOutputData';
 import DataTable, {Config, ConfigColumnDefs, ConfigColumns} from 'datatables.net-bs5';
 import 'datatables.net-buttons-bs5';
 import {Channel} from '../../../channel/channel';
 import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
 import {DataTablesAjax} from './ajax/dataTablesAjax';
 import {DataTablesPlugin} from './dataTablesPlugin';
+import {SafeJson} from '../../../safeJson/safeJson';
+import {DataTablesOutputDTO} from './dataTablesOutputDTO/dataTablesOutputDTO';
+import {DataTablesOutputDTOStub} from './dataTablesOutputDTO/dataTablesOutputDTOStub';
 
 export class DataTablesPluginImpl implements DataTablesPlugin {
   private readonly _channel: Channel;
   private readonly _dataTablesAjax: DataTablesAjax;
-  private readonly _outputDTO: OutputDTO<DataTablesOutputData, DataTablesOutputOptions>;
+  private readonly _safeJson: SafeJson<DataTablesOutputDTO>;
 
-  constructor(channel:Channel, outputDTO: OutputDTO<DataTablesOutputData, DataTablesOutputOptions>) {
+  constructor(channel:Channel, safeJson: SafeJson<DataTablesOutputDTO>) {
     this._channel = channel;
-    this._outputDTO = outputDTO;
+    this._safeJson = safeJson;
     this._dataTablesAjax = new DataTablesAjaxImpl(this);
   }
 
@@ -73,8 +74,9 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
   }
 
   attach(anchorElement: HTMLElement): void {
-    const initialData = this._outputDTO.data;
-    const headers = this._outputDTO.options.headers;
+    const dataTablesOutput = this._safeJson.deserialized(DataTablesOutputDTOStub);
+    const initialData = dataTablesOutput.data;
+    const headers = dataTablesOutput.options.headers;
     const config: Config = {
       ajax: this._dataTablesAjax.configFunction(initialData),
       serverSide: true,

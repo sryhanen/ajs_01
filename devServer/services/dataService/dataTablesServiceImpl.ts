@@ -46,7 +46,7 @@
 import {DataTablesService} from './dataTablesService';
 import {
   DataTablesOutputOptions
-} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputOptions';
+} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputDTO/dataTablesOutputOptions';
 
 export default class DataTablesServiceImpl implements DataTablesService {
   private readonly _people: string[] = ['Bob', 'Alice', 'Mark', 'Elise'];

@@ -8,6 +8,7 @@ import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragr
 import {HtmlPlugin} from '../../plugins/htmlPlugin/htmlPlugin';
 import {HtmlPluginStub} from '../../plugins/htmlPlugin/htmlPluginStub';
 import {HtmlView} from '../../../../components/output/plugins/htmlView/htmlView';
+import {SafeJsonImpl} from "../../../safeJson/safeJsonImpl";
 
 export class HTMLFormat implements OutputFormat{
   private readonly _channel:Channel;
@@ -36,9 +37,9 @@ export class HTMLFormat implements OutputFormat{
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
+    const message = data as MessageDTO<object>;
     if(message.op === 'PARAGRAPH_OUTPUT') {
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(new SafeJsonImpl(message.data));
       const output = paragraphOutputMessage.toOutput();
       if(output.isStub()){
         this._htmlPlugin = this._htmlPluginStub;

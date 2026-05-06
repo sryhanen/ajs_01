@@ -44,8 +44,8 @@
  * a licensee so wish it.
  */
 import {OutputDTO} from '../../outputDTO';
-import {DataTablesOutputData} from './dataTablesOutputData';
-import {DataTablesOutputOptions} from './dataTablesOutputOptions';
+import {DataTablesOutputData} from './dataTablesOutputDTO/dataTablesOutputData';
+import {DataTablesOutputOptions} from './dataTablesOutputDTO/dataTablesOutputOptions';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {OutputType} from '../../outputType';

@@ -43,21 +43,25 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../outputDTO';
 import {AnsiUp} from 'ansi_up';
 import {OutputPlugin} from '../outputPlugin';
+import {SafeJson} from '../../../safeJson/safeJson';
+import {TextOutputDTO} from './textOutputDTO/textOutputDTO';
+import {TextOutputDTOStub} from './textOutputDTO/textOutputDTOStub';
 
 export class TextPluginImpl implements OutputPlugin {
   private readonly _ansiUp: AnsiUp;
-  private readonly _outputDTO: OutputDTO<string>;
+  private readonly _safeJson: SafeJson<TextOutputDTO>;
 
-  constructor(outputDTO: OutputDTO<string>) {
-    this._outputDTO = outputDTO;
+  constructor(safeJson: SafeJson<TextOutputDTO>) {
+    this._safeJson = safeJson;
     this._ansiUp = new AnsiUp();
   }
 
   attach(anchorElement: HTMLElement): void {
-    anchorElement.innerHTML = this._ansiUp.ansi_to_html(this._outputDTO.data);
+    const textOutputDTO = this._safeJson.deserialized(TextOutputDTOStub);
+    const textData = textOutputDTO.data;
+    anchorElement.innerHTML = this._ansiUp.ansi_to_html(textData);
   }
 
   isStub(): boolean {

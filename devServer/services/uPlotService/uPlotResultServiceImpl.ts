@@ -45,8 +45,8 @@
  */
 import uPlot from 'uplot';
 import {uPlotResultService} from './uPlotResultService';
-import {uPlotOutputOptions} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputOptions';
-import {uPlotOutputData} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputData';
+import {uPlotOutputOptions} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputDTO/uPlotOutputOptions';
+import {uPlotOutputData} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputDTO/uPlotOutputData';
 
 export class uPlotResultServiceImpl implements uPlotResultService {
   private readonly _seriesLength:number;

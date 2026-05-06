@@ -45,8 +45,8 @@
  */
 import {
   DataTablesOutputOptions
-} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputOptions';
-import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputData';
+} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputDTO/dataTablesOutputOptions';
+import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputDTO/dataTablesOutputData';
 
 export interface DataTablesService {
   rawData(rowCount: number): object[];

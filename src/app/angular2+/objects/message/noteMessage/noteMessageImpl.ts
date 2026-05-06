@@ -44,7 +44,8 @@
  * a licensee so wish it.
  */
 import {NoteMessage} from './noteMessage';
-import {NotebookDTO, NotebookDTOStub} from './notebookDTO';
+import {NotebookDTO} from './notebookDTO';
+import {NotebookDTOStub} from './notebookDTOStub';
 import {Channel} from '../../channel/channel';
 import {Notebook} from '../../notebook/notebook';
 import {NotebookImpl} from '../../notebook/notebookImpl';

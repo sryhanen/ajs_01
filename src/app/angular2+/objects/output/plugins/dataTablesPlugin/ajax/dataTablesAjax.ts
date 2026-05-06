@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../../../channel/channel';
-import {DataTablesOutputData} from '../dataTablesOutputData';
+import {DataTablesOutputData} from '../dataTablesOutputDTO/dataTablesOutputData';
 
 export interface DataTablesAjax extends Channel {
   configFunction(initialData: DataTablesOutputData): (data: {draw:number, start:number, length:number}, callback: (data:object) => void) => void;

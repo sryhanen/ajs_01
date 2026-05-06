@@ -44,8 +44,8 @@
  * a licensee so wish it.
  */
 import {OutputDTO} from '../../outputDTO';
-import {uPlotOutputData} from './uPlotOutputData';
-import {uPlotOutputOptions} from './uPlotOutputOptions';
+import {uPlotOutputData} from './uPlotOutputDTO/uPlotOutputData';
+import {uPlotOutputOptions} from './uPlotOutputDTO/uPlotOutputOptions';
 import {OutputType} from '../../outputType';
 import uPlot from 'uplot';
 import {GraphType} from '../../format/uPlot/graphType';

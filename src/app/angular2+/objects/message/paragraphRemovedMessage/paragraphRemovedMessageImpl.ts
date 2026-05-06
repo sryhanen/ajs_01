@@ -45,7 +45,8 @@
  */
 import {ParagraphRemovedMessage} from './paragraphRemovedMessage';
 import {SafeJson} from '../../safeJson/safeJson';
-import {ParagraphRemovedMessageDTO, ParagraphRemovedMessageDTOStub} from './paragraphRemovedMessageDTO';
+import {ParagraphRemovedMessageDTO} from './paragraphRemovedMessageDTO';
+import {ParagraphRemovedMessageDTOStub} from './paragraphRemovedMessageDTOStub';
 
 export class ParagraphRemovedMessageImpl implements ParagraphRemovedMessage {
   private readonly _safeJson: SafeJson<ParagraphRemovedMessageDTO>;

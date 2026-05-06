@@ -50,11 +50,13 @@ import {DataTablesView} from '../../../../components/output/plugins/dataTablesVi
 import {DataTablesPluginStub} from '../../plugins/dataTablesPlugin/dataTablesPluginStub';
 import {OutputFormat} from '../outputFormat';
 import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
+import {ParagraphOutputDTOStub} from '../../../message/paragraphOutputMessage/paragraphOutputDTOStub';
 import {MessageDTO} from '../../../message/messageDTO';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {DataTablesOutputData} from '../../plugins/dataTablesPlugin/dataTablesOutputData';
+import {DataTablesOutputData} from '../../plugins/dataTablesPlugin/dataTablesOutputDTO/dataTablesOutputData';
 import {ContainerRef} from '../../../containerRef/containerRef';
 import {DataTablesPlugin} from '../../plugins/dataTablesPlugin/dataTablesPlugin';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 export class DataTablesFormat implements OutputFormat{
   private readonly _channel: Channel;
@@ -87,11 +89,11 @@ export class DataTablesFormat implements OutputFormat{
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
+    const message = data as MessageDTO<object>;
     const operation = message.op;
     if(operation ==='PARAGRAPH_OUTPUT'){
-      const paragraphOutputDto = message.data as ParagraphOutputDTO;
-      const output = new ParagraphOutputMessageImpl(paragraphOutputDto).toOutput();
+      const safeJson = new SafeJsonImpl<ParagraphOutputDTO>(message.data);
+      const output = new ParagraphOutputMessageImpl(safeJson).toOutput();
       if(output.isStub()){
         this._plugin = this._pluginStub;
         this._containerRefs.forEach(containerRef => containerRef.clear());
@@ -108,6 +110,8 @@ export class DataTablesFormat implements OutputFormat{
             this._containerRefs.forEach(containerRef => containerRef.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]));
           }
           else{
+            //TODO Fix this
+            const paragraphOutputDto = safeJson.deserialized(ParagraphOutputDTOStub);
             const dataTablesOutputData:DataTablesOutputData = paragraphOutputDto.output.data as DataTablesOutputData;
             this._plugin.response(dataTablesOutputData);
           }

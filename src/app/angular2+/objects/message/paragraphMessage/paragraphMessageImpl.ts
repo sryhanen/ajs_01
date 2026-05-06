@@ -1,7 +1,8 @@
 import {ParagraphMessage} from './paragraphMessage';
 import {MessageDTO} from '../messageDTO';
 import {ParagraphOutputDTO} from '../paragraphOutputMessage/paragraphOutputDTO';
-import {ParagraphDTO, ParagraphDTOStub} from './paragraphDTO';
+import {ParagraphDTO} from './paragraphDTO';
+import {ParagraphDTOStub} from './paragraphDTOStub';
 import {SafeJson} from '../../safeJson/safeJson';
 
 export class ParagraphMessageImpl implements ParagraphMessage {
