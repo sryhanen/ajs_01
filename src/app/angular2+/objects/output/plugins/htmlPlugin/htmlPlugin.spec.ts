@@ -1,11 +1,18 @@
 import {HtmlPlugin} from './htmlPlugin';
 import {HtmlPluginImpl} from './htmlPluginImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {HtmlOutputDTO} from './htmlOutputDTO/htmlOutputDTO';
+import {OutputType} from '../../outputType';
 
 describe('HtmlPlugin', () => {
   const data = 'data';
+  const htmlOutput:HtmlOutputDTO = {
+    data: data,
+    type: OutputType.html,
+  };
   let htmlPlugin: HtmlPlugin;
   beforeEach(() => {
-    htmlPlugin = new HtmlPluginImpl(data);
+    htmlPlugin = new HtmlPluginImpl(new SafeJsonImpl(htmlOutput));
   });
 
   describe('Birth', () => {

@@ -46,11 +46,18 @@
 import {AngularPluginImpl} from './angularPluginImpl';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {Channel} from '../../../channel/channel';
+import {AngularOutputDTO} from './angularOutputDTO/angularOutputDTO';
+import {OutputType} from '../../outputType';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 describe('Angular plugin', () => {
   const template = '<h1>Test Template</h1>';
+  const angularOutput: AngularOutputDTO = {
+    data: template,
+    type: OutputType.angular
+  };
   const channel:Channel = new FakeChannel();
-  const angularPlugin = new AngularPluginImpl(channel, template);
+  const angularPlugin = new AngularPluginImpl(channel, new SafeJsonImpl(angularOutput));
 
   describe('Birth', () => {
     it('Should be initialized', () => {

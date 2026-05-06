@@ -47,13 +47,12 @@ import {uPlotView} from './uPlotView';
 import {render} from '@testing-library/angular';
 import {uPlotPluginImpl} from '../../../../objects/output/plugins/uPlotPlugin/uPlotPluginImpl';
 import {uPlotPluginStub} from '../../../../objects/output/plugins/uPlotPlugin/uPlotPluginStub';
-import {OutputDTO} from '../../../../objects/output/outputDTO';
-import {uPlotOutputOptions} from '../../../../objects/output/plugins/uPlotPlugin/uPlotOutputDTO/uPlotOutputOptions';
-import {uPlotOutputData} from '../../../../objects/output/plugins/uPlotPlugin/uPlotOutputDTO/uPlotOutputData';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
+import {uPlotOutputDTO} from '../../../../objects/output/plugins/uPlotPlugin/uPlotOutputDTO/uPlotOutputDTO';
+import {SafeJsonImpl} from '../../../../objects/safeJson/safeJsonImpl';
 
 describe('uPlotView', () => {
-  const outputDto:OutputDTO<uPlotOutputData, uPlotOutputOptions> = {
+  const outputDto:uPlotOutputDTO = {
     data: [],
     options: {
       labels: [],
@@ -61,9 +60,10 @@ describe('uPlotView', () => {
       xAxisLabel: '',
       graphType: ''
     },
-    type: ''
+    type: '',
+    isAggregated: true,
   };
-  const microPlotPlugin:OutputPlugin = new uPlotPluginImpl(outputDto);
+  const microPlotPlugin:OutputPlugin = new uPlotPluginImpl(new SafeJsonImpl(outputDto));
   const microPlotPluginStub:OutputPlugin = new uPlotPluginStub();
 
   describe('Birth', () => {

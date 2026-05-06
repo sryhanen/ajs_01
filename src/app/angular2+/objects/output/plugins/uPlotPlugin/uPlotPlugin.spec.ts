@@ -43,13 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../outputDTO';
-import {uPlotOutputData} from './uPlotOutputDTO/uPlotOutputData';
 import {uPlotOutputOptions} from './uPlotOutputDTO/uPlotOutputOptions';
 import {OutputType} from '../../outputType';
 import uPlot from 'uplot';
 import {GraphType} from '../../format/uPlot/graphType';
 import {uPlotPluginImpl} from './uPlotPluginImpl';
+import {uPlotOutputDTO} from './uPlotOutputDTO/uPlotOutputDTO';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 describe('uPlotOutput', () => {
   const data:uPlot.AlignedData = [
@@ -62,15 +62,16 @@ describe('uPlotOutput', () => {
     xAxisLabel: 'value',
     graphType: GraphType.line
   };
-  let output: OutputDTO<uPlotOutputData, uPlotOutputOptions>;
+  let output: uPlotOutputDTO;
   let microPlotPlugin: uPlotPluginImpl;
   beforeEach(() => {
     output = {
       data: data,
       options: options,
-      type: OutputType.uPlot
+      type: OutputType.uPlot,
+      isAggregated: true,
     };
-    microPlotPlugin = new uPlotPluginImpl(output);
+    microPlotPlugin = new uPlotPluginImpl(new SafeJsonImpl(output));
   });
 
   describe('Birth', () =>{

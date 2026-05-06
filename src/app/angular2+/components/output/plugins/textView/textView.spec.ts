@@ -43,21 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../../../objects/output/outputDTO';
 import {TextPluginStub} from '../../../../objects/output/plugins/textPlugin/textPluginStub';
 import {TextView} from './textView';
 import {render, screen} from '@testing-library/angular';
 import {TextPluginImpl} from '../../../../objects/output/plugins/textPlugin/textPluginImpl';
 import {OutputType} from '../../../../objects/output/outputType';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
+import {TextOutputDTO} from '../../../../objects/output/plugins/textPlugin/textOutputDTO/textOutputDTO';
+import {SafeJsonImpl} from '../../../../objects/safeJson/safeJsonImpl';
 
 describe('TextView', () => {
   const textData:string = 'Some text data';
-  const outputDto: OutputDTO<string> = {
+  const outputDto: TextOutputDTO = {
     data: textData,
     type: OutputType.text,
   };
-  const textPlugin: OutputPlugin = new TextPluginImpl(outputDto);
+  const textPlugin: OutputPlugin = new TextPluginImpl(new SafeJsonImpl(outputDto));
   const textPluginStub: OutputPlugin = new TextPluginStub();
 
   describe('Birth', () => {

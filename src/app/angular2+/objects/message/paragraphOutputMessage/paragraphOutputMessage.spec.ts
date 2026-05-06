@@ -46,6 +46,7 @@
 import {ParagraphOutputMessage} from './paragraphOutputMessage';
 import {ParagraphOutputDTO} from './paragraphOutputDTO';
 import {ParagraphOutputMessageImpl} from './paragraphOutputMessageImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
 describe('ParagraphOutputMessage', () => {
   let data: ParagraphOutputDTO;
@@ -57,7 +58,7 @@ describe('ParagraphOutputMessage', () => {
       noteId: noteId,
       paragraphId: paragraphId
     };
-    paragraphOutputMessage = new ParagraphOutputMessageImpl(data);
+    paragraphOutputMessage = new ParagraphOutputMessageImpl(new SafeJsonImpl(data));
   });
 
   describe('Birth', () => {
@@ -84,7 +85,7 @@ describe('ParagraphOutputMessage', () => {
         data: {},
         type: ''
       };
-      paragraphOutputMessage = new ParagraphOutputMessageImpl(data);
+      paragraphOutputMessage = new ParagraphOutputMessageImpl(new SafeJsonImpl(data));
       expect(paragraphOutputMessage.toOutput().isStub()).toBe(false);
     });
   });

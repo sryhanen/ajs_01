@@ -54,6 +54,9 @@ import {AngularObjectUpdateDTO} from '../angular2+/objects/message/angularObject
 import {MessageDTO} from '../angular2+/objects/message/messageDTO';
 import {AngularPluginImpl} from '../angular2+/objects/output/plugins/angularPlugin/angularPluginImpl';
 import {AngularPlugin} from '../angular2+/objects/output/plugins/angularPlugin/angularPlugin';
+import {AngularOutputDTO} from '../angular2+/objects/output/plugins/angularPlugin/angularOutputDTO/angularOutputDTO';
+import {OutputType} from '../angular2+/objects/output/outputType';
+import {SafeJsonImpl} from '../angular2+/objects/safeJson/safeJsonImpl';
 
 describe('AngularPluginAjs', () => {
   const $element = [
@@ -87,8 +90,12 @@ describe('AngularPluginAjs', () => {
 
   describe('AngularJs component lifecycle $postLink-hook ', () => {
     const template = '<h1>Test Template</h1>';
+    const output: AngularOutputDTO = {
+      data:template,
+      type:OutputType.angular,
+    };
     const channel = new FakeChannel();
-    const angularPlugin:AngularPlugin = new AngularPluginImpl(channel, template);
+    const angularPlugin:AngularPlugin = new AngularPluginImpl(channel, new SafeJsonImpl(output));
     let angularObjectCollection: AngularObjectCollection;
     let angularObjects: PushValue<AngularObject<unknown>[]>;
     const angularObject1 = {

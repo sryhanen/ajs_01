@@ -43,18 +43,17 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../outputDTO';
-import {DataTablesOutputData} from './dataTablesOutputDTO/dataTablesOutputData';
-import {DataTablesOutputOptions} from './dataTablesOutputDTO/dataTablesOutputOptions';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {OutputType} from '../../outputType';
 import {DataTablesPluginImpl} from './dataTablesPluginImpl';
 import {DataTablesPlugin} from './dataTablesPlugin';
+import {DataTablesOutputDTO} from './dataTablesOutputDTO/dataTablesOutputDTO';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 describe('DataTablesOutput', () => {
   let channel:Channel;
-  let output: OutputDTO<DataTablesOutputData, DataTablesOutputOptions>;
+  let output: DataTablesOutputDTO;
   let dataTablesPlugin:DataTablesPlugin;
   const initialData = [
     {test:'test1'},
@@ -75,8 +74,9 @@ describe('DataTablesOutput', () => {
       options: {
         headers:['test']
       },
+      isAggregated:true
     };
-    dataTablesPlugin = new DataTablesPluginImpl(channel, output);
+    dataTablesPlugin = new DataTablesPluginImpl(channel, new SafeJsonImpl(output));
   });
 
   describe('Birth', () => {

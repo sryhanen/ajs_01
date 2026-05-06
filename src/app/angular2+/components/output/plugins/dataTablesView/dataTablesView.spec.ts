@@ -54,12 +54,16 @@ import {DataTablesView} from './dataTablesView';
 import {render, screen} from '@testing-library/angular';
 import {DataTablesPluginStub} from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesPluginStub';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
+import {
+  DataTablesOutputDTO
+} from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesOutputDTO/dataTablesOutputDTO';
+import {SafeJsonImpl} from "../../../../objects/safeJson/safeJsonImpl";
 
 describe('DataTablesView', () => {
   const channel:Channel = new FakeChannel();
   const header1 = 'key1';
   const header2 = 'key.with.dot';
-  const outputDto: OutputDTO<DataTablesOutputData, DataTablesOutputOptions> = {
+  const outputDto: DataTablesOutputDTO = {
     data: {
       data: [
         {'key1':'key1 row1', 'key.with.dot': 'key.with.dot row1'},
@@ -72,9 +76,10 @@ describe('DataTablesView', () => {
     options: {
       headers: [header1, header2]
     },
-    type: OutputType.dataTables
+    type: OutputType.dataTables,
+    isAggregated: true,
   };
-  const dataTablesPlugin: OutputPlugin = new DataTablesPluginImpl(channel, outputDto);
+  const dataTablesPlugin: OutputPlugin = new DataTablesPluginImpl(channel, new SafeJsonImpl(outputDto));
   const dataTablesPluginStub: OutputPlugin = new DataTablesPluginStub();
 
   describe('Birth', () =>{

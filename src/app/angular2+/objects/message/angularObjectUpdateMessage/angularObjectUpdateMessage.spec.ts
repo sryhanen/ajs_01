@@ -47,6 +47,7 @@ import {AngularObjectUpdateDTO} from './angularObjectUpdateDTO';
 import {AngularObjectUpdateMessageImpl} from './angularObjectUpdateMessageImpl';
 import {AngularObjectImpl} from '../../angularObject/angularObjectImpl';
 import {FakeChannel} from '../../channel/fakeChannel';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
 describe('AngularObjectUpdateMessage', () => {
   const noteId = 'noteId';
@@ -59,7 +60,7 @@ describe('AngularObjectUpdateMessage', () => {
     interpreterGroupId: '',
     noteId: noteId
   };
-  const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(data);
+  const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(new SafeJsonImpl(data));
 
   describe('Birth', () => {
     it('Should be initialized', () => {
