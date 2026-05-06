@@ -51,11 +51,10 @@ import {AngularView} from '../../../../components/output/plugins/angular/angular
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {MessageDTO} from '../../../message/messageDTO';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
 import { ContainerRef } from '../../../containerRef/containerRef';
 import {AngularPlugin} from '../../plugins/angularPlugin/angularPlugin';
 import {AngularPluginStub} from '../../plugins/angularPlugin/angularPluginStub';
-import {SafeJsonImpl} from "../../../safeJson/safeJsonImpl";
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 export class AngularFormat implements OutputFormat {
   private readonly _channel: Channel;

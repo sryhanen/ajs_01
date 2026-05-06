@@ -4,11 +4,10 @@ import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {Channel} from '../../../channel/channel';
 import {MessageDTO} from '../../../message/messageDTO';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
 import {HtmlPlugin} from '../../plugins/htmlPlugin/htmlPlugin';
 import {HtmlPluginStub} from '../../plugins/htmlPlugin/htmlPluginStub';
 import {HtmlView} from '../../../../components/output/plugins/htmlView/htmlView';
-import {SafeJsonImpl} from "../../../safeJson/safeJsonImpl";
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 export class HTMLFormat implements OutputFormat{
   private readonly _channel:Channel;

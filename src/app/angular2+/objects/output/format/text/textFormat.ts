@@ -48,13 +48,12 @@ import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {OutputSwitcherButtonStub} from '../../switcher/button/outputSwitcherButtonStub';
 import {TextView} from '../../../../components/output/plugins/textView/textView';
 import {Channel} from '../../../channel/channel';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
 import {MessageDTO} from '../../../message/messageDTO';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ContainerRef} from '../../../containerRef/containerRef';
 import {TextPluginStub} from '../../plugins/textPlugin/textPluginStub';
 import {OutputPlugin} from '../../plugins/outputPlugin';
-import {SafeJsonImpl} from "../../../safeJson/safeJsonImpl";
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 export class TextFormat implements OutputFormat {
   private readonly _channel:Channel;

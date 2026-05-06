@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {DataTablesOutputData} from './dataTablesOutputDTO/dataTablesOutputData';
 import DataTable, {Config, ConfigColumnDefs, ConfigColumns} from 'datatables.net-bs5';
 import 'datatables.net-buttons-bs5';
 import {Channel} from '../../../channel/channel';

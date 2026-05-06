@@ -45,9 +45,6 @@
  */
 import {Channel} from '../../../../objects/channel/channel';
 import {FakeChannel} from '../../../../objects/channel/fakeChannel';
-import {DataTablesOutputData} from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesOutputDTO/dataTablesOutputData';
-import {DataTablesOutputOptions} from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesOutputDTO/dataTablesOutputOptions';
-import {OutputDTO} from '../../../../objects/output/outputDTO';
 import {OutputType} from '../../../../objects/output/outputType';
 import {DataTablesPluginImpl} from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesPluginImpl';
 import {DataTablesView} from './dataTablesView';
@@ -57,7 +54,7 @@ import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 import {
   DataTablesOutputDTO
 } from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesOutputDTO/dataTablesOutputDTO';
-import {SafeJsonImpl} from "../../../../objects/safeJson/safeJsonImpl";
+import {SafeJsonImpl} from '../../../../objects/safeJson/safeJsonImpl';
 
 describe('DataTablesView', () => {
   const channel:Channel = new FakeChannel();
