@@ -43,10 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Response} from './response';
-import {Request} from './request';
+import {Message} from './message';
+import {SafeJson} from '../safeJson/safeJson';
 
-export interface Channel extends Response, Request {
-  request(data: object):void;
-  response(data: object):void;
+export class MessageImpl implements Message{
+  private readonly _safeJson:SafeJson;
+
+  constructor(safeJson:SafeJson) {
+    this._safeJson = safeJson;
+  }
+
+  data(): object {
+    const key = 'data';
+    return this._safeJson.getProperty(key, 'object');
+  }
+
+  operation(): string {
+    const key = 'op';
+    return this._safeJson.getProperty(key, 'string');
+  }
 }

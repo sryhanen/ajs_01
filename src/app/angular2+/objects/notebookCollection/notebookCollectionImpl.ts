@@ -46,20 +46,23 @@
 import {NotebookCollection} from './notebookCollection';
 import {Notebook} from '../notebook/notebook';
 import {Channel} from '../channel/channel';
-import {MessageDTO} from '../message/messageDTO';
-import {NotesInfoDTO} from '../message/notesInfoMessage/notesInfoDTO';
-import {NotesInfoMessageImpl} from '../message/notesInfoMessage/notesInfoMessageImpl';
 import {PushValue} from '../pushValue/pushValue';
+import {NotebookCollectionUpdate} from './notebookCollectionUpdate/notebookCollectionUpdate';
+import {Response} from '../channel/response';
 
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;
-  private _collection: Notebook[];
+  private readonly _collection: Notebook[];
   private readonly _pushCollection:PushValue<Notebook[]>[];
+  private readonly _responseEvents: Response[];
 
   constructor(channel:Channel) {
     this._channel = channel;
     this._collection = [];
     this._pushCollection = [];
+    this._responseEvents = [
+      new NotebookCollectionUpdate(this._collection, this._pushCollection, this)
+    ];
   }
 
   notebooks(value: PushValue<Notebook[]>):void {
@@ -72,11 +75,7 @@ export class NotebookCollectionImpl implements NotebookCollection{
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    if(message.op === 'NOTES_INFO'){
-      this._collection = new NotesInfoMessageImpl(message.data as NotesInfoDTO).notebooks(this);
-      this._pushCollection.forEach(value => value.update(this._collection));
-    }
+    this._responseEvents.forEach(responseEvent => responseEvent.response(data));
     this._collection.forEach((notebook: Notebook) => {
       notebook.response(data);
     });

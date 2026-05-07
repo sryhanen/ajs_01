@@ -43,48 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotesInfoMessage} from './notesInfoMessage';
-import {NotesInfoDTO} from './notesInfoDTO';
-import {NotesInfoMessageImpl} from './notesInfoMessageImpl';
-import {FakeChannel} from '../../channel/fakeChannel';
-import {Channel} from '../../channel/channel';
-
-describe('NotesInfoData', () => {
-  let channel: Channel;
-  const notes = [
-    {id:'note1'},
-    {id:'note2'},
-    {id:'note3'}
-  ];
-  let data: NotesInfoDTO;
-  let notesInfoData: NotesInfoMessage;
-  beforeEach(() => {
-    channel = new FakeChannel();
-    data = {
-      notes: notes
-    };
-    notesInfoData = new NotesInfoMessageImpl(data);
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(notesInfoData).toBeInstanceOf(NotesInfoMessageImpl);
-    });
-
-    it('Should have notebooks', () => {
-      const notebooks = notesInfoData.notebooks(channel);
-      expect(notebooks).toHaveLength(3);
-      expect(notebooks[0].id()).toEqual(notes[0].id);
-      expect(notebooks[1].id()).toEqual(notes[1].id);
-      expect(notebooks[2].id()).toEqual(notes[2].id);
-    });
-  });
-
-  describe('Empty notebooks', () => {
-    it('Should have empty list', () => {
-      data.notes = [];
-      notesInfoData = new NotesInfoMessageImpl(data);
-      expect(notesInfoData.notebooks(channel)).toEqual([]);
-    });
-  });
-});
+export interface SafeJson {
+  getProperty<T>(key:string, type:string): T;
+}

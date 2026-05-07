@@ -43,20 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotesInfoMessage} from './notesInfoMessage';
-import {Notebook} from '../../notebook/notebook';
-import {Channel} from '../../channel/channel';
-import {NotesInfoDTO} from './notesInfoDTO';
-import {NotebookImpl} from '../../notebook/notebookImpl';
+import {Paragraph} from '../paragraph/paragraph';
+import {Channel} from '../channel/channel';
+import {PushValue} from '../pushValue/pushValue';
 
-export class NotesInfoMessageImpl implements NotesInfoMessage{
-  private readonly _data: NotesInfoDTO;
-
-  constructor(data:NotesInfoDTO) {
-    this._data = data;
-  }
-
-  notebooks(channel: Channel): Notebook[] {
-    return this._data.notes.map(notebookDTO => new NotebookImpl(channel, notebookDTO));
-  }
+export interface ParagraphCollection extends Channel {
+  paragraphs(value:PushValue<Paragraph[]>):void;
 }

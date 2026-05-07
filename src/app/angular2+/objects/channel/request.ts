@@ -43,8 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookDTO} from '../noteMessage/notebookDTO';
-
-export interface NotesInfoDTO {
-  notes: Partial<NotebookDTO>[];
+export interface Request {
+  request(data:object):void;
 }

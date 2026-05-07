@@ -43,9 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
-import {Notebook} from '../../notebook/notebook';
-
-export interface NotesInfoMessage{
-  notebooks(channel:Channel): Notebook[];
+export interface Message{
+  data():object;
+  operation():string;
 }
