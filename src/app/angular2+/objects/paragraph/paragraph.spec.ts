@@ -83,11 +83,6 @@ describe('Paragraph', () => {
   });
 
   describe('Birth', () => {
-    //beforeEach(() => {
-    //  const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
-    //  paragraph = new ParagraphImpl(channel, paragraphData, angularObjectCollection);
-    //});
-
     it('Should initialize', () => {
       expect(paragraph).toBeInstanceOf(ParagraphImpl);
     });
