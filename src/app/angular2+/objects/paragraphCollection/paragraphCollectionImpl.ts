@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphCollection} from './paragraphCollection';
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
 import {PushValue} from '../pushValue/pushValue';
@@ -56,24 +55,21 @@ import {ParagraphRemovedResponse} from './responses/paragraphRemoved/paragraphRe
 import {DefaultRequest} from './requests/default/defaultRequest';
 import {RunParagraphRequest} from './requests/runParagraph/runParagraphRequest';
 import {DefaultResponse} from './responses/default/defaultResponse';
+import {ParagraphCollection} from './paragraphCollection';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
-  private readonly _channel: Channel;
   private readonly _paragraphs: Paragraph[];
   private readonly _pushParagraphs: PushValue<Paragraph[]>[];
-  private readonly _angularObjectCollection: AngularObjectCollection;
   private readonly _responses: Response[];
   private readonly _requests: Request[];
 
   constructor(channel: Channel, paragraphs: Paragraph[], angularObjectCollection: AngularObjectCollection) {
-    this._channel = channel;
     this._paragraphs = paragraphs;
-    this._angularObjectCollection = angularObjectCollection;
     this._pushParagraphs = [];
     this._responses = [
       new DefaultResponse(this._paragraphs),
-      new ParagraphResponse(this, this._paragraphs, this._pushParagraphs, this._angularObjectCollection),
-      new ParagraphAddedResponse(this, this._paragraphs, this._pushParagraphs, this._angularObjectCollection),
+      new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs, angularObjectCollection),
+      new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs, angularObjectCollection),
       new ParagraphRemovedResponse(this._paragraphs, this._pushParagraphs),
     ];
     this._requests = [
@@ -82,7 +78,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     ];
   }
 
-  paragraphs(value: PushValue<Paragraph[]>): void {
+  paragraphs(value:PushValue<Paragraph[]>):void {
     value.update(this._paragraphs);
     this._pushParagraphs.push(value);
   }

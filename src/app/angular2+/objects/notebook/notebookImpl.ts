@@ -44,94 +44,82 @@
  * a licensee so wish it.
  */
 import {Notebook} from './notebook';
-import {NotebookDTO} from '../message/noteMessage/notebookDTO';
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
-import {MessageDTO} from '../message/messageDTO';
-import {NoteMessageImpl} from '../message/noteMessage/noteMessageImpl';
-import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
-import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {PushValue} from '../pushValue/pushValue';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
-import {AngularObjectUpdateMessageImpl} from '../message/angularObjectUpdateMessage/angularObjectUpdateMessageImpl';
-import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
-import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
-import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
+import {SafeJson} from '../safeJson/safeJson';
+import {MessageImpl} from '../message/messageImpl';
+import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
+import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
+import {ParagraphImpl} from '../paragraph/paragraphImpl';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
-  private _notebook: Partial<NotebookDTO>;
-  private _paragraphs: Paragraph[];
-  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
+  private readonly _notebook: SafeJson;
   private readonly _angularObjectCollection: AngularObjectCollection;
+  private readonly _paragraphCollection: ParagraphCollection;
 
-  constructor(channel: Channel, notebook: Partial<NotebookDTO>) {
+  constructor(channel: Channel, notebook: object) {
     this._channel = channel;
-    this._notebook = notebook;
-    this._paragraphs = [];
-    this._pushParagraphs = [];
+    this._notebook = new SafeJsonImpl(notebook);
     this._angularObjectCollection = new AngularObjectCollectionImpl(this);
+    this._paragraphCollection = new ParagraphCollectionImpl(this, this.initialParagraphs(), this._angularObjectCollection);
   }
 
-  paragraphs(value:PushValue<Paragraph[]>):void{
-    value.update(this._paragraphs);
-    this._pushParagraphs.push(value);
+  private initialParagraphs(): Paragraph[] {
+    const paragraphs: Paragraph[] = [];
+    if(this._notebook.propertyExists('paragraphs')) {
+      const paragraphDataListing:Array<object> = this._notebook.getProperty('paragraphs', 'object');
+      for (const paragraphData of paragraphDataListing) {
+        paragraphs.push(new ParagraphImpl(this, paragraphData, this._angularObjectCollection));
+      }
+    }
+    return paragraphs;
+  }
+
+  paragraphs(value:PushValue<Paragraph[]>): void {
+    this._paragraphCollection.paragraphs(value);
   }
 
   id(): string {
-    return this._notebook.id;
+    return this._notebook.getProperty('id', 'string');
   }
 
   request(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    if(message.data['noteId'] !== undefined){
-      message.data['noteId'] = this.id();
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    const messageData = new SafeJsonImpl(message.data());
+    if(messageData.propertyExists('noteId')){
+      const decoratedData = message.data();
+      decoratedData['noteId'] = this.id();
+      const decoratedRequest = {
+        op:message,
+        data:decoratedData,
+      };
+      this._channel.request(decoratedRequest);
     }
-    this._channel.request(message);
+    else{
+      this._channel.request(data);
+    }
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    const op = message.op;
-    if(op === 'NOTE'){
-      const noteMessage = new NoteMessageImpl(message.data as NotebookDTO);
-      if(noteMessage.id() === this.id()){
-        this._paragraphs = noteMessage.paragraphs(this, this._angularObjectCollection);
-        this._pushParagraphs.forEach(value => value.update(this._paragraphs));
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    const messageData = new SafeJsonImpl(message.data());
+    if(messageData.propertyExists('noteId')){
+      if(messageData.getProperty('noteId', 'string') === this.id()){
+        this.respondChildren(data);
       }
     }
-    else if(op === 'PARAGRAPH_ADDED'){
-      const paragraphAddedMessage = message.data as {paragraph:ParagraphDTO, index:number};
-      const paragraph = new ParagraphImpl(this, paragraphAddedMessage.paragraph, this._angularObjectCollection);
-      this._paragraphs.splice(paragraphAddedMessage.index,0, paragraph);
-      this._pushParagraphs.forEach(value => value.update(this._paragraphs));
+    else{
+      this.respondChildren(data);
     }
-    else if(op === 'PARAGRAPH_REMOVED'){
-      const paragraphRemovedMessage = message.data as {id:string};
-      const index = this._paragraphs.findIndex(paragraph => paragraph.id() === paragraphRemovedMessage.id);
-      this._paragraphs.splice(index, 1);
-      this._pushParagraphs.forEach(value => value.update(this._paragraphs));
-    }
-    else if(op === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
-      if(paragraphOutputMessage.noteId() === this.id()){
-        this._paragraphs.forEach(paragraph => {
-          paragraph.response(message);
-        });
-      }
-    }
-    else if(op === 'ANGULAR_OBJECT_UPDATE'){
-      const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(message.data as AngularObjectUpdateDTO);
-      if(angularObjectUpdateMessage.noteId() === this.id()){
-        this._angularObjectCollection.response(data);
-      }
-    }
-    else {
-      this._paragraphs.forEach(paragraph => {
-        paragraph.response(data);
-      });
-    }
+  }
+
+  private respondChildren(data:object): void {
+    this._paragraphCollection.response(data);
+    this._angularObjectCollection.response(data);
   }
 }
