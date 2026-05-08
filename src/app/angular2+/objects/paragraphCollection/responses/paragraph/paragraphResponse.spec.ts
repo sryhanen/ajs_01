@@ -51,6 +51,7 @@ import {FakeChannel} from '../../../channel/fakeChannel';
 import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
 import {ParagraphResponse} from './paragraphResponse';
 import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
+import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 
 describe('ParagraphResponder', () => {
   let channel:Channel;
@@ -62,7 +63,7 @@ describe('ParagraphResponder', () => {
   beforeEach(() => {
     channel = new FakeChannel();
     paragraphs = [];
-    pushParagraphs = [];
+    pushParagraphs = [new PushValueImpl()];
     angularObjectCollection = new AngularObjectCollectionImpl(channel);
   });
 
@@ -93,7 +94,9 @@ describe('ParagraphResponder', () => {
           name: newName
         }
       };
+      const pushValueSpy = vi.spyOn(pushParagraphs[0], 'update');
       paragraphResponse.response(responseWithNewName);
+      expect(pushValueSpy).toHaveBeenCalledExactlyOnceWith(paragraphs);
       expect(paragraphs[0].print()).not.toEqual(initialParagraph);
     });
 

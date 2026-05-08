@@ -47,7 +47,7 @@ import {NotebookCollection} from './notebookCollection';
 import {Notebook} from '../notebook/notebook';
 import {Channel} from '../channel/channel';
 import {PushValue} from '../pushValue/pushValue';
-import {NotebookCollectionUpdateResponse} from './responses/notebookCollectionUpdateResponse';
+import {NotesInfoResponse} from './responses/notesInfoResponse';
 import {Response} from '../channel/response';
 
 export class NotebookCollectionImpl implements NotebookCollection{
@@ -61,7 +61,7 @@ export class NotebookCollectionImpl implements NotebookCollection{
     this._collection = [];
     this._pushCollection = [];
     this._responses = [
-      new NotebookCollectionUpdateResponse(this._collection, this._pushCollection, this)
+      new NotesInfoResponse(this._collection, this._pushCollection, this)
     ];
   }
 
