@@ -8,6 +8,10 @@ export class SafeJsonImpl implements SafeJson{
     this._data = data;
   }
 
+  propertyExists(key: string): boolean {
+    return Object.hasOwn(this._data, key);
+  }
+
   getProperty<T>(key:string, type:string): T {
     this.validateKeyExists(key);
     const property = this._data[key];

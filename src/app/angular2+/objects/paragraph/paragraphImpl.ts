@@ -48,35 +48,34 @@ import {Channel} from '../channel/channel';
 import {OutputContainer} from '../output/container/outputContainer';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {MessageDTO} from '../message/messageDTO';
-import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
-import {ParagraphMessageImpl} from '../message/paragraphMessage/paragraphMessageImpl';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
-  private _paragraph: SafeJson;
+  private readonly _paragraph: SafeJson;
 
   constructor(channel: Channel, paragraph: object, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
     this._outputContainer = new OutputContainerImpl(this, angularObjectCollection);
 
-
-    const paragraphOutput:object = this._paragraph.getProperty('output', 'object');
-    const paragraphOutputMessage = {
-      op:'PARAGRAPH_OUTPUT',
-      data: {
-        noteId:'',
-        paragraphId:'',
-        output: paragraphOutput,
-      }
-    };
-    this._outputContainer.response(paragraphOutputMessage);
+    if(this._paragraph.propertyExists('output')){
+      const paragraphOutput:object = this._paragraph.getProperty('output', 'object');
+      const paragraphOutputMessage = {
+        op:'PARAGRAPH_OUTPUT',
+        data: {
+          noteId:'',
+          paragraphId:'',
+          output: paragraphOutput,
+        }
+      };
+      this._outputContainer.response(paragraphOutputMessage);
+    }
   }
 
   id(): string {

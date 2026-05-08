@@ -45,4 +45,5 @@
  */
 export interface SafeJson {
   getProperty<T>(key:string, type:string): T;
+  propertyExists(key:string): boolean;
 }
