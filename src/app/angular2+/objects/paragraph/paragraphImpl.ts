@@ -87,7 +87,11 @@ export class ParagraphImpl implements Paragraph{
   }
 
   print():object {
-    return this._paragraph;
+    return {
+      text:this._paragraph.getProperty<string>('text', 'string'),
+      config:this._paragraph.getProperty<object>('config', 'object'),
+      settings: this._paragraph.getProperty<object>('settings', 'object'),
+    };
   }
 
   request(data: object): void {
