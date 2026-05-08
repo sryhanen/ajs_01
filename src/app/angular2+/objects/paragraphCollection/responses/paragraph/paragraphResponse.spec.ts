@@ -80,6 +80,7 @@ describe('ParagraphResponder', () => {
     const initialParagraph = {
       id:paragraphId,
       name: initialParagraphName,
+      text:''
     };
 
 
@@ -91,13 +92,17 @@ describe('ParagraphResponder', () => {
         op:'PARAGRAPH',
         data: {
           id:paragraphId,
-          name: newName
+          name: newName,
+          text:''
         }
       };
       const pushValueSpy = vi.spyOn(pushParagraphs[0], 'update');
+      const previousParagraph = paragraphs[0];
+      expect(pushValueSpy).toHaveBeenCalledTimes(0);
       paragraphResponse.response(responseWithNewName);
+      const newParagraph = paragraphs[0];
       expect(pushValueSpy).toHaveBeenCalledExactlyOnceWith(paragraphs);
-      expect(paragraphs[0].print()).not.toEqual(initialParagraph);
+      expect(newParagraph).not.toEqual(previousParagraph);
     });
 
 
