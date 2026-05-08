@@ -43,42 +43,50 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookCollection} from './notebookCollection';
-import {Notebook} from '../notebook/notebook';
-import {Channel} from '../channel/channel';
-import {PushValue} from '../pushValue/pushValue';
-import {NotebookCollectionUpdateResponse} from './responses/notebookCollectionUpdateResponse';
-import {Response} from '../channel/response';
+import {NotebookCollectionUpdateResponse} from './notebookCollectionUpdateResponse';
+import {FakeChannel} from '../../channel/fakeChannel';
+import {Channel} from '../../channel/channel';
+import {Notebook} from '../../notebook/notebook';
+import {PushValue} from '../../pushValue/pushValue';
+import {PushValueImpl} from '../../pushValue/pushValueImpl';
 
-export class NotebookCollectionImpl implements NotebookCollection{
-  private readonly _channel:Channel;
-  private readonly _collection: Notebook[];
-  private readonly _pushCollection:PushValue<Notebook[]>[];
-  private readonly _responses: Response[];
-
-  constructor(channel:Channel) {
-    this._channel = channel;
-    this._collection = [];
-    this._pushCollection = [];
-    this._responses = [
-      new NotebookCollectionUpdateResponse(this._collection, this._pushCollection, this)
-    ];
-  }
-
-  notebooks(value: PushValue<Notebook[]>):void {
-    value.update(this._collection);
-    this._pushCollection.push(value);
-  }
-
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(data: object): void {
-    this._responses.forEach(responseEvent => responseEvent.response(data));
-    this._collection.forEach((notebook: Notebook) => {
-      notebook.response(data);
+describe('NotebookCollectionResponder', () => {
+    let channel:Channel;
+    let notebookCollection: Notebook[];
+    let pushValue: PushValue<Notebook[]>;
+    let pushCollection: PushValue<Notebook[]>[];
+    let notebookCollectionUpdate: NotebookCollectionUpdateResponse;
+    beforeEach(() => {
+      channel  = new FakeChannel();
+      notebookCollection = [];
+      pushValue = new PushValueImpl();
+      pushCollection = [pushValue];
+      notebookCollectionUpdate = new NotebookCollectionUpdateResponse(notebookCollection, pushCollection, channel);
     });
-  }
-}
 
+    describe('Birth', () => {
+      it('Should be initialized', () => {
+        expect(notebookCollectionUpdate).toBeInstanceOf(NotebookCollectionUpdateResponse);
+      });
+    });
+
+    describe('Collection updates', () => {
+      const notebook1 = {name:'note1'};
+      const notebook2 = {name:'note2'};
+      const updateResponse = {
+        op: 'NOTES_INFO',
+        data: {
+          notes: [
+            notebook1,
+            notebook2
+          ]
+        }
+      };
+      it('Updates notebookCollection and pushCollection', () => {
+        expect(notebookCollection).toHaveLength(0);
+        notebookCollectionUpdate.response(updateResponse);
+        expect(notebookCollection).toHaveLength(2);
+        expect(pushCollection[0].value()).toHaveLength(2);
+      });
+    });
+});

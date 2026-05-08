@@ -48,18 +48,21 @@ import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
 import {PushValue} from '../pushValue/pushValue';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
+import {Response} from '../channel/response';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _channel: Channel;
   private readonly _paragraphs: Paragraph[];
   private readonly _pushParagraphs: PushValue<Paragraph[]>[];
   private readonly _angularObjectCollection: AngularObjectCollection;
+  private readonly _responses: Response[];
 
   constructor(channel: Channel, paragraphs: Paragraph[], angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._paragraphs = paragraphs;
     this._angularObjectCollection = angularObjectCollection;
     this._pushParagraphs = [];
+    this._responses = [];
   }
 
   paragraphs(value: PushValue<Paragraph[]>): void {
@@ -80,6 +83,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   response(data: object): void {
+    this._responses.forEach(responder => responder.response(data));
     //const message = new MessageImpl(data);
     //const op = message.operation();
     //if(op === 'PARAGRAPH_ADDED'){

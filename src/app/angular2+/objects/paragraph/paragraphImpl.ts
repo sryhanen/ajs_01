@@ -53,37 +53,41 @@ import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOut
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {ParagraphMessageImpl} from '../message/paragraphMessage/paragraphMessageImpl';
+import {SafeJson} from '../safeJson/safeJson';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
-  private _paragraph: ParagraphDTO;
+  private _paragraph: SafeJson;
 
-  constructor(channel: Channel, paragraph: ParagraphDTO, angularObjectCollection: AngularObjectCollection) {
+  constructor(channel: Channel, paragraph: object, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
-    this._paragraph = paragraph;
+    this._paragraph = new SafeJsonImpl(paragraph);
     this._outputContainer = new OutputContainerImpl(this, angularObjectCollection);
 
-    const paragraphOutputMessage: MessageDTO<ParagraphOutputDTO> = {
+
+    const paragraphOutput:object = this._paragraph.getProperty('output', 'object');
+    const paragraphOutputMessage = {
       op:'PARAGRAPH_OUTPUT',
       data: {
         noteId:'',
         paragraphId:'',
-        output: paragraph.output,
+        output: paragraphOutput,
       }
     };
     this._outputContainer.response(paragraphOutputMessage);
   }
 
   id(): string {
-    return this._paragraph.id;
+    return this._paragraph.getProperty('id', 'string');
   }
 
   outputContainer(): OutputContainer {
     return this._outputContainer;
   }
 
-  print():ParagraphDTO {
+  print():object {
     return this._paragraph;
   }
 
@@ -101,14 +105,7 @@ export class ParagraphImpl implements Paragraph{
   response(data: object): void {
     const message = data as MessageDTO<unknown>;
     const op = message.op;
-    if(op === 'PARAGRAPH'){
-      const paragraphMessage = new ParagraphMessageImpl(message.data as ParagraphDTO);
-      if(paragraphMessage.id() === this.id()){
-        this._paragraph = paragraphMessage.toParagraphData();
-        this._outputContainer.response(paragraphMessage.printAsParagraphOutputMessage());
-      }
-    }
-    else if(op === 'PARAGRAPH_OUTPUT'){
+    if(op === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
       if(paragraphOutputMessage.paragraphId() === this.id()){
         this._outputContainer.response(message);

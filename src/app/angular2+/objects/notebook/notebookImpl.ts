@@ -89,14 +89,6 @@ export class NotebookImpl implements Notebook {
     if(message.data['noteId'] !== undefined){
       message.data['noteId'] = this.id();
     }
-    else if(message.op === 'RUN_PARAGRAPH'){
-      const runParagraphMessage = data as MessageDTO<RunParagraphDTO>;
-      const paragraphDto = this._paragraphs.find(paragraph => paragraph.id() === runParagraphMessage.data.id).print();
-      runParagraphMessage.data.paragraph = paragraphDto.text;
-      runParagraphMessage.data.config = paragraphDto.config;
-      runParagraphMessage.data.params = paragraphDto.params;
-      this._channel.request(runParagraphMessage);
-    }
     this._channel.request(message);
   }
 
