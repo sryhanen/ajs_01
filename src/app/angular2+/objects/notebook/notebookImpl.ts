@@ -95,7 +95,7 @@ export class NotebookImpl implements Notebook {
       const decoratedData = message.data();
       decoratedData['noteId'] = this.id();
       const decoratedRequest = {
-        op:message,
+        op:message.operation(),
         data:decoratedData,
       };
       this._channel.request(decoratedRequest);
