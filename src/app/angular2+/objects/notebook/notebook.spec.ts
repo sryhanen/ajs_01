@@ -43,278 +43,134 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookDTO} from '../message/noteMessage/notebookDTO';
 import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {Notebook} from './notebook';
 import {NotebookImpl} from './notebookImpl';
-import {MessageDTO} from '../message/messageDTO';
-import {Paragraph} from '../paragraph/paragraph';
 import {PushValueImpl} from '../pushValue/pushValueImpl';
+import {Paragraph} from '../paragraph/paragraph';
 import {PushValue} from '../pushValue/pushValue';
-import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
-import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
-import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
 
 describe('Notebook', () => {
-  const noteId = 'noteId';
-  const partialNote:Partial<NotebookDTO> = {
-    id: noteId
-  };
+  const notebookId = 'noteId';
+  const notebookParagraphs = [
+    {id:'paragraph1'}
+  ];
+  let notebookData: {id:string, paragraphs?: {id:string}[]};
   let channel: Channel;
-  let notebook:Notebook;
+  let notebook: Notebook;
 
   beforeEach(() => {
+    notebookData = {
+      id: notebookId,
+      paragraphs:notebookParagraphs
+    };
     channel = new FakeChannel();
-    notebook = new NotebookImpl(channel, partialNote);
   });
 
   describe('Birth', () => {
-    it('Should have been initialized', () => {
+    it('Should have been initialized', () =>{
+      notebook = new NotebookImpl(channel, notebookData);
       expect(notebook).toBeInstanceOf(NotebookImpl);
     });
-  });
 
-  describe('Request', () =>{
-    it('Should decorate with id', () => {
-      const data = {
-        op: 'PARAGRAPH_OUTPUT_REQUEST',
-        data: {
-          noteId:''
-        }
-      };
-      const decoratedData = {
-        op: 'PARAGRAPH_OUTPUT_REQUEST',
-        data: {
-          noteId: noteId
-        }
-      };
-      const spy = vi.spyOn(channel, 'request');
-      notebook.request(data);
-      expect(spy).toHaveBeenCalledWith(decoratedData);
-    });
-
-    it('Should not decorate with id', () => {
-      const data = {
-        op: 'RANDOM_OPERATION',
-        data: {}
-      };
-      const spy = vi.spyOn(channel, 'request');
-      notebook.request(data);
-      expect(spy).toHaveBeenCalledWith(data);
-    });
-
-    it('Should decorate run paragraph request', () => {
-      const paragraphId = 'paragraphId';
-      const paragraphText = 'paragraph text';
-      const paragraphConfig = {
-        configProp:'configProp value'
-      };
-      const paragraphParams = {
-        paramsProp:'paramsProp value'
-      };
-      const paragraph: ParagraphDTO = {
-        id: paragraphId,
-        config: paragraphConfig,
-        params: paragraphParams,
-        text: paragraphText
-      };
-      const requestData: MessageDTO<RunParagraphDTO> = {
-        op: 'RUN_PARAGRAPH',
-        data: {
-          id: paragraphId,
-          paragraph: '',
-          config: {},
-          params: {}
-        }
-      };
-      const expectedData: MessageDTO<RunParagraphDTO> = {
-        op: 'RUN_PARAGRAPH',
-        data: {
-          id: paragraphId,
-          paragraph: paragraphText,
-          config: paragraphConfig,
-          params: paragraphParams
-        }
-      };
-      const noteResponse: MessageDTO<NotebookDTO> = {
-        op:'NOTE',
-        data: {
-          id:noteId,
-          paragraphs:[
-            paragraph
-          ]
-        }
-      };
-      notebook.response(noteResponse);
-      const spy = vi.spyOn(channel, 'request');
-      notebook.request(requestData);
-      expect(spy).toHaveBeenCalledWith(expectedData);
-    });
-  });
-
-  describe('Response behavior', () => {
-    let paragraphs: PushValue<Paragraph[]>;
-    let paragraphDtos: ParagraphDTO[];
-    let noteResponse: MessageDTO<NotebookDTO>;
-    beforeEach(() => {
-      notebook = new NotebookImpl(channel, partialNote);
-      paragraphs = new PushValueImpl<Paragraph[]>();
-      paragraphDtos = [
-        {
-          id: 'paragraph 1',
-          text: '',
-          config: {},
-          params: {}
-        },
-        {
-          id: 'paragraph 2',
-          text: '',
-          config: {},
-          params: {}
-        }
-      ];
+    it('Should have paragraphs', () =>{
+      notebook = new NotebookImpl(channel, notebookData);
+      const paragraphs = new PushValueImpl<Paragraph[]>();
       notebook.paragraphs(paragraphs);
-      noteResponse = {
-        op: 'NOTE',
-        data: {
-          id: noteId,
-          paragraphs: paragraphDtos,
-        }
-      };
+      expect(paragraphs.value()).toHaveLength(1);
     });
 
-    describe('Note response', () => {
-      it('Updates paragraphs if data has same id with the note', () => {
-        expect(paragraphs.value()).toEqual([]);
-        notebook.response(noteResponse);
-        expect(paragraphs.value()).toHaveLength(2);
-      });
-
-      it('Does not update paragraphs if data has different id with the note', () => {
-        expect(paragraphs.value()).toEqual([]);
-        noteResponse.data.id = 'something else';
-        notebook.response(noteResponse);
-        expect(paragraphs.value()).toEqual([]);
-      });
+    it('Should not have paragraphs', () =>{
+      delete notebookData.paragraphs;
+      notebook = new NotebookImpl(channel, notebookData);
+      const paragraphs = new PushValueImpl<Paragraph[]>();
+      notebook.paragraphs(paragraphs);
+      expect(paragraphs.value()).toEqual([]);
     });
 
-    describe('Paragraph added response', () => {
-      let paragraphAddedResponse: MessageDTO<{paragraph:ParagraphDTO, index:number}>;
+    it('Should have id', () => {
+      notebook = new NotebookImpl(channel, notebookData);
+      expect(notebook.id()).toEqual(notebookId);
+    });
+  });
+
+  describe('Response', () => {
+    describe('Filters responses if data has noteId', () => {
+      let paragraphs: PushValue<Paragraph[]>;
+      let paragraphSpy;
+
       beforeEach(() => {
-        paragraphAddedResponse = {
-          op: 'PARAGRAPH_ADDED',
-          data: {
-            paragraph: {id: 'paragraph 3', text: '', config: {}, params: {}},
-            index: 0
+        notebook = new NotebookImpl(channel, notebookData);
+        paragraphs = new PushValueImpl<Paragraph[]>();
+        notebook.paragraphs(paragraphs);
+        paragraphSpy = vi.spyOn(paragraphs.value()[0], 'response');
+      });
+
+      it('Should respond with right id', () =>{
+        const response = {
+          op:'',
+          data:{
+            noteId: notebookId
           }
         };
+        notebook.response(response);
+        expect(paragraphSpy).toHaveBeenCalledExactlyOnceWith(response);
       });
 
-      it('Adds paragraph to empty list', () => {
-        expect(paragraphs.value()).toEqual([]);
-        notebook.response(paragraphAddedResponse);
-        expect(paragraphs.value()).toHaveLength(1);
-      });
-
-      it('Adds paragraph to top of populated list', () => {
-        notebook.response(noteResponse);
-        expect(paragraphs.value()).toHaveLength(2);
-        notebook.response(paragraphAddedResponse);
-        expect(paragraphs.value()).toHaveLength(3);
-        expect(paragraphs.value()[0].id()).toEqual('paragraph 3');
-      });
-
-      it('Adds paragraph to bottom of populated list', () => {
-        notebook.response(noteResponse);
-        expect(paragraphs.value()).toHaveLength(2);
-        paragraphAddedResponse.data.index = 2;
-        notebook.response(paragraphAddedResponse);
-        expect(paragraphs.value()).toHaveLength(3);
-        expect(paragraphs.value()[2].id()).toEqual('paragraph 3');
-      });
-
-      it('Adds paragraph to middle of populated list', () => {
-        notebook.response(noteResponse);
-        expect(paragraphs.value()).toHaveLength(2);
-        paragraphAddedResponse.data.index = 1;
-        notebook.response(paragraphAddedResponse);
-        expect(paragraphs.value()).toHaveLength(3);
-        expect(paragraphs.value()[1].id()).toEqual('paragraph 3');
-      });
-    });
-
-    describe('Paragraph removed response', () => {
-      let paragraphRemovedResponse: MessageDTO<{id:string}>;
-      beforeEach(() => {
-        paragraphRemovedResponse = {
-          op: 'PARAGRAPH_REMOVED',
-          data: {
-            id: 'paragraph 1'
+      it('Should not respond with wrong id', () =>{
+        const response = {
+          op:'',
+          data:{
+            noteId: 'wrongId'
           }
         };
+        notebook.response(response);
+        expect(paragraphSpy).toHaveBeenCalledTimes(0);
       });
 
-      it('Removes paragraph the list', () => {
-        notebook.response(noteResponse);
-        notebook.response(paragraphRemovedResponse);
-        expect(paragraphs.value()).toHaveLength(1);
-        expect(paragraphs.value()[0].id()).toEqual('paragraph 2');
-      });
-    });
-
-    describe('Paragraph output response', () => {
-      let paragraphOutputResponse: MessageDTO<ParagraphOutputDTO>;
-      let paragraphSpies:unknown[];
-      beforeEach(() => {
-        paragraphOutputResponse = {
-          op:'PARAGRAPH_OUTPUT',
-          data: {
-            noteId: noteId,
-            paragraphId: ''
-          }
-        };
-        notebook.response(noteResponse);
-        paragraphSpies = paragraphs.value().map(paragraph => vi.spyOn(paragraph, 'response'));
-        expect(paragraphSpies).toHaveLength(2);
-      });
-
-      it('Responds paragraphs when id matches', () => {
-        notebook.response(paragraphOutputResponse);
-        expect(paragraphSpies[0]).toHaveBeenCalledTimes(1);
-        expect(paragraphSpies[1]).toHaveBeenCalledTimes(1);
-        expect(paragraphSpies[0]).toHaveBeenCalledWith(paragraphOutputResponse);
-        expect(paragraphSpies[1]).toHaveBeenCalledWith(paragraphOutputResponse);
-      });
-
-      it('Does not respond paragraphs when id does not match', () => {
-        paragraphOutputResponse.data.noteId = 'wrongID';
-        notebook.response(paragraphOutputResponse);
-        expect(paragraphSpies[0]).toHaveBeenCalledTimes(0);
-        expect(paragraphSpies[1]).toHaveBeenCalledTimes(0);
-      });
-    });
-
-    describe('Default response', () => {
-      let paragraphSpies:unknown[];
-      let response: MessageDTO<unknown>;
-      beforeEach(() => {
-        notebook.response(noteResponse);
-        response = {
-          op:'DEFAULT',
+      it('Should not respond if noteId property missing', () =>{
+        const response = {
+          op:'',
           data:{}
         };
-        paragraphSpies = paragraphs.value().map(paragraph => vi.spyOn(paragraph, 'response'));
-        expect(paragraphSpies).toHaveLength(2);
-      });
-
-      it('Responds paragraphs by default', () => {
         notebook.response(response);
-        expect(paragraphSpies[0]).toHaveBeenCalledTimes(1);
-        expect(paragraphSpies[1]).toHaveBeenCalledTimes(1);
-        expect(paragraphSpies[0]).toHaveBeenCalledWith(response);
-        expect(paragraphSpies[1]).toHaveBeenCalledWith(response);
+        expect(paragraphSpy).toHaveBeenCalledExactlyOnceWith(response);
       });
+    });
+  });
+
+  describe('Request', () => {
+    let channelSpy;
+    beforeEach(() => {
+      channelSpy = vi.spyOn(channel, 'request');
+      notebook = new NotebookImpl(channel, notebookData);
+    });
+
+    it('Should decorate with noteId', () => {
+      const request = {
+        op:'',
+        data:{
+          noteId: ''
+        }
+      };
+      const decoratedRequest = {
+        op:'',
+        data:{
+          noteId: notebookId,
+        }
+      };
+      notebook.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(decoratedRequest);
+    });
+
+    it('Should request channel', () => {
+      const request = {
+        op:'',
+        data:{}
+      };
+      notebook.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
     });
   });
 });
