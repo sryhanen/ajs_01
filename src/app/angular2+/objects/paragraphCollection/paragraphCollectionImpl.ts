@@ -49,6 +49,13 @@ import {Paragraph} from '../paragraph/paragraph';
 import {PushValue} from '../pushValue/pushValue';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {Response} from '../channel/response';
+import {Request} from '../channel/request';
+import {ParagraphResponse} from './responses/paragraph/paragraphResponse';
+import {ParagraphAddedResponse} from './responses/paragraphAdded/paragraphAddedResponse';
+import {ParagraphRemovedResponse} from './responses/paragraphRemoved/paragraphRemovedResponse';
+import {DefaultRequest} from './requests/default/defaultRequest';
+import {RunParagraphRequest} from './requests/runParagraph/runParagraphRequest';
+import {DefaultResponse} from './responses/default/defaultResponse';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _channel: Channel;
@@ -56,13 +63,23 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _pushParagraphs: PushValue<Paragraph[]>[];
   private readonly _angularObjectCollection: AngularObjectCollection;
   private readonly _responses: Response[];
+  private readonly _requests: Request[];
 
   constructor(channel: Channel, paragraphs: Paragraph[], angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._paragraphs = paragraphs;
     this._angularObjectCollection = angularObjectCollection;
     this._pushParagraphs = [];
-    this._responses = [];
+    this._responses = [
+      new DefaultResponse(this._paragraphs),
+      new ParagraphResponse(this, this._paragraphs, this._pushParagraphs, this._angularObjectCollection),
+      new ParagraphAddedResponse(this, this._paragraphs, this._pushParagraphs, this._angularObjectCollection),
+      new ParagraphRemovedResponse(this._paragraphs, this._pushParagraphs),
+    ];
+    this._requests = [
+      new DefaultRequest(this),
+      new RunParagraphRequest(this, this._paragraphs)
+    ];
   }
 
   paragraphs(value: PushValue<Paragraph[]>): void {
@@ -71,38 +88,10 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   request(data: object): void {
-    //if(message.op === 'RUN_PARAGRAPH'){
-    //  const runParagraphMessage = data as MessageDTO<RunParagraphDTO>;
-    //  const paragraphDto = this._paragraphs.find(paragraph => paragraph.id() === runParagraphMessage.data.id).print();
-    //  runParagraphMessage.data.paragraph = paragraphDto.text;
-    //  runParagraphMessage.data.config = paragraphDto.config;
-    //  runParagraphMessage.data.params = paragraphDto.params;
-    //  this._channel.request(runParagraphMessage);
-    //}
-    //this._channel.request(message);
+    this._requests.forEach(request => request.request(data));
   }
 
   response(data: object): void {
-    this._responses.forEach(responder => responder.response(data));
-    //const message = new MessageImpl(data);
-    //const op = message.operation();
-    //if(op === 'PARAGRAPH_ADDED'){
-    //  const paragraphAddedData = new ParagraphAddedDataImpl(message.data());
-    //  const index = paragraphAddedData.index();
-    //  const paragraph = paragraphAddedData.paragraph(this, this._angularObjectCollection);
-    //  this._paragraphs.splice(index,0, paragraph);
-    //  this._pushParagraphs.forEach(value => value.update(this._paragraphs));
-    //}
-    //else if(op === 'PARAGRAPH_REMOVED'){
-    //  const paragraphRemovedData = new ParagraphRemovedDataImpl(message.data());
-    //  const index = this._paragraphs.findIndex(paragraph => paragraph.id() === paragraphRemovedData.id());
-    //  this._paragraphs.splice(index, 1);
-    //  this._pushParagraphs.forEach(value => value.update(this._paragraphs));
-    //}
-    //else {
-    //  this._paragraphs.forEach(paragraph => {
-    //    paragraph.response(data);
-    //  });
-    //}
+    this._responses.forEach(response => response.response(data));
   }
 }
