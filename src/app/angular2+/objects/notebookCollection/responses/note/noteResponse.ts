@@ -43,51 +43,39 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotesInfoResponse} from './notesInfoResponse';
-import {FakeChannel} from '../../channel/fakeChannel';
-import {Channel} from '../../channel/channel';
-import {Notebook} from '../../notebook/notebook';
-import {PushValue} from '../../pushValue/pushValue';
-import {PushValueImpl} from '../../pushValue/pushValueImpl';
+import {Response} from '../../../channel/response';
+import {Notebook} from '../../../notebook/notebook';
+import {PushValue} from '../../../pushValue/pushValue';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {Channel} from '../../../channel/channel';
+import {NotebookImpl} from '../../../notebook/notebookImpl';
 
-describe('NotesInfoResponse', () => {
-    let channel:Channel;
-    let notebookCollection: Notebook[];
-    let pushValue: PushValue<Notebook[]>;
-    let pushCollection: PushValue<Notebook[]>[];
-    let notebookCollectionUpdate: NotesInfoResponse;
-    beforeEach(() => {
-      channel  = new FakeChannel();
-      notebookCollection = [];
-      pushValue = new PushValueImpl();
-      pushCollection = [pushValue];
-      notebookCollectionUpdate = new NotesInfoResponse(notebookCollection, pushCollection, channel);
-    });
+export class NoteResponse implements Response {
+  private readonly _channel:Channel;
+  private readonly _notebooks: Notebook[];
+  private readonly _pushCollection:PushValue<Notebook[]>[];
 
-    describe('Birth', () => {
-      it('Should be initialized', () => {
-        expect(notebookCollectionUpdate).toBeInstanceOf(NotesInfoResponse);
-      });
-    });
+  constructor(channel:Channel, notebooks:Notebook[], pushCollection:PushValue<Notebook[]>[]) {
+    this._channel = channel;
+    this._notebooks = notebooks;
+    this._pushCollection = pushCollection;
+  }
 
-    describe('Collection updates', () => {
-      const notebook1 = {name:'note1'};
-      const notebook2 = {name:'note2'};
-      const updateResponse = {
-        op: 'NOTES_INFO',
-        data: {
-          notes: [
-            notebook1,
-            notebook2
-          ]
-        }
-      };
-      it('Updates notebookCollection and pushCollection', () => {
-        expect(notebookCollection).toHaveLength(0);
-        const pushCollectionSpy = vi.spyOn(pushCollection[0], 'update');
-        notebookCollectionUpdate.response(updateResponse);
-        expect(notebookCollection).toHaveLength(2);
-        expect(pushCollectionSpy).toHaveBeenCalledExactlyOnceWith(notebookCollection);
-      });
-    });
-});
+  response(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'NOTE'){
+      const noteData = new SafeJsonImpl(message.data());
+      const noteId:string = noteData.getProperty('id', 'string');
+      const noteIndex = this._notebooks.findIndex(notebook => notebook.id() === noteId);
+      const newNotebook = new NotebookImpl(this._channel, message.data());
+      if(noteIndex === -1){
+        this._notebooks.push(newNotebook);
+      }
+      else{
+        this._notebooks.splice(noteIndex, 1, newNotebook);
+      }
+      this._pushCollection.forEach(pushValue => pushValue.update(this._notebooks));
+    }
+  }
+}

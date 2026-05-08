@@ -43,44 +43,42 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookCollection} from './notebookCollection';
-import {Notebook} from '../notebook/notebook';
-import {Channel} from '../channel/channel';
-import {PushValue} from '../pushValue/pushValue';
-import {NotesInfoResponse} from './responses/notesInfo/notesInfoResponse';
-import {Response} from '../channel/response';
-import {NoteResponse} from './responses/note/noteResponse';
+import {Response} from '../../../channel/response';
+import {Notebook} from '../../../notebook/notebook';
+import {PushValue} from '../../../pushValue/pushValue';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {Channel} from '../../../channel/channel';
+import {NotebookImpl} from '../../../notebook/notebookImpl';
 
-export class NotebookCollectionImpl implements NotebookCollection{
-  private readonly _channel:Channel;
-  private readonly _collection: Notebook[];
-  private readonly _pushCollection:PushValue<Notebook[]>[];
-  private readonly _responses: Response[];
+export class NotesInfoResponse implements Response{
+  private readonly _channel: Channel;
+  private readonly _notebookCollection: Notebook[];
+  private readonly _pushCollection: PushValue<Notebook[]>[];
 
-  constructor(channel:Channel) {
+  constructor(notebookCollection: Notebook[], pushCollection:PushValue<Notebook[]>[], channel: Channel) {
+    this._notebookCollection = notebookCollection;
+    this._pushCollection = pushCollection;
     this._channel = channel;
-    this._collection = [];
-    this._pushCollection = [];
-    this._responses = [
-      new NotesInfoResponse(this._collection, this._pushCollection, this),
-      new NoteResponse(this, this._collection, this._pushCollection)
-    ];
   }
 
-  notebooks(value: PushValue<Notebook[]>):void {
-    value.update(this._collection);
-    this._pushCollection.push(value);
+  response(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    const operation = message.operation();
+    if(operation === 'NOTES_INFO'){
+      this.clearCollection();
+      const messageData = new SafeJsonImpl(message.data());
+      const notes = messageData.getProperty<Array<object>>('notes', 'object');
+      notes.forEach(note => {
+        this._notebookCollection.push(new NotebookImpl(this._channel, note));
+      });
+      this._pushCollection.forEach(value => value.update(this._notebookCollection));
+    }
   }
 
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(data: object): void {
-    this._responses.forEach(responseEvent => responseEvent.response(data));
-    this._collection.forEach((notebook: Notebook) => {
-      notebook.response(data);
-    });
+  private clearCollection(): void {
+    const length = this._notebookCollection.length;
+    this._notebookCollection.splice(0, length);
   }
 }
 
