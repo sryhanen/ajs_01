@@ -96,7 +96,7 @@ describe('Notebook', () => {
   });
 
   describe('Response', () => {
-    describe('Filters responses if data has noteId', () => {
+    describe('Filters responses', () => {
       let paragraphs: PushValue<Paragraph[]>;
       let paragraphSpy;
 

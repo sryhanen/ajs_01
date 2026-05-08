@@ -115,7 +115,7 @@ export class ParagraphImpl implements Paragraph{
     if(messageData.propertyExists('paragraphId')){
       const paragraphId:string = messageData.getProperty('paragraphId', 'string');
       if(paragraphId === this.id()){
-        this._outputContainer.response(message);
+        this._outputContainer.response(data);
       }
     }
     else{
