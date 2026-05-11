@@ -52,6 +52,7 @@ import {SafeJson} from '../../../../safeJson/safeJson';
 import {PushValue} from '../../../../pushValue/pushValue';
 import {OutputSwitcherButton} from '../../../switcher/button/outputSwitcherButton';
 import {PushValueImpl} from '../../../../pushValue/pushValueImpl';
+import {OutputType} from '../../../outputType';
 
 export class ParagraphOutputResponse implements Channel{
   private readonly _channel:Channel;
@@ -87,10 +88,19 @@ export class ParagraphOutputResponse implements Channel{
           const outputData:object = paragraphOutputData.getProperty('output', 'object');
           const safeOutputData = new SafeJsonImpl(outputData);
           const outputType:string = safeOutputData.getProperty('type', 'string');
-          const outputFormatsToClear = this._outputFormats.filter(outputFormat => outputFormat.outputType() !== outputType);
-          outputFormatsToClear.forEach(outputFormat => outputFormat.clear());
           const outputFormatToRender = this._outputFormats.find(outputFormat => outputFormat.outputType() === outputType);
-          outputFormatToRender.render(outputData);
+          if(outputType === OutputType.dataTables){
+            this._outputFormats.forEach(format => {
+              if(format.outputType() !== OutputType.dataTables){
+                format.clear();
+              }
+            });
+            outputFormatToRender.render(outputData);
+          }
+          else {
+            this._outputFormats.forEach(format => format.clear());
+            outputFormatToRender.render(outputData);
+          }
         }
       }
     }

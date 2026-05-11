@@ -66,6 +66,9 @@ export class ParagraphResponse implements Response {
   }
 
   response(data: object): void {
+    if(this._paragraphs.length === 0){
+      return;
+    }
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'PARAGRAPH') {
       const newParagraph = new ParagraphImpl(this._channel, message.data(), this._angularObjectCollection);
