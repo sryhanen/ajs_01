@@ -54,16 +54,15 @@ import {uPlotPlugin} from './uPlotPlugin';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 export class uPlotPluginImpl implements uPlotPlugin {
-  private readonly _outputData:object;
+  private readonly _outputData: uPlot.AlignedData;
   private readonly _outputOptions:object;
 
-  constructor(outputData:object, outputOptions:object) {
+  constructor(outputData: uPlot.AlignedData, outputOptions:object) {
     this._outputData = outputData;
     this._outputOptions = outputOptions;
   }
 
   bindToElement(anchorElement: HTMLElement): void {
-    const safeOutputData = new SafeJsonImpl(this._outputData);
     const safeOutputOptions = new SafeJsonImpl(this._outputOptions);
     const uPlotOutputOptions: uPlotOutputOptions = {
       labels:safeOutputOptions.getProperty('labels', 'object'),
@@ -81,7 +80,7 @@ export class uPlotPluginImpl implements uPlotPlugin {
       uPlotOptions = basicOptions.options();
     }
     const size:ResizeListener = new ResizeListenerImpl();
-    const graph = new uPlot(uPlotOptions, safeOutputData.getProperty('data', 'object'), anchorElement);
+    const graph = new uPlot(uPlotOptions, this._outputData, anchorElement);
     size.registerToWindow(graph);
     size.registerToElement(graph, anchorElement);
   }

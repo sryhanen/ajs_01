@@ -50,7 +50,6 @@ import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
 import {MessageDTO} from '../../../src/app/angular2+/objects/message/messageDTO';
 import {ParagraphOutputRequestDTO} from '../../../src/app/angular2+/objects/output/paragraphOutputRequest/paragraphOutputRequestDTO';
-import {ParagraphOutputDTO} from '../../../src/app/angular2+/objects/message/paragraphOutputMessage/paragraphOutputDTO';
 import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
 import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
 import {uPlotResultService} from '../../services/uPlotService/uPlotResultService';
@@ -75,7 +74,7 @@ export default class ParagraphOutputRequestHandler implements Handler<MessageDTO
     client.send(JSON.stringify(result));
   }
 
-  private result(message: MessageDTO<ParagraphOutputRequestDTO>): MessageDTO<ParagraphOutputDTO>{
+  private result(message: MessageDTO<ParagraphOutputRequestDTO>){
     const rawData = this._dataTablesService.rawData(1000);
     let output:OutputDTO<unknown>;
 

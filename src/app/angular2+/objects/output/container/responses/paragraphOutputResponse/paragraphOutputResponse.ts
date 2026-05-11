@@ -74,6 +74,7 @@ export class ParagraphOutputResponse implements Channel{
   response(data: object): void {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
+      this._outputSwitcher.response(data);
       const paragraphOutputData = new SafeJsonImpl(message.data());
       if(this.shouldSwitch(paragraphOutputData)){
         this._channel.request(this._activeButton.value().requestData());
@@ -83,19 +84,22 @@ export class ParagraphOutputResponse implements Channel{
           this._outputFormats.forEach(outputFormat => outputFormat.clear());
         }
         else{
-          const outputType:string = paragraphOutputData.getProperty('type', 'string');
+          const outputData:object = paragraphOutputData.getProperty('output', 'object');
+          const safeOutputData = new SafeJsonImpl(outputData);
+          const outputType:string = safeOutputData.getProperty('type', 'string');
           const outputFormatsToClear = this._outputFormats.filter(outputFormat => outputFormat.outputType() !== outputType);
           outputFormatsToClear.forEach(outputFormat => outputFormat.clear());
           const outputFormatToRender = this._outputFormats.find(outputFormat => outputFormat.outputType() === outputType);
-          outputFormatToRender.render(message.data());
+          outputFormatToRender.render(outputData);
         }
       }
     }
   }
 
   private shouldSwitch(paragraphOutputData:SafeJson): boolean {
+    const output = new SafeJsonImpl(paragraphOutputData.getProperty('output', 'object'));
     let shouldSwitch = false;
-    const outputType:string = paragraphOutputData.getProperty('type', 'string');
+    const outputType:string = output.getProperty('type', 'string');
     if(!this._activeButton.value().isStub()){
       const activeButton = this._activeButton.value();
       shouldSwitch = outputType !== activeButton.outputType();

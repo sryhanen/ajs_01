@@ -52,7 +52,9 @@ import {ContainerRef} from '../../../containerRef/containerRef';
 import {uPlotPluginStub} from '../../plugins/uPlotPlugin/uPlotPluginStub';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {uPlotPlugin} from '../../plugins/uPlotPlugin/uPlotPlugin';
-import {uPlotPluginImpl} from "../../plugins/uPlotPlugin/uPlotPluginImpl";
+import {uPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
+import {OutputType} from '../../outputType';
+import uPlot from 'uplot';
 
 export class uPlotFormat implements OutputFormat {
   private readonly _switcherButtons:OutputSwitcherButton[];
@@ -60,8 +62,10 @@ export class uPlotFormat implements OutputFormat {
   private readonly _containerRefs: ContainerRef[];
   private readonly _pluginStub: uPlotPlugin;
   private _plugin: uPlotPlugin;
+  private readonly _outputType: string;
 
   constructor() {
+    this._outputType = OutputType.uPlot;
     this._switcherButtons = [
       new uPlotSwitcherButton('Line Chart', 'fas fa-chart-line', GraphType.line),
       new uPlotSwitcherButton('Area Chart', 'fas fa-chart-area', GraphType.area),
@@ -82,12 +86,12 @@ export class uPlotFormat implements OutputFormat {
   }
 
   outputType(): string {
-    return 'this._outputType';
+    return this._outputType;
   }
 
   render(paragraphOutputData:object): void {
     const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
+    const outputData: uPlot.AlignedData = safeParagraphOutputData.getProperty('data', 'object');
     const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
     this._plugin = new uPlotPluginImpl(outputData, outputOptions);
     this._containerRefs.forEach(containerRef => {

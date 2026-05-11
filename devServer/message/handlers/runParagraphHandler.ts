@@ -54,7 +54,6 @@ import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceI
 import NoteService from '../../services/noteService';
 import {MessageDTO} from '../../../src/app/angular2+/objects/message/messageDTO';
 import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
-import {ParagraphOutputDTO} from '../../../src/app/angular2+/objects/message/paragraphOutputMessage/paragraphOutputDTO';
 import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
 import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputData';
 
@@ -99,7 +98,7 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
 
     for (let i = 1; i < draws; i++) {
       const index = messageQueue.length / draws;
-      const updateOutputMessage: MessageDTO<ParagraphOutputDTO> = {
+      const updateOutputMessage = {
         op: sendOperation.paragraphOutput,
         data: {
           noteId: this._noteService.lastNoteId(),
@@ -121,7 +120,7 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
     paragraph.progress = 100;
     paragraph.output = output2;
 
-    const updateOutputMessage: MessageDTO<ParagraphOutputDTO> = {
+    const updateOutputMessage = {
       op: sendOperation.paragraphOutput,
       data: {
         noteId: this._noteService.lastNoteId(),

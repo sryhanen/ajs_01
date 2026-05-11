@@ -87,9 +87,8 @@ export class TextFormat implements OutputFormat {
 
   render(paragraphOutputData:object): void {
     const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
-    const data:string = new SafeJsonImpl(outputData).getProperty('data', 'string');
-    this._plugin = new TextPluginImpl(data);
+    const outputData:string = safeParagraphOutputData.getProperty('data', 'string');
+    this._plugin = new TextPluginImpl(outputData);
     this._containerRefs.forEach(containerRef => {
       containerRef.createComponent(this._viewComponent, [{name:'plugin', value:this._plugin}]);
     });

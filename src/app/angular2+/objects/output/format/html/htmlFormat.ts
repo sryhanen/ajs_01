@@ -36,9 +36,8 @@ export class HTMLFormat implements OutputFormat{
 
   render(paragraphOutputData:object): void {
     const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
-    const data:string = new SafeJsonImpl(outputData).getProperty('data', 'string');
-    this._plugin = new HtmlPluginImpl(data);
+    const outputData:string = safeParagraphOutputData.getProperty('data', 'string');
+    this._plugin = new HtmlPluginImpl(outputData);
     this._containerRefs.forEach(containerRef => {
       containerRef.createComponent(this._component, [{name:'plugin', value:this._plugin}]);
     });
