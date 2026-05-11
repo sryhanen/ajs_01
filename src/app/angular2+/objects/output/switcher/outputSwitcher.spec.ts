@@ -70,8 +70,8 @@ describe('OutputSwitcher', () => {
     outputSwitcher = new OutputSwitcherImpl(channel, outputFormats);
     isSwitchable = new PushValueImpl();
     isLoading = new PushValueImpl();
-    outputSwitcher.pushIsSwitchable(isSwitchable);
-    outputSwitcher.pushIsLoading(isLoading);
+    outputSwitcher.isSwitchable(isSwitchable);
+    outputSwitcher.isLoading(isLoading);
   });
 
   describe('Birth', () => {

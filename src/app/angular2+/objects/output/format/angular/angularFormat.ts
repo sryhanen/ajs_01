@@ -49,9 +49,6 @@ import {OutputSwitcherButtonStub} from '../../switcher/button/outputSwitcherButt
 import {Channel} from '../../../channel/channel';
 import {AngularView} from '../../../../components/output/plugins/angular/angularView';
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
 import { ContainerRef } from '../../../containerRef/containerRef';
 import {AngularPlugin} from '../../plugins/angularPlugin/angularPlugin';
 import {AngularPluginStub} from '../../plugins/angularPlugin/angularPluginStub';
@@ -82,27 +79,35 @@ export class AngularFormat implements OutputFormat {
     }
   }
 
-  request(data: object): void {
-    this._channel.request(data);
+  outputType(): string {
+    return 'this._outputType';
+  }
+
+  render(outputData:object): void {
+
+  }
+
+  clear(): void {
+
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    if(message.op === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
-      const output = paragraphOutputMessage.toOutput();
-      if(output.isStub()){
-        this._plugin = this._pluginStub;
-        this._containerRefs.forEach(containerRef => containerRef.clear());
-      }
-      else {
-        this._containerRefs.forEach(containerRef => containerRef.clear());
-        this._plugin = output.toAngularPlugin(this._channel);
-        if(!this._plugin.isStub()){
-          this._containerRefs.forEach(containerRef => containerRef.createComponent(this._viewComponent, this.componentInputs()));
-        }
-      }
-    }
+    //const message = data as MessageDTO<unknown>;
+    //if(message.op === 'PARAGRAPH_OUTPUT'){
+    //  const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
+    //  const output = paragraphOutputMessage.toOutput();
+    //  if(output.isStub()){
+    //    this._plugin = this._pluginStub;
+    //    this._containerRefs.forEach(containerRef => containerRef.clear());
+    //  }
+    //  else {
+    //    this._containerRefs.forEach(containerRef => containerRef.clear());
+    //    this._plugin = output.toAngularPlugin(this._channel);
+    //    if(!this._plugin.isStub()){
+    //      this._containerRefs.forEach(containerRef => containerRef.createComponent(this._viewComponent, this.componentInputs()));
+    //    }
+    //  }
+    //}
   }
 
   switcherButtons(): OutputSwitcherButton[] {

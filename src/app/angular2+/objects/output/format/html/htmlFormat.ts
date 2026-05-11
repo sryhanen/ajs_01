@@ -31,27 +31,36 @@ export class HTMLFormat implements OutputFormat{
     }
   }
 
-  request(data: object): void {
-    this._channel.request(data);
+
+  outputType(): string {
+    return 'this._outputType';
+  }
+
+  render(outputData:object): void {
+
+  }
+
+  clear(): void {
+
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    if(message.op === 'PARAGRAPH_OUTPUT') {
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
-      const output = paragraphOutputMessage.toOutput();
-      if(output.isStub()){
-        this._htmlPlugin = this._htmlPluginStub;
-        this._containerRefs.forEach(containerRef => containerRef.clear());
-      }
-      else{
-        this._htmlPlugin = output.toHtmlPlugin();
-        this._containerRefs.forEach(containerRef => containerRef.clear());
-        if(!this._htmlPlugin.isStub()){
-          this._containerRefs.forEach(containerRef => containerRef.createComponent(this._component, [{name:'plugin', value:this._htmlPlugin}]));
-        }
-      }
-    }
+    //const message = data as MessageDTO<unknown>;
+    //if(message.op === 'PARAGRAPH_OUTPUT') {
+    //  const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
+    //  const output = paragraphOutputMessage.toOutput();
+    //  if(output.isStub()){
+    //    this._htmlPlugin = this._htmlPluginStub;
+    //    this._containerRefs.forEach(containerRef => containerRef.clear());
+    //  }
+    //  else{
+    //    this._htmlPlugin = output.toHtmlPlugin();
+    //    this._containerRefs.forEach(containerRef => containerRef.clear());
+    //    if(!this._htmlPlugin.isStub()){
+    //      this._containerRefs.forEach(containerRef => containerRef.createComponent(this._component, [{name:'plugin', value:this._htmlPlugin}]));
+    //    }
+    //  }
+    //}
   }
 
   switcherButtons(): OutputSwitcherButton[] {

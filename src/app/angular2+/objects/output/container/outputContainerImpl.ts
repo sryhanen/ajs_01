@@ -72,7 +72,7 @@ export class OutputContainerImpl implements OutputContainer{
       new AngularFormat(this, angularObjectCollection),
       new HTMLFormat(this)
     ];
-    this._outputSwitcher = new OutputSwitcherImpl(this, this._outputFormats);
+    this._outputSwitcher = new OutputSwitcherImpl(this);
     this._errorListener = new InterpreterErrorListenerImpl(this);
   }
 

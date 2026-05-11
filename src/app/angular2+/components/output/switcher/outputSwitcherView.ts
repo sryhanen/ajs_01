@@ -85,7 +85,7 @@ export class OutputSwitcherView implements OnInit{
   ngOnInit(): void {
     this.isSwitchable = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
     this.isLoading = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
-    this.outputSwitcher.pushIsSwitchable(this.isSwitchable);
-    this.outputSwitcher.pushIsLoading(this.isLoading);
+    this.outputSwitcher.isSwitchable(this.isSwitchable);
+    this.outputSwitcher.isLoading(this.isLoading);
   }
 }

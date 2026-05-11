@@ -54,44 +54,50 @@ import {PushValue} from '../../pushValue/pushValue';
 
 export class OutputSwitcherImpl implements OutputSwitcher {
   private readonly _channel: Channel;
-  private readonly _outputFormats:Channel[];
   private _activeButton: OutputSwitcherButton;
-  private isLoading: boolean;
-  private isSwitchable: boolean;
-  private _pushIsSwitchable: PushValue<boolean>[];
-  private _pushIsLoading: PushValue<boolean>[];
+  private _isLoading: boolean;
+  private _isSwitchable: boolean;
+  private readonly _pushIsSwitchable: PushValue<boolean>[];
+  private readonly _pushIsLoading: PushValue<boolean>[];
+  private readonly _pushActiveButton: PushValue<OutputSwitcherButton>[];
 
-  constructor(channel: Channel, outputFormats: Channel[]) {
+  constructor(channel: Channel) {
     this._channel = channel;
-    this._outputFormats = outputFormats;
     this._activeButton = new OutputSwitcherButtonStub();
-    this.isLoading = false;
-    this.isSwitchable = false;
+    this._isLoading = false;
+    this._isSwitchable = false;
     this._pushIsSwitchable = [];
     this._pushIsLoading = [];
+    this._pushActiveButton = [];
   }
 
   switchFormat(outputSwitcherButton: OutputSwitcherButton): void {
     this._activeButton = outputSwitcherButton;
+    this._pushActiveButton.forEach(button => button.update(this._activeButton));
     this.request(outputSwitcherButton.requestData());
   }
 
-  pushIsSwitchable(value: PushValue<boolean>): void {
-    value.update(this.isSwitchable);
+  isSwitchable(value: PushValue<boolean>): void {
+    value.update(this._isSwitchable);
     this._pushIsSwitchable.push(value);
   }
 
-  pushIsLoading(value: PushValue<boolean>): void {
-    value.update(this.isLoading);
+  isLoading(value: PushValue<boolean>): void {
+    value.update(this._isLoading);
     this._pushIsLoading.push(value);
+  }
+
+  activeButton(value:PushValue<OutputSwitcherButton>): void {
+    value.update(this._activeButton);
+    this._pushActiveButton.push(value);
   }
 
   request(data: object): void {
     const message = data as MessageDTO<unknown>;
     const op = message.op;
     if(op === 'PARAGRAPH_OUTPUT_REQUEST') {
-      this.isLoading = true;
-      this._pushIsLoading.forEach(value => value.update(this.isLoading));
+      this._isLoading = true;
+      this._pushIsLoading.forEach(value => value.update(this._isLoading));
     }
     this._channel.request(data);
   }
@@ -102,26 +108,19 @@ export class OutputSwitcherImpl implements OutputSwitcher {
     if(op === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
       const output = paragraphOutputMessage.toOutput();
-      if(output.isStub() || this._activeButton.isStub()) {
-        this._outputFormats.forEach(format => format.response(message));
+      if(output.isStub()) {
         this._activeButton = new OutputSwitcherButtonStub();
+        this._pushActiveButton.forEach(button => button.update(this._activeButton));
+        this._isSwitchable = false;
+        this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));
       }
       else{
-        if(output.type() === this._activeButton.outputType()){
-          this._outputFormats.forEach(format => format.response(message));
-        }
-        else {
-          this._channel.request(this._activeButton.requestData());
-        }
+        this._isSwitchable = output.isAggregated();
+        this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));
+
       }
-      this.isLoading = false;
-      this._pushIsLoading.forEach(value => value.update(this.isLoading));
-      let isSwitchable = false;
-      if(!output.isStub()) {
-        isSwitchable = output.isAggregated();
-      }
-      this.isSwitchable = isSwitchable;
-      this._pushIsSwitchable.forEach(value => value.update(this.isSwitchable));
+      this._isLoading = false;
+      this._pushIsLoading.forEach(value => value.update(this._isLoading));
     }
   }
 }

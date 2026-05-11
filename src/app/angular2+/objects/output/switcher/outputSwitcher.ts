@@ -48,7 +48,8 @@ import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {PushValue} from '../../pushValue/pushValue';
 
 export interface OutputSwitcher extends Channel {
-  pushIsSwitchable(value: PushValue<boolean>): void;
-  pushIsLoading(value: PushValue<boolean>): void;
+  isSwitchable(value: PushValue<boolean>): void;
+  isLoading(value: PushValue<boolean>): void;
+  activeButton(value:PushValue<OutputSwitcherButton>): void;
   switchFormat(outputSwitcherButton: OutputSwitcherButton): void;
 }

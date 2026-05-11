@@ -43,12 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
 import {OutputSwitcherButton} from '../switcher/button/outputSwitcherButton';
 import {ContainerRef} from '../../containerRef/containerRef';
 
-export interface OutputFormat extends Channel {
+export interface OutputFormat {
   switcherButtons(): OutputSwitcherButton[];
   pushContainerRef(value:ContainerRef): void;
+  outputType(): string;
+  render(outputData:object): void;
+  clear(): void;
 }
 
