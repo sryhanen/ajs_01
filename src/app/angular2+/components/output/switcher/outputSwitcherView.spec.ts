@@ -48,7 +48,6 @@ import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {OutputSwitcherImpl} from '../../../objects/output/switcher/outputSwitcherImpl';
 import {Channel} from '../../../objects/channel/channel';
 import {OutputSwitcherView} from './outputSwitcherView';
-import {ParagraphOutputDTO} from '../../../objects/message/paragraphOutputMessage/paragraphOutputDTO';
 import {MessageDTO} from '../../../objects/message/messageDTO';
 import {render, screen} from '@testing-library/angular';
 import { test } from 'vitest';
@@ -60,7 +59,7 @@ describe('OutputSwitcherView', () => {
   let outputSwitcher: OutputSwitcher;
   beforeEach(async () => {
     channel = new FakeChannel();
-    outputSwitcher = new OutputSwitcherImpl(channel, []);
+    outputSwitcher = new OutputSwitcherImpl(channel);
     await render(OutputSwitcherView, {
       inputs:{
         outputSwitcher: outputSwitcher,
@@ -78,7 +77,7 @@ describe('OutputSwitcherView', () => {
   });
 
   describe('Content visibility', () => {
-    let paragraphOutput: MessageDTO<ParagraphOutputDTO>;
+    let paragraphOutput;
     let paragraphOutputRequest: MessageDTO<ParagraphOutputRequestDTO>;
     beforeEach(() => {
       paragraphOutput = {

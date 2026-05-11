@@ -43,40 +43,46 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AngularObjectCollection} from './angularObjectCollection';
-import {Channel} from '../channel/channel';
-import {Response} from '../channel/response';
-import {PushValue} from '../pushValue/pushValue';
-import {AngularObject} from '../angularObject/angularObject';
-import {AngularObjectRemoveResponse} from './responses/angularObjectRemove/angularObjectRemoveResponse';
-import {AngularObjectUpdateResponse} from './responses/angularObjectUpdate/angularObjectUpdateResponse';
 
-export class AngularObjectCollectionImpl implements AngularObjectCollection {
+import {Response} from '../../../channel/response';
+import {AngularObject} from '../../../angularObject/angularObject';
+import {PushValue} from '../../../pushValue/pushValue';
+import {Channel} from '../../../channel/channel';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
+
+export class AngularObjectUpdateResponse implements Response {
   private readonly _channel: Channel;
   private readonly _angularObjects: AngularObject<unknown>[];
   private readonly _pushValues: PushValue<AngularObject<unknown>[]>[];
-  private readonly _responses: Response[];
 
-  constructor(channel: Channel) {
+  constructor(channel: Channel, angularObjects: AngularObject<unknown>[], pushValues: PushValue<AngularObject<unknown>[]>[]) {
     this._channel = channel;
-    this._angularObjects = [];
-    this._pushValues = [];
-    this._responses = [
-      new AngularObjectRemoveResponse(this._angularObjects, this._pushValues),
-      new AngularObjectUpdateResponse(this, this._angularObjects, this._pushValues)
-    ];
+    this._angularObjects = angularObjects;
+    this._pushValues = pushValues;
   }
 
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(data: object): void {
-    this._responses.forEach(response => response.response(data));
-  }
-
-  angularObjects(value: PushValue<AngularObject<unknown>[]>): void {
-    value.update(this._angularObjects);
-    this._pushValues.push(value);
+  response(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'ANGULAR_OBJECT_UPDATE'){
+      const angularObjectUpdateData = new SafeJsonImpl(message.data());
+      const angularObjectSafeData = new SafeJsonImpl(angularObjectUpdateData.getProperty<object>('angularObject', 'object'));
+      const angularObjectData: {noteId: string, interpreterGroupId: string, name: string, value: unknown} = {
+        noteId:angularObjectUpdateData.getProperty('noteId', 'string'),
+        interpreterGroupId:angularObjectUpdateData.getProperty('interpreterGroupId', 'string'),
+        name:angularObjectSafeData.getProperty('name', 'string'),
+        value:message.data()['angularObject']['object']
+      };
+      const angularObject = new AngularObjectImpl(this._channel, angularObjectData);
+      const existingAngularObjectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObject.name());
+      if(existingAngularObjectIndex === -1){
+        this._angularObjects.push(angularObject);
+      }
+      else{
+        this._angularObjects.splice(existingAngularObjectIndex, 1, angularObject);
+      }
+      this._pushValues.forEach(value => value.update(this._angularObjects));
+    }
   }
 }

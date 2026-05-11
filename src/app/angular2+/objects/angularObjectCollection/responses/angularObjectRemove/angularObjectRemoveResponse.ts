@@ -43,40 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AngularObjectCollection} from './angularObjectCollection';
-import {Channel} from '../channel/channel';
-import {Response} from '../channel/response';
-import {PushValue} from '../pushValue/pushValue';
-import {AngularObject} from '../angularObject/angularObject';
-import {AngularObjectRemoveResponse} from './responses/angularObjectRemove/angularObjectRemoveResponse';
-import {AngularObjectUpdateResponse} from './responses/angularObjectUpdate/angularObjectUpdateResponse';
+import {Response} from '../../../channel/response';
+import {AngularObject} from '../../../angularObject/angularObject';
+import {PushValue} from '../../../pushValue/pushValue';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
-export class AngularObjectCollectionImpl implements AngularObjectCollection {
-  private readonly _channel: Channel;
+export class AngularObjectRemoveResponse implements Response {
   private readonly _angularObjects: AngularObject<unknown>[];
   private readonly _pushValues: PushValue<AngularObject<unknown>[]>[];
-  private readonly _responses: Response[];
 
-  constructor(channel: Channel) {
-    this._channel = channel;
-    this._angularObjects = [];
-    this._pushValues = [];
-    this._responses = [
-      new AngularObjectRemoveResponse(this._angularObjects, this._pushValues),
-      new AngularObjectUpdateResponse(this, this._angularObjects, this._pushValues)
-    ];
+  constructor(angularObjects: AngularObject<unknown>[], pushValues: PushValue<AngularObject<unknown>[]>[]) {
+    this._angularObjects = angularObjects;
+    this._pushValues = pushValues;
   }
 
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(data: object): void {
-    this._responses.forEach(response => response.response(data));
-  }
-
-  angularObjects(value: PushValue<AngularObject<unknown>[]>): void {
-    value.update(this._angularObjects);
-    this._pushValues.push(value);
+  response(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'ANGULAR_OBJECT_REMOVE'){
+      const angularObjectRemoveData = new SafeJsonImpl(message.data());
+      const objectToRemoveName:string = angularObjectRemoveData.getProperty('name', 'string');
+      const objectIndex = this._angularObjects.findIndex(ao => ao.name() === objectToRemoveName);
+      if(objectIndex === -1){
+        throw new Error(`Error during angular object remove: no object "${objectToRemoveName}" in current collection.`);
+      }
+      this._angularObjects.splice(objectIndex, 1);
+      this._pushValues.forEach(value => value.update(this._angularObjects));
+    }
   }
 }

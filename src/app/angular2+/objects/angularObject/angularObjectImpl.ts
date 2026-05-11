@@ -45,7 +45,6 @@
  */
 import {AngularObject} from './angularObject';
 import {Channel} from '../channel/channel';
-import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
 import {MessageDTO} from '../message/messageDTO';
 import {AngularObjectUpdatedDTO} from '../message/angularObjectUpdatedMessage/angularObjectUpdatedDTO';
 
@@ -56,12 +55,12 @@ export class AngularObjectImpl<T> implements AngularObject<T>{
   private readonly _name: string;
   private _value: T;
 
-  constructor(channel:Channel, data:AngularObjectUpdateDTO) {
+  constructor(channel:Channel, data:{noteId:string, interpreterGroupId:string, name:string, value:T}) {
     this._channel = channel;
     this._notebookId = data.noteId;
     this._interpreterGroupId = data.interpreterGroupId;
-    this._name = data.angularObject.name;
-    this._value = data.angularObject.object as T;
+    this._name = data.name;
+    this._value = data.value as T;
   }
 
   request(data: object): void {
