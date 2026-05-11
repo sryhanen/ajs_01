@@ -80,27 +80,22 @@ export class ParagraphOutputResponse implements Channel{
       if(this.shouldSwitch(paragraphOutputData)){
         this._channel.request(this._activeButton.value().requestData());
       }
-      else{
-        if(!paragraphOutputData.propertyExists('output')){
-          this._outputFormats.forEach(outputFormat => outputFormat.clear());
+      else {
+        const outputData:object = paragraphOutputData.getProperty('output', 'object');
+        const safeOutputData = new SafeJsonImpl(outputData);
+        const outputType:string = safeOutputData.getProperty('type', 'string');
+        const outputFormatToRender = this._outputFormats.find(outputFormat => outputFormat.outputType() === outputType);
+        if(outputFormatToRender.outputType() === OutputType.dataTables){
+          this._outputFormats.forEach(format => {
+            if(format.outputType() !== OutputType.dataTables){
+              format.clear();
+            }
+          });
+          outputFormatToRender.render(outputData);
         }
         else{
-          const outputData:object = paragraphOutputData.getProperty('output', 'object');
-          const safeOutputData = new SafeJsonImpl(outputData);
-          const outputType:string = safeOutputData.getProperty('type', 'string');
-          const outputFormatToRender = this._outputFormats.find(outputFormat => outputFormat.outputType() === outputType);
-          if(outputType === OutputType.dataTables){
-            this._outputFormats.forEach(format => {
-              if(format.outputType() !== OutputType.dataTables){
-                format.clear();
-              }
-            });
-            outputFormatToRender.render(outputData);
-          }
-          else {
-            this._outputFormats.forEach(format => format.clear());
-            outputFormatToRender.render(outputData);
-          }
+          this._outputFormats.forEach(format => format.clear());
+          outputFormatToRender.render(outputData);
         }
       }
     }
