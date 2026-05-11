@@ -43,8 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {uPlotOutputData} from './uPlotOutputData';
-import {OutputDTO} from '../../outputDTO';
 import {uPlotOutputOptions} from './uPlotOutputOptions';
 import uPlot from 'uplot';
 import {ResizeListener} from './configuration/resizeListener/resizeListener';
@@ -52,21 +50,30 @@ import {ResizeListenerImpl} from './configuration/resizeListener/resizeListenerI
 import {GraphType} from '../../format/uPlot/graphType';
 import {BarChartOptionsImpl} from './configuration/options/barChartOptionsImpl';
 import {BasicOptionsImpl} from './configuration/options/basicOptionsImpl';
-import {OutputPlugin} from '../outputPlugin';
+import {uPlotPlugin} from './uPlotPlugin';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
-export class uPlotPluginImpl implements OutputPlugin {
-  private readonly _outputDTO: OutputDTO<uPlotOutputData, uPlotOutputOptions>;
+export class uPlotPluginImpl implements uPlotPlugin {
+  private readonly _outputData:object;
+  private readonly _outputOptions:object;
 
-  constructor(outputDTO: OutputDTO<uPlotOutputData, uPlotOutputOptions>) {
-    this._outputDTO = outputDTO;
+  constructor(outputData:object, outputOptions:object) {
+    this._outputData = outputData;
+    this._outputOptions = outputOptions;
   }
 
-  attach(anchorElement: HTMLElement): void {
-    const data = this._outputDTO.data;
-    const options = this._outputDTO.options;
+  bindToElement(anchorElement: HTMLElement): void {
+    const safeOutputData = new SafeJsonImpl(this._outputData);
+    const safeOutputOptions = new SafeJsonImpl(this._outputOptions);
+    const uPlotOutputOptions: uPlotOutputOptions = {
+      labels:safeOutputOptions.getProperty('labels', 'object'),
+      series:safeOutputOptions.getProperty('series', 'object'),
+      xAxisLabel:safeOutputOptions.getProperty('xAxisLabel', 'string'),
+      graphType: safeOutputOptions.getProperty('graphType', 'string'),
+    };
     let uPlotOptions:uPlot.Options;
-    const basicOptions = new BasicOptionsImpl(options);
-    if(options.graphType === GraphType.bar){
+    const basicOptions = new BasicOptionsImpl(uPlotOutputOptions);
+    if(uPlotOutputOptions.graphType === GraphType.bar){
       const barChartOptions = new BarChartOptionsImpl(basicOptions);
       uPlotOptions = barChartOptions.options();
     }
@@ -74,7 +81,7 @@ export class uPlotPluginImpl implements OutputPlugin {
       uPlotOptions = basicOptions.options();
     }
     const size:ResizeListener = new ResizeListenerImpl();
-    const graph = new uPlot(uPlotOptions, data, anchorElement);
+    const graph = new uPlot(uPlotOptions, safeOutputData.getProperty('data', 'object'), anchorElement);
     size.registerToWindow(graph);
     size.registerToElement(graph, anchorElement);
   }

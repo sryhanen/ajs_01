@@ -44,8 +44,6 @@
  * a licensee so wish it.
  */
 import {OutputSwitcherButton} from './outputSwitcherButton';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputRequestDTO} from '../../paragraphOutputRequest/paragraphOutputRequestDTO';
 
 export class FakeOutputSwitcherButton implements OutputSwitcherButton {
   isStub(): boolean {
@@ -60,7 +58,15 @@ export class FakeOutputSwitcherButton implements OutputSwitcherButton {
     return '';
   }
 
-  requestData(): MessageDTO<ParagraphOutputRequestDTO>{
+  requestData(): {
+    op: 'PARAGRAPH_OUTPUT_REQUEST',
+    data:{
+      paragraphId: string
+      noteId: string
+      type: string
+      requestOptions: object
+    }
+  }{
     return {
       op:'PARAGRAPH_OUTPUT_REQUEST',
       data:{

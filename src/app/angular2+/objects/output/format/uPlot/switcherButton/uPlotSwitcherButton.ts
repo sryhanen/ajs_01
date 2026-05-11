@@ -64,7 +64,15 @@ export class uPlotSwitcherButton implements OutputSwitcherButton {
     return this._type;
   }
 
-  requestData(): MessageDTO<ParagraphOutputRequestDTO> {
+  requestData():{
+    op: 'PARAGRAPH_OUTPUT_REQUEST',
+    data:{
+      paragraphId: string
+      noteId: string
+      type: string
+      requestOptions: object
+    }
+  }  {
     return {
       op:'PARAGRAPH_OUTPUT_REQUEST',
       data:{

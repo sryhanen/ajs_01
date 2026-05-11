@@ -55,10 +55,6 @@ export class AngularPluginImpl implements AngularPlugin{
     this._template = template;
   }
 
-  attach(anchorElement: HTMLElement): void {
-    throw new Error('AngularPluginImpl: Method not implemented.');
-  }
-
   isStub(): boolean {
     return false;
   }
@@ -69,8 +65,5 @@ export class AngularPluginImpl implements AngularPlugin{
 
   request(data: object): void {
     this._channel.request(data);
-  }
-
-  response(data: object): void {
   }
 }

@@ -43,10 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Output} from '../../output/output';
+import Stubable from '../../../../../shared/interfaces/stubable';
 
-export interface ParagraphOutputMessage{
-  noteId():string;
-  paragraphId():string;
-  toOutput(): Output;
+export interface TextPlugin extends Stubable{
+  bindToElement(anchorElement: HTMLElement): void;
 }

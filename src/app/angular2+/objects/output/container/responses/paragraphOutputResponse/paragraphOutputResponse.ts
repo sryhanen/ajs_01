@@ -84,12 +84,10 @@ export class ParagraphOutputResponse implements Channel{
         }
         else{
           const outputType:string = paragraphOutputData.getProperty('type', 'string');
-          const outputFormat = this._outputFormats.find(outputFormat => outputFormat.outputType() === outputType);
-          const data = {
-            data: paragraphOutputData.getProperty('data', 'object'),
-            options: paragraphOutputData.getProperty('options', 'object'),
-          };
-          outputFormat.render(data);
+          const outputFormatsToClear = this._outputFormats.filter(outputFormat => outputFormat.outputType() !== outputType);
+          outputFormatsToClear.forEach(outputFormat => outputFormat.clear());
+          const outputFormatToRender = this._outputFormats.find(outputFormat => outputFormat.outputType() === outputType);
+          outputFormatToRender.render(message.data());
         }
       }
     }

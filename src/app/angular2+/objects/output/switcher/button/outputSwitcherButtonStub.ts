@@ -60,7 +60,15 @@ export class OutputSwitcherButtonStub implements OutputSwitcherButton {
     throw new Error('OutputSwitcherButtonStub: Method not implemented.');
   }
 
-  requestData(): MessageDTO<ParagraphOutputRequestDTO> {
+  requestData():  {
+    op: 'PARAGRAPH_OUTPUT_REQUEST',
+    data:{
+      paragraphId: string
+      noteId: string
+      type: string
+      requestOptions: object
+    }
+  } {
     throw new Error('OutputSwitcherButtonStub: Method not implemented.');
   }
 

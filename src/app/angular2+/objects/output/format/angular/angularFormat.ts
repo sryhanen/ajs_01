@@ -45,13 +45,14 @@
  */
 import {OutputFormat} from '../outputFormat';
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
-import {OutputSwitcherButtonStub} from '../../switcher/button/outputSwitcherButtonStub';
 import {Channel} from '../../../channel/channel';
 import {AngularView} from '../../../../components/output/plugins/angular/angularView';
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import { ContainerRef } from '../../../containerRef/containerRef';
 import {AngularPlugin} from '../../plugins/angularPlugin/angularPlugin';
 import {AngularPluginStub} from '../../plugins/angularPlugin/angularPluginStub';
+import {AngularPluginImpl} from '../../plugins/angularPlugin/angularPluginImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 export class AngularFormat implements OutputFormat {
   private readonly _channel: Channel;
@@ -65,7 +66,7 @@ export class AngularFormat implements OutputFormat {
   constructor(channel: Channel, angularObjectCollection:AngularObjectCollection) {
     this._channel = channel;
     this._angularObjectCollection = angularObjectCollection;
-    this._switcherButtons = [new OutputSwitcherButtonStub()];
+    this._switcherButtons = [];
     this._pluginStub = new AngularPluginStub();
     this._plugin = this._pluginStub;
     this._viewComponent = AngularView;
@@ -83,31 +84,21 @@ export class AngularFormat implements OutputFormat {
     return 'this._outputType';
   }
 
-  render(outputData:object): void {
-
+  render(paragraphOutputData:object): void {
+    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
+    const data:object = safeParagraphOutputData.getProperty('data', 'object');
+    const template:string = new SafeJsonImpl(data).getProperty('data', 'string');
+    this._plugin = new AngularPluginImpl(this._channel, template);
+    this._containerRefs.forEach(containerRef => {
+      containerRef.createComponent(this._viewComponent, this.componentInputs());
+    });
   }
 
   clear(): void {
-
-  }
-
-  response(data: object): void {
-    //const message = data as MessageDTO<unknown>;
-    //if(message.op === 'PARAGRAPH_OUTPUT'){
-    //  const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
-    //  const output = paragraphOutputMessage.toOutput();
-    //  if(output.isStub()){
-    //    this._plugin = this._pluginStub;
-    //    this._containerRefs.forEach(containerRef => containerRef.clear());
-    //  }
-    //  else {
-    //    this._containerRefs.forEach(containerRef => containerRef.clear());
-    //    this._plugin = output.toAngularPlugin(this._channel);
-    //    if(!this._plugin.isStub()){
-    //      this._containerRefs.forEach(containerRef => containerRef.createComponent(this._viewComponent, this.componentInputs()));
-    //    }
-    //  }
-    //}
+    this._plugin = this._pluginStub;
+    this._containerRefs.forEach(containerRef => {
+      containerRef.clear();
+    });
   }
 
   switcherButtons(): OutputSwitcherButton[] {

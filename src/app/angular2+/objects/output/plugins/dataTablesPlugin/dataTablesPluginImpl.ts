@@ -43,24 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../outputDTO';
-import {DataTablesOutputData} from './dataTablesOutputData';
-import {DataTablesOutputOptions} from './dataTablesOutputOptions';
 import DataTable, {Config, ConfigColumnDefs, ConfigColumns} from 'datatables.net-bs5';
 import 'datatables.net-buttons-bs5';
 import {Channel} from '../../../channel/channel';
 import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
 import {DataTablesAjax} from './ajax/dataTablesAjax';
 import {DataTablesPlugin} from './dataTablesPlugin';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 export class DataTablesPluginImpl implements DataTablesPlugin {
   private readonly _channel: Channel;
   private readonly _dataTablesAjax: DataTablesAjax;
-  private readonly _outputDTO: OutputDTO<DataTablesOutputData, DataTablesOutputOptions>;
+  private readonly _outputData:object;
+  private readonly _outputOptions:object;
 
-  constructor(channel:Channel, outputDTO: OutputDTO<DataTablesOutputData, DataTablesOutputOptions>) {
+  constructor(channel:Channel, outputData:object, outputOptions:object) {
     this._channel = channel;
-    this._outputDTO = outputDTO;
+    this._outputData = outputData;
+    this._outputOptions = outputOptions;
     this._dataTablesAjax = new DataTablesAjaxImpl(this);
   }
 
@@ -68,15 +68,15 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
     this._channel.request(data);
   }
 
-  response(data:DataTablesOutputData): void {
+  response(data:object): void {
     this._dataTablesAjax.response(data);
   }
 
-  attach(anchorElement: HTMLElement): void {
-    const initialData = this._outputDTO.data;
-    const headers = this._outputDTO.options.headers;
+  bindToElement(anchorElement: HTMLElement): void {
+    const safeOptions = new SafeJsonImpl(this._outputOptions);
+    const headers:Array<string> = safeOptions.getProperty('headers', 'object');
     const config: Config = {
-      ajax: this._dataTablesAjax.configFunction(initialData),
+      ajax: this._dataTablesAjax.configFunction(this._outputData),
       serverSide: true,
       columns: this.transformedColumns(headers),
       columnDefs: this.escapeHtml().concat(this.defaultVisible(headers)),

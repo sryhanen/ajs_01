@@ -1,66 +1,52 @@
 import {OutputFormat} from '../outputFormat';
 import {ContainerRef} from '../../../containerRef/containerRef';
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
-import {Channel} from '../../../channel/channel';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
 import {HtmlPlugin} from '../../plugins/htmlPlugin/htmlPlugin';
 import {HtmlPluginStub} from '../../plugins/htmlPlugin/htmlPluginStub';
 import {HtmlView} from '../../../../components/output/plugins/htmlView/htmlView';
+import {OutputType} from '../../outputType';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {HtmlPluginImpl} from '../../plugins/htmlPlugin/htmlPluginImpl';
 
 export class HTMLFormat implements OutputFormat{
-  private readonly _channel:Channel;
   private readonly _containerRefs:ContainerRef[];
-  private readonly _htmlPluginStub: HtmlPlugin;
-  private _htmlPlugin: HtmlPlugin;
+  private readonly _pluginStub: HtmlPlugin;
+  private _plugin: HtmlPlugin;
   private readonly _component: new () => HtmlView;
+  private readonly _outputType: string;
 
-  constructor(channel:Channel) {
-    this._channel = channel;
+  constructor() {
+    this._outputType = OutputType.html;
     this._containerRefs = [];
-    this._htmlPluginStub = new HtmlPluginStub();
-    this._htmlPlugin = this._htmlPluginStub;
+    this._pluginStub = new HtmlPluginStub();
+    this._plugin = this._pluginStub;
     this._component = HtmlView;
   }
 
   pushContainerRef(value: ContainerRef): void {
     this._containerRefs.push(value);
-    if(!this._htmlPlugin.isStub()){
-      value.createComponent(this._component, [{name:'plugin', value:this._htmlPlugin}]);
+    if(!this._plugin.isStub()){
+      value.createComponent(this._component, [{name:'plugin', value:this._plugin}]);
     }
   }
 
-
   outputType(): string {
-    return 'this._outputType';
+    return this._outputType;
   }
 
-  render(outputData:object): void {
-
+  render(paragraphOutputData:object): void {
+    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
+    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
+    const data:string = new SafeJsonImpl(outputData).getProperty('data', 'string');
+    this._plugin = new HtmlPluginImpl(data);
+    this._containerRefs.forEach(containerRef => {
+      containerRef.createComponent(this._component, [{name:'plugin', value:this._plugin}]);
+    });
   }
 
   clear(): void {
-
-  }
-
-  response(data: object): void {
-    //const message = data as MessageDTO<unknown>;
-    //if(message.op === 'PARAGRAPH_OUTPUT') {
-    //  const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
-    //  const output = paragraphOutputMessage.toOutput();
-    //  if(output.isStub()){
-    //    this._htmlPlugin = this._htmlPluginStub;
-    //    this._containerRefs.forEach(containerRef => containerRef.clear());
-    //  }
-    //  else{
-    //    this._htmlPlugin = output.toHtmlPlugin();
-    //    this._containerRefs.forEach(containerRef => containerRef.clear());
-    //    if(!this._htmlPlugin.isStub()){
-    //      this._containerRefs.forEach(containerRef => containerRef.createComponent(this._component, [{name:'plugin', value:this._htmlPlugin}]));
-    //    }
-    //  }
-    //}
+    this._plugin = this._pluginStub;
+    this._containerRefs.forEach(containerRef => containerRef.clear());
   }
 
   switcherButtons(): OutputSwitcherButton[] {

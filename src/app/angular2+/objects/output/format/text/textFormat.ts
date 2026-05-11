@@ -45,28 +45,26 @@
  */
 import {OutputFormat} from '../outputFormat';
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
-import {OutputSwitcherButtonStub} from '../../switcher/button/outputSwitcherButtonStub';
 import {TextView} from '../../../../components/output/plugins/textView/textView';
-import {Channel} from '../../../channel/channel';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ContainerRef} from '../../../containerRef/containerRef';
 import {TextPluginStub} from '../../plugins/textPlugin/textPluginStub';
-import {OutputPlugin} from '../../plugins/outputPlugin';
+import {OutputType} from '../../outputType';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {TextPluginImpl} from '../../plugins/textPlugin/textPluginImpl';
+import {TextPlugin} from '../../plugins/textPlugin/textPlugin';
 
 export class TextFormat implements OutputFormat {
-  private readonly _channel:Channel;
   private readonly _switcherButtons: OutputSwitcherButton[];
   private readonly _viewComponent: new () => TextView;
   private readonly _containerRefs: ContainerRef[];
-  private readonly _pluginStub: OutputPlugin;
-  private _plugin: OutputPlugin;
+  private readonly _pluginStub: TextPlugin;
+  private _plugin: TextPlugin;
+  private readonly _outputType: string;
 
-  constructor(channel: Channel) {
-    this._channel = channel;
+  constructor() {
+    this._outputType = OutputType.text;
     this._viewComponent = TextView;
-    this._switcherButtons = [new OutputSwitcherButtonStub()];
+    this._switcherButtons = [];
     this._containerRefs = [];
     this._pluginStub = new TextPluginStub();
     this._plugin = this._pluginStub;
@@ -84,33 +82,21 @@ export class TextFormat implements OutputFormat {
   }
 
   outputType(): string {
-    return 'this._outputType';
+    return this._outputType;
   }
 
-  render(outputData:object): void {
-
+  render(paragraphOutputData:object): void {
+    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
+    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
+    const data:string = new SafeJsonImpl(outputData).getProperty('data', 'string');
+    this._plugin = new TextPluginImpl(data);
+    this._containerRefs.forEach(containerRef => {
+      containerRef.createComponent(this._viewComponent, [{name:'plugin', value:this._plugin}]);
+    });
   }
 
   clear(): void {
-
-  }
-
-  response(data: object): void {
-    //const message = data as MessageDTO<unknown>;
-    //const op = message.op;
-    //if(op === 'PARAGRAPH_OUTPUT'){
-    //  const output = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO).toOutput();
-    //  if(output.isStub()){
-    //    this._plugin = this._pluginStub;
-    //    this._containerRefs.forEach(containerRef => containerRef.clear());
-    //  }
-    //  else{
-    //    this._containerRefs.forEach(containerRef => containerRef.clear());
-    //    this._plugin = output.toTextPlugin();
-    //    if(!this._plugin.isStub()){
-    //      this._containerRefs.forEach(containerRef => containerRef.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]));
-    //    }
-    //  }
-    //}
+    this._plugin = this._pluginStub;
+    this._containerRefs.forEach(containerRef => containerRef.clear());
   }
 }

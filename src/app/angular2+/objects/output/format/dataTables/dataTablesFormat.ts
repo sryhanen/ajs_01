@@ -53,7 +53,8 @@ import {OutputFormat} from '../outputFormat';
 import {ContainerRef} from '../../../containerRef/containerRef';
 import {DataTablesPlugin} from '../../plugins/dataTablesPlugin/dataTablesPlugin';
 import {OutputType} from '../../outputType';
-import {DataTablesPluginImpl} from "../../plugins/dataTablesPlugin/dataTablesPluginImpl";
+import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
+import {SafeJsonImpl} from "../../../safeJson/safeJsonImpl";
 
 export class DataTablesFormat implements OutputFormat, Request{
   private readonly _channel: Channel;
@@ -87,9 +88,15 @@ export class DataTablesFormat implements OutputFormat, Request{
     return this._outputType;
   }
 
-  render(outputData:object): void {
+  render(paragraphOutputData:object): void {
+    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
+    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
+    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
     if(this._plugin.isStub()){
-      //this._plugin = new DataTablesPluginImpl();
+      this._plugin = new DataTablesPluginImpl(this._channel, outputData, outputOptions);
+      this._containerRefs.forEach(containerRef => {
+        containerRef.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]);
+      });
     }
     else{
       this._plugin.response(outputData);
@@ -98,42 +105,11 @@ export class DataTablesFormat implements OutputFormat, Request{
 
   clear(): void {
     this._plugin = this._pluginStub;
-
-
+    this._containerRefs.forEach(containerRef => containerRef.clear());
   }
 
   request(data: object): void {
     this._channel.request(data);
-  }
-
-  response(data: object): void {
-    //const message = data as MessageDTO<unknown>;
-    //const operation = message.op;
-    //if(operation ==='PARAGRAPH_OUTPUT'){
-    //  const paragraphOutputDto = message.data as ParagraphOutputDTO;
-    //  const output = new ParagraphOutputMessageImpl(paragraphOutputDto).toOutput();
-    //  if(output.isStub()){
-    //    this._plugin = this._pluginStub;
-    //    this._containerRefs.forEach(containerRef => containerRef.clear());
-    //  }
-    //  else{
-    //    const plugin = output.toDataTablesPlugin(this);
-    //    if(plugin.isStub()){
-    //      this._plugin = this._pluginStub;
-    //      this._containerRefs.forEach(containerRef => containerRef.clear());
-    //    }
-    //    else{
-    //      if(this._plugin.isStub()){
-    //        this._plugin = plugin;
-    //        this._containerRefs.forEach(containerRef => containerRef.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]));
-    //      }
-    //      else{
-    //        const dataTablesOutputData:DataTablesOutputData = paragraphOutputDto.output.data as DataTablesOutputData;
-    //        this._plugin.response(dataTablesOutputData);
-    //      }
-    //    }
-    //  }
-    //}
   }
 
   switcherButtons(): OutputSwitcherButton[] {

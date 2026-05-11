@@ -54,14 +54,6 @@ export class AngularPluginStub implements AngularPlugin{
     throw new Error('AngularPluginStub: Method not implemented.');
   }
 
-  response(data: object): void {
-    throw new Error('AngularPluginStub: Method not implemented.');
-  }
-
-  attach(anchorElement: HTMLElement): void {
-    throw new Error('AngularPluginStub: Method not implemented.');
-  }
-
   template(): string {
     throw new Error('AngularPluginStub: Method not implemented.');
   }

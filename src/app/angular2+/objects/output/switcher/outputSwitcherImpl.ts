@@ -47,10 +47,10 @@ import {Channel} from '../../channel/channel';
 import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {OutputSwitcher} from './outputSwitcher';
 import {MessageDTO} from '../../message/messageDTO';
-import {ParagraphOutputDTO} from '../../message/paragraphOutputMessage/paragraphOutputDTO';
-import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {OutputSwitcherButtonStub} from './button/outputSwitcherButtonStub';
 import {PushValue} from '../../pushValue/pushValue';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../../message/messageImpl';
 
 export class OutputSwitcherImpl implements OutputSwitcher {
   private readonly _channel: Channel;
@@ -103,21 +103,24 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    const op = message.op;
-    if(op === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
-      const output = paragraphOutputMessage.toOutput();
-      if(output.isStub()) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'PARAGRAPH_OUTPUT'){
+      const paragraphOutputData = new SafeJsonImpl(message.data());
+      if(paragraphOutputData.propertyExists('output')){
+        const safeOutput = new SafeJsonImpl(paragraphOutputData.getProperty('output', 'object'));
+        if(safeOutput.propertyExists('isAggregated')){
+          this._isSwitchable = safeOutput.getProperty('isAggregated', 'boolean');
+        }
+        else{
+          this._isSwitchable = false;
+        }
+        this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));
+      }
+      else{
         this._activeButton = new OutputSwitcherButtonStub();
         this._pushActiveButton.forEach(button => button.update(this._activeButton));
         this._isSwitchable = false;
         this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));
-      }
-      else{
-        this._isSwitchable = output.isAggregated();
-        this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));
-
       }
       this._isLoading = false;
       this._pushIsLoading.forEach(value => value.update(this._isLoading));

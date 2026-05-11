@@ -43,10 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputPlugin} from '../outputPlugin';
+import {TextPlugin} from './textPlugin';
 
-export class TextPluginStub implements OutputPlugin{
-  attach(anchorElement: HTMLElement): HTMLElement {
+export class TextPluginStub implements TextPlugin{
+  bindToElement(anchorElement: HTMLElement): void {
     throw new Error('TextPluginStub: method not implemented');
   }
 

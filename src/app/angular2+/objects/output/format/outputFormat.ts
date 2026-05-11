@@ -50,7 +50,7 @@ export interface OutputFormat {
   switcherButtons(): OutputSwitcherButton[];
   pushContainerRef(value:ContainerRef): void;
   outputType(): string;
-  render(outputData:object): void;
+  render(paragraphOutputData:object): void;
   clear(): void;
 }
 

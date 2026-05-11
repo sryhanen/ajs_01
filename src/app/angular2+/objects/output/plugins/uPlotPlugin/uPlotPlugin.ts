@@ -43,49 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphOutputMessage} from './paragraphOutputMessage';
-import {ParagraphOutputDTO} from './paragraphOutputDTO';
-import {ParagraphOutputMessageImpl} from './paragraphOutputMessageImpl';
+import Stubable from '../../../../../shared/interfaces/stubable';
 
-describe('ParagraphOutputMessage', () => {
-  let data: ParagraphOutputDTO;
-  let paragraphOutputMessage: ParagraphOutputMessage;
-  const noteId = 'noteId';
-  const paragraphId = 'paragraphId';
-  beforeEach(() => {
-    data = {
-      noteId: noteId,
-      paragraphId: paragraphId
-    };
-    paragraphOutputMessage = new ParagraphOutputMessageImpl(data);
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(paragraphOutputMessage).toBeInstanceOf(ParagraphOutputMessageImpl);
-    });
-
-    it('Has noteId', () => {
-      expect(paragraphOutputMessage.noteId()).toEqual(noteId);
-    });
-
-    it('Has paragraphId', () => {
-      expect(paragraphOutputMessage.paragraphId()).toEqual(paragraphId);
-    });
-  });
-
-  describe('toOutput method', () => {
-    it('Should have stub output', () => {
-      expect(paragraphOutputMessage.toOutput().isStub()).toBe(true);
-    });
-
-    it('Should have output implementation', () => {
-      data.output = {
-        data: {},
-        type: ''
-      };
-      paragraphOutputMessage = new ParagraphOutputMessageImpl(data);
-      expect(paragraphOutputMessage.toOutput().isStub()).toBe(false);
-    });
-  });
-});
+export interface uPlotPlugin extends Stubable {
+  bindToElement(anchorElement: HTMLElement): void;
+}

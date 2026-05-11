@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import { Api } from 'datatables.net';
 import {DataTablesPlugin} from './dataTablesPlugin';
 
 export class DataTablesPluginStub implements DataTablesPlugin {
@@ -56,7 +55,7 @@ export class DataTablesPluginStub implements DataTablesPlugin {
   response(data: object): void {
     throw new Error('DataTablesResultStub: Method not implemented.');
   }
-  attach(): Api<unknown> {
+  bindToElement(anchorElement: HTMLElement): void {
     throw new Error('DataTablesResultStub: Method not implemented.');
   }
 }
