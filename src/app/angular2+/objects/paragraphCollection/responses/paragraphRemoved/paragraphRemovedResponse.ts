@@ -61,6 +61,9 @@ export class ParagraphRemovedResponse implements Response {
   response(data: object): void {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'PARAGRAPH_REMOVED'){
+      if(this._paragraphs.length === 0){
+        return;
+      }
       const paragraphRemovedData = new SafeJsonImpl(message.data());
       const removedParagraphId:string = paragraphRemovedData.getProperty('id', 'string');
       const removedParagraphIndex = this._paragraphs.findIndex(paragraph => paragraph.id() === removedParagraphId);

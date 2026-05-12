@@ -88,8 +88,16 @@ describe('ParagraphRemovedResponse', () => {
     });
 
     it('Should throw error if paragraph is not in the collection', () => {
-      paragraphRemovedResponse = new ParagraphRemovedResponse([], pushParagraphs);
+      paragraphRemovedResponse = new ParagraphRemovedResponse(paragraphs, pushParagraphs);
+      response.data.id = 'notInCollection';
       expect(() => paragraphRemovedResponse.response(response)).toThrow();
+    });
+
+    it('Should omit remove if collection is empty', () => {
+      paragraphs = [];
+      paragraphRemovedResponse = new ParagraphRemovedResponse(paragraphs, pushParagraphs);
+      paragraphRemovedResponse.response(response);
+      expect(paragraphs).toEqual([]);
     });
   });
 });

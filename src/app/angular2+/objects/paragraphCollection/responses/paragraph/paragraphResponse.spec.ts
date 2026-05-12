@@ -83,7 +83,6 @@ describe('ParagraphResponder', () => {
       text:''
     };
 
-
     it('Should update collection', () => {
       paragraphs = [new ParagraphImpl(channel, initialParagraph, angularObjectCollection)];
       paragraphResponse = new ParagraphResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
@@ -105,14 +104,33 @@ describe('ParagraphResponder', () => {
       expect(newParagraph).not.toEqual(previousParagraph);
     });
 
-
     it('Should throw error if paragraph is not in the collection', () => {
+      paragraphs = [new ParagraphImpl(channel, initialParagraph, angularObjectCollection)];
       paragraphResponse = new ParagraphResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
       const response = {
         op:'PARAGRAPH',
-        data:initialParagraph
+        data:{
+          id: 'notInCollection',
+          name: '',
+          text:''
+        }
       };
       expect(() => paragraphResponse.response(response)).toThrow();
+    });
+
+    it('Paragraph message with empty collection is omitted', () => {
+      paragraphs = [];
+      paragraphResponse = new ParagraphResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
+      const response = {
+        op:'PARAGRAPH',
+        data:{
+          id: 'notInCollection',
+          name: '',
+          text:''
+        }
+      };
+      paragraphResponse.response(response);
+      expect(paragraphs).toEqual([]);
     });
   });
 });
