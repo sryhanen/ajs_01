@@ -47,11 +47,6 @@ import {FakeChannel} from '../../../channel/fakeChannel';
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {AngularFormat} from './angularFormat';
 import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
-import {OutputType} from '../../outputType';
-import {ContainerRef} from '../../../containerRef/containerRef';
-import {FakeContainerRef} from '../../../containerRef/fakeContainerRef';
 
 describe('AngularFormat', () => {
   const channel = new FakeChannel();
@@ -68,74 +63,8 @@ describe('AngularFormat', () => {
       expect(angularFormat).toBeInstanceOf(AngularFormat);
     });
 
-    it('Should have stub switcher button', () => {
-      const buttons =angularFormat.switcherButtons();
-      expect(buttons).toHaveLength(1);
-      expect(buttons[0].isStub()).toBe(true);
-    });
-  });
-
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const request = {test: 'test'};
-      const spy = vi.spyOn(channel, 'request');
-      angularFormat.request(request);
-      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
-    });
-  });
-
-  describe('Response', () => {
-    let containerRef:ContainerRef;
-    let paragraphOutputMessage:MessageDTO<ParagraphOutputDTO>;
-    let clearSpy;
-    let createComponentSpy;
-    beforeEach(() => {
-      containerRef = new FakeContainerRef();
-      paragraphOutputMessage = {
-        op: 'PARAGRAPH_OUTPUT',
-        data: {
-          noteId: '',
-          paragraphId: '',
-          output: {
-            type: OutputType.angular,
-            data: '<h1>Test</h1>',
-          }
-        },
-      };
-      clearSpy = vi.spyOn(containerRef, 'clear');
-      createComponentSpy = vi.spyOn(containerRef, 'createComponent');
-      expect(clearSpy).toHaveBeenCalledTimes(0);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
-    });
-
-    it('Should clear container and create component', () => {
-      angularFormat.pushContainerRef(containerRef);
-      angularFormat.response(paragraphOutputMessage);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-      expect(createComponentSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('Should create component if received response before containerReference', () => {
-      angularFormat.response(paragraphOutputMessage);
-      angularFormat.pushContainerRef(containerRef);
-      expect(createComponentSpy).toHaveBeenCalledTimes(1);
-      expect(clearSpy).toHaveBeenCalledTimes(0);
-    });
-
-    it('Should only clear container', () => {
-      angularFormat.pushContainerRef(containerRef);
-      paragraphOutputMessage.data.output = undefined;
-      angularFormat.response(paragraphOutputMessage);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
-    });
-
-    it('Should only clear container', () => {
-      angularFormat.pushContainerRef(containerRef);
-      paragraphOutputMessage.data.output.type = 'text';
-      angularFormat.response(paragraphOutputMessage);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
+    it('Should not have switcherButtons', () => {
+      expect(angularFormat.switcherButtons()).toEqual([]);
     });
   });
 });

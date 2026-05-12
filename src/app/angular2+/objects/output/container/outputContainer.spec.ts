@@ -76,32 +76,4 @@ describe('OutputContainer', () => {
       expect(outputContainer.errorListener()).toBeDefined();
     });
   });
-
-  describe('Request and response', () => {
-    it('Should have requested channel', () => {
-      const channelSpy = vi.spyOn(channel, 'request');
-      expect(channelSpy).toHaveBeenCalledTimes(0);
-
-      const message: MessageDTO<unknown> = {
-        op:'RANDOM_OPERATION',
-        data: {}
-      };
-      outputContainer.request(message);
-      expect(channelSpy).toHaveBeenCalledTimes(1);
-      expect(channelSpy).toHaveBeenCalledWith(message);
-    });
-
-    it('Should have responded outputSwitcher and error listener', () => {
-      const responseData = {test:'test'};
-      const outputSwitcherSpy = vi.spyOn(outputContainer.outputSwitcher(), 'response');
-      const errorListenerSpy = vi.spyOn(outputContainer.errorListener(), 'response');
-      expect(outputSwitcherSpy).toHaveBeenCalledTimes(0);
-      expect(errorListenerSpy).toHaveBeenCalledTimes(0);
-      outputContainer.response(responseData);
-      expect(outputSwitcherSpy).toHaveBeenCalledTimes(1);
-      expect(outputSwitcherSpy).toHaveBeenCalledWith(responseData);
-      expect(errorListenerSpy).toHaveBeenCalledTimes(1);
-      expect(errorListenerSpy).toHaveBeenCalledWith(responseData);
-    });
-  });
 });

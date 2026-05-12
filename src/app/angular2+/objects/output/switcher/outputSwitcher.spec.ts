@@ -47,9 +47,6 @@ import {Channel} from '../../channel/channel';
 import {OutputSwitcher} from './outputSwitcher';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {OutputSwitcherImpl} from './outputSwitcherImpl';
-import {MessageDTO} from '../../message/messageDTO';
-import {ParagraphOutputDTO} from '../../message/paragraphOutputMessage/paragraphOutputDTO';
-import {ParagraphOutputRequestDTO} from '../paragraphOutputRequest/paragraphOutputRequestDTO';
 import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {FakeOutputSwitcherButton} from './button/fakeOutputSwitcherButton';
 import {PushValue} from '../../pushValue/pushValue';
@@ -67,7 +64,7 @@ describe('OutputSwitcher', () => {
       new FakeChannel(),
       new FakeChannel(),
     ];
-    outputSwitcher = new OutputSwitcherImpl(channel, outputFormats);
+    outputSwitcher = new OutputSwitcherImpl(channel);
     isSwitchable = new PushValueImpl();
     isLoading = new PushValueImpl();
     outputSwitcher.isSwitchable(isSwitchable);
@@ -89,8 +86,8 @@ describe('OutputSwitcher', () => {
   });
 
   describe('Stateful properties', () => {
-    let paragraphOutputResponse: MessageDTO<ParagraphOutputDTO>;
-    let paragraphOutputRequest: MessageDTO<ParagraphOutputRequestDTO>;
+    let paragraphOutputResponse;
+    let paragraphOutputRequest;
     beforeEach(() => {
       paragraphOutputResponse = {
         op:'PARAGRAPH_OUTPUT',
@@ -128,7 +125,7 @@ describe('OutputSwitcher', () => {
       });
 
       it('Should not be switchable', () => {
-        paragraphOutputResponse.data.output.isAggregated = undefined;
+        delete paragraphOutputResponse.data.output.isAggregated;
         outputSwitcher.response(paragraphOutputResponse);
         expect(isSwitchable.value()).toBe(false);
       });
@@ -155,7 +152,7 @@ describe('OutputSwitcher', () => {
   });
 
   describe('Responses are channeled', () => {
-    let paragraphOutputResponse: MessageDTO<ParagraphOutputDTO>;
+    let paragraphOutputResponse;
     let outputFormatSpies;
     beforeEach(() => {
       paragraphOutputResponse = {

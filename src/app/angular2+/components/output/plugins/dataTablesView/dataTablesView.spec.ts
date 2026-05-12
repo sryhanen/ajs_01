@@ -45,37 +45,30 @@
  */
 import {Channel} from '../../../../objects/channel/channel';
 import {FakeChannel} from '../../../../objects/channel/fakeChannel';
-import {DataTablesOutputData} from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesOutputData';
-import {DataTablesOutputOptions} from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesOutputOptions';
-import {OutputDTO} from '../../../../objects/output/outputDTO';
-import {OutputType} from '../../../../objects/output/outputType';
 import {DataTablesPluginImpl} from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesPluginImpl';
 import {DataTablesView} from './dataTablesView';
 import {render, screen} from '@testing-library/angular';
 import {DataTablesPluginStub} from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesPluginStub';
-import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
 describe('DataTablesView', () => {
   const channel:Channel = new FakeChannel();
   const header1 = 'key1';
   const header2 = 'key.with.dot';
-  const outputDto: OutputDTO<DataTablesOutputData, DataTablesOutputOptions> = {
-    data: {
-      data: [
-        {'key1':'key1 row1', 'key.with.dot': 'key.with.dot row1'},
-        {'key1':'key1 row2', 'key.with.dot': 'key.with.dot row2'},
-      ],
-      draw: 1,
-      recordsTotal: 2,
-      recordsFiltered: 2
-    },
-    options: {
-      headers: [header1, header2]
-    },
-    type: OutputType.dataTables
+  const outputData ={
+    data: [
+      {'key1':'key1 row1', 'key.with.dot': 'key.with.dot row1'},
+      {'key1':'key1 row2', 'key.with.dot': 'key.with.dot row2'},
+    ],
+    draw: 1,
+    recordsTotal: 2,
+    recordsFiltered: 2
   };
-  const dataTablesPlugin: OutputPlugin = new DataTablesPluginImpl(channel, outputDto);
-  const dataTablesPluginStub: OutputPlugin = new DataTablesPluginStub();
+  const outputOptions = {
+    headers: [header1, header2]
+  };
+
+  const dataTablesPlugin = new DataTablesPluginImpl(channel, outputData, outputOptions);
+  const dataTablesPluginStub = new DataTablesPluginStub();
 
   describe('Birth', () =>{
     test('Should be initialized', async () => {

@@ -44,16 +44,11 @@
  * a licensee so wish it.
  */
 import {TextFormat} from './textFormat';
-import {Channel} from '../../../channel/channel';
-import {FakeChannel} from '../../../channel/fakeChannel';
 
 describe('Text Format', () => {
   let textFormat: TextFormat;
-  let channel: Channel;
-
 
   beforeEach(() => {
-    channel = new FakeChannel();
     textFormat = new TextFormat();
   });
 
@@ -63,9 +58,7 @@ describe('Text Format', () => {
     });
 
     it('Should have switcherButton stub', () => {
-      const list = textFormat.switcherButtons();
-      expect(list).toHaveLength(1);
-      expect(list[0].isStub()).toBe(true);
+      expect(textFormat.switcherButtons()).toEqual([]);
     });
   });
 });

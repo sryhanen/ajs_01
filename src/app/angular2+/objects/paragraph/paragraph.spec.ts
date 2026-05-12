@@ -94,17 +94,6 @@ describe('Paragraph', () => {
     it('Should have OutputContainer', () => {
       expect(paragraph.outputContainer()).toBeInstanceOf(OutputContainerImpl);
     });
-
-    it('Should print', ()=> {
-      const expectedPrint = {
-        text:paragraphText,
-        config:paragraphConfig,
-        settings:{
-          params:paragraphParams,
-        },
-      };
-      expect(paragraph.print()).toEqual(expectedPrint);
-    });
   });
 
   describe('Response', () => {

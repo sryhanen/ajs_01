@@ -47,23 +47,17 @@ import {uPlotView} from './uPlotView';
 import {render} from '@testing-library/angular';
 import {uPlotPluginImpl} from '../../../../objects/output/plugins/uPlotPlugin/uPlotPluginImpl';
 import {uPlotPluginStub} from '../../../../objects/output/plugins/uPlotPlugin/uPlotPluginStub';
-import {OutputDTO} from '../../../../objects/output/outputDTO';
-import {uPlotOutputOptions} from '../../../../objects/output/plugins/uPlotPlugin/uPlotOutputOptions';
-import {uPlotOutputData} from '../../../../objects/output/plugins/uPlotPlugin/uPlotOutputData';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
 describe('uPlotView', () => {
-  const outputDto:OutputDTO<uPlotOutputData, uPlotOutputOptions> = {
-    data: [],
-    options: {
-      labels: [],
-      series: [],
-      xAxisLabel: '',
-      graphType: ''
-    },
-    type: ''
+  const outputData = [];
+  const outputOptions = {
+    labels: [],
+    series: [],
+    xAxisLabel: '',
+    graphType: ''
   };
-  const microPlotPlugin:OutputPlugin = new uPlotPluginImpl(outputDto);
+  const microPlotPlugin:OutputPlugin = new uPlotPluginImpl(outputData, outputOptions);
   const microPlotPluginStub:OutputPlugin = new uPlotPluginStub();
 
   describe('Birth', () => {

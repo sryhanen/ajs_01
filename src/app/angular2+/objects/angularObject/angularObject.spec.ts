@@ -57,15 +57,7 @@ describe('AngularObject', () => {
   let angularObject: AngularObject;
 
   beforeEach(() => {
-    data = {
-      angularObject: {
-        name: name,
-        noteId: '',
-        object: value
-      },
-      interpreterGroupId: '',
-      noteId: ''
-    };
+    data = {noteId: '', interpreterGroupId: '', name: name, value: value};
     angularObject = new AngularObjectImpl(channel,data);
   });
 

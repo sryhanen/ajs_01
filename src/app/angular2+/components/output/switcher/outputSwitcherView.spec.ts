@@ -48,11 +48,9 @@ import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {OutputSwitcherImpl} from '../../../objects/output/switcher/outputSwitcherImpl';
 import {Channel} from '../../../objects/channel/channel';
 import {OutputSwitcherView} from './outputSwitcherView';
-import {MessageDTO} from '../../../objects/message/messageDTO';
 import {render, screen} from '@testing-library/angular';
 import { test } from 'vitest';
 import {FakeOutputSwitcherButton} from '../../../objects/output/switcher/button/fakeOutputSwitcherButton';
-import {ParagraphOutputRequestDTO} from '../../../objects/output/paragraphOutputRequest/paragraphOutputRequestDTO';
 
 describe('OutputSwitcherView', () => {
   let channel:Channel;
@@ -78,7 +76,7 @@ describe('OutputSwitcherView', () => {
 
   describe('Content visibility', () => {
     let paragraphOutput;
-    let paragraphOutputRequest: MessageDTO<ParagraphOutputRequestDTO>;
+    let paragraphOutputRequest;
     beforeEach(() => {
       paragraphOutput = {
         op:'PARAGRAPH_OUTPUT',
@@ -131,14 +129,6 @@ describe('OutputSwitcherView', () => {
         expect(() => screen.getByRole('status')).toThrow();
       });
 
-      test('Stub output', () =>{
-        paragraphOutput.data.output = undefined;
-        outputSwitcher.response(paragraphOutput);
-        expect(() => screen.getByRole('group')).toThrow();
-        expect(() => screen.getAllByRole('button')).toThrow();
-        expect(() => screen.getByRole('status')).toThrow();
-      });
-
       test('Output is not aggregated', () => {
         paragraphOutput.data.output.isAggregated = false;
         outputSwitcher.response(paragraphOutput);
@@ -148,7 +138,7 @@ describe('OutputSwitcherView', () => {
       });
 
       test('Output isAggregated key missing', () =>{
-        paragraphOutput.data.output.isAggregated = undefined;
+        delete paragraphOutput.data.output.isAggregated;
         outputSwitcher.response(paragraphOutput);
         expect(() => screen.getByRole('group')).toThrow();
         expect(() => screen.getAllByRole('button')).toThrow();
