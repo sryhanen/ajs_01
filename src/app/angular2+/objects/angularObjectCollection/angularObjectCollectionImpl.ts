@@ -53,8 +53,8 @@ import {AngularObjectUpdateResponse} from './responses/angularObjectUpdate/angul
 
 export class AngularObjectCollectionImpl implements AngularObjectCollection {
   private readonly _channel: Channel;
-  private readonly _angularObjects: AngularObject<unknown>[];
-  private readonly _pushValues: PushValue<AngularObject<unknown>[]>[];
+  private readonly _angularObjects: AngularObject[];
+  private readonly _pushValues: PushValue<AngularObject[]>[];
   private readonly _responses: Response[];
 
   constructor(channel: Channel) {
@@ -75,7 +75,7 @@ export class AngularObjectCollectionImpl implements AngularObjectCollection {
     this._responses.forEach(response => response.response(data));
   }
 
-  angularObjects(value: PushValue<AngularObject<unknown>[]>): void {
+  angularObjects(value: PushValue<AngularObject[]>): void {
     value.update(this._angularObjects);
     this._pushValues.push(value);
   }

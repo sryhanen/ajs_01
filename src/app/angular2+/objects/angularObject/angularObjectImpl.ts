@@ -45,33 +45,27 @@
  */
 import {AngularObject} from './angularObject';
 import {Channel} from '../channel/channel';
-import {MessageDTO} from '../message/messageDTO';
-import {AngularObjectUpdatedDTO} from '../message/angularObjectUpdatedMessage/angularObjectUpdatedDTO';
 
-export class AngularObjectImpl<T> implements AngularObject<T>{
+export class AngularObjectImpl implements AngularObject{
   private readonly _channel:Channel;
   private readonly _notebookId:string;
   private readonly _interpreterGroupId:string;
   private readonly _name: string;
-  private _value: T;
+  private _value: unknown;
 
-  constructor(channel:Channel, data:{noteId:string, interpreterGroupId:string, name:string, value:T}) {
+  constructor(channel:Channel, data:{noteId:string, interpreterGroupId:string, name:string, value:unknown}) {
     this._channel = channel;
     this._notebookId = data.noteId;
     this._interpreterGroupId = data.interpreterGroupId;
     this._name = data.name;
-    this._value = data.value as T;
+    this._value = data.value;
   }
 
   request(data: object): void {
     this._channel.request(data);
   }
 
-  response(data: object): void {
-    throw new Error('AngularObjectImpl: Method not implemented.');
-  }
-
-  update(value: T): void {
+  update(value: unknown): void {
     this._value = value;
     this.request(this.updateRequest(this._value));
   }
@@ -80,11 +74,11 @@ export class AngularObjectImpl<T> implements AngularObject<T>{
     return this._name;
   }
 
-  value(): T {
+  value(): unknown {
     return this._value;
   }
 
-  private updateRequest(value:T): MessageDTO<AngularObjectUpdatedDTO> {
+  private updateRequest(value:unknown): object {
     return {
       op: 'ANGULAR_OBJECT_UPDATED',
       data: {

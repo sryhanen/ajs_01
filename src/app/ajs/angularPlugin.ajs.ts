@@ -66,7 +66,7 @@ export class AngularPluginAjs implements IPostLink{
   plugin!: AngularPlugin;
   angularObjectCollection!: AngularObjectCollection;
 
-  private _angularObjects: PushValue<AngularObject<unknown>[]>;
+  private _angularObjects: PushValue<AngularObject[]>;
 
   constructor($compile, $scope: IScope, $element) {
     this.$compile = $compile;

@@ -43,10 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
+import {Request} from '../channel/request';
 
-export interface AngularObject<T> extends Channel{
+export interface AngularObject extends Request{
   name(): string;
-  value():T;
-  update(value:T):void;
+  value(): unknown;
+  update(value:unknown):void;
 }

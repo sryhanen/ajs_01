@@ -54,10 +54,10 @@ import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
 
 export class AngularObjectUpdateResponse implements Response {
   private readonly _channel: Channel;
-  private readonly _angularObjects: AngularObject<unknown>[];
-  private readonly _pushValues: PushValue<AngularObject<unknown>[]>[];
+  private readonly _angularObjects: AngularObject[];
+  private readonly _pushValues: PushValue<AngularObject[]>[];
 
-  constructor(channel: Channel, angularObjects: AngularObject<unknown>[], pushValues: PushValue<AngularObject<unknown>[]>[]) {
+  constructor(channel: Channel, angularObjects: AngularObject[], pushValues: PushValue<AngularObject[]>[]) {
     this._channel = channel;
     this._angularObjects = angularObjects;
     this._pushValues = pushValues;

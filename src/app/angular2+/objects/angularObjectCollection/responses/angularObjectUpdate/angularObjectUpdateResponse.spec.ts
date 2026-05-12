@@ -59,9 +59,9 @@ describe('AngularObjectUpdateResponse', () => {
     value: 'value1'
   };
   let channel:Channel;
-  let defaultAngularObject: AngularObject<unknown>;
-  let angularObjects: AngularObject<unknown>[];
-  let pushValues:PushValue<AngularObject<unknown>[]>[];
+  let defaultAngularObject: AngularObject;
+  let angularObjects: AngularObject[];
+  let pushValues:PushValue<AngularObject[]>[];
   let angularObjectUpdateResponse:AngularObjectUpdateResponse;
 
   beforeEach(() => {
@@ -113,5 +113,4 @@ describe('AngularObjectUpdateResponse', () => {
       expect(pushValues[0].value()).toEqual(angularObjects);
     });
   });
-
 });

@@ -50,7 +50,6 @@ import {FakeChannel} from '../angular2+/objects/channel/fakeChannel';
 import {AngularObject} from '../angular2+/objects/angularObject/angularObject';
 import {PushValue} from '../angular2+/objects/pushValue/pushValue';
 import {PushValueImpl} from '../angular2+/objects/pushValue/pushValueImpl';
-import {AngularObjectUpdateDTO} from '../angular2+/objects/message/angularObjectUpdateMessage/angularObjectUpdateDTO';
 import {MessageDTO} from '../angular2+/objects/message/messageDTO';
 import {AngularPluginImpl} from '../angular2+/objects/output/plugins/angularPlugin/angularPluginImpl';
 import {AngularPlugin} from '../angular2+/objects/output/plugins/angularPlugin/angularPlugin';
@@ -90,7 +89,7 @@ describe('AngularPluginAjs', () => {
     const channel = new FakeChannel();
     const angularPlugin:AngularPlugin = new AngularPluginImpl(channel, template);
     let angularObjectCollection: AngularObjectCollection;
-    let angularObjects: PushValue<AngularObject<unknown>[]>;
+    let angularObjects: PushValue<AngularObject[]>;
     const angularObject1 = {
       name: 'SomeVariable1',
       object: 'test data1',
@@ -101,7 +100,7 @@ describe('AngularPluginAjs', () => {
       object: 'test data2',
       noteId: '',
     };
-    const angularObjectResponse1:MessageDTO<AngularObjectUpdateDTO> = {
+    const angularObjectResponse1: object = {
       op: 'ANGULAR_OBJECT_UPDATE',
       data: {
         angularObject: angularObject1,
@@ -109,7 +108,7 @@ describe('AngularPluginAjs', () => {
         interpreterGroupId: ''
       },
     };
-    const angularObjectResponse2:MessageDTO<AngularObjectUpdateDTO> = {
+    const angularObjectResponse2:object = {
       op: 'ANGULAR_OBJECT_UPDATE',
       data: {
         angularObject: angularObject2,

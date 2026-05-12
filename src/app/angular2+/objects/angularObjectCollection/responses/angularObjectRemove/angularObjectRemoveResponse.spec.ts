@@ -59,9 +59,9 @@ describe('AngularObjectRemoveResponse', () => {
     value: 'value1'
   };
   let channel:Channel;
-  let defaultAngularObject: AngularObject<unknown>;
-  let angularObjects: AngularObject<unknown>[];
-  let pushValues:PushValue<AngularObject<unknown>[]>[];
+  let defaultAngularObject: AngularObject;
+  let angularObjects: AngularObject[];
+  let pushValues:PushValue<AngularObject[]>[];
   let angularObjectRemoveResponse:AngularObjectRemoveResponse;
 
   beforeEach(() => {

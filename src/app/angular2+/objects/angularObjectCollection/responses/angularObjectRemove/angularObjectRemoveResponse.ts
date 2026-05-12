@@ -50,10 +50,10 @@ import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 export class AngularObjectRemoveResponse implements Response {
-  private readonly _angularObjects: AngularObject<unknown>[];
-  private readonly _pushValues: PushValue<AngularObject<unknown>[]>[];
+  private readonly _angularObjects: AngularObject[];
+  private readonly _pushValues: PushValue<AngularObject[]>[];
 
-  constructor(angularObjects: AngularObject<unknown>[], pushValues: PushValue<AngularObject<unknown>[]>[]) {
+  constructor(angularObjects: AngularObject[], pushValues: PushValue<AngularObject[]>[]) {
     this._angularObjects = angularObjects;
     this._pushValues = pushValues;
   }
