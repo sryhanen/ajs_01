@@ -43,21 +43,15 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
 import {uPlotFormat} from './uPlotFormat';
-import {FakeChannel} from '../../../channel/fakeChannel';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
 import {OutputType} from '../../outputType';
 import {ContainerRef} from '../../../containerRef/containerRef';
 import {FakeContainerRef} from '../../../containerRef/fakeContainerRef';
 
 describe('uPlotFormat', () => {
-  let channel: Channel;
   let microPlotFormat: uPlotFormat;
   beforeEach(async () => {
-    channel = new FakeChannel();
-    microPlotFormat = new uPlotFormat(channel);
+    microPlotFormat = new uPlotFormat();
   });
 
   describe('Birth', ()=> {
@@ -69,70 +63,54 @@ describe('uPlotFormat', () => {
       const switcherButtons = microPlotFormat.switcherButtons();
       expect(switcherButtons).toHaveLength(4);
     });
-  });
 
-  describe('Request', () => {
-    const request = {
-      test:'test'
-    };
-    it('Should request channel', () => {
-      const channelSpy = vi.spyOn(channel, 'request');
-      microPlotFormat.request(request);
-      expect(channelSpy).toHaveBeenCalledTimes(1);
-      expect(channelSpy).toHaveBeenCalledWith(request);
+    it('Should have outputType', () => {
+      expect(microPlotFormat.outputType()).toEqual(OutputType.uPlot);
     });
   });
 
-
-  describe('Paragraph output response', () => {
-    let paragraphOutputResponse: MessageDTO<ParagraphOutputDTO>;
+  describe('Rendering', ()=> {
     let containerRef: ContainerRef;
     let createComponentSpy;
-    let clearSpy;
+    let clearComponentSpy;
+    let outputData: {
+      data: [][],
+      options: object
+    };
     beforeEach(() => {
+      outputData = {
+        data:[],
+        options: {}
+      };
       containerRef = new FakeContainerRef();
       createComponentSpy = vi.spyOn(containerRef, 'createComponent');
-      clearSpy = vi.spyOn(containerRef, 'clear');
-      paragraphOutputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data: {
-          noteId:'',
-          paragraphId:'',
-          output: {
-            data: {},
-            type: OutputType.uPlot,
-          }
-        }
-      };
-      microPlotFormat.pushContainerRef(containerRef);
+      clearComponentSpy = vi.spyOn(containerRef, 'clear');
       expect(createComponentSpy).toHaveBeenCalledTimes(0);
-      expect(clearSpy).toHaveBeenCalledTimes(0);
+      expect(clearComponentSpy).toHaveBeenCalledTimes(0);
     });
 
     it('Should create component', () => {
-      microPlotFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-      expect(createComponentSpy).toHaveBeenCalledTimes(1);
+      microPlotFormat.pushContainerRef(containerRef);
+      microPlotFormat.render(outputData);
+      expect(createComponentSpy).toHaveBeenCalledOnce();
     });
 
-    it('Should create new component for sequential updates', () => {
-      microPlotFormat.response(paragraphOutputResponse);
-      microPlotFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(2);
-      expect(createComponentSpy).toHaveBeenCalledTimes(2);
+    it('Should clear component', () => {
+      microPlotFormat.pushContainerRef(containerRef);
+      microPlotFormat.clear();
+      expect(clearComponentSpy).toHaveBeenCalledOnce();
     });
 
-    it('Should only clear component', () => {
-      paragraphOutputResponse.data.output = undefined;
-      microPlotFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
+    it('Should create component if render has been evoked', () => {
+      microPlotFormat.render(outputData);
+      microPlotFormat.pushContainerRef(containerRef);
+      expect(createComponentSpy).toHaveBeenCalledOnce();
     });
 
-    it('Should only clear component', () => {
-      paragraphOutputResponse.data.output.type = 'text';
-      microPlotFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
+    it('Should not create component if render and clear have been evoked', () => {
+      microPlotFormat.render(outputData);
+      microPlotFormat.clear();
+      microPlotFormat.pushContainerRef(containerRef);
       expect(createComponentSpy).toHaveBeenCalledTimes(0);
     });
   });
