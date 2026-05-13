@@ -51,6 +51,5 @@ export interface OutputSwitcher extends Response{
   outputTypeIsValid(outputType:string):boolean;
   activeButton(): OutputSwitcherButton;
   requestFormatSwitch(outputSwitcherButton: OutputSwitcherButton): void;
-  isSwitchable(value: PushValue<boolean>): void;
-  isLoading(value: PushValue<boolean>): void;
+  status(value: PushValue<{isSwitchable:boolean, isLoading:boolean}>):void;
 }

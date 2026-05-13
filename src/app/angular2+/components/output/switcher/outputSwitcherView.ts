@@ -62,14 +62,15 @@ import {PushValueWithChangeDetection} from '../../../objects/pushValue/pushValue
     OutputSwitcherButtonView
   ],
   template: `
-    @if (isSwitchable.value()) {
+    @let status = this.switcherStatus.value();
+      @if (status.isSwitchable) {
       <div class="btn-group" role="group">
         @for (button of outputSwitcherButtons; track $index) {
           <output-switcher-button class="btn-group" [outputSwitcherButton]="button"
                                   [outputSwitcher]="outputSwitcher"></output-switcher-button>
         }
       </div>
-      @if (isLoading.value()) {
+      @if (status.isLoading) {
         <div class="spinner-border mx-2 text-primary" role="status"></div>
       }
     }
@@ -79,13 +80,10 @@ export class OutputSwitcherView implements OnInit{
   @Input({required:true}) outputSwitcher:OutputSwitcher;
   @Input({required:true}) outputSwitcherButtons: OutputSwitcherButton[];
   private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
-  protected isSwitchable:PushValue<boolean>;
-  protected isLoading:PushValue<boolean>;
+  protected switcherStatus: PushValue<{isSwitchable:boolean, isLoading:boolean}>;
 
   ngOnInit(): void {
-    this.isSwitchable = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
-    this.isLoading = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
-    this.outputSwitcher.isSwitchable(this.isSwitchable);
-    this.outputSwitcher.isLoading(this.isLoading);
+    this.switcherStatus = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
+    this.outputSwitcher.status(this.switcherStatus);
   }
 }

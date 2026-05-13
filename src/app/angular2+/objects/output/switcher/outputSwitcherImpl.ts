@@ -54,24 +54,23 @@ import {MessageImpl} from '../../message/messageImpl';
 export class OutputSwitcherImpl implements OutputSwitcher {
   private readonly _channel: Channel;
   private _activeButton: OutputSwitcherButton;
-  private _isLoading: boolean;
-  private _isSwitchable: boolean;
-  private readonly _pushIsSwitchable: PushValue<boolean>[];
-  private readonly _pushIsLoading: PushValue<boolean>[];
+  private readonly _status: {isSwitchable:boolean, isLoading:boolean};
+  private readonly _pushStatus: PushValue<{isSwitchable:boolean, isLoading:boolean}>[];
 
   constructor(channel: Channel) {
     this._channel = channel;
     this._activeButton = new OutputSwitcherButtonStub();
-    this._isLoading = false;
-    this._isSwitchable = false;
-    this._pushIsSwitchable = [];
-    this._pushIsLoading = [];
+    this._status = {
+      isSwitchable: false,
+      isLoading: false,
+    };
+    this._pushStatus = [];
   }
 
   requestFormatSwitch(outputSwitcherButton: OutputSwitcherButton): void {
     this._activeButton = outputSwitcherButton;
-    this._isLoading = true;
-    this._pushIsLoading.forEach(value => value.update(this._isLoading));
+    this._status.isLoading = true;
+    this._pushStatus.forEach(value => value.update(this._status));
     this._channel.request(outputSwitcherButton.requestData());
   }
 
@@ -87,14 +86,9 @@ export class OutputSwitcherImpl implements OutputSwitcher {
     return this._activeButton;
   }
 
-  isSwitchable(value: PushValue<boolean>): void {
-    value.update(this._isSwitchable);
-    this._pushIsSwitchable.push(value);
-  }
-
-  isLoading(value: PushValue<boolean>): void {
-    value.update(this._isLoading);
-    this._pushIsLoading.push(value);
+  status(value: PushValue<{isSwitchable:boolean, isLoading:boolean}>):void {
+    value.update(this._status);
+    this._pushStatus.push(value);
   }
 
   response(data: object): void {
@@ -103,14 +97,13 @@ export class OutputSwitcherImpl implements OutputSwitcher {
       const paragraphOutputData = new SafeJsonImpl(message.data());
       const safeOutput = new SafeJsonImpl(paragraphOutputData.getProperty('output', 'object'));
       if(safeOutput.propertyExists('isAggregated')){
-        this._isSwitchable = safeOutput.getProperty('isAggregated', 'boolean');
+        this._status.isSwitchable = safeOutput.getProperty('isAggregated', 'boolean');
       }
       else{
-        this._isSwitchable = false;
+        this._status.isSwitchable = false;
       }
-      this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));
-      this._isLoading = false;
-      this._pushIsLoading.forEach(value => value.update(this._isLoading));
+      this._status.isLoading = false;
+      this._pushStatus.forEach(value => value.update(this._status));
     }
   }
 }
