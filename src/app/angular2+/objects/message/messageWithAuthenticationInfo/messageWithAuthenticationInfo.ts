@@ -43,8 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageDTO} from '../messageDTO';
 
 export interface MessageWithAuthenticationInfo {
-  print(): MessageDTO<unknown> & {ticket:string, principal:string, roles:string, msgId:string};
+  print(): {
+    op: string,
+    data: object,
+    ticket:string,
+    principal:string,
+    roles:string,
+    msgId:string
+  };
 }

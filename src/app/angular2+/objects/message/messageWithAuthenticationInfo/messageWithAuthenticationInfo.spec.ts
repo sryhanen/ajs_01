@@ -43,42 +43,48 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageDTO} from '../messageDTO';
 import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
 import {MessageWithAuthenticationInfoImpl} from './messageWithAuthenticationInfoImpl';
 import {Authentication} from '../../../../shared/objects/security/authentication';
 import {AuthenticationStub} from '../../../../shared/objects/security/authenticationStub';
 import {Ticket} from '../../../../shared/types/securityTicket';
 import {AuthenticationImpl} from '../../../../shared/objects/security/authenticationImpl';
+import {Message} from '../message';
+import {MessageImpl} from '../messageImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
 describe('DecoratedMessage', () => {
   const messageId = 'messageId';
   let authentication: Authentication;
-  let data: MessageDTO<unknown>;
+  let messageData:{op:string, data:object};
+  let message: Message;
   let messageWithAuthenticationInfo: MessageWithAuthenticationInfo;
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      messageWithAuthenticationInfo = new MessageWithAuthenticationInfoImpl(data, authentication, messageId);
+      messageWithAuthenticationInfo = new MessageWithAuthenticationInfoImpl(message, authentication, messageId);
       expect(messageWithAuthenticationInfo).toBeInstanceOf(MessageWithAuthenticationInfoImpl);
     });
   });
 
   describe('Decoration with authentication info', () => {
-    it('Decorates with stub authentication', () => {
-      data = {
-        op:'',
-        data:{}
+    beforeEach(() => {
+      messageData  = {
+        op: '',
+        data: {}
       };
+      message = new MessageImpl(new SafeJsonImpl(messageData));
+    });
+    it('Decorates with stub authentication', () => {
       const expectedMessage = {
-        ...data,
+        ...messageData,
         ticket:'',
         principal:'',
         roles:'',
         msgId:messageId
       };
       authentication = new AuthenticationStub();
-      messageWithAuthenticationInfo = new MessageWithAuthenticationInfoImpl(data, authentication, messageId);
+      messageWithAuthenticationInfo = new MessageWithAuthenticationInfoImpl(message, authentication, messageId);
       expect(messageWithAuthenticationInfo.print()).toEqual(expectedMessage);
     });
 
@@ -88,17 +94,13 @@ describe('DecoratedMessage', () => {
         roles: '[role1,role2]',
         ticket: 'ticket'
       };
-      data = {
-        op:'',
-        data:{}
-      };
       const expectedMessage = {
-        ...data,
+        ...messageData,
         ...ticket,
         msgId:messageId
       };
       authentication = new AuthenticationImpl(ticket);
-      messageWithAuthenticationInfo = new MessageWithAuthenticationInfoImpl(data, authentication, messageId);
+      messageWithAuthenticationInfo = new MessageWithAuthenticationInfoImpl(message, authentication, messageId);
       expect(messageWithAuthenticationInfo.print()).toEqual(expectedMessage);
     });
   });
