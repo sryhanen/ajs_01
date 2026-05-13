@@ -48,5 +48,5 @@ import {PushValue} from '../pushValue/pushValue';
 import {AngularObject} from '../angularObject/angularObject';
 
 export interface AngularObjectCollection extends Channel{
-  angularObjects(value: PushValue<AngularObject<unknown>[]>): void;
+  angularObjects(value: PushValue<AngularObject[]>): void;
 }
