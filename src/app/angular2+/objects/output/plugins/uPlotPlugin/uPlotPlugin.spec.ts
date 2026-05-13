@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {uPlotOutputOptions} from './uPlotOutputOptions';
 import uPlot from 'uplot';
 import {GraphType} from '../../format/uPlot/graphType';
 import {uPlotPluginImpl} from './uPlotPluginImpl';
@@ -53,7 +52,7 @@ describe('uPlotOutput', () => {
     [1,2,3],
     [1,2,3]
   ];
-  const options: uPlotOutputOptions = {
+  const options = {
     labels: ['moment1', 'moment2', 'moment3'],
     series: ['series1'],
     xAxisLabel: 'value',

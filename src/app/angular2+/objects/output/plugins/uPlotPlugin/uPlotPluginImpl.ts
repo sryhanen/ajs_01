@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {uPlotOutputOptions} from './uPlotOutputOptions';
 import uPlot from 'uplot';
 import {ResizeListener} from './configuration/resizeListener/resizeListener';
 import {ResizeListenerImpl} from './configuration/resizeListener/resizeListenerImpl';
@@ -75,7 +74,7 @@ export class uPlotPluginImpl implements OutputPlugin {
 
   render(anchorElement: HTMLElement): void {
     const safeOutputOptions = new SafeJsonImpl(this._outputOptions);
-    const uPlotOutputOptions: uPlotOutputOptions = {
+    const uPlotOutputOptions = {
       labels:safeOutputOptions.getProperty('labels', 'object'),
       series:safeOutputOptions.getProperty('series', 'object'),
       xAxisLabel:safeOutputOptions.getProperty('xAxisLabel', 'string'),

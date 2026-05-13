@@ -47,7 +47,6 @@ import {Channel} from '../../../../channel/channel';
 import {DataTablesAjaxImpl} from './dataTablesAjaxImpl';
 import {FakeChannel} from '../../../../channel/fakeChannel';
 import {DataTablesAjax} from './dataTablesAjax';
-import {DataTablesOutputData} from '../dataTablesOutputData';
 
 describe('Ajax', () => {
   let channel:Channel;
@@ -67,7 +66,7 @@ describe('Ajax', () => {
   describe('configFunction', () => {
     let configFunction: (data: {draw: number, start: number, length: number}, callback: (data: object) => void) => void;
     let requestData:{draw:number, start:number, length:number};
-    let initialData: DataTablesOutputData;
+    let initialData;
     let callback;
 
     beforeEach(() => {

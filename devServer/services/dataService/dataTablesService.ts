@@ -43,13 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {
-  DataTablesOutputOptions
-} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputOptions';
-import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputData';
 
 export interface DataTablesService {
   rawData(rowCount: number): object[];
-  paginated(data: object[], start:number, length:number, draw:number): DataTablesOutputData;
-  options(data:object[]): DataTablesOutputOptions;
+  paginated(data: object[], start:number, length:number, draw:number): object;
+  options(data:object[]): object;
 }
