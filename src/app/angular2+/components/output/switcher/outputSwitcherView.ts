@@ -44,17 +44,13 @@
  * a licensee so wish it.
  */
 import {
-  ChangeDetectorRef,
   Component,
-  inject,
-  Input, OnInit,
+  Input, OnInit, signal,
 } from '@angular/core';
 import {OutputSwitcher} from '../../../objects/output/switcher/outputSwitcher';
 import {OutputSwitcherButtonView} from './button/outputSwitcherButtonView';
 import {OutputSwitcherButton} from '../../../objects/output/switcher/button/outputSwitcherButton';
-import {PushValue} from '../../../objects/pushValue/pushValue';
-import {PushValueImpl} from '../../../objects/pushValue/pushValueImpl';
-import {PushValueWithChangeDetection} from '../../../objects/pushValue/pushValueWithChangeDetection';
+import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writableSignalAsPushValue';
 
 @Component({
   selector: 'output-switcher',
@@ -62,7 +58,7 @@ import {PushValueWithChangeDetection} from '../../../objects/pushValue/pushValue
     OutputSwitcherButtonView
   ],
   template: `
-    @let status = this.switcherStatus.value();
+    @let status = this.switcherStatus();
       @if (status.isSwitchable) {
       <div class="btn-group" role="group">
         @for (button of outputSwitcherButtons; track $index) {
@@ -79,11 +75,9 @@ import {PushValueWithChangeDetection} from '../../../objects/pushValue/pushValue
 export class OutputSwitcherView implements OnInit{
   @Input({required:true}) outputSwitcher:OutputSwitcher;
   @Input({required:true}) outputSwitcherButtons: OutputSwitcherButton[];
-  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
-  protected switcherStatus: PushValue<{isSwitchable:boolean, isLoading:boolean}>;
+  protected switcherStatus = signal({isSwitchable:false, isLoading:false});
 
   ngOnInit(): void {
-    this.switcherStatus = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
-    this.outputSwitcher.status(this.switcherStatus);
+    this.outputSwitcher.status(new WritableSignalAsPushValue(this.switcherStatus));
   }
 }

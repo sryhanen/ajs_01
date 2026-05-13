@@ -43,14 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ChangeDetectorRef, Component, inject, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, signal} from '@angular/core';
 import {NotebookView} from '../notebook/notebookView';
 import {NotebookCollection} from '../../objects/notebookCollection/notebookCollection';
 import {webAppRoot} from '../../objects/webAppRoot/webAppRootImpl';
-import {PushValue} from '../../objects/pushValue/pushValue';
-import {Notebook} from '../../objects/notebook/notebook';
-import {PushValueImpl} from '../../objects/pushValue/pushValueImpl';
-import {PushValueWithChangeDetection} from '../../objects/pushValue/pushValueWithChangeDetection';
+import {WritableSignalAsPushValue} from '../writableSignalAsPushValue/writableSignalAsPushValue';
 
 @Component({
   selector: 'notebook-collection',
@@ -58,7 +55,7 @@ import {PushValueWithChangeDetection} from '../../objects/pushValue/pushValueWit
     NotebookView
   ],
   template: `
-    @for (notebook of notebookList.value(); track notebook.id()) {
+    @for (notebook of notebooks(); track notebook.id()) {
         <notebook [noteId]="noteId" [paragraphId]="paragraphId" [notebook]="notebook"></notebook>
     }
   `
@@ -66,13 +63,11 @@ import {PushValueWithChangeDetection} from '../../objects/pushValue/pushValueWit
 export class NotebookCollectionView implements OnInit {
   @Input({required:true}) noteId: string;
   @Input({required:true}) paragraphId: string;
-  private cdr = inject(ChangeDetectorRef);
   private collection: NotebookCollection;
-  protected notebookList: PushValue<Notebook[]>;
+  protected notebooks = signal([]);
 
   ngOnInit() {
     this.collection = webAppRoot.rootObject();
-    this.notebookList = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
-    this.collection.notebooks(this.notebookList);
+    this.collection.notebooks(new WritableSignalAsPushValue(this.notebooks));
   }
 }

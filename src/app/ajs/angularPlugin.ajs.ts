@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import angular, {IPostLink, IScope} from 'angular';
-import {AngularObjectCollection} from '../angular2+/objects/angularObjectCollection/angularObjectCollection';
 import {PushValue} from '../angular2+/objects/pushValue/pushValue';
 import {PushValueImpl} from '../angular2+/objects/pushValue/pushValueImpl';
 import {AngularObject} from '../angular2+/objects/angularObject/angularObject';
@@ -56,7 +55,6 @@ export class AngularPluginAjs implements IPostLink{
   readonly $scope: IScope;
   private readonly $element;
   plugin!: AngularPlugin;
-  angularObjectCollection!: AngularObjectCollection;
 
   private _angularObjects: PushValue<AngularObject[]>;
 
@@ -72,7 +70,7 @@ export class AngularPluginAjs implements IPostLink{
 
   $postLink() {
     this._angularObjects = new PushValueImpl();
-    this.angularObjectCollection.angularObjects(this._angularObjects);
+    this.plugin.angularObjectCollection().angularObjects(this._angularObjects);
     this.watchAngularObjects();
     this.render();
   };
@@ -159,7 +157,6 @@ export const angularPluginAjs = {
     `,
   bindings: {
     plugin: '=',
-    angularObjectCollection: '=',
   },
   controller: AngularPluginAjs
 };

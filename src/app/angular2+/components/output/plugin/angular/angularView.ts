@@ -46,7 +46,6 @@
 import {Component, Input} from '@angular/core';
 import {AngularViewUpgradeModule} from './angularViewUpgradeModule';
 import {AngularPlugin} from '../../../../objects/output/plugins/angularPlugin/angularPlugin';
-import {AngularObjectCollection} from '../../../../objects/angularObjectCollection/angularObjectCollection';
 
 @Component({
   selector: 'angular-view',
@@ -54,10 +53,9 @@ import {AngularObjectCollection} from '../../../../objects/angularObjectCollecti
     AngularViewUpgradeModule
   ],
   template: `
-    <ajs-angular-view [plugin]="plugin" [angularObjectCollection]="angularObjectCollection"></ajs-angular-view>
+    <ajs-angular-view [plugin]="plugin"></ajs-angular-view>
   `
 })
 export class AngularView {
   @Input({required:true}) plugin: AngularPlugin;
-  @Input({required:true}) angularObjectCollection: AngularObjectCollection;
 }

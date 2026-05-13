@@ -1,5 +1,5 @@
 import {WritableSignal} from '@angular/core';
-import {PushValue} from './pushValue';
+import {PushValue} from '../../objects/pushValue/pushValue';
 
 export class WritableSignalAsPushValue<T> implements PushValue<T> {
   private readonly _writableSignal: WritableSignal<T>;

@@ -48,11 +48,11 @@ import {OutputContainer} from '../../../objects/output/container/outputContainer
 import {OutputSwitcherView} from '../switcher/outputSwitcherView';
 import {InterpreterErrorDirective} from '../../../directives/interpreterErrorDirective';
 import {OutputSwitcherButton} from '../../../objects/output/switcher/button/outputSwitcherButton';
-import {PushValue} from '../../../objects/pushValue/pushValue';
-import {OutputPlugin} from '../../../objects/output/plugins/outputPlugin';
 import {PluginView} from '../plugin/pluginView';
-import {WritableSignalAsPushValue} from '../../../objects/pushValue/writableSignalAsPushValue';
+import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writableSignalAsPushValue';
 import {OutputPluginStub} from '../../../objects/output/plugins/outputPluginStub';
+import {OutputType} from '../../../objects/output/outputType';
+import {AngularView} from '../plugin/angular/angularView';
 
 @Component({
   selector: 'output-container',
@@ -68,14 +68,20 @@ import {OutputPluginStub} from '../../../objects/output/plugins/outputPluginStub
 export class OutputContainerView implements OnInit {
   @Input({required:true}) outputContainer: OutputContainer;
   protected outputSwitcherButtons: OutputSwitcherButton[];
-  protected outputPlugin: PushValue<OutputPlugin>;
   private viewContainer = inject(ViewContainerRef);
-  protected pluginSignal= signal(new OutputPluginStub());
-  private previousInstance: ComponentRef<PluginView>;
+  protected plugin= signal(new OutputPluginStub());
+  private previousInstance: ComponentRef<AngularView | PluginView>;
   private pluginChange = effect(() => {
-    if(!this.pluginSignal().isStub()){
-      const newInstance = this.viewContainer.createComponent(PluginView);
-      newInstance.setInput('plugin', this.pluginSignal());
+    if(!this.plugin().isStub()){
+      let newInstance: ComponentRef<AngularView | PluginView>;
+      if(this.plugin().outputType() === OutputType.angular){
+        newInstance = this.viewContainer.createComponent(AngularView);
+      }
+      else{
+        newInstance = this.viewContainer.createComponent(PluginView);
+      }
+
+      newInstance.setInput('plugin', this.plugin());
       if(this.previousInstance !== undefined){
         this.previousInstance.destroy();
       }
@@ -85,7 +91,6 @@ export class OutputContainerView implements OnInit {
 
   ngOnInit(): void {
     this.outputSwitcherButtons = this.outputContainer.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
-    this.outputPlugin = new WritableSignalAsPushValue(this.pluginSignal);
-    this.outputContainer.outputPlugin(this.outputPlugin);
+    this.outputContainer.outputPlugin(new WritableSignalAsPushValue(this.plugin));
   }
 }

@@ -45,7 +45,6 @@
  */
 import {Directive, ElementRef, Inject, Injector, Input} from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
-import {AngularObjectCollection} from '../../../../objects/angularObjectCollection/angularObjectCollection';
 import {AngularPlugin} from '../../../../objects/output/plugins/angularPlugin/angularPlugin';
 
 @Directive({
@@ -53,7 +52,6 @@ import {AngularPlugin} from '../../../../objects/output/plugins/angularPlugin/an
 })
 export class AngularViewUpgradeModule extends UpgradeComponent {
   @Input({required:true}) plugin: AngularPlugin;
-  @Input({required:true}) angularObjectCollection: AngularObjectCollection;
 
   constructor(
     @Inject(ElementRef) elementRef: ElementRef,
