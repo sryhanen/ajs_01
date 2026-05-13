@@ -48,6 +48,7 @@ import {NotebookView} from '../notebook/notebookView';
 import {NotebookCollection} from '../../objects/notebookCollection/notebookCollection';
 import {webAppRoot} from '../../objects/webAppRoot/webAppRootImpl';
 import {WritableSignalAsPushValue} from '../writableSignalAsPushValue/writableSignalAsPushValue';
+import {Notebook} from '../../objects/notebook/notebook';
 
 @Component({
   selector: 'notebook-collection',
@@ -64,7 +65,7 @@ export class NotebookCollectionView implements OnInit {
   @Input({required:true}) noteId: string;
   @Input({required:true}) paragraphId: string;
   private collection: NotebookCollection;
-  protected notebooks = signal([]);
+  protected notebooks = signal<Notebook[]>([]);
 
   ngOnInit() {
     this.collection = webAppRoot.rootObject();

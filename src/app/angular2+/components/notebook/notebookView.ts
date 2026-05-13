@@ -47,6 +47,7 @@ import {Component, Input, OnInit, signal} from '@angular/core';
 import {Notebook} from '../../objects/notebook/notebook';
 import {ParagraphView} from '../paragraph/paragraphView';
 import {WritableSignalAsPushValue} from '../writableSignalAsPushValue/writableSignalAsPushValue';
+import {Paragraph} from '../../objects/paragraph/paragraph';
 
 @Component({
   selector: 'notebook',
@@ -65,7 +66,7 @@ export class NotebookView implements OnInit {
   @Input({required:true}) noteId: string;
   @Input({required:true}) paragraphId: string;
   @Input({required:true}) notebook: Notebook;
-  protected paragraphs = signal([]);
+  protected paragraphs = signal<Paragraph[]>([]);
 
   ngOnInit() {
     this.notebook.paragraphs(new WritableSignalAsPushValue(this.paragraphs));
