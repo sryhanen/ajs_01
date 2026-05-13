@@ -46,8 +46,6 @@
 import {AngularObject} from './angularObject';
 import {AngularObjectImpl} from './angularObjectImpl';
 import {FakeChannel} from '../channel/fakeChannel';
-import {MessageDTO} from '../message/messageDTO';
-import {AngularObjectUpdatedDTO} from '../message/angularObjectUpdatedMessage/angularObjectUpdatedDTO';
 
 describe('AngularObject', () => {
   const channel = new FakeChannel();
@@ -78,7 +76,7 @@ describe('AngularObject', () => {
   describe('Update', () => {
     it('Should create request', () => {
       const newValue = 'New value';
-      const updateRequest: MessageDTO<AngularObjectUpdatedDTO> = {
+      const updateRequest = {
         op: 'ANGULAR_OBJECT_UPDATED',
         data: {
           noteId: '',
