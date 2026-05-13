@@ -6,10 +6,12 @@ import {HtmlPluginImpl} from '../../plugins/htmlPlugin/htmlPluginImpl';
 import {OutputPlugin} from '../../plugins/outputPlugin';
 
 export class HTMLFormat implements OutputFormat{
+  private readonly _switcherButtons: OutputSwitcherButton[];
   private readonly _outputType: string;
 
   constructor() {
     this._outputType = OutputType.html;
+    this._switcherButtons = [];
   }
 
   plugin(paragraphOutputData: object): OutputPlugin {
@@ -23,6 +25,6 @@ export class HTMLFormat implements OutputFormat{
   }
 
   switcherButtons(): OutputSwitcherButton[] {
-    return [];
+    return this._switcherButtons;
   }
 }
