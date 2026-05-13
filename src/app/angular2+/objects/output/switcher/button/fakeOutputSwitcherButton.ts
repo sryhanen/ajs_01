@@ -51,11 +51,11 @@ export class FakeOutputSwitcherButton implements OutputSwitcherButton {
   }
 
   outputType(): string {
-    return '';
+    return 'outputType';
   }
 
   icon(): string {
-    return '';
+    return 'icon';
   }
 
   requestData(): {
@@ -72,13 +72,13 @@ export class FakeOutputSwitcherButton implements OutputSwitcherButton {
       data:{
         noteId:'',
         paragraphId:'',
-        type: '',
+        type: this.outputType(),
         requestOptions: {}
       }
     };
   }
 
   title(): string {
-    return '';
+    return 'title';
   }
 }

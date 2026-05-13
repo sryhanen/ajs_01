@@ -47,56 +47,119 @@ import {Channel} from '../../channel/channel';
 import {OutputSwitcher} from './outputSwitcher';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {OutputSwitcherImpl} from './outputSwitcherImpl';
-import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {PushValue} from '../../pushValue/pushValue';
 import {PushValueImpl} from '../../pushValue/pushValueImpl';
+import {OutputSwitcherButton} from './button/outputSwitcherButton';
+import {FakeOutputSwitcherButton} from './button/fakeOutputSwitcherButton';
 
 describe('OutputSwitcher', () => {
   let channel:Channel;
   let outputSwitcher: OutputSwitcher;
-  let isSwitchable: PushValue<boolean>;
-  let isLoading: PushValue<boolean>;
-  let activeButton: PushValue<OutputSwitcherButton>;
+  let switcherStatus: PushValue<{isSwitchable:boolean, isLoading:boolean}>;
+  const switcherButton: OutputSwitcherButton = new FakeOutputSwitcherButton();
 
   beforeEach(() => {
     channel = new FakeChannel();
     outputSwitcher = new OutputSwitcherImpl(channel);
-    isSwitchable = new PushValueImpl();
-    isLoading = new PushValueImpl();
-    activeButton = new PushValueImpl();
-    outputSwitcher.isSwitchable(isSwitchable);
-    outputSwitcher.isLoading(isLoading);
-    outputSwitcher.activeButton(activeButton);
+    switcherStatus = new PushValueImpl();
+    outputSwitcher.status(switcherStatus);
   });
 
   describe('Birth', () => {
     it('Should initialize', () => {
       expect(outputSwitcher).toBeInstanceOf(OutputSwitcherImpl);
     });
+  });
 
-    it('Is not switchable', () => {
-      expect(isSwitchable.value()).toEqual(false);
+  describe('Format switch request', () => {
+    let channelSpy;
+    beforeEach(() => {
+      channelSpy = vi.spyOn(channel, 'request');
+      outputSwitcher.requestFormatSwitch(switcherButton);
     });
 
-    it('Is not loading', () => {
-      expect(isLoading.value()).toEqual(false);
+    it('Should have requested channel', () => {
+      expect(channelSpy).toHaveBeenCalledOnce();
     });
 
-    it('Active button is stub', () => {
-      expect(activeButton.value().isStub()).toBe(true);
+    it('Should be loading', () => {
+      const status = switcherStatus.value();
+      expect(status.isLoading).toBe(true);
+      expect(status.isSwitchable).toBe(false);
     });
   });
 
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const request = {op: 'test', data:{}};
-      const spy = vi.spyOn(channel, 'request');
-      outputSwitcher.request(request);
-      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
+  describe('Output type validation', () => {
+    it('Should be true if no request has been made', () => {
+      expect(outputSwitcher.outputTypeIsValid('')).toBe(true);
+    });
+
+    it('Should be true if output type matches', () => {
+      const outputType = switcherButton.requestData().data.type;
+      outputSwitcher.requestFormatSwitch(switcherButton);
+      expect(outputSwitcher.outputTypeIsValid(outputType)).toBe(true);
+    });
+
+    it('Should be false if output does not match', () => {
+      outputSwitcher.requestFormatSwitch(switcherButton);
+      expect(outputSwitcher.outputTypeIsValid('wrongType')).toBe(false);
     });
   });
 
-  describe('Switching format', () => {
+  describe('Active button', () => {
+    it('Has active button stub by default', () => {
+      expect(outputSwitcher.activeButton().isStub()).toBe(true);
+    });
 
+    it('Updates active button after request', () => {
+      outputSwitcher.requestFormatSwitch(switcherButton);
+      expect(outputSwitcher.activeButton().isStub()).toBe(false);
+    });
+  });
+
+  describe('Status updates', () => {
+    let response:{
+      op:string,
+      data: {
+        output:{
+          isAggregated?:boolean,
+        }
+      }
+    };
+    beforeEach(() => {
+      response = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{}
+        }
+      };
+    });
+    it('Has default status', () => {
+      expect(switcherStatus.value().isSwitchable).toBe(false);
+      expect(switcherStatus.value().isLoading).toBe(false);
+    });
+
+    it('Is switchable and not loading after response', () => {
+      response.data.output.isAggregated = true;
+      outputSwitcher.response(response);
+      const status = switcherStatus.value();
+      expect(status.isLoading).toBe(false);
+      expect(status.isSwitchable).toBe(true);
+    });
+
+    it('Is not switchable and not loading after response', () => {
+      response.data.output.isAggregated = false;
+      outputSwitcher.response(response);
+      const status = switcherStatus.value();
+      expect(status.isLoading).toBe(false);
+      expect(status.isSwitchable).toBe(false);
+    });
+
+    it('Is not switchable and not loading after response', () => {
+      outputSwitcher.response(response);
+      const status = switcherStatus.value();
+      expect(status.isLoading).toBe(false);
+      expect(status.isSwitchable).toBe(false);
+    });
   });
 });

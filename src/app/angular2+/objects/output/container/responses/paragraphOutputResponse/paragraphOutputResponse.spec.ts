@@ -100,7 +100,7 @@ describe('ParagraphOutputResponse', () => {
     });
 
     it('It should create request if output is not in requested format', () => {
-      outputSwitcher.switchFormat(dataTablesOutputFormat.switcherButtons()[0]);
+      outputSwitcher.requestFormatSwitch(dataTablesOutputFormat.switcherButtons()[0]);
       const channelSpy = vi.spyOn(channel, 'request');
       const outputFormatSpies = outputFormats.map(format => vi.spyOn(format, 'render'));
       paragraphOutputResponse.response(paragraphOutputResponseMessage);
