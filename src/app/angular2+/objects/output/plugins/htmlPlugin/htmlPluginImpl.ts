@@ -59,10 +59,6 @@ export class HtmlPluginImpl implements OutputPlugin {
     return this._outputType;
   }
 
-  response(data: object): void {
-      throw new Error("Method not implemented.");
-  }
-
   render(anchorElement: HTMLElement):void {
     anchorElement.innerHTML = this._data;
   }

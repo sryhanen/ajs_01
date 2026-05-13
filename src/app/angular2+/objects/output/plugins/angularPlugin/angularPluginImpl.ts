@@ -69,12 +69,8 @@ export class AngularPluginImpl implements AngularPlugin {
     return this._outputType;
   }
 
-  response(data: object): void {
-    //TODO
-  }
-
   render(anchorElement: HTMLElement): void {
-    //TODO angular plugin does not render
+    throw new Error('Angular plugin: Method not implemented.');
   }
 
   isStub(): boolean {

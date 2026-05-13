@@ -68,17 +68,13 @@ export class uPlotPluginImpl implements OutputPlugin {
     return this._outputType;
   }
 
-  response(data: object): void {
-      throw new Error("Method not implemented.");
-  }
-
   render(anchorElement: HTMLElement): void {
     const safeOutputOptions = new SafeJsonImpl(this._outputOptions);
     const uPlotOutputOptions = {
-      labels:safeOutputOptions.getProperty('labels', 'object'),
-      series:safeOutputOptions.getProperty('series', 'object'),
-      xAxisLabel:safeOutputOptions.getProperty('xAxisLabel', 'string'),
-      graphType: safeOutputOptions.getProperty('graphType', 'string'),
+      labels:safeOutputOptions.getProperty<string[]>('labels', 'object'),
+      series:safeOutputOptions.getProperty<string[]>('series', 'object'),
+      xAxisLabel:safeOutputOptions.getProperty<string>('xAxisLabel', 'string'),
+      graphType: safeOutputOptions.getProperty<string>('graphType', 'string'),
     };
     let uPlotOptions:uPlot.Options;
     const basicOptions = new BasicOptionsImpl(uPlotOutputOptions);

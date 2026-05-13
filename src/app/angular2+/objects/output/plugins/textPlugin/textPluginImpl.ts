@@ -62,10 +62,6 @@ export class TextPluginImpl implements OutputPlugin {
     return this._outputType;
   }
 
-  response(data: object): void {
-    //TODO how to deal with this
-  }
-
   render(anchorElement: HTMLElement): void {
     anchorElement.innerHTML = this._ansiUp.ansi_to_html(this._outputData);
   }
