@@ -53,29 +53,26 @@ import {MessageImpl} from '../../message/messageImpl';
 
 export class OutputSwitcherImpl implements OutputSwitcher {
   private readonly _channel: Channel;
-  private readonly _stubButton: OutputSwitcherButton;
   private _activeButton: OutputSwitcherButton;
   private _isLoading: boolean;
   private _isSwitchable: boolean;
   private readonly _pushIsSwitchable: PushValue<boolean>[];
   private readonly _pushIsLoading: PushValue<boolean>[];
-  private readonly _pushActiveButton: PushValue<OutputSwitcherButton>[];
 
   constructor(channel: Channel) {
     this._channel = channel;
-    this._stubButton = new OutputSwitcherButtonStub();
-    this._activeButton = this._stubButton;
+    this._activeButton = new OutputSwitcherButtonStub();
     this._isLoading = false;
     this._isSwitchable = false;
     this._pushIsSwitchable = [];
     this._pushIsLoading = [];
-    this._pushActiveButton = [];
   }
 
   requestFormatSwitch(outputSwitcherButton: OutputSwitcherButton): void {
     this._activeButton = outputSwitcherButton;
-    this._pushActiveButton.forEach(button => button.update(this._activeButton));
-    this.request(outputSwitcherButton.requestData());
+    this._isLoading = true;
+    this._pushIsLoading.forEach(value => value.update(this._isLoading));
+    this._channel.request(outputSwitcherButton.requestData());
   }
 
   outputTypeIsValid(outputType:string): boolean {
@@ -98,15 +95,6 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   isLoading(value: PushValue<boolean>): void {
     value.update(this._isLoading);
     this._pushIsLoading.push(value);
-  }
-
-  request(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    if(message.operation() === 'PARAGRAPH_OUTPUT_REQUEST') {
-      this._isLoading = true;
-      this._pushIsLoading.forEach(value => value.update(this._isLoading));
-    }
-    this._channel.request(data);
   }
 
   response(data: object): void {
