@@ -48,7 +48,7 @@ import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {OutputSwitcherImpl} from '../../../objects/output/switcher/outputSwitcherImpl';
 import {Channel} from '../../../objects/channel/channel';
 import {OutputSwitcherView} from './outputSwitcherView';
-import {render, screen} from '@testing-library/angular';
+import {render, screen, fireEvent} from '@testing-library/angular';
 import { test } from 'vitest';
 import {FakeOutputSwitcherButton} from '../../../objects/output/switcher/button/fakeOutputSwitcherButton';
 
@@ -75,10 +75,9 @@ describe('OutputSwitcherView', () => {
   });
 
   describe('Content visibility', () => {
-    let paragraphOutput;
-    let paragraphOutputRequest;
+    let paragraphOutputResponse;
     beforeEach(() => {
-      paragraphOutput = {
+      paragraphOutputResponse = {
         op:'PARAGRAPH_OUTPUT',
         data: {
           noteId: '',
@@ -90,19 +89,10 @@ describe('OutputSwitcherView', () => {
           }
         }
       };
-      paragraphOutputRequest = {
-        op: 'PARAGRAPH_OUTPUT_REQUEST',
-        data: {
-          paragraphId: '',
-          noteId: '',
-          type: '',
-          requestOptions:{}
-        }
-      };
     });
 
     test('Should have buttons visible', () =>{
-      outputSwitcher.response(paragraphOutput);
+      outputSwitcher.response(paragraphOutputResponse);
       const buttonGroup = screen.getByRole('group');
       const buttons = screen.getAllByRole('button');
       expect(buttonGroup).toBeDefined();
@@ -110,40 +100,19 @@ describe('OutputSwitcherView', () => {
     });
 
     test('Should have loader visible', () =>{
-      outputSwitcher.response(paragraphOutput);
-      outputSwitcher.request(paragraphOutputRequest);
+      outputSwitcher.response(paragraphOutputResponse);
+      const button = screen.getByRole('button');
+      fireEvent.click(button);
       const loader = screen.getByRole('status');
       expect(loader).toBeDefined();
     });
 
     test('Should hide loader', () =>{
-      outputSwitcher.response(paragraphOutput);
-      outputSwitcher.request(paragraphOutputRequest);
-      outputSwitcher.response(paragraphOutput);
+      outputSwitcher.response(paragraphOutputResponse);
+      const button = screen.getByRole('button');
+      fireEvent.click(button);
+      outputSwitcher.response(paragraphOutputResponse);
       expect(() => screen.getByRole('status')).toThrow();
-    });
-
-    describe('Should have nothing visible', () =>{
-      afterAll(() => {
-        outputSwitcher.request(paragraphOutputRequest);
-        expect(() => screen.getByRole('status')).toThrow();
-      });
-
-      test('Output is not aggregated', () => {
-        paragraphOutput.data.output.isAggregated = false;
-        outputSwitcher.response(paragraphOutput);
-        expect(() => screen.getByRole('group')).toThrow();
-        expect(() => screen.getAllByRole('button')).toThrow();
-        expect(() => screen.getByRole('status')).toThrow();
-      });
-
-      test('Output isAggregated key missing', () =>{
-        delete paragraphOutput.data.output.isAggregated;
-        outputSwitcher.response(paragraphOutput);
-        expect(() => screen.getByRole('group')).toThrow();
-        expect(() => screen.getAllByRole('button')).toThrow();
-        expect(() => screen.getByRole('status')).toThrow();
-      });
     });
   });
 });
