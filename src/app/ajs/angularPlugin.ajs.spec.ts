@@ -50,7 +50,6 @@ import {FakeChannel} from '../angular2+/objects/channel/fakeChannel';
 import {AngularObject} from '../angular2+/objects/angularObject/angularObject';
 import {PushValue} from '../angular2+/objects/pushValue/pushValue';
 import {PushValueImpl} from '../angular2+/objects/pushValue/pushValueImpl';
-import {MessageDTO} from '../angular2+/objects/message/messageDTO';
 import {AngularPluginImpl} from '../angular2+/objects/output/plugins/angularPlugin/angularPluginImpl';
 import {AngularPlugin} from '../angular2+/objects/output/plugins/angularPlugin/angularPlugin';
 

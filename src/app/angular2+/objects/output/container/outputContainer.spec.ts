@@ -47,7 +47,6 @@ import {OutputContainer} from './outputContainer';
 import {Channel} from '../../channel/channel';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {OutputContainerImpl} from './outputContainerImpl';
-import {MessageDTO} from '../../message/messageDTO';
 import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 
 describe('OutputContainer', () => {

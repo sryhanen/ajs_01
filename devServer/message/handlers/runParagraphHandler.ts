@@ -52,11 +52,9 @@ import ParagraphImpl from '../../data/paragraph/paragraphImpl';
 import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
 import NoteService from '../../services/noteService';
-import {MessageDTO} from '../../../src/app/angular2+/objects/message/messageDTO';
 import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
 import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
 import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputData';
-
 
 export default class RunParagraphHandler implements Handler<RunParagraphMessage>{
   private readonly _noteService: NoteService;
@@ -78,7 +76,7 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
     const paragraphId = message.data.id;
     const title = message.data.title;
     const text = message.data.paragraph;
-    const messageQueue: MessageDTO<unknown>[] = [];
+    const messageQueue: object[] = [];
     const paragraph = new ParagraphImpl('PENDING', undefined, text, title, paragraphId);
     messageQueue.push(this.paraMessage(paragraph));
 
@@ -144,7 +142,7 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
     this._noteService.update(notebook, notebook.id);
   }
 
-  private emitMessageQueue(messageQueue: MessageDTO<unknown>[], client: WebSocket) {
+  private emitMessageQueue(messageQueue: object[], client: WebSocket) {
     for(let i = 0; i < messageQueue.length; i++) {
       const timeout =  (i + 1) * 1000;
       setTimeout(() => {

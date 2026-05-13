@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../../../channel/channel';
-import {MessageDTO} from '../../../../message/messageDTO';
 import {ParagraphOutputRequestDTO} from '../../../paragraphOutputRequest/paragraphOutputRequestDTO';
 import {OutputType} from '../../../outputType';
 import {DataTablesAjax} from './dataTablesAjax';
@@ -88,7 +87,7 @@ export class DataTablesAjaxImpl implements DataTablesAjax {
       this._callback = callback;
       this._callback(validatedData);
       if(data.draw > validatedData.draw) {
-        const request: MessageDTO<ParagraphOutputRequestDTO> = {
+        const request = {
           op:'PARAGRAPH_OUTPUT_REQUEST',
           data: {
             paragraphId: '',
