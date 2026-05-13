@@ -57,6 +57,9 @@ import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/inter
 import {AngularFormat} from '../format/angular/angularFormat';
 import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 import {HTMLFormat} from '../format/html/htmlFormat';
+import {ParagraphOutputResponseImpl} from './responses/paragraphOutputResponse/paragraphOutputResponseImpl';
+import {OutputPlugin} from '../plugins/outputPlugin';
+import {PushValue} from '../../pushValue/pushValue';
 import {ParagraphOutputResponse} from './responses/paragraphOutputResponse/paragraphOutputResponse';
 
 export class OutputContainerImpl implements OutputContainer{
@@ -64,6 +67,7 @@ export class OutputContainerImpl implements OutputContainer{
   private readonly _outputFormats:OutputFormat[];
   private readonly _outputSwitcher:OutputSwitcher;
   private readonly _errorListener: InterpreterErrorListener;
+  private readonly _paragraphOutputResponse: ParagraphOutputResponse;
   private readonly _responses: Response[];
 
   constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
@@ -77,9 +81,14 @@ export class OutputContainerImpl implements OutputContainer{
     ];
     this._outputSwitcher = new OutputSwitcherImpl(this);
     this._errorListener = new InterpreterErrorListenerImpl(this);
+    this._paragraphOutputResponse = new ParagraphOutputResponseImpl(this, this._outputFormats, this._outputSwitcher);
     this._responses = [
-      new ParagraphOutputResponse(this, this._outputFormats, this._outputSwitcher)
+      this._paragraphOutputResponse
     ];
+  }
+
+  outputPlugin(pushValue: PushValue<OutputPlugin>): void {
+    this._paragraphOutputResponse.outputPlugin(pushValue);
   }
 
   errorListener(): InterpreterErrorListener {

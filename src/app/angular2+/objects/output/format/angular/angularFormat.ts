@@ -46,72 +46,37 @@
 import {OutputFormat} from '../outputFormat';
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {Channel} from '../../../channel/channel';
-import {AngularView} from '../../../../components/output/plugins/angular/angularView';
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
-import { ContainerRef } from '../../../containerRef/containerRef';
-import {AngularPlugin} from '../../plugins/angularPlugin/angularPlugin';
-import {AngularPluginStub} from '../../plugins/angularPlugin/angularPluginStub';
 import {AngularPluginImpl} from '../../plugins/angularPlugin/angularPluginImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {OutputType} from '../../outputType';
+import {OutputPlugin} from '../../plugins/outputPlugin';
 
 export class AngularFormat implements OutputFormat {
   private readonly _channel: Channel;
-  private readonly _switcherButtons: OutputSwitcherButton[];
-  private readonly _viewComponent: new () => AngularView;
-  private readonly _containerRefs: ContainerRef[];
-  private readonly _pluginStub:AngularPlugin;
-  private _plugin:AngularPlugin;
   private readonly _angularObjectCollection:AngularObjectCollection;
+  private readonly _switcherButtons: OutputSwitcherButton[];
   private readonly _outputType:string;
 
   constructor(channel: Channel, angularObjectCollection:AngularObjectCollection) {
     this._channel = channel;
     this._angularObjectCollection = angularObjectCollection;
     this._switcherButtons = [];
-    this._pluginStub = new AngularPluginStub();
-    this._plugin = this._pluginStub;
-    this._viewComponent = AngularView;
-    this._containerRefs = [];
     this._outputType = OutputType.angular;
-  }
-
-  pushContainerRef(value: ContainerRef): void {
-    this._containerRefs.push(value);
-    if(!this._plugin.isStub()){
-      value.createComponent(this._viewComponent, this.componentInputs());
-    }
   }
 
   outputType(): string {
     return this._outputType;
   }
 
-  render(paragraphOutputData:object): void {
+  plugin(paragraphOutputData: object): OutputPlugin {
     const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
     const data:object = safeParagraphOutputData.getProperty('data', 'object');
     const template:string = new SafeJsonImpl(data).getProperty('data', 'string');
-    this._plugin = new AngularPluginImpl(this._channel, template);
-    this._containerRefs.forEach(containerRef => {
-      containerRef.createComponent(this._viewComponent, this.componentInputs());
-    });
-  }
-
-  clear(): void {
-    this._plugin = this._pluginStub;
-    this._containerRefs.forEach(containerRef => {
-      containerRef.clear();
-    });
+    return new AngularPluginImpl(this._channel, template, this._angularObjectCollection);
   }
 
   switcherButtons(): OutputSwitcherButton[] {
     return this._switcherButtons;
-  }
-
-  private componentInputs(): {name: string; value: unknown}[] {
-    return [
-      {name:'plugin', value:this._plugin},
-      {name:'angularObjectCollection', value:this._angularObjectCollection}
-    ];
   }
 }

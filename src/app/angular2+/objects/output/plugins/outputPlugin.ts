@@ -44,7 +44,9 @@
  * a licensee so wish it.
  */
 import Stubable from '../../../../shared/interfaces/stubable';
+import {Response} from '../../channel/response';
 
-export interface OutputPlugin extends Stubable{
+export interface OutputPlugin extends Stubable, Response{
   render(anchorElement: HTMLElement): void;
+  outputType():string;
 }

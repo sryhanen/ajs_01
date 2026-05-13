@@ -43,24 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {DataTablesPlugin} from './dataTablesPlugin';
+import {OutputPlugin} from './outputPlugin';
 
-export class DataTablesPluginStub implements DataTablesPlugin {
+export class OutputPluginStub implements OutputPlugin {
   isStub(): boolean {
     return true;
   }
 
-  render(anchorElement: HTMLElement): void {
-    throw new Error('DataTablesResultStub: Method not implemented.');
+  response(data: object): void {
+    throw new Error('OutputPluginStub: method not implemented');
   }
 
-  request(data: object): void {
-    throw new Error('DataTablesResultStub: Method not implemented.');
+  outputType(): string {
+    throw new Error('OutputPluginStub: method not implemented');
   }
-  response(data: object): void {
-    throw new Error('DataTablesResultStub: Method not implemented.');
-  }
-  bindToElement(anchorElement: HTMLElement): void {
-    throw new Error('DataTablesResultStub: Method not implemented.');
+
+  render(anchorElement: HTMLElement): void {
+    throw new Error('OutputPluginStub: method not implemented');
   }
 }

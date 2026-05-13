@@ -50,18 +50,25 @@ import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
 import {DataTablesAjax} from './ajax/dataTablesAjax';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {OutputPlugin} from '../outputPlugin';
+import {OutputType} from '../../outputType';
 
 export class DataTablesPluginImpl implements OutputPlugin, Channel {
   private readonly _channel: Channel;
   private readonly _dataTablesAjax: DataTablesAjax;
   private readonly _outputData:object;
   private readonly _outputOptions:object;
+  private readonly _outputType:string;
 
   constructor(channel:Channel, outputData:object, outputOptions:object) {
     this._channel = channel;
     this._outputData = outputData;
     this._outputOptions = outputOptions;
     this._dataTablesAjax = new DataTablesAjaxImpl(this);
+    this._outputType = OutputType.dataTables;
+  }
+
+  outputType(): string {
+    return this._outputType;
   }
 
   request(data: object): void {
@@ -104,7 +111,12 @@ export class DataTablesPluginImpl implements OutputPlugin, Channel {
       ordering: false,
       processing: true,
     };
-    new DataTable(anchorElement, config);
+    const anchor = document.createElement('table');
+    anchor.classList.add('table');
+    anchor.classList.add('table-bordered');
+    anchor.classList.add('table-striped');
+    anchorElement.appendChild(anchor);
+    new DataTable(anchor, config);
   }
 
   isStub(): boolean {

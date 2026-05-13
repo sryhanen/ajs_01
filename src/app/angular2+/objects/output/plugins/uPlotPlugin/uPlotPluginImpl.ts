@@ -52,14 +52,25 @@ import {BarChartOptionsImpl} from './configuration/options/barChartOptionsImpl';
 import {BasicOptionsImpl} from './configuration/options/basicOptionsImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {OutputPlugin} from '../outputPlugin';
+import {OutputType} from '../../outputType';
 
 export class uPlotPluginImpl implements OutputPlugin {
   private readonly _outputData: uPlot.AlignedData;
   private readonly _outputOptions:object;
+  private readonly _outputType:string;
 
   constructor(outputData: uPlot.AlignedData, outputOptions:object) {
+    this._outputType = OutputType.uPlot;
     this._outputData = outputData;
     this._outputOptions = outputOptions;
+  }
+
+  outputType(): string {
+    return this._outputType;
+  }
+
+  response(data: object): void {
+      throw new Error("Method not implemented.");
   }
 
   render(anchorElement: HTMLElement): void {

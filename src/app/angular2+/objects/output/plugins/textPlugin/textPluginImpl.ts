@@ -45,14 +45,25 @@
  */
 import {AnsiUp} from 'ansi_up';
 import {OutputPlugin} from '../outputPlugin';
+import {OutputType} from '../../outputType';
 
 export class TextPluginImpl implements OutputPlugin {
   private readonly _ansiUp: AnsiUp;
   private readonly _outputData: string;
+  private readonly _outputType:string;
 
   constructor(outputData: string) {
     this._outputData = outputData;
     this._ansiUp = new AnsiUp();
+    this._outputType = OutputType.text;
+  }
+
+  outputType(): string {
+    return this._outputType;
+  }
+
+  response(data: object): void {
+    //TODO how to deal with this
   }
 
   render(anchorElement: HTMLElement): void {

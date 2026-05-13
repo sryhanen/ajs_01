@@ -47,65 +47,34 @@ import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {Channel} from '../../../channel/channel';
 import {Request} from '../../../channel/request';
 import {DataTableSwitcherButton} from './switcherButton/dataTablesSwitcherButton';
-import {DataTablesView} from '../../../../components/output/plugins/dataTablesView/dataTablesView';
-import {DataTablesPluginStub} from '../../plugins/dataTablesPlugin/dataTablesPluginStub';
 import {OutputFormat} from '../outputFormat';
-import {ContainerRef} from '../../../containerRef/containerRef';
-import {DataTablesPlugin} from '../../plugins/dataTablesPlugin/dataTablesPlugin';
 import {OutputType} from '../../outputType';
 import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import { OutputPlugin } from '../../plugins/outputPlugin';
 
-export class DataTablesFormat implements OutputFormat, Request{
+export class DataTablesFormat implements OutputFormat, Request {
   private readonly _channel: Channel;
   private readonly _outputType: string;
   private readonly _switcherButtons: OutputSwitcherButton[];
-  private readonly _viewComponent: new () => DataTablesView;
-  private readonly _pluginStub:DataTablesPlugin;
-  private _plugin: DataTablesPlugin;
-  private readonly _containerRefs: ContainerRef[];
 
   constructor(channel: Channel) {
     this._channel = channel;
     this._outputType = OutputType.dataTables;
-    this._pluginStub = new DataTablesPluginStub();
-    this._plugin = this._pluginStub;
     this._switcherButtons = [
       new DataTableSwitcherButton()
     ];
-    this._viewComponent = DataTablesView;
-    this._containerRefs = [];
   }
 
-  pushContainerRef(value:ContainerRef): void {
-    this._containerRefs.push(value);
-    if(!this._plugin.isStub()){
-      value.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]);
-    }
+  plugin(paragraphOutputData: object): OutputPlugin {
+    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
+    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
+    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
+    return new DataTablesPluginImpl(this._channel, outputData, outputOptions);
   }
 
   outputType(): string {
     return this._outputType;
-  }
-
-  render(paragraphOutputData:object): void {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
-    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
-    if(this._plugin.isStub()){
-      this._plugin = new DataTablesPluginImpl(this._channel, outputData, outputOptions);
-      this._containerRefs.forEach(containerRef => {
-        containerRef.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]);
-      });
-    }
-    else{
-      this._plugin.response(outputData);
-    }
-  }
-
-  clear(): void {
-    this._plugin = this._pluginStub;
-    this._containerRefs.forEach(containerRef => containerRef.clear());
   }
 
   request(data: object): void {

@@ -44,15 +44,11 @@
  * a licensee so wish it.
  */
 import {OutputSwitcherButton} from '../switcher/button/outputSwitcherButton';
-import {ContainerRef} from '../../containerRef/containerRef';
 import {OutputPlugin} from '../plugins/outputPlugin';
 
 export interface OutputFormat {
   switcherButtons(): OutputSwitcherButton[];
-  pushContainerRef(value:ContainerRef): void;
   outputType(): string;
-  render(paragraphOutputData:object): void;
-  plugin?(paragraphOutputData:object): OutputPlugin;
-  clear(): void;
+  plugin(paragraphOutputData:object): OutputPlugin;
 }
 

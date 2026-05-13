@@ -45,9 +45,6 @@
  */
 import {OutputFormat} from '../outputFormat';
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
-import {TextView} from '../../../../components/output/plugins/textView/textView';
-import {ContainerRef} from '../../../containerRef/containerRef';
-import {TextPluginStub} from '../../plugins/textPlugin/textPluginStub';
 import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {TextPluginImpl} from '../../plugins/textPlugin/textPluginImpl';
@@ -55,23 +52,17 @@ import {OutputPlugin} from '../../plugins/outputPlugin';
 
 export class TextFormat implements OutputFormat {
   private readonly _switcherButtons: OutputSwitcherButton[];
-  private readonly _viewComponent: new () => TextView;
-  private readonly _containerRefs: ContainerRef[];
-  private _plugin: OutputPlugin;
   private readonly _outputType: string;
 
   constructor() {
     this._outputType = OutputType.text;
-    this._viewComponent = TextView;
     this._switcherButtons = [];
-    this._containerRefs = [];
   }
 
-  pushContainerRef(value:ContainerRef): void {
-    this._containerRefs.push(value);
-    if(!this._plugin.isStub()){
-      value.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]);
-    }
+  plugin(paragraphOutputData: object): OutputPlugin {
+    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
+    const outputData:string = safeParagraphOutputData.getProperty('data', 'string');
+    return new TextPluginImpl(outputData);
   }
 
   switcherButtons(): OutputSwitcherButton[] {
@@ -80,18 +71,5 @@ export class TextFormat implements OutputFormat {
 
   outputType(): string {
     return this._outputType;
-  }
-
-  render(paragraphOutputData:object): void {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData:string = safeParagraphOutputData.getProperty('data', 'string');
-    this._plugin = new TextPluginImpl(outputData);
-    this._containerRefs.forEach(containerRef => {
-      containerRef.createComponent(this._viewComponent, [{name:'plugin', value:this._plugin}]);
-    });
-  }
-
-  clear(): void {
-    this._containerRefs.forEach(containerRef => containerRef.clear());
   }
 }

@@ -46,7 +46,7 @@
 import {OutputFormat} from '../../../format/outputFormat';
 import {OutputSwitcher} from '../../../switcher/outputSwitcher';
 import {Channel} from '../../../../channel/channel';
-import {ParagraphOutputResponse} from './paragraphOutputResponse';
+import {ParagraphOutputResponseImpl} from './paragraphOutputResponseImpl';
 import {FakeChannel} from '../../../../channel/fakeChannel';
 import {OutputSwitcherImpl} from '../../../switcher/outputSwitcherImpl';
 import {DataTablesFormat} from '../../../format/dataTables/dataTablesFormat';
@@ -59,7 +59,7 @@ describe('ParagraphOutputResponse', () => {
   let uPlotOutputFormat: OutputFormat;
   let outputFormats:OutputFormat[];
   let outputSwitcher:OutputSwitcher;
-  let paragraphOutputResponse:ParagraphOutputResponse;
+  let paragraphOutputResponse:ParagraphOutputResponseImpl;
 
   beforeEach(() => {
     channel = new FakeChannel();
@@ -67,12 +67,12 @@ describe('ParagraphOutputResponse', () => {
     uPlotOutputFormat = new uPlotFormat();
     outputFormats = [dataTablesOutputFormat, uPlotOutputFormat];
     outputSwitcher = new OutputSwitcherImpl(channel);
-    paragraphOutputResponse = new ParagraphOutputResponse(channel, outputFormats, outputSwitcher);
+    paragraphOutputResponse = new ParagraphOutputResponseImpl(channel, outputFormats, outputSwitcher);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(paragraphOutputResponse).toBeInstanceOf(ParagraphOutputResponse);
+      expect(paragraphOutputResponse).toBeInstanceOf(ParagraphOutputResponseImpl);
     });
   });
 

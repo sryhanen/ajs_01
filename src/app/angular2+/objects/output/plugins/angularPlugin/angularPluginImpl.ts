@@ -45,18 +45,36 @@
  */
 import {AngularPlugin} from './angularPlugin';
 import {Channel} from '../../../channel/channel';
+import { AngularObjectCollection } from '../../../angularObjectCollection/angularObjectCollection';
+import {OutputType} from '../../outputType';
 
-export class AngularPluginImpl implements AngularPlugin{
+export class AngularPluginImpl implements AngularPlugin {
   private readonly _channel: Channel;
-  private readonly _template:string;
+  private readonly _template: string;
+  private readonly _outputType: string;
+  private readonly _angularObjectCollection: AngularObjectCollection;
 
-  constructor(channel: Channel, template:string) {
+  constructor(channel: Channel, template: string, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._template = template;
+    this._angularObjectCollection = angularObjectCollection;
+    this._outputType = OutputType.angular;
+  }
+
+  angularObjectCollection(): AngularObjectCollection {
+    return this._angularObjectCollection;
+  }
+
+  outputType(): string {
+    return this._outputType;
+  }
+
+  response(data: object): void {
+    //TODO
   }
 
   render(anchorElement: HTMLElement): void {
-    //TODO
+    //TODO angular plugin does not render
   }
 
   isStub(): boolean {

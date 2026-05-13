@@ -45,7 +45,9 @@
  */
 import {Request} from '../../../channel/request';
 import {OutputPlugin} from '../outputPlugin';
+import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 
 export interface AngularPlugin extends Request, OutputPlugin {
   template():string;
+  angularObjectCollection(): AngularObjectCollection;
 }

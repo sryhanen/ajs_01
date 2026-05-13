@@ -56,7 +56,7 @@ import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 @Component({
   selector: 'dataTables',
   template: `
-    <table #anchor class="table table-bordered table-striped"></table>
+    <div #anchor></div>
   `,
 })
 export class DataTablesView implements AfterViewInit{

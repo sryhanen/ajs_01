@@ -46,9 +46,7 @@
 import {OutputFormat} from '../outputFormat';
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
-import {uPlotView} from '../../../../components/output/plugins/uPlotView/uPlotView';
 import {GraphType} from './graphType';
-import {ContainerRef} from '../../../containerRef/containerRef';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {uPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
 import {OutputType} from '../../outputType';
@@ -57,9 +55,6 @@ import {OutputPlugin} from '../../plugins/outputPlugin';
 
 export class uPlotFormat implements OutputFormat {
   private readonly _switcherButtons:OutputSwitcherButton[];
-  private readonly _viewComponent: new () => uPlotView;
-  private readonly _containerRefs: ContainerRef[];
-  private _plugin: OutputPlugin;
   private readonly _outputType: string;
 
   constructor() {
@@ -70,33 +65,17 @@ export class uPlotFormat implements OutputFormat {
       new uPlotSwitcherButton('Bar Chart', 'fas fa-chart-bar', GraphType.bar),
       new uPlotSwitcherButton('Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
-    this._viewComponent = uPlotView;
-    this._containerRefs = [];
   }
 
-  pushContainerRef(value:ContainerRef): void {
-    this._containerRefs.push(value);
-    if(!this._plugin.isStub()){
-      value.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]);
-    }
+  plugin(paragraphOutputData: object): OutputPlugin {
+    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
+    const outputData: uPlot.AlignedData = safeParagraphOutputData.getProperty('data', 'object');
+    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
+    return new uPlotPluginImpl(outputData, outputOptions);
   }
 
   outputType(): string {
     return this._outputType;
-  }
-
-  render(paragraphOutputData:object): void {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData: uPlot.AlignedData = safeParagraphOutputData.getProperty('data', 'object');
-    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
-    this._plugin = new uPlotPluginImpl(outputData, outputOptions);
-    this._containerRefs.forEach(containerRef => {
-      containerRef.createComponent(this._viewComponent, [{name:'plugin', value:this._plugin}]);
-    });
-  }
-
-  clear(): void {
-    this._containerRefs.forEach(containerRef => containerRef.clear());
   }
 
   switcherButtons(): OutputSwitcherButton[] {
