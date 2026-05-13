@@ -50,7 +50,7 @@ import {
   Input,
   ViewChild
 } from '@angular/core';
-import {TextPlugin} from '../../../../objects/output/plugins/textPlugin/textPlugin';
+import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
 @Component({
   selector:'text',
@@ -59,10 +59,10 @@ import {TextPlugin} from '../../../../objects/output/plugins/textPlugin/textPlug
   `
   })
 export class TextView implements AfterViewInit{
-  @Input({required:true}) plugin: TextPlugin;
+  @Input({required:true}) plugin: OutputPlugin;
   @ViewChild('anchor') anchor: ElementRef;
 
   ngAfterViewInit(): void {
-    this.plugin.bindToElement(this.anchor.nativeElement);
+    this.plugin.render(this.anchor.nativeElement);
   }
 }

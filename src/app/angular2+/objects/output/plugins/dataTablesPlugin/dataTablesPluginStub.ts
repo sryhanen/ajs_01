@@ -49,6 +49,11 @@ export class DataTablesPluginStub implements DataTablesPlugin {
   isStub(): boolean {
     return true;
   }
+
+  render(anchorElement: HTMLElement): void {
+    throw new Error('DataTablesResultStub: Method not implemented.');
+  }
+
   request(data: object): void {
     throw new Error('DataTablesResultStub: Method not implemented.');
   }

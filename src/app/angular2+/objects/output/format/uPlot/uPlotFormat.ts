@@ -49,19 +49,17 @@ import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
 import {uPlotView} from '../../../../components/output/plugins/uPlotView/uPlotView';
 import {GraphType} from './graphType';
 import {ContainerRef} from '../../../containerRef/containerRef';
-import {uPlotPluginStub} from '../../plugins/uPlotPlugin/uPlotPluginStub';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {uPlotPlugin} from '../../plugins/uPlotPlugin/uPlotPlugin';
 import {uPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
 import {OutputType} from '../../outputType';
 import uPlot from 'uplot';
+import {OutputPlugin} from '../../plugins/outputPlugin';
 
 export class uPlotFormat implements OutputFormat {
   private readonly _switcherButtons:OutputSwitcherButton[];
   private readonly _viewComponent: new () => uPlotView;
   private readonly _containerRefs: ContainerRef[];
-  private readonly _pluginStub: uPlotPlugin;
-  private _plugin: uPlotPlugin;
+  private _plugin: OutputPlugin;
   private readonly _outputType: string;
 
   constructor() {
@@ -74,8 +72,6 @@ export class uPlotFormat implements OutputFormat {
     ];
     this._viewComponent = uPlotView;
     this._containerRefs = [];
-    this._pluginStub = new uPlotPluginStub();
-    this._plugin = this._pluginStub;
   }
 
   pushContainerRef(value:ContainerRef): void {
@@ -100,7 +96,6 @@ export class uPlotFormat implements OutputFormat {
   }
 
   clear(): void {
-    this._plugin = this._pluginStub;
     this._containerRefs.forEach(containerRef => containerRef.clear());
   }
 

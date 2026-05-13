@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
-import {HtmlPlugin} from '../../../../objects/output/plugins/htmlPlugin/htmlPlugin';
+import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
 @Component({
   selector:'html',
@@ -8,10 +8,10 @@ import {HtmlPlugin} from '../../../../objects/output/plugins/htmlPlugin/htmlPlug
   `
 })
 export class HtmlView implements AfterViewInit{
-  @Input({required:true}) plugin: HtmlPlugin;
+  @Input({required:true}) plugin: OutputPlugin;
   @ViewChild('anchor') anchor: ElementRef;
 
   ngAfterViewInit(){
-    this.anchor.nativeElement.innerHTML = this.plugin.unsanitizedHtmlString();
+    this.plugin.render(this.anchor.nativeElement);
   }
 }

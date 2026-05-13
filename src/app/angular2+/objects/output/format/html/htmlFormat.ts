@@ -7,19 +7,17 @@ import {HtmlView} from '../../../../components/output/plugins/htmlView/htmlView'
 import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {HtmlPluginImpl} from '../../plugins/htmlPlugin/htmlPluginImpl';
+import {OutputPlugin} from '../../plugins/outputPlugin';
 
 export class HTMLFormat implements OutputFormat{
   private readonly _containerRefs:ContainerRef[];
-  private readonly _pluginStub: HtmlPlugin;
-  private _plugin: HtmlPlugin;
+  private _plugin: OutputPlugin;
   private readonly _component: new () => HtmlView;
   private readonly _outputType: string;
 
   constructor() {
     this._outputType = OutputType.html;
     this._containerRefs = [];
-    this._pluginStub = new HtmlPluginStub();
-    this._plugin = this._pluginStub;
     this._component = HtmlView;
   }
 
@@ -44,7 +42,6 @@ export class HTMLFormat implements OutputFormat{
   }
 
   clear(): void {
-    this._plugin = this._pluginStub;
     this._containerRefs.forEach(containerRef => containerRef.clear());
   }
 

@@ -55,6 +55,10 @@ export class AngularPluginImpl implements AngularPlugin{
     this._template = template;
   }
 
+  render(anchorElement: HTMLElement): void {
+    //TODO
+  }
+
   isStub(): boolean {
     return false;
   }

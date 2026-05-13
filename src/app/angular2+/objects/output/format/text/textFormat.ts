@@ -51,14 +51,13 @@ import {TextPluginStub} from '../../plugins/textPlugin/textPluginStub';
 import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {TextPluginImpl} from '../../plugins/textPlugin/textPluginImpl';
-import {TextPlugin} from '../../plugins/textPlugin/textPlugin';
+import {OutputPlugin} from '../../plugins/outputPlugin';
 
 export class TextFormat implements OutputFormat {
   private readonly _switcherButtons: OutputSwitcherButton[];
   private readonly _viewComponent: new () => TextView;
   private readonly _containerRefs: ContainerRef[];
-  private readonly _pluginStub: TextPlugin;
-  private _plugin: TextPlugin;
+  private _plugin: OutputPlugin;
   private readonly _outputType: string;
 
   constructor() {
@@ -66,8 +65,6 @@ export class TextFormat implements OutputFormat {
     this._viewComponent = TextView;
     this._switcherButtons = [];
     this._containerRefs = [];
-    this._pluginStub = new TextPluginStub();
-    this._plugin = this._pluginStub;
   }
 
   pushContainerRef(value:ContainerRef): void {
@@ -95,7 +92,6 @@ export class TextFormat implements OutputFormat {
   }
 
   clear(): void {
-    this._plugin = this._pluginStub;
     this._containerRefs.forEach(containerRef => containerRef.clear());
   }
 }

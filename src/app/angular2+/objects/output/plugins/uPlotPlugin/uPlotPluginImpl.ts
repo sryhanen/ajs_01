@@ -50,10 +50,10 @@ import {ResizeListenerImpl} from './configuration/resizeListener/resizeListenerI
 import {GraphType} from '../../format/uPlot/graphType';
 import {BarChartOptionsImpl} from './configuration/options/barChartOptionsImpl';
 import {BasicOptionsImpl} from './configuration/options/basicOptionsImpl';
-import {uPlotPlugin} from './uPlotPlugin';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {OutputPlugin} from '../outputPlugin';
 
-export class uPlotPluginImpl implements uPlotPlugin {
+export class uPlotPluginImpl implements OutputPlugin {
   private readonly _outputData: uPlot.AlignedData;
   private readonly _outputOptions:object;
 
@@ -62,7 +62,7 @@ export class uPlotPluginImpl implements uPlotPlugin {
     this._outputOptions = outputOptions;
   }
 
-  bindToElement(anchorElement: HTMLElement): void {
+  render(anchorElement: HTMLElement): void {
     const safeOutputOptions = new SafeJsonImpl(this._outputOptions);
     const uPlotOutputOptions: uPlotOutputOptions = {
       labels:safeOutputOptions.getProperty('labels', 'object'),

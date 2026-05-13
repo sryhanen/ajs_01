@@ -50,7 +50,7 @@ import {
   Input,
   ViewChild
 } from '@angular/core';
-import {uPlotPlugin} from '../../../../objects/output/plugins/uPlotPlugin/uPlotPlugin';
+import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
 @Component({
   selector: 'uPlot',
@@ -59,10 +59,10 @@ import {uPlotPlugin} from '../../../../objects/output/plugins/uPlotPlugin/uPlotP
   `,
 })
 export class uPlotView implements AfterViewInit {
-  @Input({required:true}) plugin: uPlotPlugin;
+  @Input({required:true}) plugin: OutputPlugin;
   @ViewChild('anchor') anchor: ElementRef;
 
   ngAfterViewInit(): void {
-    this.plugin.bindToElement(this.anchor.nativeElement);
+    this.plugin.render(this.anchor.nativeElement);
   }
 }

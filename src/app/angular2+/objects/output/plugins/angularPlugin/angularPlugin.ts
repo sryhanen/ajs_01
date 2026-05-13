@@ -44,8 +44,8 @@
  * a licensee so wish it.
  */
 import {Request} from '../../../channel/request';
-import Stubable from '../../../../../shared/interfaces/stubable';
+import {OutputPlugin} from '../outputPlugin';
 
-export interface AngularPlugin extends Request, Stubable {
+export interface AngularPlugin extends Request, OutputPlugin {
   template():string;
 }

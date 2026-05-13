@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../../../channel/channel';
-import {ParagraphOutputRequestDTO} from '../../../paragraphOutputRequest/paragraphOutputRequestDTO';
 import {OutputType} from '../../../outputType';
 import {DataTablesAjax} from './dataTablesAjax';
 import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';

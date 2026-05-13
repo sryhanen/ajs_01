@@ -50,6 +50,10 @@ export class AngularPluginStub implements AngularPlugin{
     return true;
   }
 
+  render(anchorElement: HTMLElement): void {
+    throw new Error('AngularPluginStub: Method not implemented.');
+  }
+
   request(data: object): void {
     throw new Error('AngularPluginStub: Method not implemented.');
   }

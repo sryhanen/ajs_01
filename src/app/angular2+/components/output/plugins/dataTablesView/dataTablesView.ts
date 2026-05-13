@@ -50,7 +50,7 @@ import {
   Input,
   ViewChild,
 } from '@angular/core';
-import {DataTablesPlugin} from '../../../../objects/output/plugins/dataTablesPlugin/dataTablesPlugin';
+import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
 
 @Component({
@@ -60,10 +60,10 @@ import {DataTablesPlugin} from '../../../../objects/output/plugins/dataTablesPlu
   `,
 })
 export class DataTablesView implements AfterViewInit{
-  @Input({required:true}) plugin: DataTablesPlugin;
+  @Input({required:true}) plugin: OutputPlugin;
   @ViewChild('anchor') anchor: ElementRef;
 
   ngAfterViewInit(): void {
-    this.plugin.bindToElement(this.anchor.nativeElement);
+    this.plugin.render(this.anchor.nativeElement);
   }
 }

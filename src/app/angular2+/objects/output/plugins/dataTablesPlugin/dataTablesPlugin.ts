@@ -44,9 +44,6 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../../channel/channel';
-import Stubable from '../../../../../shared/interfaces/stubable';
+import {OutputPlugin} from '../outputPlugin';
 
-export interface DataTablesPlugin extends Channel, Stubable {
-  bindToElement(anchorElement: HTMLElement): void;
-  isStub(): boolean;
-}
+export interface DataTablesPlugin extends Channel, OutputPlugin {}

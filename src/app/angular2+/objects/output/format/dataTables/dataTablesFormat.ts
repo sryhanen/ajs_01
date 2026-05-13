@@ -54,7 +54,7 @@ import {ContainerRef} from '../../../containerRef/containerRef';
 import {DataTablesPlugin} from '../../plugins/dataTablesPlugin/dataTablesPlugin';
 import {OutputType} from '../../outputType';
 import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
-import {SafeJsonImpl} from "../../../safeJson/safeJsonImpl";
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 export class DataTablesFormat implements OutputFormat, Request{
   private readonly _channel: Channel;

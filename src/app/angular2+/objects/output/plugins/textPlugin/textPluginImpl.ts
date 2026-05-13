@@ -44,9 +44,9 @@
  * a licensee so wish it.
  */
 import {AnsiUp} from 'ansi_up';
-import {TextPlugin} from './textPlugin';
+import {OutputPlugin} from '../outputPlugin';
 
-export class TextPluginImpl implements TextPlugin {
+export class TextPluginImpl implements OutputPlugin {
   private readonly _ansiUp: AnsiUp;
   private readonly _outputData: string;
 
@@ -55,7 +55,7 @@ export class TextPluginImpl implements TextPlugin {
     this._ansiUp = new AnsiUp();
   }
 
-  bindToElement(anchorElement: HTMLElement): void {
+  render(anchorElement: HTMLElement): void {
     anchorElement.innerHTML = this._ansiUp.ansi_to_html(this._outputData);
   }
 

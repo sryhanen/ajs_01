@@ -48,10 +48,10 @@ import 'datatables.net-buttons-bs5';
 import {Channel} from '../../../channel/channel';
 import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
 import {DataTablesAjax} from './ajax/dataTablesAjax';
-import {DataTablesPlugin} from './dataTablesPlugin';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {OutputPlugin} from '../outputPlugin';
 
-export class DataTablesPluginImpl implements DataTablesPlugin {
+export class DataTablesPluginImpl implements OutputPlugin, Channel {
   private readonly _channel: Channel;
   private readonly _dataTablesAjax: DataTablesAjax;
   private readonly _outputData:object;
@@ -72,7 +72,7 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
     this._dataTablesAjax.response(data);
   }
 
-  bindToElement(anchorElement: HTMLElement): void {
+  render(anchorElement: HTMLElement): void {
     const safeOptions = new SafeJsonImpl(this._outputOptions);
     const headers:Array<string> = safeOptions.getProperty('headers', 'object');
     const config: Config = {

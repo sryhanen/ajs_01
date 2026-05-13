@@ -46,5 +46,5 @@
 import Stubable from '../../../../shared/interfaces/stubable';
 
 export interface OutputPlugin extends Stubable{
-  bindToElement(anchorElement: HTMLElement): void;
+  render(anchorElement: HTMLElement): void;
 }
