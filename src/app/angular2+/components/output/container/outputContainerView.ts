@@ -43,18 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, inject, Input, OnInit, ViewContainerRef} from '@angular/core';
+import {Component, inject, Input, OnInit, signal, effect, ViewContainerRef, ComponentRef} from '@angular/core';
 import {OutputContainer} from '../../../objects/output/container/outputContainer';
 import {OutputSwitcherView} from '../switcher/outputSwitcherView';
 import {InterpreterErrorDirective} from '../../../directives/interpreterErrorDirective';
 import {OutputSwitcherButton} from '../../../objects/output/switcher/button/outputSwitcherButton';
-import {ContainerRefImpl} from '../../../objects/containerRef/containerRefImpl';
+import {PushValue} from '../../../objects/pushValue/pushValue';
+import {OutputPlugin} from '../../../objects/output/plugins/outputPlugin';
+import {PluginView} from '../plugin/pluginView';
+import {WritableSignalAsPushValue} from '../../../objects/pushValue/writableSignalAsPushValue';
+import {OutputPluginStub} from '../../../objects/output/plugins/outputPluginStub';
 
 @Component({
   selector: 'output-container',
   imports: [
     OutputSwitcherView,
-    InterpreterErrorDirective
+    InterpreterErrorDirective,
   ],
   template: `
       <output-switcher [interpreter-error-popup]="outputContainer.errorListener()" [outputSwitcher]="outputContainer.outputSwitcher()" [outputSwitcherButtons]="outputSwitcherButtons"></output-switcher>
@@ -63,14 +67,25 @@ import {ContainerRefImpl} from '../../../objects/containerRef/containerRefImpl';
 })
 export class OutputContainerView implements OnInit {
   @Input({required:true}) outputContainer: OutputContainer;
-  private viewContainer = inject(ViewContainerRef);
   protected outputSwitcherButtons: OutputSwitcherButton[];
+  protected outputPlugin: PushValue<OutputPlugin>;
+  private viewContainer = inject(ViewContainerRef);
+  protected pluginSignal= signal(new OutputPluginStub());
+  private previousInstance: ComponentRef<PluginView>;
+  private pluginChange = effect(() => {
+    if(!this.pluginSignal().isStub()){
+      const newInstance = this.viewContainer.createComponent(PluginView);
+      newInstance.setInput('plugin', this.pluginSignal());
+      if(this.previousInstance !== undefined){
+        this.previousInstance.destroy();
+      }
+      this.previousInstance = newInstance;
+    }
+  });
 
   ngOnInit(): void {
     this.outputSwitcherButtons = this.outputContainer.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
-    this.outputContainer.outputFormats().forEach(format => {
-      const containerRef = new ContainerRefImpl(this.viewContainer);
-      format.pushContainerRef(containerRef);
-    });
+    this.outputPlugin = new WritableSignalAsPushValue(this.pluginSignal);
+    this.outputContainer.outputPlugin(this.outputPlugin);
   }
 }

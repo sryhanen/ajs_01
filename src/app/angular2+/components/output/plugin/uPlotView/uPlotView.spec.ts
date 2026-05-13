@@ -46,7 +46,6 @@
 import {uPlotView} from './uPlotView';
 import {render} from '@testing-library/angular';
 import {uPlotPluginImpl} from '../../../../objects/output/plugins/uPlotPlugin/uPlotPluginImpl';
-import {uPlotPluginStub} from '../../../../objects/output/plugins/uPlotPlugin/uPlotPluginStub';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
 describe('uPlotView', () => {
