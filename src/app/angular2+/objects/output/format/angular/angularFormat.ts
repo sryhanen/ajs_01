@@ -53,6 +53,7 @@ import {AngularPlugin} from '../../plugins/angularPlugin/angularPlugin';
 import {AngularPluginStub} from '../../plugins/angularPlugin/angularPluginStub';
 import {AngularPluginImpl} from '../../plugins/angularPlugin/angularPluginImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {OutputType} from '../../outputType';
 
 export class AngularFormat implements OutputFormat {
   private readonly _channel: Channel;
@@ -62,6 +63,7 @@ export class AngularFormat implements OutputFormat {
   private readonly _pluginStub:AngularPlugin;
   private _plugin:AngularPlugin;
   private readonly _angularObjectCollection:AngularObjectCollection;
+  private readonly _outputType:string;
 
   constructor(channel: Channel, angularObjectCollection:AngularObjectCollection) {
     this._channel = channel;
@@ -71,6 +73,7 @@ export class AngularFormat implements OutputFormat {
     this._plugin = this._pluginStub;
     this._viewComponent = AngularView;
     this._containerRefs = [];
+    this._outputType = OutputType.angular;
   }
 
   pushContainerRef(value: ContainerRef): void {
@@ -81,7 +84,7 @@ export class AngularFormat implements OutputFormat {
   }
 
   outputType(): string {
-    return 'this._outputType';
+    return this._outputType;
   }
 
   render(paragraphOutputData:object): void {
