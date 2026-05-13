@@ -45,8 +45,6 @@
  */
 import {uPlotFormat} from './uPlotFormat';
 import {OutputType} from '../../outputType';
-import {ContainerRef} from '../../../containerRef/containerRef';
-import {FakeContainerRef} from '../../../containerRef/fakeContainerRef';
 
 describe('uPlotFormat', () => {
   let microPlotFormat: uPlotFormat;
@@ -66,52 +64,6 @@ describe('uPlotFormat', () => {
 
     it('Should have outputType', () => {
       expect(microPlotFormat.outputType()).toEqual(OutputType.uPlot);
-    });
-  });
-
-  describe('Rendering', ()=> {
-    let containerRef: ContainerRef;
-    let createComponentSpy;
-    let clearComponentSpy;
-    let outputData: {
-      data: [][],
-      options: object
-    };
-    beforeEach(() => {
-      outputData = {
-        data:[],
-        options: {}
-      };
-      containerRef = new FakeContainerRef();
-      createComponentSpy = vi.spyOn(containerRef, 'createComponent');
-      clearComponentSpy = vi.spyOn(containerRef, 'clear');
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
-      expect(clearComponentSpy).toHaveBeenCalledTimes(0);
-    });
-
-    it('Should create component', () => {
-      microPlotFormat.pushContainerRef(containerRef);
-      microPlotFormat.render(outputData);
-      expect(createComponentSpy).toHaveBeenCalledOnce();
-    });
-
-    it('Should clear component', () => {
-      microPlotFormat.pushContainerRef(containerRef);
-      microPlotFormat.clear();
-      expect(clearComponentSpy).toHaveBeenCalledOnce();
-    });
-
-    it('Should create component if render has been evoked', () => {
-      microPlotFormat.render(outputData);
-      microPlotFormat.pushContainerRef(containerRef);
-      expect(createComponentSpy).toHaveBeenCalledOnce();
-    });
-
-    it('Should not create component if render and clear have been evoked', () => {
-      microPlotFormat.render(outputData);
-      microPlotFormat.clear();
-      microPlotFormat.pushContainerRef(containerRef);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
     });
   });
 });

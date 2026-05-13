@@ -46,9 +46,6 @@
 import {DataTablesFormat} from './dataTablesFormat';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {OutputType} from '../../outputType';
-import {ContainerRef} from '../../../containerRef/containerRef';
-import {FakeContainerRef} from '../../../containerRef/fakeContainerRef';
 
 describe('dataTablesFormat', () => {
   let channel:Channel;
