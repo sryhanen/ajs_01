@@ -46,7 +46,6 @@
 import {Channel} from '../../channel/channel';
 import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {OutputSwitcher} from './outputSwitcher';
-import {MessageDTO} from '../../message/messageDTO';
 import {OutputSwitcherButtonStub} from './button/outputSwitcherButtonStub';
 import {PushValue} from '../../pushValue/pushValue';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
@@ -54,6 +53,7 @@ import {MessageImpl} from '../../message/messageImpl';
 
 export class OutputSwitcherImpl implements OutputSwitcher {
   private readonly _channel: Channel;
+  private readonly _stubButton: OutputSwitcherButton;
   private _activeButton: OutputSwitcherButton;
   private _isLoading: boolean;
   private _isSwitchable: boolean;
@@ -63,7 +63,8 @@ export class OutputSwitcherImpl implements OutputSwitcher {
 
   constructor(channel: Channel) {
     this._channel = channel;
-    this._activeButton = new OutputSwitcherButtonStub();
+    this._stubButton = new OutputSwitcherButtonStub();
+    this._activeButton =  this._stubButton;
     this._isLoading = false;
     this._isSwitchable = false;
     this._pushIsSwitchable = [];
@@ -93,9 +94,8 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   }
 
   request(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    const op = message.op;
-    if(op === 'PARAGRAPH_OUTPUT_REQUEST') {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'PARAGRAPH_OUTPUT_REQUEST') {
       this._isLoading = true;
       this._pushIsLoading.forEach(value => value.update(this._isLoading));
     }
@@ -117,7 +117,7 @@ export class OutputSwitcherImpl implements OutputSwitcher {
         this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));
       }
       else{
-        this._activeButton = new OutputSwitcherButtonStub();
+        this._activeButton = this._stubButton;
         this._pushActiveButton.forEach(button => button.update(this._activeButton));
         this._isSwitchable = false;
         this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));

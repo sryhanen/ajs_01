@@ -44,8 +44,6 @@
  * a licensee so wish it.
  */
 import {OutputSwitcherButton} from './outputSwitcherButton';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputRequestDTO} from '../../paragraphOutputRequest/paragraphOutputRequestDTO';
 
 export class OutputSwitcherButtonStub implements OutputSwitcherButton {
   isStub(): boolean {

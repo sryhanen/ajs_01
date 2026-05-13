@@ -45,8 +45,6 @@
  */
 import {OutputSwitcherButton} from '../../../switcher/button/outputSwitcherButton';
 import {OutputType} from '../../../outputType';
-import {MessageDTO} from '../../../../message/messageDTO';
-import {ParagraphOutputRequestDTO} from '../../../paragraphOutputRequest/paragraphOutputRequestDTO';
 
 export class uPlotSwitcherButton implements OutputSwitcherButton {
   private readonly _title:string;
