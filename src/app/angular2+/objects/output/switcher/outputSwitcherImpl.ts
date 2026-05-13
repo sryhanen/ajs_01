@@ -64,7 +64,7 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   constructor(channel: Channel) {
     this._channel = channel;
     this._stubButton = new OutputSwitcherButtonStub();
-    this._activeButton =  this._stubButton;
+    this._activeButton = this._stubButton;
     this._isLoading = false;
     this._isSwitchable = false;
     this._pushIsSwitchable = [];
@@ -72,10 +72,22 @@ export class OutputSwitcherImpl implements OutputSwitcher {
     this._pushActiveButton = [];
   }
 
-  switchFormat(outputSwitcherButton: OutputSwitcherButton): void {
+  requestFormatSwitch(outputSwitcherButton: OutputSwitcherButton): void {
     this._activeButton = outputSwitcherButton;
     this._pushActiveButton.forEach(button => button.update(this._activeButton));
     this.request(outputSwitcherButton.requestData());
+  }
+
+  outputTypeIsValid(outputType:string): boolean {
+    let isValid:boolean = true;
+    if(!this._activeButton.isStub()){
+      isValid = outputType === this._activeButton.outputType();
+    }
+    return isValid;
+  }
+
+  activeButton(): OutputSwitcherButton {
+    return this._activeButton;
   }
 
   isSwitchable(value: PushValue<boolean>): void {
@@ -86,11 +98,6 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   isLoading(value: PushValue<boolean>): void {
     value.update(this._isLoading);
     this._pushIsLoading.push(value);
-  }
-
-  activeButton(value:PushValue<OutputSwitcherButton>): void {
-    value.update(this._activeButton);
-    this._pushActiveButton.push(value);
   }
 
   request(data: object): void {
@@ -106,22 +113,14 @@ export class OutputSwitcherImpl implements OutputSwitcher {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputData = new SafeJsonImpl(message.data());
-      if(paragraphOutputData.propertyExists('output')){
-        const safeOutput = new SafeJsonImpl(paragraphOutputData.getProperty('output', 'object'));
-        if(safeOutput.propertyExists('isAggregated')){
-          this._isSwitchable = safeOutput.getProperty('isAggregated', 'boolean');
-        }
-        else{
-          this._isSwitchable = false;
-        }
-        this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));
+      const safeOutput = new SafeJsonImpl(paragraphOutputData.getProperty('output', 'object'));
+      if(safeOutput.propertyExists('isAggregated')){
+        this._isSwitchable = safeOutput.getProperty('isAggregated', 'boolean');
       }
       else{
-        this._activeButton = this._stubButton;
-        this._pushActiveButton.forEach(button => button.update(this._activeButton));
         this._isSwitchable = false;
-        this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));
       }
+      this._pushIsSwitchable.forEach(value => value.update(this._isSwitchable));
       this._isLoading = false;
       this._pushIsLoading.forEach(value => value.update(this._isLoading));
     }

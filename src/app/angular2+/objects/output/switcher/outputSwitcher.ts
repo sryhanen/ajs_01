@@ -43,13 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
+import {Response} from '../../channel/response';
 import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {PushValue} from '../../pushValue/pushValue';
 
-export interface OutputSwitcher extends Channel {
+export interface OutputSwitcher extends Response{
+  outputTypeIsValid(outputType:string):boolean;
+  activeButton(): OutputSwitcherButton;
+  requestFormatSwitch(outputSwitcherButton: OutputSwitcherButton): void;
   isSwitchable(value: PushValue<boolean>): void;
   isLoading(value: PushValue<boolean>): void;
-  activeButton(value:PushValue<OutputSwitcherButton>): void;
-  switchFormat(outputSwitcherButton: OutputSwitcherButton): void;
 }

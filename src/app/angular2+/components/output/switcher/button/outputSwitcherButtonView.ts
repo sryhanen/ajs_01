@@ -53,7 +53,7 @@ import {OutputSwitcher} from '../../../../objects/output/switcher/outputSwitcher
     <button class="btn btn-secondary"
             type="button"
             title="{{outputSwitcherButton.title()}}"
-            (click)="outputSwitcher.switchFormat(outputSwitcherButton)">
+            (click)="outputSwitcher.requestFormatSwitch(outputSwitcherButton)">
       <i class="{{outputSwitcherButton.icon()}}"></i>
     </button>
   `
