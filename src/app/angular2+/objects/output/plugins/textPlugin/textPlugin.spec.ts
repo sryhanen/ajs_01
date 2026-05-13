@@ -44,6 +44,7 @@
  * a licensee so wish it.
  */
 import {TextPluginImpl} from './textPluginImpl';
+import {OutputType} from '../../outputType';
 
 describe('TextPlugin', () => {
   const textData = 'Test data';
@@ -56,6 +57,21 @@ describe('TextPlugin', () => {
   describe('Birth', () => {
     it('Should be initialized', () => {
       expect(textPlugin).toBeInstanceOf(TextPluginImpl);
+    });
+
+    it('Should have output type', () => {
+      expect(textPlugin.outputType()).toEqual(OutputType.text);
+    });
+
+    it('Should not be stub', () => {
+      expect(textPlugin.isStub()).toBe(false);
+    });
+  });
+  describe('Render', () => {
+    it('Should bind table to the html element', () => {
+      const htmlElement = document.createElement('div');
+      textPlugin.render(htmlElement);
+      expect(htmlElement.innerHTML).toContain(textData);
     });
   });
 });

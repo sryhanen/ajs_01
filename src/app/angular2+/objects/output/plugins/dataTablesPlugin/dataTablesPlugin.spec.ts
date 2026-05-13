@@ -47,6 +47,7 @@ import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {DataTablesPluginImpl} from './dataTablesPluginImpl';
 import {DataTablesPlugin} from './dataTablesPlugin';
+import {OutputType} from '../../outputType';
 
 describe('DataTablesOutput', () => {
   let channel:Channel;
@@ -77,6 +78,14 @@ describe('DataTablesOutput', () => {
     it('Should be initialized', () => {
       expect(dataTablesPlugin).toBeInstanceOf(DataTablesPluginImpl);
     });
+
+    it('Should have output type', () => {
+      expect(dataTablesPlugin.outputType()).toEqual(OutputType.dataTables);
+    });
+
+    it('Should not be a stub', () => {
+      expect(dataTablesPlugin.isStub()).toBe(false);
+    });
   });
 
   describe('Request', () => {
@@ -87,6 +96,14 @@ describe('DataTablesOutput', () => {
       dataTablesPlugin.request(request);
       expect(channelSpy).toHaveBeenCalledTimes(1);
       expect(channelSpy).toHaveBeenCalledWith(request);
+    });
+  });
+
+  describe('Render', () => {
+    it('Should bind table to the html element', () => {
+      const htmlElement = document.createElement('div');
+      dataTablesPlugin.render(htmlElement);
+      expect(htmlElement.innerHTML).toContain('<table class="table table-bordered table-striped');
     });
   });
 });
