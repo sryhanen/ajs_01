@@ -43,21 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../outputDTO';
 import {TextPluginImpl} from './textPluginImpl';
-import {OutputType} from '../../outputType';
 
-describe('TextOutput', () => {
+describe('TextPlugin', () => {
   const textData = 'Test data';
-  let output:OutputDTO<string>;
   let textPlugin: TextPluginImpl;
 
   beforeEach(() => {
-    output = {
-      type:OutputType.text,
-      data: textData,
-    };
-    textPlugin = new TextPluginImpl(output);
+    textPlugin = new TextPluginImpl(textData);
   });
 
   describe('Birth', () => {

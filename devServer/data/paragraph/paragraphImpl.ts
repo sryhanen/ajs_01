@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import { ParagraphDTO } from './paragraphDTO';
-import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
 
 
 export default class ParagraphImpl implements ParagraphDTO {
@@ -60,7 +59,7 @@ export default class ParagraphImpl implements ParagraphDTO {
   progress = 100;
   text: string;
   title: string;
-  output: OutputDTO<unknown>;
+  output: object;
   settings = {
     params: {},
     forms: {}
@@ -81,7 +80,7 @@ export default class ParagraphImpl implements ParagraphDTO {
     enabled: true
   };
 
-  constructor(status: string, output?: OutputDTO<unknown>, text?: string, title?: string, id = 'p'.concat(Math.random().toString(36).slice(2, 12))) {
+  constructor(status: string, output?: object, text?: string, title?: string, id = 'p'.concat(Math.random().toString(36).slice(2, 12))) {
     this.id = id;
     this.status = status;
     this.text = text;

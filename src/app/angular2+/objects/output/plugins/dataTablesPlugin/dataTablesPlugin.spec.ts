@@ -43,18 +43,15 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../outputDTO';
-import {DataTablesOutputData} from './dataTablesOutputData';
-import {DataTablesOutputOptions} from './dataTablesOutputOptions';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {OutputType} from '../../outputType';
 import {DataTablesPluginImpl} from './dataTablesPluginImpl';
 import {DataTablesPlugin} from './dataTablesPlugin';
 
 describe('DataTablesOutput', () => {
   let channel:Channel;
-  let output: OutputDTO<DataTablesOutputData, DataTablesOutputOptions>;
+  let outputData;
+  let outputOptions;
   let dataTablesPlugin:DataTablesPlugin;
   const initialData = [
     {test:'test1'},
@@ -64,19 +61,16 @@ describe('DataTablesOutput', () => {
 
   beforeEach(() => {
     channel = new FakeChannel();
-    output = {
-      type: OutputType.dataTables,
-      data: {
-        data:initialData,
-        draw:1,
-        recordsTotal: 3,
-        recordsFiltered: 3,
-      },
-      options: {
-        headers:['test']
-      },
+    outputData = {
+      data:initialData,
+      draw:1,
+      recordsTotal: 3,
+      recordsFiltered: 3,
     };
-    dataTablesPlugin = new DataTablesPluginImpl(channel, output);
+    outputOptions = {
+      headers:['test']
+    };
+    dataTablesPlugin = new DataTablesPluginImpl(channel, outputData, outputOptions);
   });
 
   describe('Birth', () => {

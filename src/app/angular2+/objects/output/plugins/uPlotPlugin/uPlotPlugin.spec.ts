@@ -43,10 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../outputDTO';
-import {uPlotOutputData} from './uPlotOutputData';
 import {uPlotOutputOptions} from './uPlotOutputOptions';
-import {OutputType} from '../../outputType';
 import uPlot from 'uplot';
 import {GraphType} from '../../format/uPlot/graphType';
 import {uPlotPluginImpl} from './uPlotPluginImpl';
@@ -62,15 +59,9 @@ describe('uPlotOutput', () => {
     xAxisLabel: 'value',
     graphType: GraphType.line
   };
-  let output: OutputDTO<uPlotOutputData, uPlotOutputOptions>;
   let microPlotPlugin: uPlotPluginImpl;
   beforeEach(() => {
-    output = {
-      data: data,
-      options: options,
-      type: OutputType.uPlot
-    };
-    microPlotPlugin = new uPlotPluginImpl(output);
+    microPlotPlugin = new uPlotPluginImpl(data, options);
   });
 
   describe('Birth', () =>{

@@ -53,8 +53,6 @@ import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
 import NoteService from '../../services/noteService';
 import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
-import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
-import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputData';
 
 export default class RunParagraphHandler implements Handler<RunParagraphMessage>{
   private readonly _noteService: NoteService;
@@ -113,7 +111,7 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
       messageQueue.splice(i*index,0, updateOutputMessage);
     }
     const data2 = this._dataTablesService.paginated(this._baseData, 0, 50, draws);
-    const output2: OutputDTO<DataTablesOutputData> = {data: data2, options: this._dataTablesService.options(this._baseData), type:OutputType.dataTables, isAggregated:true};
+    const output2 = {data: data2, options: this._dataTablesService.options(this._baseData), type:OutputType.dataTables, isAggregated:true};
     paragraph.status = 'FINISHED';
     paragraph.progress = 100;
     paragraph.output = output2;

@@ -49,7 +49,6 @@ import {receiveOperation, sendOperation} from '../webSocketOperations';
 import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
 import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
-import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
 import {uPlotResultService} from '../../services/uPlotService/uPlotResultService';
 import {uPlotResultServiceImpl} from '../../services/uPlotService/uPlotResultServiceImpl';
 
@@ -74,7 +73,7 @@ export default class ParagraphOutputRequestHandler implements Handler<object>{
 
   private result(message: object){
     const rawData = this._dataTablesService.rawData(1000);
-    let output:OutputDTO<unknown>;
+    let output;
     const messageData = message['data'];
     const outputType = messageData['type'];
 
