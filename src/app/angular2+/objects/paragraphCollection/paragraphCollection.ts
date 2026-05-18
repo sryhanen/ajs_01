@@ -43,10 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AngularObject} from '../../angularObject/angularObject';
-import {Channel} from '../../channel/channel';
+import {Paragraph} from '../paragraph/paragraph';
+import {Channel} from '../channel/channel';
+import {PushValue} from '../pushValue/pushValue';
 
-export interface AngularObjectUpdateMessage {
-  toAngularObject<T>(channel:Channel):AngularObject<T>;
-  noteId():string;
+export interface ParagraphCollection extends Channel {
+  paragraphs(value:PushValue<Paragraph[]>):void;
 }
