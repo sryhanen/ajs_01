@@ -43,8 +43,19 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookDTO} from '../noteMessage/notebookDTO';
+import {Component, Input} from '@angular/core';
+import {AngularViewUpgradeModule} from './angularViewUpgradeModule';
+import {AngularPlugin} from '../../../../objects/output/plugins/angularPlugin/angularPlugin';
 
-export interface NotesInfoDTO {
-  notes: Partial<NotebookDTO>[];
+@Component({
+  selector: 'angular-view',
+  imports: [
+    AngularViewUpgradeModule
+  ],
+  template: `
+    <ajs-angular-view [plugin]="plugin"></ajs-angular-view>
+  `
+})
+export class AngularView {
+  @Input({required:true}) plugin: AngularPlugin;
 }

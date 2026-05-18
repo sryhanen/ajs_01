@@ -43,21 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {AngularViewUpgradeModule} from './angularViewUpgradeModule';
-import {AngularPlugin} from '../../../../objects/output/plugins/angularPlugin/angularPlugin';
-import {AngularObjectCollection} from '../../../../objects/angularObjectCollection/angularObjectCollection';
+import {WritableSignal} from '@angular/core';
+import {PushValue} from '../../objects/pushValue/pushValue';
 
-@Component({
-  selector: 'angular-view',
-  imports: [
-    AngularViewUpgradeModule
-  ],
-  template: `
-    <ajs-angular-view [plugin]="plugin" [angularObjectCollection]="angularObjectCollection"></ajs-angular-view>
-  `
-})
-export class AngularView {
-  @Input({required:true}) plugin: AngularPlugin;
-  @Input({required:true}) angularObjectCollection: AngularObjectCollection;
+export class WritableSignalAsPushValue<T> implements PushValue<T> {
+  private readonly _writableSignal: WritableSignal<T>;
+
+  constructor(writableSignal: WritableSignal<T>) {
+    this._writableSignal = writableSignal;
+  }
+
+  update(value: T): void {
+    this._writableSignal.set(value);
+  }
+
+  value(): T {
+    return this._writableSignal();
+  }
 }

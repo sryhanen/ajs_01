@@ -51,15 +51,19 @@ import {OutputContainerImpl} from '../../../objects/output/container/outputConta
 import {OutputContainerView} from './outputContainerView';
 import {ToasterService} from '../../../../shared/components/Toaster/notifications.service';
 import {FakeToasterService} from '../../../../shared/components/Toaster/fakeToasterService';
+import {AngularObjectCollection} from '../../../objects/angularObjectCollection/angularObjectCollection';
+import {AngularObjectCollectionImpl} from '../../../objects/angularObjectCollection/angularObjectCollectionImpl';
 
 describe('OutputContainerView', () => {
   let channel:Channel;
+  let angularObjectCollection: AngularObjectCollection;
   let outputContainer: OutputContainer;
   let toaster: FakeToasterService;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     channel = new FakeChannel();
-    outputContainer = new OutputContainerImpl(channel);
+    angularObjectCollection = new AngularObjectCollectionImpl(channel);
+    outputContainer = new OutputContainerImpl(channel, angularObjectCollection);
     toaster = new FakeToasterService();
   });
 

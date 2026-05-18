@@ -43,26 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  Input,
-  ViewChild
-} from '@angular/core';
-import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
+import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {OutputPlugin} from '../../../objects/output/plugins/outputPlugin';
 
 @Component({
-  selector:'text',
+  selector: 'output-plugin',
   template: `
-  <div #anchor class="plain-text"></div>
-  `
-  })
-export class TextView implements AfterViewInit{
+    <div #anchor></div>
+  `,
+})
+export class PluginView implements AfterViewInit {
   @Input({required:true}) plugin: OutputPlugin;
   @ViewChild('anchor') anchor: ElementRef;
 
   ngAfterViewInit(): void {
-    this.plugin.attach(this.anchor.nativeElement);
+    if(!this.plugin.isStub()){
+      this.plugin.render(this.anchor.nativeElement);
+    }
   }
 }
