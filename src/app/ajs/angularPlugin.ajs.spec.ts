@@ -86,7 +86,7 @@ describe('AngularPluginAjs', () => {
   describe('AngularJs component lifecycle $postLink-hook ', () => {
     const template = '<h1>Test Template</h1>';
     const channel = new FakeChannel();
-    const angularPlugin:AngularPlugin = new AngularPluginImpl(channel, template);
+    let angularPlugin:AngularPlugin;
     let angularObjectCollection: AngularObjectCollection;
     let angularObjects: PushValue<AngularObject[]>;
     const angularObject1 = {
@@ -118,11 +118,11 @@ describe('AngularPluginAjs', () => {
     beforeEach(() => {
       angularObjects = new PushValueImpl();
       angularObjectCollection = new AngularObjectCollectionImpl(channel);
+      angularPlugin  = new AngularPluginImpl(channel, template, angularObjectCollection);
       angularObjectCollection.angularObjects(angularObjects);
       angularObjectCollection.response(angularObjectResponse1);
       angularObjectCollection.response(angularObjectResponse2);
       angularPluginAjs.plugin = angularPlugin;
-      angularPluginAjs.angularObjectCollection = angularObjectCollection;
       angularPluginAjs.$postLink();
     });
 
