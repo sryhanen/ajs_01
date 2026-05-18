@@ -64,7 +64,7 @@ export class SafeJsonImpl implements SafeJson{
 
   private validateKeyExists(key:string):void {
     if(!Object.prototype.hasOwnProperty.call(this._data, key)) {
-      throw new Error(`Key "${key}" not found in object ${this._data}`);
+      throw new Error(`Key "${key}" not found in object ${JSON.stringify(this._data)}`);
     }
   }
 
