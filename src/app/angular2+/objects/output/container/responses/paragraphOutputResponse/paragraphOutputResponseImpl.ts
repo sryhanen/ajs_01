@@ -96,7 +96,7 @@ export class ParagraphOutputResponseImpl implements ParagraphOutputResponse {
           this._pushOutputPlugin.forEach(value => value.update(this._activePlugin));
         }
         else if(this._activePlugin.outputType() === OutputType.dataTables && outputFormatToRender.outputType() === OutputType.dataTables){
-          this._activePlugin.response(outputData);
+          this._activePlugin.response(safeOutputData.getProperty('data', 'object'));
         }
         else{
           this._activePlugin = outputFormatToRender.plugin(outputData);
