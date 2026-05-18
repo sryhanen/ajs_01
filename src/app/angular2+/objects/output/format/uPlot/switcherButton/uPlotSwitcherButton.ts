@@ -45,8 +45,6 @@
  */
 import {OutputSwitcherButton} from '../../../switcher/button/outputSwitcherButton';
 import {OutputType} from '../../../outputType';
-import {MessageDTO} from '../../../../message/messageDTO';
-import {ParagraphOutputRequestDTO} from '../../../paragraphOutputRequest/paragraphOutputRequestDTO';
 
 export class uPlotSwitcherButton implements OutputSwitcherButton {
   private readonly _title:string;
@@ -64,7 +62,15 @@ export class uPlotSwitcherButton implements OutputSwitcherButton {
     return this._type;
   }
 
-  requestData(): MessageDTO<ParagraphOutputRequestDTO> {
+  requestData():{
+    op: 'PARAGRAPH_OUTPUT_REQUEST',
+    data:{
+      paragraphId: string
+      noteId: string
+      type: string
+      requestOptions: object
+    }
+  }  {
     return {
       op:'PARAGRAPH_OUTPUT_REQUEST',
       data:{
