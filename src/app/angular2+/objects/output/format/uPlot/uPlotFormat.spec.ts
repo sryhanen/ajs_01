@@ -43,21 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
 import {uPlotFormat} from './uPlotFormat';
-import {FakeChannel} from '../../../channel/fakeChannel';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
 import {OutputType} from '../../outputType';
-import {ContainerRef} from '../../../containerRef/containerRef';
-import {FakeContainerRef} from '../../../containerRef/fakeContainerRef';
+import {uPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
 
 describe('uPlotFormat', () => {
-  let channel: Channel;
   let microPlotFormat: uPlotFormat;
-  beforeEach(async () => {
-    channel = new FakeChannel();
-    microPlotFormat = new uPlotFormat(channel);
+  beforeEach(() => {
+    microPlotFormat = new uPlotFormat();
   });
 
   describe('Birth', ()=> {
@@ -69,71 +62,24 @@ describe('uPlotFormat', () => {
       const switcherButtons = microPlotFormat.switcherButtons();
       expect(switcherButtons).toHaveLength(4);
     });
+
+    it('Should have outputType', () => {
+      expect(microPlotFormat.outputType()).toEqual(OutputType.uPlot);
+    });
   });
 
-  describe('Request', () => {
-    const request = {
-      test:'test'
+  describe('Plugin formatting', ()=> {
+    const pluginData = {
+      data:{},
+      options:{}
     };
-    it('Should request channel', () => {
-      const channelSpy = vi.spyOn(channel, 'request');
-      microPlotFormat.request(request);
-      expect(channelSpy).toHaveBeenCalledTimes(1);
-      expect(channelSpy).toHaveBeenCalledWith(request);
-    });
-  });
 
-
-  describe('Paragraph output response', () => {
-    let paragraphOutputResponse: MessageDTO<ParagraphOutputDTO>;
-    let containerRef: ContainerRef;
-    let createComponentSpy;
-    let clearSpy;
-    beforeEach(() => {
-      containerRef = new FakeContainerRef();
-      createComponentSpy = vi.spyOn(containerRef, 'createComponent');
-      clearSpy = vi.spyOn(containerRef, 'clear');
-      paragraphOutputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data: {
-          noteId:'',
-          paragraphId:'',
-          output: {
-            data: {},
-            type: OutputType.uPlot,
-          }
-        }
-      };
-      microPlotFormat.pushContainerRef(containerRef);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
-      expect(clearSpy).toHaveBeenCalledTimes(0);
+    it('Should return plugin', () => {
+      expect(microPlotFormat.plugin(pluginData)).toBeInstanceOf(uPlotPluginImpl);
     });
 
-    it('Should create component', () => {
-      microPlotFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-      expect(createComponentSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('Should create new component for sequential updates', () => {
-      microPlotFormat.response(paragraphOutputResponse);
-      microPlotFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(2);
-      expect(createComponentSpy).toHaveBeenCalledTimes(2);
-    });
-
-    it('Should only clear component', () => {
-      paragraphOutputResponse.data.output = undefined;
-      microPlotFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
-    });
-
-    it('Should only clear component', () => {
-      paragraphOutputResponse.data.output.type = 'text';
-      microPlotFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
+    it('Should validate plugin data', () => {
+      expect(() => microPlotFormat.plugin({})).toThrow();
     });
   });
 });

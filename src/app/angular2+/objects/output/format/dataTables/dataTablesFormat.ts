@@ -45,75 +45,40 @@
  */
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {Channel} from '../../../channel/channel';
+import {Request} from '../../../channel/request';
 import {DataTableSwitcherButton} from './switcherButton/dataTablesSwitcherButton';
-import {DataTablesView} from '../../../../components/output/plugins/dataTablesView/dataTablesView';
-import {DataTablesPluginStub} from '../../plugins/dataTablesPlugin/dataTablesPluginStub';
 import {OutputFormat} from '../outputFormat';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {DataTablesOutputData} from '../../plugins/dataTablesPlugin/dataTablesOutputData';
-import {ContainerRef} from '../../../containerRef/containerRef';
-import {DataTablesPlugin} from '../../plugins/dataTablesPlugin/dataTablesPlugin';
+import {OutputType} from '../../outputType';
+import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import { OutputPlugin } from '../../plugins/outputPlugin';
 
-export class DataTablesFormat implements OutputFormat{
+export class DataTablesFormat implements OutputFormat, Request {
   private readonly _channel: Channel;
+  private readonly _outputType: string;
   private readonly _switcherButtons: OutputSwitcherButton[];
-  private readonly _viewComponent: new () => DataTablesView;
-  private readonly _pluginStub:DataTablesPlugin;
-  private _plugin: DataTablesPlugin;
-  private readonly _containerRefs: ContainerRef[];
 
   constructor(channel: Channel) {
     this._channel = channel;
-    this._pluginStub = new DataTablesPluginStub();
-    this._plugin = this._pluginStub;
+    this._outputType = OutputType.dataTables;
     this._switcherButtons = [
       new DataTableSwitcherButton()
     ];
-    this._viewComponent = DataTablesView;
-    this._containerRefs = [];
   }
 
-  pushContainerRef(value:ContainerRef): void {
-    this._containerRefs.push(value);
-    if(!this._plugin.isStub()){
-      value.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]);
-    }
+  plugin(paragraphOutputData: object): OutputPlugin {
+    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
+    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
+    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
+    return new DataTablesPluginImpl(this._channel, outputData, outputOptions);
+  }
+
+  outputType(): string {
+    return this._outputType;
   }
 
   request(data: object): void {
     this._channel.request(data);
-  }
-
-  response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    const operation = message.op;
-    if(operation ==='PARAGRAPH_OUTPUT'){
-      const paragraphOutputDto = message.data as ParagraphOutputDTO;
-      const output = new ParagraphOutputMessageImpl(paragraphOutputDto).toOutput();
-      if(output.isStub()){
-        this._plugin = this._pluginStub;
-        this._containerRefs.forEach(containerRef => containerRef.clear());
-      }
-      else{
-        const plugin = output.toDataTablesPlugin(this);
-        if(plugin.isStub()){
-          this._plugin = this._pluginStub;
-          this._containerRefs.forEach(containerRef => containerRef.clear());
-        }
-        else{
-          if(this._plugin.isStub()){
-            this._plugin = plugin;
-            this._containerRefs.forEach(containerRef => containerRef.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]));
-          }
-          else{
-            const dataTablesOutputData:DataTablesOutputData = paragraphOutputDto.output.data as DataTablesOutputData;
-            this._plugin.response(dataTablesOutputData);
-          }
-        }
-      }
-    }
   }
 
   switcherButtons(): OutputSwitcherButton[] {

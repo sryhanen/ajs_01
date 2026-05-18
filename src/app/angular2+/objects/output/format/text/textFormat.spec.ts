@@ -44,22 +44,14 @@
  * a licensee so wish it.
  */
 import {TextFormat} from './textFormat';
-import {Channel} from '../../../channel/channel';
-import {FakeChannel} from '../../../channel/fakeChannel';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
 import {OutputType} from '../../outputType';
-import {ContainerRef} from "../../../containerRef/containerRef";
-import {FakeContainerRef} from "../../../containerRef/fakeContainerRef";
+import {TextPluginImpl} from "../../plugins/textPlugin/textPluginImpl";
 
 describe('Text Format', () => {
   let textFormat: TextFormat;
-  let channel: Channel;
-
 
   beforeEach(() => {
-    channel = new FakeChannel();
-    textFormat = new TextFormat(channel);
+    textFormat = new TextFormat();
   });
 
   describe('Birth', () => {
@@ -68,72 +60,25 @@ describe('Text Format', () => {
     });
 
     it('Should have switcherButton stub', () => {
-      const list = textFormat.switcherButtons();
-      expect(list).toHaveLength(1);
-      expect(list[0].isStub()).toBe(true);
+      expect(textFormat.switcherButtons()).toEqual([]);
+    });
+
+    it('Should have output type', () => {
+      expect(textFormat.outputType()).toBe(OutputType.text);
     });
   });
 
-  describe('Request', () => {
-    it('Should send request channel',  () =>{
-      const request = {test:'test'};
-      const spy = vi.spyOn(channel, 'request');
-      textFormat.request(request);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(request);
-    });
-  });
+  describe('Plugin formatting', () => {
+    const pluginData = {
+      data:'',
+    };
 
-  describe('Paragraph output response', () => {
-    let paragraphOutputResponse: MessageDTO<ParagraphOutputDTO>;
-    let containerRef: ContainerRef;
-    let createComponentSpy;
-    let clearSpy;
-    beforeEach(() => {
-      containerRef = new FakeContainerRef();
-      createComponentSpy = vi.spyOn(containerRef, 'createComponent');
-      clearSpy = vi.spyOn(containerRef, 'clear');
-      paragraphOutputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data: {
-          noteId:'',
-          paragraphId:'',
-          output: {
-            data: 'Test data',
-            type: OutputType.text,
-          }
-        }
-      };
-      textFormat.pushContainerRef(containerRef);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
-      expect(clearSpy).toHaveBeenCalledTimes(0);
+    it('Should return plugin', () => {
+      expect(textFormat.plugin(pluginData)).toBeInstanceOf(TextPluginImpl);
     });
 
-    it('Should create component', () => {
-      textFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-      expect(createComponentSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('Should create new component for sequential updates', () => {
-      textFormat.response(paragraphOutputResponse);
-      textFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(2);
-      expect(createComponentSpy).toHaveBeenCalledTimes(2);
-    });
-
-    it('Should only clear component', () => {
-      paragraphOutputResponse.data.output = undefined;
-      textFormat.response(paragraphOutputResponse);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('Should only clear component', () => {
-      paragraphOutputResponse.data.output.type = 'dataTable';
-      textFormat.response(paragraphOutputResponse);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
+    it('Should validate plugin data', () => {
+      expect(() => textFormat.plugin({})).toThrow();
     });
   });
 });

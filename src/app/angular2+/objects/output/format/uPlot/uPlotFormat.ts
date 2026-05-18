@@ -45,67 +45,37 @@
  */
 import {OutputFormat} from '../outputFormat';
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
-import {Channel} from '../../../channel/channel';
 import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
-import {uPlotView} from '../../../../components/output/plugins/uPlotView/uPlotView';
 import {GraphType} from './graphType';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ContainerRef} from '../../../containerRef/containerRef';
-import {uPlotPluginStub} from '../../plugins/uPlotPlugin/uPlotPluginStub';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {uPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
+import {OutputType} from '../../outputType';
+import uPlot from 'uplot';
 import {OutputPlugin} from '../../plugins/outputPlugin';
 
 export class uPlotFormat implements OutputFormat {
-  private readonly _channel:Channel;
   private readonly _switcherButtons:OutputSwitcherButton[];
-  private readonly _viewComponent: new () => uPlotView;
-  private readonly _containerRefs: ContainerRef[];
-  private readonly _pluginStub: OutputPlugin;
-  private _plugin: OutputPlugin;
+  private readonly _outputType: string;
 
-  constructor(channel: Channel) {
-    this._channel = channel;
+  constructor() {
+    this._outputType = OutputType.uPlot;
     this._switcherButtons = [
       new uPlotSwitcherButton('Line Chart', 'fas fa-chart-line', GraphType.line),
       new uPlotSwitcherButton('Area Chart', 'fas fa-chart-area', GraphType.area),
       new uPlotSwitcherButton('Bar Chart', 'fas fa-chart-bar', GraphType.bar),
       new uPlotSwitcherButton('Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
-    this._viewComponent = uPlotView;
-    this._containerRefs = [];
-    this._pluginStub = new uPlotPluginStub();
-    this._plugin = this._pluginStub;
   }
 
-  pushContainerRef(value:ContainerRef): void {
-    this._containerRefs.push(value);
-    if(!this._plugin.isStub()){
-      value.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]);
-    }
+  plugin(paragraphOutputData: object): OutputPlugin {
+    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
+    const outputData: uPlot.AlignedData = safeParagraphOutputData.getProperty('data', 'object');
+    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
+    return new uPlotPluginImpl(outputData, outputOptions);
   }
 
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    const op = message.op;
-    if(op === 'PARAGRAPH_OUTPUT'){
-      const output = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO).toOutput();
-      if(output.isStub()){
-        this._plugin = this._pluginStub;
-        this._containerRefs.forEach(containerRef => containerRef.clear());
-      }
-      else{
-        this._containerRefs.forEach(containerRef => containerRef.clear());
-        this._plugin = output.touPlotPlugin();
-        if(!this._plugin.isStub()){
-          this._containerRefs.forEach(containerRef => containerRef.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]));
-        }
-      }
-    }
+  outputType(): string {
+    return this._outputType;
   }
 
   switcherButtons(): OutputSwitcherButton[] {
