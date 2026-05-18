@@ -43,36 +43,51 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
-import {Authentication} from '../../../../shared/objects/security/authentication';
-import {Message} from '../message';
+import {NotesInfoResponse} from './notesInfoResponse';
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {Channel} from '../../../channel/channel';
+import {Notebook} from '../../../notebook/notebook';
+import {PushValue} from '../../../pushValue/pushValue';
+import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 
-export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {
-  private readonly _message: Message;
-  private readonly _authentication:Authentication;
-  private readonly _messageId:string;
+describe('NotesInfoResponse', () => {
+    let channel:Channel;
+    let notebookCollection: Notebook[];
+    let pushValue: PushValue<Notebook[]>;
+    let pushCollection: PushValue<Notebook[]>[];
+    let notebookCollectionUpdate: NotesInfoResponse;
+    beforeEach(() => {
+      channel  = new FakeChannel();
+      notebookCollection = [];
+      pushValue = new PushValueImpl();
+      pushCollection = [pushValue];
+      notebookCollectionUpdate = new NotesInfoResponse(notebookCollection, pushCollection, channel);
+    });
 
-  constructor(message: Message, authentication:Authentication, messageId:string) {
-    this._message = message;
-    this._authentication = authentication;
-    this._messageId = messageId;
-  }
+    describe('Birth', () => {
+      it('Should be initialized', () => {
+        expect(notebookCollectionUpdate).toBeInstanceOf(NotesInfoResponse);
+      });
+    });
 
-  print(): { op: string, data: object, ticket:string, principal:string, roles:string, msgId:string }{
-    let authenticationInfo = {
-      principal: '',
-      ticket: '',
-      roles: '',
-    };
-    if(!this._authentication.isStub()){
-      const {screenUsername, ...ticket } = this._authentication.ticket();
-      authenticationInfo = ticket;
-    }
-    return {
-      op: this._message.operation(),
-      data: this._message.data(),
-      ...authenticationInfo,
-      msgId: this._messageId,
-    };
-  }
-}
+    describe('Collection updates', () => {
+      const notebook1 = {name:'note1'};
+      const notebook2 = {name:'note2'};
+      const updateResponse = {
+        op: 'NOTES_INFO',
+        data: {
+          notes: [
+            notebook1,
+            notebook2
+          ]
+        }
+      };
+      it('Updates notebookCollection and pushCollection', () => {
+        expect(notebookCollection).toHaveLength(0);
+        const pushCollectionSpy = vi.spyOn(pushCollection[0], 'update');
+        notebookCollectionUpdate.response(updateResponse);
+        expect(notebookCollection).toHaveLength(2);
+        expect(pushCollectionSpy).toHaveBeenCalledExactlyOnceWith(notebookCollection);
+      });
+    });
+});

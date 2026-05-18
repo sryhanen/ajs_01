@@ -43,36 +43,47 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
-import {Authentication} from '../../../../shared/objects/security/authentication';
-import {Message} from '../message';
+import {Channel} from '../../../channel/channel';
+import {DefaultRequest} from './defaultRequest';
+import {FakeChannel} from '../../../channel/fakeChannel';
 
-export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {
-  private readonly _message: Message;
-  private readonly _authentication:Authentication;
-  private readonly _messageId:string;
+describe('DefaultRequest', () => {
+  let channel:Channel;
+  let defaultRequest:DefaultRequest;
 
-  constructor(message: Message, authentication:Authentication, messageId:string) {
-    this._message = message;
-    this._authentication = authentication;
-    this._messageId = messageId;
-  }
+  beforeEach(() => {
+    channel = new FakeChannel();
+    defaultRequest = new DefaultRequest(channel);
+  });
 
-  print(): { op: string, data: object, ticket:string, principal:string, roles:string, msgId:string }{
-    let authenticationInfo = {
-      principal: '',
-      ticket: '',
-      roles: '',
-    };
-    if(!this._authentication.isStub()){
-      const {screenUsername, ...ticket } = this._authentication.ticket();
-      authenticationInfo = ticket;
-    }
-    return {
-      op: this._message.operation(),
-      data: this._message.data(),
-      ...authenticationInfo,
-      msgId: this._messageId,
-    };
-  }
-}
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(defaultRequest).toBeInstanceOf(DefaultRequest);
+    });
+  });
+
+  describe('Request', () => {
+    let channelSpy;
+    beforeEach(() => {
+      channelSpy = vi.spyOn(channel, 'request');
+    });
+
+    it('Should request channel', () => {
+      const request = {
+        op:'',
+        data:{}
+      };
+      defaultRequest.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+
+    it('Should not request channel', () => {
+      const request = {
+        op:'RUN_PARAGRAPH',
+        data:{}
+      };
+      defaultRequest.request(request);
+      expect(channelSpy).toHaveBeenCalledTimes(0);
+    });
+  });
+});

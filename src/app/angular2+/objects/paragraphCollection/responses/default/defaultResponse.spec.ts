@@ -43,36 +43,40 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
-import {Authentication} from '../../../../shared/objects/security/authentication';
-import {Message} from '../message';
+import {Paragraph} from '../../../paragraph/paragraph';
+import {DefaultResponse} from './defaultResponse';
+import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {Channel} from '../../../channel/channel';
+import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
+import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
 
-export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {
-  private readonly _message: Message;
-  private readonly _authentication:Authentication;
-  private readonly _messageId:string;
+describe('DefaultResponse', () => {
+  let paragraphs:Paragraph[];
+  let defaultResponse:DefaultResponse;
 
-  constructor(message: Message, authentication:Authentication, messageId:string) {
-    this._message = message;
-    this._authentication = authentication;
-    this._messageId = messageId;
-  }
+  beforeEach(() => {
+    const channel: Channel = new FakeChannel();
+    const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
+    paragraphs = [new ParagraphImpl(channel, {}, angularObjectCollection)];
+    defaultResponse = new DefaultResponse(paragraphs);
+  });
 
-  print(): { op: string, data: object, ticket:string, principal:string, roles:string, msgId:string }{
-    let authenticationInfo = {
-      principal: '',
-      ticket: '',
-      roles: '',
-    };
-    if(!this._authentication.isStub()){
-      const {screenUsername, ...ticket } = this._authentication.ticket();
-      authenticationInfo = ticket;
-    }
-    return {
-      op: this._message.operation(),
-      data: this._message.data(),
-      ...authenticationInfo,
-      msgId: this._messageId,
-    };
-  }
-}
+  describe('Birth', () => {
+    it('Should be initialized', ()=> {
+      expect(defaultResponse).toBeInstanceOf(DefaultResponse);
+    });
+  });
+
+  describe('Response', () => {
+    it('Should response paragraphs', ()=> {
+      const paragraphSpy = vi.spyOn(paragraphs[0], 'response');
+      const response = {
+        op:'',
+        data:{}
+      };
+      defaultResponse.response(response);
+      expect(paragraphSpy).toHaveBeenCalledExactlyOnceWith(response);
+    });
+  });
+});

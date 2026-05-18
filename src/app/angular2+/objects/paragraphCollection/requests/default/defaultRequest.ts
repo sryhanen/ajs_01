@@ -43,36 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
-import {Authentication} from '../../../../shared/objects/security/authentication';
-import {Message} from '../message';
+import {Request} from '../../../channel/request';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../../../message/messageImpl';
+import {Channel} from '../../../channel/channel';
 
-export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {
-  private readonly _message: Message;
-  private readonly _authentication:Authentication;
-  private readonly _messageId:string;
+export class DefaultRequest implements Request {
+  private readonly _channel: Channel;
 
-  constructor(message: Message, authentication:Authentication, messageId:string) {
-    this._message = message;
-    this._authentication = authentication;
-    this._messageId = messageId;
+  constructor(channel: Channel) {
+    this._channel = channel;
   }
 
-  print(): { op: string, data: object, ticket:string, principal:string, roles:string, msgId:string }{
-    let authenticationInfo = {
-      principal: '',
-      ticket: '',
-      roles: '',
-    };
-    if(!this._authentication.isStub()){
-      const {screenUsername, ...ticket } = this._authentication.ticket();
-      authenticationInfo = ticket;
+  request(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() !== 'RUN_PARAGRAPH'){
+      this._channel.request(data);
     }
-    return {
-      op: this._message.operation(),
-      data: this._message.data(),
-      ...authenticationInfo,
-      msgId: this._messageId,
-    };
   }
 }

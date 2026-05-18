@@ -43,36 +43,41 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
-import {Authentication} from '../../../../shared/objects/security/authentication';
-import {Message} from '../message';
+import {Channel} from '../../../channel/channel';
+import {Response} from '../../../channel/response';
+import {Paragraph} from '../../../paragraph/paragraph';
+import {PushValue} from '../../../pushValue/pushValue';
+import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
 
-export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {
-  private readonly _message: Message;
-  private readonly _authentication:Authentication;
-  private readonly _messageId:string;
+export class ParagraphResponse implements Response {
+  private readonly _channel: Channel;
+  private readonly _paragraphs: Paragraph[];
+  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
+  private readonly _angularObjectCollection: AngularObjectCollection;
 
-  constructor(message: Message, authentication:Authentication, messageId:string) {
-    this._message = message;
-    this._authentication = authentication;
-    this._messageId = messageId;
+  constructor(channel: Channel, paragraphs: Paragraph[], pushParagraphs: PushValue<Paragraph[]>[], angularObjectCollection: AngularObjectCollection) {
+    this._channel = channel;
+    this._paragraphs = paragraphs;
+    this._pushParagraphs = pushParagraphs;
+    this._angularObjectCollection = angularObjectCollection;
   }
 
-  print(): { op: string, data: object, ticket:string, principal:string, roles:string, msgId:string }{
-    let authenticationInfo = {
-      principal: '',
-      ticket: '',
-      roles: '',
-    };
-    if(!this._authentication.isStub()){
-      const {screenUsername, ...ticket } = this._authentication.ticket();
-      authenticationInfo = ticket;
+  response(data: object): void {
+    if(this._paragraphs.length === 0){
+      return;
     }
-    return {
-      op: this._message.operation(),
-      data: this._message.data(),
-      ...authenticationInfo,
-      msgId: this._messageId,
-    };
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'PARAGRAPH') {
+      const newParagraph = new ParagraphImpl(this._channel, message.data(), this._angularObjectCollection);
+      const paragraphIndex = this._paragraphs.findIndex(paragraph => paragraph.id() === newParagraph.id());
+      if(paragraphIndex === -1){
+        throw new Error(`Paragraph update failed: Paragraph "${newParagraph.id()}" not found in current collection.`);
+      }
+      this._paragraphs.splice(paragraphIndex, 1, newParagraph);
+      this._pushParagraphs.forEach(value => value.update(this._paragraphs));
+    }
   }
 }
