@@ -43,36 +43,46 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
-import {Authentication} from '../../../../shared/objects/security/authentication';
-import {Message} from '../message';
+import {Request} from '../../../channel/request';
+import {Paragraph} from '../../../paragraph/paragraph';
+import {Channel} from '../../../channel/channel';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {Message} from '../../../message/message';
 
-export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {
-  private readonly _message: Message;
-  private readonly _authentication:Authentication;
-  private readonly _messageId:string;
+export class RunParagraphRequest implements Request {
+  private readonly _channel: Channel;
+  private readonly _paragraphs: Paragraph[];
 
-  constructor(message: Message, authentication:Authentication, messageId:string) {
-    this._message = message;
-    this._authentication = authentication;
-    this._messageId = messageId;
+  constructor(channel: Channel, paragraphs: Paragraph[]){
+    this._channel = channel;
+    this._paragraphs = paragraphs;
   }
 
-  print(): { op: string, data: object, ticket:string, principal:string, roles:string, msgId:string }{
-    let authenticationInfo = {
-      principal: '',
-      ticket: '',
-      roles: '',
-    };
-    if(!this._authentication.isStub()){
-      const {screenUsername, ...ticket } = this._authentication.ticket();
-      authenticationInfo = ticket;
+  request(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'RUN_PARAGRAPH'){
+      const runParagraphData = new SafeJsonImpl(message.data());
+      const paragraphId:string = runParagraphData.getProperty('id', 'string');
+      const decoratorParagraph = this._paragraphs.find(paragraph => paragraph.id() === paragraphId);
+      if(decoratorParagraph === undefined){
+        throw new Error(`Failed to decorate run paragraph request: paragraph "${paragraphId}" not found in collection`);
+      }
+      this._channel.request(this.decoratedMessage(message, decoratorParagraph));
     }
+  }
+
+  private decoratedMessage(message:Message, decoratorParagraph:Paragraph):object {
+    const data = message.data();
+    const decoratorData = new SafeJsonImpl(decoratorParagraph.print());
+    data['paragraph'] = decoratorData.getProperty<string>('text', 'string');
+    data['config'] = decoratorData.getProperty<object>('config', 'object');
+    const settings = decoratorData.getProperty<object>('settings', 'object');
+    data['params'] = new SafeJsonImpl(settings).getProperty<object>('params', 'object');
     return {
-      op: this._message.operation(),
-      data: this._message.data(),
-      ...authenticationInfo,
-      msgId: this._messageId,
+      op: message.operation(),
+      data: data
     };
   }
 }
+

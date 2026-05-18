@@ -43,36 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
-import {Authentication} from '../../../../shared/objects/security/authentication';
-import {Message} from '../message';
+import {Response} from '../../../channel/response';
+import {Paragraph} from '../../../paragraph/paragraph';
+import {PushValue} from '../../../pushValue/pushValue';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../../../message/messageImpl';
 
-export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {
-  private readonly _message: Message;
-  private readonly _authentication:Authentication;
-  private readonly _messageId:string;
+export class ParagraphRemovedResponse implements Response {
+  private readonly _paragraphs: Paragraph[];
+  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
 
-  constructor(message: Message, authentication:Authentication, messageId:string) {
-    this._message = message;
-    this._authentication = authentication;
-    this._messageId = messageId;
+  constructor(paragraphs: Paragraph[], pushParagraphs: PushValue<Paragraph[]>[]) {
+    this._paragraphs = paragraphs;
+    this._pushParagraphs = pushParagraphs;
   }
 
-  print(): { op: string, data: object, ticket:string, principal:string, roles:string, msgId:string }{
-    let authenticationInfo = {
-      principal: '',
-      ticket: '',
-      roles: '',
-    };
-    if(!this._authentication.isStub()){
-      const {screenUsername, ...ticket } = this._authentication.ticket();
-      authenticationInfo = ticket;
+  response(data: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'PARAGRAPH_REMOVED'){
+      if(this._paragraphs.length === 0){
+        return;
+      }
+      const paragraphRemovedData = new SafeJsonImpl(message.data());
+      const removedParagraphId:string = paragraphRemovedData.getProperty('id', 'string');
+      const removedParagraphIndex = this._paragraphs.findIndex(paragraph => paragraph.id() === removedParagraphId);
+      if(removedParagraphIndex === -1) {
+        throw new Error(`Paragraph delete failed: Paragraph "${removedParagraphId}" not found in current collection.`);
+      }
+      this._paragraphs.splice(removedParagraphIndex, 1);
+      this._pushParagraphs.forEach(pushValue => pushValue.update(this._paragraphs));
     }
-    return {
-      op: this._message.operation(),
-      data: this._message.data(),
-      ...authenticationInfo,
-      msgId: this._messageId,
-    };
   }
 }

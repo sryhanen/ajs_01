@@ -43,36 +43,17 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
-import {Authentication} from '../../../../shared/objects/security/authentication';
-import {Message} from '../message';
+import {Response} from '../../../channel/response';
+import {Paragraph} from '../../../paragraph/paragraph';
 
-export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {
-  private readonly _message: Message;
-  private readonly _authentication:Authentication;
-  private readonly _messageId:string;
+export class DefaultResponse implements Response {
+  private readonly _paragraphs: Paragraph[];
 
-  constructor(message: Message, authentication:Authentication, messageId:string) {
-    this._message = message;
-    this._authentication = authentication;
-    this._messageId = messageId;
+  constructor(paragraphs: Paragraph[]) {
+    this._paragraphs = paragraphs;
   }
 
-  print(): { op: string, data: object, ticket:string, principal:string, roles:string, msgId:string }{
-    let authenticationInfo = {
-      principal: '',
-      ticket: '',
-      roles: '',
-    };
-    if(!this._authentication.isStub()){
-      const {screenUsername, ...ticket } = this._authentication.ticket();
-      authenticationInfo = ticket;
-    }
-    return {
-      op: this._message.operation(),
-      data: this._message.data(),
-      ...authenticationInfo,
-      msgId: this._messageId,
-    };
+  response(data: object) {
+    this._paragraphs.forEach(paragraph => paragraph.response(data));
   }
 }

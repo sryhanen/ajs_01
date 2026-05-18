@@ -43,36 +43,39 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
-import {Authentication} from '../../../../shared/objects/security/authentication';
-import {Message} from '../message';
+import {Response} from '../../../channel/response';
+import {Notebook} from '../../../notebook/notebook';
+import {PushValue} from '../../../pushValue/pushValue';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {Channel} from '../../../channel/channel';
+import {NotebookImpl} from '../../../notebook/notebookImpl';
 
-export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {
-  private readonly _message: Message;
-  private readonly _authentication:Authentication;
-  private readonly _messageId:string;
+export class NoteResponse implements Response {
+  private readonly _channel:Channel;
+  private readonly _notebooks: Notebook[];
+  private readonly _pushCollection:PushValue<Notebook[]>[];
 
-  constructor(message: Message, authentication:Authentication, messageId:string) {
-    this._message = message;
-    this._authentication = authentication;
-    this._messageId = messageId;
+  constructor(channel:Channel, notebooks:Notebook[], pushCollection:PushValue<Notebook[]>[]) {
+    this._channel = channel;
+    this._notebooks = notebooks;
+    this._pushCollection = pushCollection;
   }
 
-  print(): { op: string, data: object, ticket:string, principal:string, roles:string, msgId:string }{
-    let authenticationInfo = {
-      principal: '',
-      ticket: '',
-      roles: '',
-    };
-    if(!this._authentication.isStub()){
-      const {screenUsername, ...ticket } = this._authentication.ticket();
-      authenticationInfo = ticket;
+  response(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'NOTE'){
+      const noteData = new SafeJsonImpl(message.data());
+      const noteId:string = noteData.getProperty('id', 'string');
+      const noteIndex = this._notebooks.findIndex(notebook => notebook.id() === noteId);
+      const newNotebook = new NotebookImpl(this._channel, message.data());
+      if(noteIndex === -1){
+        this._notebooks.push(newNotebook);
+      }
+      else{
+        this._notebooks.splice(noteIndex, 1, newNotebook);
+      }
+      this._pushCollection.forEach(pushValue => pushValue.update(this._notebooks));
     }
-    return {
-      op: this._message.operation(),
-      data: this._message.data(),
-      ...authenticationInfo,
-      msgId: this._messageId,
-    };
   }
 }
