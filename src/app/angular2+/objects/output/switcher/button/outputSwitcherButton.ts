@@ -44,12 +44,18 @@
  * a licensee so wish it.
  */
 import Stubable from '../../../../../shared/interfaces/stubable';
-import {ParagraphOutputRequestDTO} from '../../paragraphOutputRequest/paragraphOutputRequestDTO';
-import {MessageDTO} from '../../../message/messageDTO';
 
 export interface OutputSwitcherButton extends Stubable {
   icon(): string;
   title(): string;
   outputType(): string;
-  requestData(): MessageDTO<ParagraphOutputRequestDTO>;
+  requestData(): {
+    op: 'PARAGRAPH_OUTPUT_REQUEST',
+    data:{
+      paragraphId: string
+      noteId: string
+      type: string
+      requestOptions: object
+    }
+  };
 }

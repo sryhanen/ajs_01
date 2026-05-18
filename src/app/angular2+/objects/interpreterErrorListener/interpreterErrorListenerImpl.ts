@@ -45,8 +45,8 @@
  */
 import {InterpreterErrorListener} from './interpreterErrorListener';
 import {Channel} from '../channel/channel';
-import {MessageDTO} from '../message/messageDTO';
-import {InterpreterErrorDTO} from './interpreterErrorDTO';
+import {MessageImpl} from '../message/messageImpl';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 
 export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
   private readonly _channel: Channel;
@@ -68,11 +68,10 @@ export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    const operation = message.op;
-    if(operation === 'INTERPRETER_ERROR'){
-      const errorData = message.data as InterpreterErrorDTO;
-      this._toaster.addToast(errorData.message, 'Danger');
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'INTERPRETER_ERROR'){
+      const errorData = new SafeJsonImpl(message.data());
+      this._toaster.addToast(errorData.getProperty('message', 'string'), 'Danger');
     }
   }
 }
