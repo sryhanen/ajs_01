@@ -44,19 +44,10 @@
  * a licensee so wish it.
  */
 import angular, {IPostLink, IScope} from 'angular';
-import {AngularObjectCollection} from '../angular2+/objects/angularObjectCollection/angularObjectCollection';
 import {PushValue} from '../angular2+/objects/pushValue/pushValue';
 import {PushValueImpl} from '../angular2+/objects/pushValue/pushValueImpl';
 import {AngularObject} from '../angular2+/objects/angularObject/angularObject';
-import {MessageDTO} from '../angular2+/objects/message/messageDTO';
-import {RunParagraphDTO} from '../angular2+/objects/message/runParagraphMessage/runParagraphDTO';
 import {AngularPlugin} from '../angular2+/objects/output/plugins/angularPlugin/angularPlugin';
-import {
-  AngularObjectClientBindDTO
-} from '../angular2+/objects/message/angularObjectClientBindMessage/angularObjectClientBindDTO';
-import {
-  AngularObjectClientUnbindDTO
-} from '../angular2+/objects/message/angularObjectClientUnbindMessage/angularObjectClientUnbindDTO';
 
 export class AngularPluginAjs implements IPostLink{
   static $inject = ['$compile', '$scope', '$element'];
@@ -64,9 +55,8 @@ export class AngularPluginAjs implements IPostLink{
   readonly $scope: IScope;
   private readonly $element;
   plugin!: AngularPlugin;
-  angularObjectCollection!: AngularObjectCollection;
 
-  private _angularObjects: PushValue<AngularObject<unknown>[]>;
+  private _angularObjects: PushValue<AngularObject[]>;
 
   constructor($compile, $scope: IScope, $element) {
     this.$compile = $compile;
@@ -80,13 +70,13 @@ export class AngularPluginAjs implements IPostLink{
 
   $postLink() {
     this._angularObjects = new PushValueImpl();
-    this.angularObjectCollection.angularObjects(this._angularObjects);
+    this.plugin.angularObjectCollection().angularObjects(this._angularObjects);
     this.watchAngularObjects();
     this.render();
   };
 
   private runParagraph(paragraphId:string) {
-    const runParagraphMessage:MessageDTO<RunParagraphDTO> = {
+    const runParagraphMessage = {
       op: 'RUN_PARAGRAPH',
       data: {
         id: paragraphId,
@@ -99,7 +89,7 @@ export class AngularPluginAjs implements IPostLink{
   }
 
   private angularBind(name:string, value:string, paragraphId:string) {
-    const angularObjectClientBindMessage:MessageDTO<AngularObjectClientBindDTO> = {
+    const angularObjectClientBindMessage = {
       op: 'ANGULAR_OBJECT_CLIENT_BIND',
       data: {
         noteId: '',
@@ -113,7 +103,7 @@ export class AngularPluginAjs implements IPostLink{
   }
 
   private angularUnbind(name:string, paragraphId:string) {
-    const angularObjectClientUnbindMessage:MessageDTO<AngularObjectClientUnbindDTO> = {
+    const angularObjectClientUnbindMessage = {
       op: 'ANGULAR_OBJECT_CLIENT_UNBIND',
       data: {
         noteId: '',
@@ -167,7 +157,6 @@ export const angularPluginAjs = {
     `,
   bindings: {
     plugin: '=',
-    angularObjectCollection: '=',
   },
   controller: AngularPluginAjs
 };
