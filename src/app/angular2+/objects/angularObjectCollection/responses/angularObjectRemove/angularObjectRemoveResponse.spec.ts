@@ -43,74 +43,61 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from './outputDTO';
-import {Output} from './output';
-import {OutputImpl} from './outputImpl';
-import {OutputType} from './outputType';
-import {FakeChannel} from '../channel/fakeChannel';
-import {Channel} from '../channel/channel';
+import {AngularObject} from '../../../angularObject/angularObject';
+import {PushValue} from '../../../pushValue/pushValue';
+import {AngularObjectRemoveResponse} from './angularObjectRemoveResponse';
+import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
+import {Channel} from '../../../channel/channel';
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 
-describe('Output', () => {
-  let data:OutputDTO<unknown>;
-  let output:Output;
+describe('AngularObjectRemoveResponse', () => {
+  const defaultAngularObjectData =  {
+    noteId: 'noteId',
+    interpreterGroupId: 'interpreterGroupId',
+    name: 'object1',
+    value: 'value1'
+  };
   let channel:Channel;
+  let defaultAngularObject: AngularObject;
+  let angularObjects: AngularObject[];
+  let pushValues:PushValue<AngularObject[]>[];
+  let angularObjectRemoveResponse:AngularObjectRemoveResponse;
+
   beforeEach(() => {
-    data = {
-      type: 'test',
-      data: {}
-    };
-    output = new OutputImpl(data);
     channel = new FakeChannel();
+    defaultAngularObject = new AngularObjectImpl(channel, defaultAngularObjectData);
+    angularObjects = [defaultAngularObject];
+    pushValues = [new PushValueImpl()];
+    angularObjectRemoveResponse = new AngularObjectRemoveResponse(angularObjects, pushValues);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(output).toBeInstanceOf(OutputImpl);
-    });
-
-    it('Should not be stub', () => {
-      expect(output.isStub()).toBe(false);
+      expect(angularObjectRemoveResponse).toBeInstanceOf(AngularObjectRemoveResponse);
     });
   });
 
-  describe('Plugins', () => {
-    describe('toDataTables', () => {
-      it('Should have stub', () => {
-        output = new OutputImpl(data);
-        expect(output.toDataTablesPlugin(channel).isStub()).toBe(true);
-      });
-
-      it('Should have implementation', () => {
-        data.type = OutputType.dataTables;
-        output = new OutputImpl(data);
-        expect(output.toDataTablesPlugin(channel).isStub()).toBe(false);
-      });
+  describe('Response', () => {
+    let response;
+    beforeEach(() => {
+      response = {
+        op:'ANGULAR_OBJECT_REMOVE',
+        data: {
+          name: defaultAngularObjectData.name,
+        }
+      };
     });
 
-    describe('toText', () => {
-      it('Should have stub', () => {
-        output = new OutputImpl(data);
-        expect(output.toTextPlugin().isStub()).toBe(true);
-      });
-
-      it('Should have implementation', () => {
-        data.type = OutputType.text;
-        output = new OutputImpl(data);
-        expect(output.toTextPlugin().isStub()).toBe(false);
-      });
+    it('Should remove object', () => {
+      angularObjectRemoveResponse.response(response);
+      expect(angularObjects).toEqual([]);
+      expect(pushValues[0].value()).toEqual(angularObjects);
     });
 
-    describe('touPlot', () => {
-      it('Should have stub', () => {
-        output = new OutputImpl(data);
-        expect(output.touPlotPlugin().isStub()).toBe(true);
-      });
-
-      it('Should have implementation', () => {
-        data.type = OutputType.uPlot;
-        output = new OutputImpl(data);
-        expect(output.touPlotPlugin().isStub()).toBe(false);
-      });
+    it('Should throw if object is not in the collection remove object', () => {
+      response.data.name = 'object2';
+      expect(() => angularObjectRemoveResponse.response(response)).toThrow();
     });
   });
 });
