@@ -43,8 +43,57 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface AngularObjectRemoveDTO {
-  noteId:string;
-  paragraphId:string;
-  name:string;
-}
+import {SafeJson} from './safeJson';
+import {SafeJsonImpl} from './safeJsonImpl';
+
+describe('SafeJson', () => {
+  let safeJson: SafeJson;
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      safeJson = new SafeJsonImpl({});
+      expect(safeJson).toBeInstanceOf(SafeJsonImpl);
+    });
+  });
+
+  describe('Property exists', () => {
+    const json = {test: ''};
+
+    it('Should have property', () => {
+      safeJson = new SafeJsonImpl(json);
+      expect(safeJson.propertyExists('test')).toBe(true);
+    });
+
+    it('Should not have property', () => {
+      safeJson = new SafeJsonImpl(json);
+      expect(safeJson.propertyExists('test1')).toBe(false);
+    });
+  });
+
+  describe('Get property', () => {
+    const json = {
+      stringProperty: 'value of string property',
+      numberProperty: 12,
+      objectProperty: {nestedObjectProperty: ''},
+      booleanProperty: true,
+    };
+
+    it('Should have properties', () => {
+      safeJson = new SafeJsonImpl(json);
+      expect(safeJson.getProperty<string>('stringProperty', 'string')).toEqual(json.stringProperty);
+      expect(safeJson.getProperty<number>('numberProperty', 'number')).toEqual(json.numberProperty);
+      expect(safeJson.getProperty<object>('objectProperty', 'object')).toEqual(json.objectProperty);
+      expect(safeJson.getProperty<string>('booleanProperty', 'boolean')).toEqual(json.booleanProperty);
+    });
+
+    it('Should throw if assumed type is wrong', () => {
+      safeJson = new SafeJsonImpl(json);
+      expect(() => safeJson.getProperty<string>('stringProperty', 'object')).toThrow();
+    });
+
+    it('Should throw if property does not exist', () => {
+      safeJson = new SafeJsonImpl(json);
+      expect(() => safeJson.getProperty<string>('stringProperty1', 'string')).toThrow();
+    });
+  });
+});
