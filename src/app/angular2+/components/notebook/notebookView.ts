@@ -43,13 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ChangeDetectorRef, Component, inject, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, signal} from '@angular/core';
 import {Notebook} from '../../objects/notebook/notebook';
 import {ParagraphView} from '../paragraph/paragraphView';
-import {PushValueImpl} from '../../objects/pushValue/pushValueImpl';
+import {WritableSignalAsPushValue} from '../writableSignalAsPushValue/writableSignalAsPushValue';
 import {Paragraph} from '../../objects/paragraph/paragraph';
-import {PushValue} from '../../objects/pushValue/pushValue';
-import {PushValueWithChangeDetection} from '../../objects/pushValue/pushValueWithChangeDetection';
 
 @Component({
   selector: 'notebook',
@@ -58,7 +56,7 @@ import {PushValueWithChangeDetection} from '../../objects/pushValue/pushValueWit
   ],
   template: `
     @if(noteId === notebook.id()){
-      @for(paragraph of this.paragraphs.value(); track paragraph.id()){
+      @for(paragraph of this.paragraphs(); track paragraph){
         <paragraph [paragraphId]="paragraphId" [paragraph]="paragraph"></paragraph>
       }
     }
@@ -68,11 +66,9 @@ export class NotebookView implements OnInit {
   @Input({required:true}) noteId: string;
   @Input({required:true}) paragraphId: string;
   @Input({required:true}) notebook: Notebook;
-  private cdr = inject(ChangeDetectorRef);
-  protected paragraphs: PushValue<Paragraph[]>;
+  protected paragraphs = signal<Paragraph[]>([]);
 
   ngOnInit() {
-    this.paragraphs = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
-    this.notebook.paragraphs(this.paragraphs);
+    this.notebook.paragraphs(new WritableSignalAsPushValue(this.paragraphs));
   }
 }

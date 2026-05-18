@@ -43,37 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../../../objects/output/outputDTO';
-import {TextPluginStub} from '../../../../objects/output/plugins/textPlugin/textPluginStub';
-import {TextView} from './textView';
-import {render, screen} from '@testing-library/angular';
-import {TextPluginImpl} from '../../../../objects/output/plugins/textPlugin/textPluginImpl';
-import {OutputType} from '../../../../objects/output/outputType';
-import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
+import {Directive, ElementRef, Inject, Injector, Input} from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+import {AngularPlugin} from '../../../../objects/output/plugins/angularPlugin/angularPlugin';
 
-describe('TextView', () => {
-  const textData:string = 'Some text data';
-  const outputDto: OutputDTO<string> = {
-    data: textData,
-    type: OutputType.text,
-  };
-  const textPlugin: OutputPlugin = new TextPluginImpl(outputDto);
-  const textPluginStub: OutputPlugin = new TextPluginStub();
+@Directive({
+  selector: 'ajs-angular-view'
+})
+export class AngularViewUpgradeModule extends UpgradeComponent {
+  @Input({required:true}) plugin: AngularPlugin;
 
-  describe('Birth', () => {
-    test('Should be initialized', async () => {
-      const {container} = await render(TextView, {
-        inputs:{plugin: textPlugin},
-      });
-      expect(container).toBeDefined();
-      expect(() => screen.getByText(textData)).toBeDefined();
-    });
-
-    it('Should throw', async () => {
-      const result = render(TextView, {
-        inputs:{plugin:textPluginStub}
-      });
-      expect(async () => await result).rejects.toThrow();
-    });
-  });
-});
+  constructor(
+    @Inject(ElementRef) elementRef: ElementRef,
+    @Inject(Injector) injector: Injector
+  ) {
+    super('angularPluginAjs', elementRef, injector);
+  }
+}
