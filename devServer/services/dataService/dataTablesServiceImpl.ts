@@ -44,16 +44,13 @@
  * a licensee so wish it.
  */
 import {DataTablesService} from './dataTablesService';
-import {
-  DataTablesOutputOptions
-} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputOptions';
 
 export default class DataTablesServiceImpl implements DataTablesService {
   private readonly _people: string[] = ['Bob', 'Alice', 'Mark', 'Elise'];
   private readonly _operation: string[] = ['create', 'read', 'update', 'delete'];
   private readonly _host: string[] = ['example.test', ''];
 
-  options(data:object[]): DataTablesOutputOptions {
+  options(data:object[]): object {
     const headers = Object.keys(data[0]);
     return {
       headers: headers,

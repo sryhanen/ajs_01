@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
 
 
 export interface ParagraphDTO {
@@ -55,7 +54,7 @@ export interface ParagraphDTO {
   jobName: string;
   progress:number;
   progressUpdateIntervalMs:number;
-  output?: OutputDTO<unknown>;
+  output?: object;
   status: string;
   text: string;
   title: string;

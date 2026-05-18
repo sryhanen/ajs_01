@@ -52,12 +52,7 @@ import ParagraphImpl from '../../data/paragraph/paragraphImpl';
 import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
 import NoteService from '../../services/noteService';
-import {MessageDTO} from '../../../src/app/angular2+/objects/message/messageDTO';
 import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
-import {ParagraphOutputDTO} from '../../../src/app/angular2+/objects/message/paragraphOutputMessage/paragraphOutputDTO';
-import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
-import {DataTablesOutputData} from '../../../src/app/angular2+/objects/output/plugins/dataTablesPlugin/dataTablesOutputData';
-
 
 export default class RunParagraphHandler implements Handler<RunParagraphMessage>{
   private readonly _noteService: NoteService;
@@ -79,7 +74,7 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
     const paragraphId = message.data.id;
     const title = message.data.title;
     const text = message.data.paragraph;
-    const messageQueue: MessageDTO<unknown>[] = [];
+    const messageQueue: object[] = [];
     const paragraph = new ParagraphImpl('PENDING', undefined, text, title, paragraphId);
     messageQueue.push(this.paraMessage(paragraph));
 
@@ -99,7 +94,7 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
 
     for (let i = 1; i < draws; i++) {
       const index = messageQueue.length / draws;
-      const updateOutputMessage: MessageDTO<ParagraphOutputDTO> = {
+      const updateOutputMessage = {
         op: sendOperation.paragraphOutput,
         data: {
           noteId: this._noteService.lastNoteId(),
@@ -116,12 +111,12 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
       messageQueue.splice(i*index,0, updateOutputMessage);
     }
     const data2 = this._dataTablesService.paginated(this._baseData, 0, 50, draws);
-    const output2: OutputDTO<DataTablesOutputData> = {data: data2, options: this._dataTablesService.options(this._baseData), type:OutputType.dataTables, isAggregated:true};
+    const output2 = {data: data2, options: this._dataTablesService.options(this._baseData), type:OutputType.dataTables, isAggregated:true};
     paragraph.status = 'FINISHED';
     paragraph.progress = 100;
     paragraph.output = output2;
 
-    const updateOutputMessage: MessageDTO<ParagraphOutputDTO> = {
+    const updateOutputMessage = {
       op: sendOperation.paragraphOutput,
       data: {
         noteId: this._noteService.lastNoteId(),
@@ -145,7 +140,7 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
     this._noteService.update(notebook, notebook.id);
   }
 
-  private emitMessageQueue(messageQueue: MessageDTO<unknown>[], client: WebSocket) {
+  private emitMessageQueue(messageQueue: object[], client: WebSocket) {
     for(let i = 0; i < messageQueue.length; i++) {
       const timeout =  (i + 1) * 1000;
       setTimeout(() => {
