@@ -48,16 +48,12 @@ import {Handler} from './handler';
 import {receiveOperation, sendOperation} from '../webSocketOperations';
 import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
-import {MessageDTO} from '../../../src/app/angular2+/objects/message/messageDTO';
-import {ParagraphOutputRequestDTO} from '../../../src/app/angular2+/objects/output/paragraphOutputRequest/paragraphOutputRequestDTO';
-import {ParagraphOutputDTO} from '../../../src/app/angular2+/objects/message/paragraphOutputMessage/paragraphOutputDTO';
 import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
-import {OutputDTO} from '../../../src/app/angular2+/objects/output/outputDTO';
 import {uPlotResultService} from '../../services/uPlotService/uPlotResultService';
 import {uPlotResultServiceImpl} from '../../services/uPlotService/uPlotResultServiceImpl';
 
 
-export default class ParagraphOutputRequestHandler implements Handler<MessageDTO<ParagraphOutputRequestDTO>>{
+export default class ParagraphOutputRequestHandler implements Handler<object>{
   private readonly _dataTablesService: DataTablesService;
   private readonly _uPlotResultService: uPlotResultService;
 
@@ -70,17 +66,19 @@ export default class ParagraphOutputRequestHandler implements Handler<MessageDTO
     return receiveOperation.paragraphOutputRequest;
   }
 
-  execute(message: MessageDTO<ParagraphOutputRequestDTO>, client: WebSocket): void  {
+  execute(message: object, client: WebSocket): void  {
     const result = this.result(message);
     client.send(JSON.stringify(result));
   }
 
-  private result(message: MessageDTO<ParagraphOutputRequestDTO>): MessageDTO<ParagraphOutputDTO>{
+  private result(message: object){
     const rawData = this._dataTablesService.rawData(1000);
-    let output:OutputDTO<unknown>;
+    let output;
+    const messageData = message['data'];
+    const outputType = messageData['type'];
 
-    if(message.data.type === OutputType.dataTables){
-      const options = message.data.requestOptions as {start:number, length:number, draw:number};
+    if(outputType === OutputType.dataTables){
+      const options = messageData.requestOptions as {start:number, length:number, draw:number};
       const paginated = this._dataTablesService.paginated(rawData, options.start, options.length, options.draw);
       output = {
         type: OutputType.dataTables,
@@ -89,8 +87,8 @@ export default class ParagraphOutputRequestHandler implements Handler<MessageDTO
         isAggregated:true
       };
     }
-    else if(message.data.type === OutputType.uPlot){
-      const requestOptions = message.data.requestOptions as {graphType: string};
+    else if(outputType === OutputType.uPlot){
+      const requestOptions = messageData.requestOptions as {graphType: string};
       output = {
         type: OutputType.uPlot,
         data: this._uPlotResultService.outputData(),
@@ -102,8 +100,8 @@ export default class ParagraphOutputRequestHandler implements Handler<MessageDTO
     return {
       op: sendOperation.paragraphOutput,
       data: {
-        noteId: message.data.noteId,
-        paragraphId: message.data.paragraphId,
+        noteId: messageData.noteId,
+        paragraphId: messageData.paragraphId,
         output:output,
       },
     };

@@ -45,8 +45,6 @@
  */
 import uPlot from 'uplot';
 import {uPlotResultService} from './uPlotResultService';
-import {uPlotOutputOptions} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputOptions';
-import {uPlotOutputData} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputData';
 
 export class uPlotResultServiceImpl implements uPlotResultService {
   private readonly _seriesLength:number;
@@ -57,7 +55,7 @@ export class uPlotResultServiceImpl implements uPlotResultService {
     this._seriesCount = 4;
   }
 
-  options(graphType:string): uPlotOutputOptions {
+  options(graphType:string): object {
     const xValues = this.xValues();
     const series = [];
     for(let i=0; i< this._seriesCount; i++) {
@@ -71,7 +69,7 @@ export class uPlotResultServiceImpl implements uPlotResultService {
     };
   }
 
-  outputData(): uPlotOutputData {
+  outputData(): uPlot.AlignedData {
     const xValues = this.xValues();
     const data = [];
     for(let i=0; i< this._seriesCount; i++){

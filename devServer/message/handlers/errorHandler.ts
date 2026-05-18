@@ -46,14 +46,13 @@
 import {WebSocket} from 'ws';
 import {receiveOperation, sendOperation} from '../webSocketOperations';
 import {Handler} from './handler';
-import {MessageDTO} from '../../../src/app/angular2+/objects/message/messageDTO';
 
-export default class ErrorHandler implements Handler<MessageDTO<unknown>>{
+export default class ErrorHandler implements Handler<object>{
 
-  execute(message: MessageDTO<unknown>, client: WebSocket): void {
+  execute(message: object, client: WebSocket): void {
     const msg = {
       op: sendOperation.errorInfo,
-      data: {error: 'Unknown operation', op: message.op},
+      data: {error: 'Unknown operation', op: message['op']},
     };
     client.send(JSON.stringify(msg));
   }
