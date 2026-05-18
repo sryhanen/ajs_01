@@ -52,6 +52,9 @@ import {OutputSwitcherImpl} from '../../../switcher/outputSwitcherImpl';
 import {DataTablesFormat} from '../../../format/dataTables/dataTablesFormat';
 import {uPlotFormat} from '../../../format/uPlot/uPlotFormat';
 import {OutputType} from '../../../outputType';
+import {PushValueImpl} from '../../../../pushValue/pushValueImpl';
+import {OutputPlugin} from '../../../plugins/outputPlugin';
+import {PushValue} from '../../../../pushValue/pushValue';
 
 describe('ParagraphOutputResponse', () => {
   let channel:Channel;
@@ -60,6 +63,7 @@ describe('ParagraphOutputResponse', () => {
   let outputFormats:OutputFormat[];
   let outputSwitcher:OutputSwitcher;
   let paragraphOutputResponse:ParagraphOutputResponseImpl;
+  let outputPlugin: PushValue<OutputPlugin>;
 
   beforeEach(() => {
     channel = new FakeChannel();
@@ -68,11 +72,17 @@ describe('ParagraphOutputResponse', () => {
     outputFormats = [dataTablesOutputFormat, uPlotOutputFormat];
     outputSwitcher = new OutputSwitcherImpl(channel);
     paragraphOutputResponse = new ParagraphOutputResponseImpl(channel, outputFormats, outputSwitcher);
+    outputPlugin = new PushValueImpl<OutputPlugin>();
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
       expect(paragraphOutputResponse).toBeInstanceOf(ParagraphOutputResponseImpl);
+    });
+
+    it('Should have plugin stub', () => {
+      paragraphOutputResponse.outputPlugin(outputPlugin);
+      expect(outputPlugin.value().isStub()).toBe(true);
     });
   });
 
@@ -81,11 +91,11 @@ describe('ParagraphOutputResponse', () => {
     let outputData: {
       type: string,
       data: object,
-      options?: object,
+      options: object,
     };
     beforeEach(()  => {
       outputData = {
-        type: OutputType.text,
+        type: OutputType.dataTables,
         data: {},
         options: {},
       };
@@ -99,14 +109,41 @@ describe('ParagraphOutputResponse', () => {
       };
     });
 
-    it('It should create request if output is not in requested format', () => {
-      outputSwitcher.requestFormatSwitch(dataTablesOutputFormat.switcherButtons()[0]);
-      const channelSpy = vi.spyOn(channel, 'request');
-      const outputFormatSpies = outputFormats.map(format => vi.spyOn(format, 'render'));
-      paragraphOutputResponse.response(paragraphOutputResponseMessage);
-      expect(channelSpy).toHaveBeenCalledOnce();
-      expect(outputFormatSpies[0]).toHaveBeenCalledTimes(0);
-      expect(outputFormatSpies[1]).toHaveBeenCalledTimes(0);
+    describe('Plugin is updated successfully on response', () => {
+      it('Should update plugin', () => {
+        paragraphOutputResponse.outputPlugin(outputPlugin);
+        paragraphOutputResponse.response(paragraphOutputResponseMessage);
+        expect(outputPlugin.value().isStub()).toBe(false);
+      });
+
+      it('Should have plugin', () => {
+        paragraphOutputResponse.response(paragraphOutputResponseMessage);
+        paragraphOutputResponse.outputPlugin(outputPlugin);
+        expect(outputPlugin.value().isStub()).toBe(false);
+      });
+    });
+
+    describe('Creates output request if received response is not in requested format', () =>{
+      it('Creates request and does not update plugin', () => {
+        outputSwitcher.requestFormatSwitch(uPlotOutputFormat.switcherButtons()[0]);
+        const channelSpy = vi.spyOn(channel, 'request');
+        const outputFormatSpies = outputFormats.map(format => vi.spyOn(format, 'plugin'));
+        paragraphOutputResponse.response(paragraphOutputResponseMessage);
+        expect(channelSpy).toHaveBeenCalledOnce();
+        expect(outputFormatSpies[0]).toHaveBeenCalledTimes(0);
+        expect(outputFormatSpies[1]).toHaveBeenCalledTimes(0);
+      });
+    });
+
+    describe('Sequential responses to datatables', () =>{
+      it('Should respond to datatables plugin', () => {
+        paragraphOutputResponse.response(paragraphOutputResponseMessage);
+        paragraphOutputResponse.outputPlugin(outputPlugin);
+        const pluginSpy = vi.spyOn(outputPlugin.value(), 'response');
+        paragraphOutputResponse.response(paragraphOutputResponseMessage);
+        paragraphOutputResponse.response(paragraphOutputResponseMessage);
+        expect(pluginSpy).toHaveBeenCalledTimes(2);
+      });
     });
   });
 });
