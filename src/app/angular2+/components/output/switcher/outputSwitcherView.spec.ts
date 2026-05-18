@@ -48,17 +48,18 @@ import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {OutputSwitcherImpl} from '../../../objects/output/switcher/outputSwitcherImpl';
 import {Channel} from '../../../objects/channel/channel';
 import {OutputSwitcherView} from './outputSwitcherView';
-import {render, screen, fireEvent} from '@testing-library/angular';
+import {render, screen, fireEvent, RenderResult} from '@testing-library/angular';
 import { test } from 'vitest';
 import {FakeOutputSwitcherButton} from '../../../objects/output/switcher/button/fakeOutputSwitcherButton';
 
 describe('OutputSwitcherView', () => {
   let channel:Channel;
   let outputSwitcher: OutputSwitcher;
+  let renderResult: RenderResult<unknown, unknown>;
   beforeEach(async () => {
     channel = new FakeChannel();
     outputSwitcher = new OutputSwitcherImpl(channel);
-    await render(OutputSwitcherView, {
+    renderResult = await render(OutputSwitcherView, {
       inputs:{
         outputSwitcher: outputSwitcher,
         outputSwitcherButtons: [new FakeOutputSwitcherButton()]
@@ -79,40 +80,37 @@ describe('OutputSwitcherView', () => {
     beforeEach(() => {
       paragraphOutputResponse = {
         op:'PARAGRAPH_OUTPUT',
-        data: {
-          noteId: '',
-          paragraphId: '',
-          output: {
+        data:{
+          output:{
             isAggregated: true,
-            data: {},
-            type: ''
           }
         }
       };
     });
 
-    test('Should have buttons visible', () =>{
+    test('Should have buttons visible', async () =>{
       outputSwitcher.response(paragraphOutputResponse);
-      const buttonGroup = screen.getByRole('group');
-      const buttons = screen.getAllByRole('button');
+      const buttonGroup = await screen.findByRole('group');
+      const buttons = await screen.findAllByRole('button');
       expect(buttonGroup).toBeDefined();
       expect(buttons).toHaveLength(1);
     });
 
-    test('Should have loader visible', () =>{
+    test('Should have loader visible', async () =>{
       outputSwitcher.response(paragraphOutputResponse);
-      const button = screen.getByRole('button');
+      const button = await screen.findByRole('button');
       fireEvent.click(button);
-      const loader = screen.getByRole('status');
+      const loader = await screen.findByRole('status');
       expect(loader).toBeDefined();
     });
 
-    test('Should hide loader', () =>{
+    test('Should hide loader', async () =>{
       outputSwitcher.response(paragraphOutputResponse);
-      const button = screen.getByRole('button');
+      const button = await screen.findByRole('button');
       fireEvent.click(button);
       outputSwitcher.response(paragraphOutputResponse);
-      expect(() => screen.getByRole('status')).toThrow();
+      renderResult.detectChanges();
+      expect(async () => await screen.findByRole('status')).rejects.toThrow();
     });
   });
 });

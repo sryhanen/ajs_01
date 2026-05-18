@@ -59,7 +59,7 @@ import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writabl
   ],
   template: `
     @let status = this.switcherStatus();
-      @if (status.isSwitchable) {
+    @if (status.isSwitchable) {
       <div class="btn-group" role="group">
         @for (button of outputSwitcherButtons; track $index) {
           <output-switcher-button class="btn-group" [outputSwitcherButton]="button"
