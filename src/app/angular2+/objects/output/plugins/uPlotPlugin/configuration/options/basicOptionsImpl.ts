@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import uPlot from 'uplot';
-import {uPlotOutputOptions} from '../../uPlotOutputOptions';
 import {GraphSeries} from '../series/graphSeries';
 import {SeriesColor} from '../color/seriesColor';
 import {SeriesColorImpl} from '../color/seriesColorImpl';
@@ -54,11 +53,16 @@ import {ScatterSeries} from '../series/scatterSeries';
 import {BarSeries} from '../series/barSeries';
 
 export class BasicOptionsImpl {
-  private readonly _outputOptions: uPlotOutputOptions;
+  private readonly _outputOptions: {
+    labels: string[];
+    series: string[];
+    xAxisLabel: string;
+    graphType: string
+  };
   private readonly _supportedSeries: GraphSeries[];
   private readonly _seriesColor: SeriesColor;
 
-  constructor(resultOptions: uPlotOutputOptions) {
+  constructor(resultOptions: {labels: string[];series: string[];xAxisLabel: string;graphType: string}) {
     this._outputOptions = resultOptions;
     this._seriesColor = new SeriesColorImpl();
     this._supportedSeries  = [

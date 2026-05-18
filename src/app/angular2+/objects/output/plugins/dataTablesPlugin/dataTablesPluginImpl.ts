@@ -43,40 +43,47 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../outputDTO';
-import {DataTablesOutputData} from './dataTablesOutputData';
-import {DataTablesOutputOptions} from './dataTablesOutputOptions';
 import DataTable, {Config, ConfigColumnDefs, ConfigColumns} from 'datatables.net-bs5';
 import 'datatables.net-buttons-bs5';
 import {Channel} from '../../../channel/channel';
 import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
 import {DataTablesAjax} from './ajax/dataTablesAjax';
-import {DataTablesPlugin} from './dataTablesPlugin';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {OutputPlugin} from '../outputPlugin';
+import {OutputType} from '../../outputType';
 
-export class DataTablesPluginImpl implements DataTablesPlugin {
+export class DataTablesPluginImpl implements OutputPlugin, Channel {
   private readonly _channel: Channel;
   private readonly _dataTablesAjax: DataTablesAjax;
-  private readonly _outputDTO: OutputDTO<DataTablesOutputData, DataTablesOutputOptions>;
+  private readonly _outputData:object;
+  private readonly _outputOptions:object;
+  private readonly _outputType:string;
 
-  constructor(channel:Channel, outputDTO: OutputDTO<DataTablesOutputData, DataTablesOutputOptions>) {
+  constructor(channel:Channel, outputData:object, outputOptions:object) {
     this._channel = channel;
-    this._outputDTO = outputDTO;
+    this._outputData = outputData;
+    this._outputOptions = outputOptions;
     this._dataTablesAjax = new DataTablesAjaxImpl(this);
+    this._outputType = OutputType.dataTables;
+  }
+
+  outputType(): string {
+    return this._outputType;
   }
 
   request(data: object): void {
     this._channel.request(data);
   }
 
-  response(data:DataTablesOutputData): void {
+  response(data:object): void {
     this._dataTablesAjax.response(data);
   }
 
-  attach(anchorElement: HTMLElement): void {
-    const initialData = this._outputDTO.data;
-    const headers = this._outputDTO.options.headers;
+  render(anchorElement: HTMLElement): void {
+    const safeOptions = new SafeJsonImpl(this._outputOptions);
+    const headers:Array<string> = safeOptions.getProperty('headers', 'object');
     const config: Config = {
-      ajax: this._dataTablesAjax.configFunction(initialData),
+      ajax: this._dataTablesAjax.configFunction(this._outputData),
       serverSide: true,
       columns: this.transformedColumns(headers),
       columnDefs: this.escapeHtml().concat(this.defaultVisible(headers)),
@@ -104,7 +111,12 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
       ordering: false,
       processing: true,
     };
-    new DataTable(anchorElement, config);
+    const anchor = document.createElement('table');
+    anchor.classList.add('table');
+    anchor.classList.add('table-bordered');
+    anchor.classList.add('table-striped');
+    anchorElement.appendChild(anchor);
+    new DataTable(anchor, config);
   }
 
   isStub(): boolean {

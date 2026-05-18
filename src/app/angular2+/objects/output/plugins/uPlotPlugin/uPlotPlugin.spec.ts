@@ -43,39 +43,38 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../../outputDTO';
-import {uPlotOutputData} from './uPlotOutputData';
-import {uPlotOutputOptions} from './uPlotOutputOptions';
-import {OutputType} from '../../outputType';
 import uPlot from 'uplot';
 import {GraphType} from '../../format/uPlot/graphType';
 import {uPlotPluginImpl} from './uPlotPluginImpl';
+import {OutputType} from '../../outputType';
 
 describe('uPlotOutput', () => {
   const data:uPlot.AlignedData = [
     [1,2,3],
     [1,2,3]
   ];
-  const options: uPlotOutputOptions = {
+  const options = {
     labels: ['moment1', 'moment2', 'moment3'],
     series: ['series1'],
     xAxisLabel: 'value',
     graphType: GraphType.line
   };
-  let output: OutputDTO<uPlotOutputData, uPlotOutputOptions>;
   let microPlotPlugin: uPlotPluginImpl;
   beforeEach(() => {
-    output = {
-      data: data,
-      options: options,
-      type: OutputType.uPlot
-    };
-    microPlotPlugin = new uPlotPluginImpl(output);
+    microPlotPlugin = new uPlotPluginImpl(data, options);
   });
 
   describe('Birth', () =>{
     it('Should be initialized', () => {
       expect(microPlotPlugin).toBeInstanceOf(uPlotPluginImpl);
+    });
+
+    it('Should have output type', () => {
+      expect(microPlotPlugin.outputType()).toBe(OutputType.uPlot);
+    });
+
+    it('Should not be stub', () => {
+      expect(microPlotPlugin.isStub()).toBe(false);
     });
   });
 });
