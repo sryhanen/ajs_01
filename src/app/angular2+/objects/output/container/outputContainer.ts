@@ -47,9 +47,12 @@ import {Channel} from '../../channel/channel';
 import {OutputSwitcher} from '../switcher/outputSwitcher';
 import {OutputFormat} from '../format/outputFormat';
 import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
+import {OutputPlugin} from '../plugins/outputPlugin';
+import {PushValue} from '../../pushValue/pushValue';
 
 export interface OutputContainer extends Channel{
   outputSwitcher(): OutputSwitcher;
   outputFormats(): OutputFormat[];
   errorListener(): InterpreterErrorListener;
+  outputPlugin(pushValue: PushValue<OutputPlugin>): void;
 }
