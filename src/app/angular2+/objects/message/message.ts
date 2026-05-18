@@ -43,10 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ContainerRef} from './containerRef';
-
-export class FakeContainerRef implements ContainerRef {
-  clear(): void {}
-
-  createComponent(component: { new(): unknown }, inputs: { name: string; value: unknown }[]): void {}
+export interface Message{
+  data():object;
+  operation():string;
 }
