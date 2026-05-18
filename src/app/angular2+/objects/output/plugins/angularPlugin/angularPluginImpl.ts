@@ -45,18 +45,32 @@
  */
 import {AngularPlugin} from './angularPlugin';
 import {Channel} from '../../../channel/channel';
+import { AngularObjectCollection } from '../../../angularObjectCollection/angularObjectCollection';
+import {OutputType} from '../../outputType';
 
-export class AngularPluginImpl implements AngularPlugin{
+export class AngularPluginImpl implements AngularPlugin {
   private readonly _channel: Channel;
-  private readonly _template:string;
+  private readonly _template: string;
+  private readonly _outputType: string;
+  private readonly _angularObjectCollection: AngularObjectCollection;
 
-  constructor(channel: Channel, template:string) {
+  constructor(channel: Channel, template: string, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._template = template;
+    this._angularObjectCollection = angularObjectCollection;
+    this._outputType = OutputType.angular;
   }
 
-  attach(anchorElement: HTMLElement): void {
-    throw new Error('AngularPluginImpl: Method not implemented.');
+  angularObjectCollection(): AngularObjectCollection {
+    return this._angularObjectCollection;
+  }
+
+  outputType(): string {
+    return this._outputType;
+  }
+
+  render(anchorElement: HTMLElement): void {
+    throw new Error('Angular plugin: Method not implemented.');
   }
 
   isStub(): boolean {
@@ -69,8 +83,5 @@ export class AngularPluginImpl implements AngularPlugin{
 
   request(data: object): void {
     this._channel.request(data);
-  }
-
-  response(data: object): void {
   }
 }

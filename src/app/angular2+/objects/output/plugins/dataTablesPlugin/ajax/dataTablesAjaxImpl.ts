@@ -44,11 +44,9 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../../../channel/channel';
-import {MessageDTO} from '../../../../message/messageDTO';
-import {ParagraphOutputRequestDTO} from '../../../paragraphOutputRequest/paragraphOutputRequestDTO';
 import {OutputType} from '../../../outputType';
-import {DataTablesOutputData} from '../dataTablesOutputData';
 import {DataTablesAjax} from './dataTablesAjax';
+import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';
 
 export class DataTablesAjaxImpl implements DataTablesAjax {
   private readonly _channel: Channel;
@@ -62,19 +60,33 @@ export class DataTablesAjaxImpl implements DataTablesAjax {
     this._channel.request(data);
   }
 
-  response(data: DataTablesOutputData): void {
+  response(data: object): void {
     if(this._callback) {
-      this._callback(data);
+      this._callback(this.validatedData(data));
     }
   }
 
-  configFunction(initialData: DataTablesOutputData): (data: {draw:number, start:number, length:number}, callback: (data:object) => void) => void {
-    const initialDraw = initialData.draw;
+  private validatedData(data: object): {draw:number, recordsTotal:number, recordsFiltered:number, data:object} {
+    const safeJson = new SafeJsonImpl(data);
+    const draw:number = safeJson.getProperty('draw', 'number');
+    const recordsTotal:number = safeJson.getProperty('recordsTotal', 'number');
+    const recordsFiltered:number = safeJson.getProperty('recordsFiltered', 'number');
+    const tableData:object = safeJson.getProperty('data', 'object');
+    return {
+      draw:draw,
+      recordsTotal:recordsTotal,
+      recordsFiltered:recordsFiltered,
+      data:tableData
+    };
+  }
+
+  configFunction(initialData: object): (data: {draw:number, start:number, length:number}, callback: (data:object) => void) => void {
+    const validatedData = this.validatedData(initialData);
     return (data: {draw:number, start:number, length:number}, callback: (data:object) => void) => {
       this._callback = callback;
-      this._callback(initialData);
-      if(data.draw > initialDraw) {
-        const request: MessageDTO<ParagraphOutputRequestDTO> = {
+      this._callback(validatedData);
+      if(data.draw > validatedData.draw) {
+        const request = {
           op:'PARAGRAPH_OUTPUT_REQUEST',
           data: {
             paragraphId: '',

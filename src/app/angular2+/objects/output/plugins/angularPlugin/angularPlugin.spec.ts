@@ -46,28 +46,40 @@
 import {AngularPluginImpl} from './angularPluginImpl';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {Channel} from '../../../channel/channel';
+import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
+import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
+import {OutputType} from '../../outputType';
 
 describe('Angular plugin', () => {
   const template = '<h1>Test Template</h1>';
   const channel:Channel = new FakeChannel();
-  const angularPlugin = new AngularPluginImpl(channel, template);
+  const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
+  const angularPlugin = new AngularPluginImpl(channel, template, angularObjectCollection);
 
   describe('Birth', () => {
     it('Should be initialized', () => {
       expect(angularPlugin).toBeInstanceOf(AngularPluginImpl);
     });
 
-    it('Should have template', () => {
-      expect(angularPlugin.template()).toEqual(template);
+    it('Should have angularObjectCollection', () => {
+      expect(angularPlugin.angularObjectCollection()).toEqual(angularObjectCollection);
+    });
+
+    it('Should have output type', () => {
+      expect(angularPlugin.outputType()).toEqual(OutputType.angular);
+    });
+
+    it('Render should throw', () => {
+      const element = document.createElement('a');
+      expect(() => angularPlugin.render(element)).toThrow();
     });
 
     it('Should not be stub', () => {
       expect(angularPlugin.isStub()).toBe(false);
     });
 
-    it('Attach method should throw', () => {
-      const element = document.createElement('a');
-      expect(() => angularPlugin.attach(element)).toThrow();
+    it('Should have template', () => {
+      expect(angularPlugin.template()).toEqual(template);
     });
   });
 

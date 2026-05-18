@@ -43,9 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {Request} from '../../../channel/request';
 import {OutputPlugin} from '../outputPlugin';
-import {Channel} from '../../../channel/channel';
+import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 
-export interface AngularPlugin extends OutputPlugin, Channel {
+export interface AngularPlugin extends Request, OutputPlugin {
   template():string;
+  angularObjectCollection(): AngularObjectCollection;
 }

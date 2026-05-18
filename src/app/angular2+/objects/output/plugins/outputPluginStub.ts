@@ -43,14 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputPlugin} from '../outputPlugin';
+import {OutputPlugin} from './outputPlugin';
 
-export class uPlotPluginStub implements OutputPlugin {
+export class OutputPluginStub implements OutputPlugin {
   isStub(): boolean {
     return true;
   }
 
-  attach(anchorElement: HTMLElement): void{
-    throw new Error('uPlotPluginStub: Methods is not implemented.');
+  response(data: object): void {
+    throw new Error('OutputPluginStub: method not implemented');
+  }
+
+  outputType(): string {
+    throw new Error('OutputPluginStub: method not implemented');
+  }
+
+  render(anchorElement: HTMLElement): void {
+    throw new Error('OutputPluginStub: method not implemented');
   }
 }
