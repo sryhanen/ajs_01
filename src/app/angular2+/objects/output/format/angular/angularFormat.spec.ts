@@ -47,6 +47,8 @@ import {FakeChannel} from '../../../channel/fakeChannel';
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {AngularFormat} from './angularFormat';
 import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
+import {OutputType} from '../../outputType';
+import {AngularPluginImpl} from '../../plugins/angularPlugin/angularPluginImpl';
 
 describe('AngularFormat', () => {
   const channel = new FakeChannel();
@@ -63,8 +65,29 @@ describe('AngularFormat', () => {
       expect(angularFormat).toBeInstanceOf(AngularFormat);
     });
 
+    it('Should have output type', () => {
+      expect(angularFormat.outputType()).toEqual(OutputType.angular);
+    });
+
     it('Should not have switcherButtons', () => {
       expect(angularFormat.switcherButtons()).toEqual([]);
+    });
+  });
+
+  describe('Plugin formatting', () => {
+    const pluginData = {
+      data:{
+        data:
+          '<h1>{{test}}</h1>'
+      }
+    };
+
+    it('Should return plugin', () => {
+      expect(angularFormat.plugin(pluginData)).toBeInstanceOf(AngularPluginImpl);
+    });
+
+    it('Should validate plugin data', () => {
+      expect(() => angularFormat.plugin({})).toThrow();
     });
   });
 });

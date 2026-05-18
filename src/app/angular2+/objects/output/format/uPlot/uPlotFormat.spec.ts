@@ -45,10 +45,11 @@
  */
 import {uPlotFormat} from './uPlotFormat';
 import {OutputType} from '../../outputType';
+import {uPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
 
 describe('uPlotFormat', () => {
   let microPlotFormat: uPlotFormat;
-  beforeEach(async () => {
+  beforeEach(() => {
     microPlotFormat = new uPlotFormat();
   });
 
@@ -64,6 +65,21 @@ describe('uPlotFormat', () => {
 
     it('Should have outputType', () => {
       expect(microPlotFormat.outputType()).toEqual(OutputType.uPlot);
+    });
+  });
+
+  describe('Plugin formatting', ()=> {
+    const pluginData = {
+      data:{},
+      options:{}
+    };
+
+    it('Should return plugin', () => {
+      expect(microPlotFormat.plugin(pluginData)).toBeInstanceOf(uPlotPluginImpl);
+    });
+
+    it('Should validate plugin data', () => {
+      expect(() => microPlotFormat.plugin({})).toThrow();
     });
   });
 });

@@ -46,6 +46,8 @@
 import {DataTablesFormat} from './dataTablesFormat';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
+import {OutputType} from '../../outputType';
+import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
 
 describe('dataTablesFormat', () => {
   let channel:Channel;
@@ -61,9 +63,13 @@ describe('dataTablesFormat', () => {
       expect(dataTablesFormat).toBeInstanceOf(DataTablesFormat);
     });
 
-    it('Should have switcher button', () =>{
+    it('Should have a switcher button', () =>{
       const buttons = dataTablesFormat.switcherButtons();
       expect(buttons).toHaveLength(1);
+    });
+
+    it('Should have output type', () =>{
+      expect(dataTablesFormat.outputType()).toEqual(OutputType.dataTables);
     });
   });
 
@@ -74,6 +80,20 @@ describe('dataTablesFormat', () => {
       dataTablesFormat.request(requestData);
       expect(channelSpy).toHaveBeenCalledTimes(1);
       expect(channelSpy).toHaveBeenCalledWith(requestData);
+    });
+  });
+
+  describe('Plugin formatting', () => {
+    const plugingData = {
+      data:{},
+      options:{}
+    };
+    it('Should return plugin', () =>{
+      expect(dataTablesFormat.plugin(plugingData)).toBeInstanceOf(DataTablesPluginImpl);
+    });
+
+    it('Should validate plugin data', () =>{
+      expect(() => dataTablesFormat.plugin({})).toThrow();
     });
   });
 });

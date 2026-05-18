@@ -44,6 +44,8 @@
  * a licensee so wish it.
  */
 import {TextFormat} from './textFormat';
+import {OutputType} from '../../outputType';
+import {TextPluginImpl} from "../../plugins/textPlugin/textPluginImpl";
 
 describe('Text Format', () => {
   let textFormat: TextFormat;
@@ -59,6 +61,24 @@ describe('Text Format', () => {
 
     it('Should have switcherButton stub', () => {
       expect(textFormat.switcherButtons()).toEqual([]);
+    });
+
+    it('Should have output type', () => {
+      expect(textFormat.outputType()).toBe(OutputType.text);
+    });
+  });
+
+  describe('Plugin formatting', () => {
+    const pluginData = {
+      data:'',
+    };
+
+    it('Should return plugin', () => {
+      expect(textFormat.plugin(pluginData)).toBeInstanceOf(TextPluginImpl);
+    });
+
+    it('Should validate plugin data', () => {
+      expect(() => textFormat.plugin({})).toThrow();
     });
   });
 });
