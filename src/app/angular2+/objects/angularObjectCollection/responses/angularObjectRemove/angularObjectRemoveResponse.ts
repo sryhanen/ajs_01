@@ -43,26 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ContainerRef} from './containerRef';
-import {ComponentRef, ViewContainerRef} from '@angular/core';
+import {Response} from '../../../channel/response';
+import {AngularObject} from '../../../angularObject/angularObject';
+import {PushValue} from '../../../pushValue/pushValue';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
-export class ContainerRefImpl implements ContainerRef {
-  private readonly _viewContainerRef: ViewContainerRef;
-  private _componentRef: ComponentRef<unknown>;
+export class AngularObjectRemoveResponse implements Response {
+  private readonly _angularObjects: AngularObject[];
+  private readonly _pushValues: PushValue<AngularObject[]>[];
 
-  constructor(viewContainerRef: ViewContainerRef) {
-    this._viewContainerRef = viewContainerRef;
+  constructor(angularObjects: AngularObject[], pushValues: PushValue<AngularObject[]>[]) {
+    this._angularObjects = angularObjects;
+    this._pushValues = pushValues;
   }
 
-  createComponent(component: new () => unknown, inputs: { name: string, value: unknown }[]): void {
-    this._componentRef = this._viewContainerRef.createComponent(component);
-    inputs.forEach(input => this._componentRef.setInput(input.name, input.value));
-  }
-
-  clear(): void {
-    if(this._componentRef) {
-      this._componentRef.destroy();
-      this._componentRef.changeDetectorRef.detectChanges();
+  response(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'ANGULAR_OBJECT_REMOVE'){
+      const angularObjectRemoveData = new SafeJsonImpl(message.data());
+      const objectToRemoveName:string = angularObjectRemoveData.getProperty('name', 'string');
+      const objectIndex = this._angularObjects.findIndex(ao => ao.name() === objectToRemoveName);
+      if(objectIndex === -1){
+        throw new Error(`Error during angular object remove: no object "${objectToRemoveName}" in current collection.`);
+      }
+      this._angularObjects.splice(objectIndex, 1);
+      this._pushValues.forEach(value => value.update(this._angularObjects));
     }
   }
 }
