@@ -47,21 +47,14 @@ import {Channel} from '../channel/channel';
 import {NotebookCollection} from './notebookCollection';
 import {FakeChannel} from '../channel/fakeChannel';
 import {NotebookCollectionImpl} from './notebookCollectionImpl';
-import {Notebook} from '../notebook/notebook';
-import {PushValue} from '../pushValue/pushValue';
-import {PushValueImpl} from '../pushValue/pushValueImpl';
-import {MessageDTO} from '../message/messageDTO';
-import {NotesInfoDTO} from '../message/notesInfoMessage/notesInfoDTO';
 
 describe('NotebookCollection', () => {
   let channel: Channel;
   let notebookCollection: NotebookCollection;
-  let pushCollection:PushValue<Notebook[]>;
 
   beforeEach(() => {
     channel = new FakeChannel();
     notebookCollection = new NotebookCollectionImpl(channel);
-    pushCollection = new PushValueImpl();
   });
 
   describe('Birth', () => {
@@ -70,62 +63,15 @@ describe('NotebookCollection', () => {
     });
   });
 
-  describe('Request', ()=> {
-    it('Should send request to channel', () =>{
-      const spy = vi.spyOn(channel, 'request');
-      const requestData = {};
-      expect(spy).toHaveBeenCalledTimes(0);
-      notebookCollection.request(requestData);
-      expect(spy).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('Response', ()=> {
-    let notesInfoMessage:MessageDTO<NotesInfoDTO>;
-    let defaultMessage:MessageDTO<unknown>;
-    beforeEach(() => {
-      notesInfoMessage = {
-        op:'NOTES_INFO',
-        data: {
-          notes: [
-            {
-              id:'note 1',
-            },
-            {
-              id:'note 2',
-            }
-          ]
-        }
+  describe('Request', () => {
+    it('Should request channel', () => {
+      const channelSpy = vi.spyOn(channel, 'request');
+      const request = {
+        op:'test',
+        data:{}
       };
-      defaultMessage = {
-        op:'DEFAULT',
-        data: {}
-      };
-      notebookCollection.notebooks(pushCollection);
-    });
-
-    it('Should update notebooks', () => {
-      expect(pushCollection.value()).toHaveLength(0);
-      notebookCollection.response(notesInfoMessage);
-      expect(pushCollection.value()).toHaveLength(2);
-    });
-
-    it('Should not update notebooks', () => {
-      expect(pushCollection.value()).toHaveLength(0);
-      notebookCollection.response(defaultMessage);
-      expect(pushCollection.value()).toHaveLength(0);
-    });
-
-    it('Should evoke response for each notebook', () =>{
-      notebookCollection.response(notesInfoMessage);
-      const spies = pushCollection.value().map(note => vi.spyOn(note, 'response'));
-      expect(spies).toHaveLength(2);
-      expect(spies[0]).toHaveBeenCalledTimes(0);
-      expect(spies[1]).toHaveBeenCalledTimes(0);
-
-      notebookCollection.response(defaultMessage);
-      expect(spies[0]).toHaveBeenCalledTimes(1);
-      expect(spies[1]).toHaveBeenCalledTimes(1);
+      notebookCollection.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
     });
   });
 });
