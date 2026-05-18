@@ -142,6 +142,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:apache/zeppelin.git"
+    "url": "git@github.com/teragrep/ajs_01"
   }
 }
