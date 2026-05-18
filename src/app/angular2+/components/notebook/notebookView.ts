@@ -56,7 +56,7 @@ import {Paragraph} from '../../objects/paragraph/paragraph';
   ],
   template: `
     @if(noteId === notebook.id()){
-      @for(paragraph of this.paragraphs(); track paragraph.print()){
+      @for(paragraph of this.paragraphs(); track paragraph){
         <paragraph [paragraphId]="paragraphId" [paragraph]="paragraph"></paragraph>
       }
     }

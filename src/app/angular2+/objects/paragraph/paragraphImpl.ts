@@ -56,12 +56,10 @@ export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
   private readonly _paragraph: SafeJson;
-  private readonly _hash: number;
 
   constructor(channel: Channel, paragraph: object, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
-    this._hash = this.hashCode(JSON.stringify(paragraph));
     this._outputContainer = new OutputContainerImpl(this, angularObjectCollection);
 
     if(this._paragraph.propertyExists('output')){
@@ -77,16 +75,6 @@ export class ParagraphImpl implements Paragraph{
       this._outputContainer.response(paragraphOutputMessage);
     }
   }
-  private hashCode(string:string):number{
-    let hash = 0;
-    for (let i = 0; i < string.length; i++) {
-      const code = string.charCodeAt(i);
-      hash = (hash<<5)-hash+code;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    return hash;
-  }
-
 
   id(): string {
     return this._paragraph.getProperty('id', 'string');
@@ -101,7 +89,6 @@ export class ParagraphImpl implements Paragraph{
       text:this._paragraph.getProperty<string>('text', 'string'),
       config:this._paragraph.getProperty<object>('config', 'object'),
       settings: this._paragraph.getProperty<object>('settings', 'object'),
-      hash:this._hash,
     };
   }
 
