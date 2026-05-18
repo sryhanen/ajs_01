@@ -43,32 +43,36 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphOutputMessage} from './paragraphOutputMessage';
-import {ParagraphOutputDTO} from './paragraphOutputDTO';
-import {Output} from '../../output/output';
-import {OutputStub} from '../../output/outputStub';
-import {OutputImpl} from '../../output/outputImpl';
+import {SafeJson} from './safeJson';
 
-export class ParagraphOutputMessageImpl implements ParagraphOutputMessage{
-  private readonly _data: ParagraphOutputDTO;
+export class SafeJsonImpl implements SafeJson{
+  private readonly _data:object;
 
-  constructor(data: ParagraphOutputDTO) {
+  constructor(data:object) {
     this._data = data;
   }
 
-  noteId():string {
-    return this._data.noteId;
+  propertyExists(key: string): boolean {
+    return Object.prototype.hasOwnProperty.call(this._data, key);
   }
 
-  paragraphId():string {
-    return this._data.paragraphId;
+  getProperty<T>(key:string, type:string): T {
+    this.validateKeyExists(key);
+    const property = this._data[key];
+    return this.validatePropertyType(property, type);
   }
 
-  toOutput(): Output {
-    let output: Output = new OutputStub();
-    if (this._data.output !== undefined) {
-      output = new OutputImpl(this._data.output);
+  private validateKeyExists(key:string):void {
+    if(!Object.prototype.hasOwnProperty.call(this._data, key)) {
+      throw new Error(`Key "${key}" not found in object ${JSON.stringify(this._data)}`);
     }
-    return output;
+  }
+
+  private validatePropertyType<T>(property: T, type:string): T {
+    const propertyType = typeof property;
+    if(propertyType !== type) {
+      throw new Error(`Type "${propertyType}" of property ${property} is not of type "${type}"`);
+    }
+    return property;
   }
 }
