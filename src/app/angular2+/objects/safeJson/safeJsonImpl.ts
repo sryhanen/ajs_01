@@ -53,7 +53,7 @@ export class SafeJsonImpl implements SafeJson{
   }
 
   propertyExists(key: string): boolean {
-    return Object.hasOwn(this._data, key);
+    return Object.prototype.hasOwnProperty.call(this._data, key);
   }
 
   getProperty<T>(key:string, type:string): T {
@@ -63,7 +63,7 @@ export class SafeJsonImpl implements SafeJson{
   }
 
   private validateKeyExists(key:string):void {
-    if(!Object.hasOwn(this._data, key)) {
+    if(!Object.prototype.hasOwnProperty.call(this._data, key)) {
       throw new Error(`Key "${key}" not found in object ${this._data}`);
     }
   }
