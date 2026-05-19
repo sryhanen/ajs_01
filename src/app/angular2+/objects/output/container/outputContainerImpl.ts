@@ -60,15 +60,17 @@ import {HTMLFormat} from '../format/html/htmlFormat';
 import {ParagraphOutputResponseImpl} from './responses/paragraphOutputResponse/paragraphOutputResponseImpl';
 import {OutputPlugin} from '../plugins/outputPlugin';
 import {PushValue} from '../../pushValue/pushValue';
-import {ParagraphOutputResponse} from './responses/paragraphOutputResponse/paragraphOutputResponse';
+import {OutputPluginStub} from '../plugins/outputPluginStub';
+import {PushValueImpl} from '../../pushValue/pushValueImpl';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
   private readonly _outputFormats:OutputFormat[];
   private readonly _outputSwitcher:OutputSwitcher;
   private readonly _errorListener: InterpreterErrorListener;
-  private readonly _paragraphOutputResponse: ParagraphOutputResponse;
   private readonly _responses: Response[];
+  private readonly _outputPluginListeners: PushValue<OutputPlugin>[];
+  private readonly _activePlugin:PushValue<OutputPlugin>;
 
   constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
@@ -81,14 +83,17 @@ export class OutputContainerImpl implements OutputContainer{
     ];
     this._outputSwitcher = new OutputSwitcherImpl(this);
     this._errorListener = new InterpreterErrorListenerImpl(this);
-    this._paragraphOutputResponse = new ParagraphOutputResponseImpl(this, this._outputFormats, this._outputSwitcher);
+    this._outputPluginListeners = [];
+    this._activePlugin = new PushValueImpl();
+    this._activePlugin.update(new OutputPluginStub());
     this._responses = [
-      this._paragraphOutputResponse
+      new ParagraphOutputResponseImpl(this, this._outputFormats, this._outputSwitcher, this._activePlugin, this._outputPluginListeners)
     ];
   }
 
-  outputPlugin(pushValue: PushValue<OutputPlugin>): void {
-    this._paragraphOutputResponse.outputPlugin(pushValue);
+  outputPlugin(value: PushValue<OutputPlugin>): void {
+    value.update(this._activePlugin.value());
+    this._outputPluginListeners.push(value);
   }
 
   errorListener(): InterpreterErrorListener {

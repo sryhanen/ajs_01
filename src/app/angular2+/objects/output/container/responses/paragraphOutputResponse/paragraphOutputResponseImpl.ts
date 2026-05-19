@@ -51,27 +51,20 @@ import {MessageImpl} from '../../../../message/messageImpl';
 import {OutputType} from '../../../outputType';
 import {PushValue} from '../../../../pushValue/pushValue';
 import {OutputPlugin} from '../../../plugins/outputPlugin';
-import {OutputPluginStub} from '../../../plugins/outputPluginStub';
-import {ParagraphOutputResponse} from './paragraphOutputResponse';
 
-export class ParagraphOutputResponseImpl implements ParagraphOutputResponse {
+export class ParagraphOutputResponseImpl implements Channel {
   private readonly _channel:Channel;
   private readonly _outputFormats:OutputFormat[];
   private readonly _outputSwitcher:OutputSwitcher;
-  private _activePlugin:OutputPlugin;
-  private readonly _pushOutputPlugin: PushValue<OutputPlugin>[];
+  private readonly _activePlugin:PushValue<OutputPlugin>;
+  private readonly _outputPluginListeners:PushValue<OutputPlugin>[];
 
-  constructor(channel:Channel, outputFormats:OutputFormat[], outputSwitcher:OutputSwitcher) {
+  constructor(channel:Channel, outputFormats:OutputFormat[], outputSwitcher:OutputSwitcher, activePlugin:PushValue<OutputPlugin>, outputPluginListeners:PushValue<OutputPlugin>[]) {
     this._channel = channel;
     this._outputFormats = outputFormats;
     this._outputSwitcher = outputSwitcher;
-    this._activePlugin = new OutputPluginStub();
-    this._pushOutputPlugin = [];
-  }
-
-  outputPlugin(pushValue: PushValue<OutputPlugin>): void {
-    pushValue.update(this._activePlugin);
-    this._pushOutputPlugin.push(pushValue);
+    this._activePlugin = activePlugin;
+    this._outputPluginListeners = outputPluginListeners;
   }
 
   request(data: object) {
@@ -89,19 +82,16 @@ export class ParagraphOutputResponseImpl implements ParagraphOutputResponse {
         this._outputSwitcher.requestFormatSwitch(this._outputSwitcher.activeButton());
       }
       else {
-        this._outputSwitcher.response(data);
         const outputFormatToRender = this._outputFormats.find(outputFormat => outputFormat.outputType() === outputType);
-        if(this._activePlugin.isStub()){
-          this._activePlugin = outputFormatToRender.plugin(outputData);
-          this._pushOutputPlugin.forEach(value => value.update(this._activePlugin));
-        }
-        else if(this._activePlugin.outputType() === OutputType.dataTables && outputFormatToRender.outputType() === OutputType.dataTables){
-          this._activePlugin.response(safeOutputData.getProperty('data', 'object'));
+        const newPlugin = outputFormatToRender.plugin(outputData);
+        if(!this._activePlugin.value().isStub() && this._activePlugin.value().outputType() === OutputType.dataTables && outputFormatToRender.outputType() === OutputType.dataTables){
+          this._activePlugin.value().response(safeOutputData.getProperty('data', 'object'));
         }
         else{
-          this._activePlugin = outputFormatToRender.plugin(outputData);
-          this._pushOutputPlugin.forEach(value => value.update(this._activePlugin));
+          this._activePlugin.update(newPlugin);
+          this._outputPluginListeners.forEach(listener => listener.update(this._activePlugin.value()));
         }
+        this._outputSwitcher.response(data);
       }
     }
   }
