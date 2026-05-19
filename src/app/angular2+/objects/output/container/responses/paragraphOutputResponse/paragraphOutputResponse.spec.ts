@@ -55,6 +55,7 @@ import {OutputType} from '../../../outputType';
 import {PushValueImpl} from '../../../../pushValue/pushValueImpl';
 import {OutputPlugin} from '../../../plugins/outputPlugin';
 import {PushValue} from '../../../../pushValue/pushValue';
+import {OutputPluginStub} from '../../../plugins/outputPluginStub';
 
 describe('ParagraphOutputResponse', () => {
   let channel:Channel;
@@ -62,8 +63,9 @@ describe('ParagraphOutputResponse', () => {
   let uPlotOutputFormat: OutputFormat;
   let outputFormats:OutputFormat[];
   let outputSwitcher:OutputSwitcher;
+  let activePlugin:PushValue<OutputPlugin>;
+  let outputPluginListeners:PushValue<OutputPlugin>[];
   let paragraphOutputResponse:ParagraphOutputResponseImpl;
-  let outputPlugin: PushValue<OutputPlugin>;
 
   beforeEach(() => {
     channel = new FakeChannel();
@@ -71,18 +73,15 @@ describe('ParagraphOutputResponse', () => {
     uPlotOutputFormat = new uPlotFormat();
     outputFormats = [dataTablesOutputFormat, uPlotOutputFormat];
     outputSwitcher = new OutputSwitcherImpl(channel);
-    paragraphOutputResponse = new ParagraphOutputResponseImpl(channel, outputFormats, outputSwitcher);
-    outputPlugin = new PushValueImpl<OutputPlugin>();
+    activePlugin = new PushValueImpl();
+    activePlugin.update(new OutputPluginStub());
+    outputPluginListeners = [new PushValueImpl()];
+    paragraphOutputResponse = new ParagraphOutputResponseImpl(channel, outputFormats, outputSwitcher, activePlugin, outputPluginListeners);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
       expect(paragraphOutputResponse).toBeInstanceOf(ParagraphOutputResponseImpl);
-    });
-
-    it('Should have plugin stub', () => {
-      paragraphOutputResponse.outputPlugin(outputPlugin);
-      expect(outputPlugin.value().isStub()).toBe(true);
     });
   });
 
@@ -109,17 +108,35 @@ describe('ParagraphOutputResponse', () => {
       };
     });
 
-    describe('Plugin is updated successfully on response', () => {
-      it('Should update plugin', () => {
-        paragraphOutputResponse.outputPlugin(outputPlugin);
+    describe('Active plugin is updated', () => {
+      beforeEach(() => {
         paragraphOutputResponse.response(paragraphOutputResponseMessage);
-        expect(outputPlugin.value().isStub()).toBe(false);
       });
 
-      it('Should have plugin', () => {
+      it('Should update active plugin from stub to dataTables', () => {
+        expect(activePlugin.value().isStub()).toBe(false);
+        expect(activePlugin.value().outputType()).toEqual(OutputType.dataTables);
+        expect(outputPluginListeners[0].value().isStub()).toBe(false);
+        expect(outputPluginListeners[0].value().outputType()).toEqual(OutputType.dataTables);
+      });
+
+      it('Should update active plugin from dataTables to uPlot', () => {
+        paragraphOutputResponseMessage.data.output.type = OutputType.uPlot;
         paragraphOutputResponse.response(paragraphOutputResponseMessage);
-        paragraphOutputResponse.outputPlugin(outputPlugin);
-        expect(outputPlugin.value().isStub()).toBe(false);
+        expect(activePlugin.value().outputType()).toEqual(OutputType.uPlot);
+        expect(outputPluginListeners[0].value().outputType()).toEqual(OutputType.uPlot);
+      });
+    });
+
+    describe('Sequential responses to datatables', () =>{
+      it('Should respond to datatables plugin', () => {
+        paragraphOutputResponse.response(paragraphOutputResponseMessage);
+        const activePluginSpy = vi.spyOn(activePlugin.value(), 'response');
+        const listenerPluginSpy = vi.spyOn(outputPluginListeners[0].value(), 'response');
+        paragraphOutputResponse.response(paragraphOutputResponseMessage);
+        paragraphOutputResponse.response(paragraphOutputResponseMessage);
+        expect(activePluginSpy).toHaveBeenCalledTimes(2);
+        expect(listenerPluginSpy).toHaveBeenCalledTimes(2);
       });
     });
 
@@ -132,17 +149,6 @@ describe('ParagraphOutputResponse', () => {
         expect(channelSpy).toHaveBeenCalledOnce();
         expect(outputFormatSpies[0]).toHaveBeenCalledTimes(0);
         expect(outputFormatSpies[1]).toHaveBeenCalledTimes(0);
-      });
-    });
-
-    describe('Sequential responses to datatables', () =>{
-      it('Should respond to datatables plugin', () => {
-        paragraphOutputResponse.response(paragraphOutputResponseMessage);
-        paragraphOutputResponse.outputPlugin(outputPlugin);
-        const pluginSpy = vi.spyOn(outputPlugin.value(), 'response');
-        paragraphOutputResponse.response(paragraphOutputResponseMessage);
-        paragraphOutputResponse.response(paragraphOutputResponseMessage);
-        expect(pluginSpy).toHaveBeenCalledTimes(2);
       });
     });
   });
