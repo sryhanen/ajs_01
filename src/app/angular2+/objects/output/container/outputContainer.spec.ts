@@ -80,9 +80,18 @@ describe('OutputContainer', () => {
       expect(outputContainer.errorListener()).toBeDefined();
     });
 
-    it('Should have outputPlugin', () => {
+    it('Should have outputPlugin stub', () => {
       outputContainer.outputPlugin(outputPlugin);
-      expect(outputPlugin.value()).toBeDefined();
+      expect(outputPlugin.value().isStub()).toBe(true);
+    });
+  });
+
+  describe('Request', () => {
+    it('Should request channel', () => {
+      const channelSpy = vi.spyOn(channel, 'request');
+      const request = {test:'test'};
+      outputContainer.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
     });
   });
 });
