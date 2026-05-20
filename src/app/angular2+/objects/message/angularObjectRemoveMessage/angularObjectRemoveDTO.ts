@@ -43,9 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputDTO} from '../output/outputDTO';
-
-export interface ParagraphDTO {
-  id: string,
-  output?: OutputDTO<unknown>,
+export interface AngularObjectRemoveDTO {
+  noteId:string;
+  paragraphId:string;
+  name:string;
 }

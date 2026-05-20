@@ -46,6 +46,8 @@
 import {Output} from './output';
 import {OutputPlugin} from './plugins/outputPlugin';
 import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
+import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
+import { HtmlPlugin } from './plugins/htmlPlugin/htmlPlugin';
 
 export class OutputStub implements Output {
   isStub(): boolean {
@@ -56,7 +58,15 @@ export class OutputStub implements Output {
     throw new Error('OutputStub: Method not implemented');
   }
 
+  toHtmlPlugin(): HtmlPlugin {
+    throw new Error('OutputStub: Method not implemented');
+  }
+
   isAggregated(): boolean {
+    throw new Error('OutputStub: Method not implemented');
+  }
+
+  toAngularPlugin(): AngularPlugin {
     throw new Error('OutputStub: Method not implemented');
   }
 

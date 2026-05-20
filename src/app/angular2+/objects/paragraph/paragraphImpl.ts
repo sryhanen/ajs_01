@@ -44,24 +44,25 @@
  * a licensee so wish it.
  */
 import {Paragraph} from './paragraph';
-import {ParagraphDTO} from './paragraphDTO';
 import {Channel} from '../channel/channel';
 import {OutputContainer} from '../output/container/outputContainer';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {MessageDTO} from '../message/messageDTO';
+import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
 import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ParagraphOutputRequestDTO} from '../output/paragraphOutputRequest/paragraphOutputRequestDTO';
+import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
+import {ParagraphMessageImpl} from '../message/paragraphMessage/paragraphMessageImpl';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
-  private readonly _paragraph: ParagraphDTO;
+  private _paragraph: ParagraphDTO;
 
-  constructor(channel: Channel, paragraph: ParagraphDTO) {
+  constructor(channel: Channel, paragraph: ParagraphDTO, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._paragraph = paragraph;
-    this._outputContainer = new OutputContainerImpl(this);
+    this._outputContainer = new OutputContainerImpl(this, angularObjectCollection);
 
     const paragraphOutputMessage: MessageDTO<ParagraphOutputDTO> = {
       op:'PARAGRAPH_OUTPUT',
@@ -82,31 +83,29 @@ export class ParagraphImpl implements Paragraph{
     return this._outputContainer;
   }
 
+  print():ParagraphDTO {
+    return this._paragraph;
+  }
+
   request(data: object): void {
-    let message = data as MessageDTO<unknown>;
-    if(message.op === 'PARAGRAPH_OUTPUT_REQUEST') {
-      const paragraphOutputRequestMessage = data as MessageDTO<ParagraphOutputRequestDTO>;
-      paragraphOutputRequestMessage.data.paragraphId = this.id();
-      message = paragraphOutputRequestMessage;
+    const message = data as MessageDTO<unknown>;
+    if(message.data['paragraphId'] !== undefined) {
+      message.data['paragraphId'] = this.id();
+      this._channel.request(message);
     }
-    this._channel.request(message);
+    else {
+      this._channel.request(data);
+    }
   }
 
   response(data: object): void {
     const message = data as MessageDTO<unknown>;
     const op = message.op;
     if(op === 'PARAGRAPH'){
-      const paragraphDto = message.data as ParagraphDTO;
-      if(paragraphDto.id === this.id()){
-        const paragraphOutputMessage: MessageDTO<ParagraphOutputDTO> = {
-          op:'PARAGRAPH_OUTPUT',
-          data: {
-            noteId:'',
-            paragraphId:'',
-            output: paragraphDto.output,
-          }
-        };
-        this._outputContainer.response(paragraphOutputMessage);
+      const paragraphMessage = new ParagraphMessageImpl(message.data as ParagraphDTO);
+      if(paragraphMessage.id() === this.id()){
+        this._paragraph = paragraphMessage.toParagraphData();
+        this._outputContainer.response(paragraphMessage.printAsParagraphOutputMessage());
       }
     }
     else if(op === 'PARAGRAPH_OUTPUT'){

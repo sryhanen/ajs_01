@@ -43,21 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ChangeDetectorRef} from '@angular/core';
+import {Channel} from '../channel/channel';
 
-export class FakeChangeDetectorRef implements ChangeDetectorRef{
-  checkNoChanges(): void {
-  }
-
-  detach(): void {
-  }
-
-  detectChanges(): void {
-  }
-
-  markForCheck(): void {
-  }
-
-  reattach(): void {
-  }
+export interface AngularObject<T> extends Channel{
+  name(): string;
+  value():T;
+  update(value:T):void;
 }

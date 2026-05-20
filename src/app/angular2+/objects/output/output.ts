@@ -47,11 +47,15 @@ import {Channel} from '../channel/channel';
 import Stubable from '../../../shared/interfaces/stubable';
 import {OutputPlugin} from './plugins/outputPlugin';
 import {DataTablesPlugin} from './plugins/dataTablesPlugin/dataTablesPlugin';
+import {AngularPlugin} from './plugins/angularPlugin/angularPlugin';
+import {HtmlPlugin} from './plugins/htmlPlugin/htmlPlugin';
 
 export interface Output extends Stubable {
   toDataTablesPlugin(channel:Channel): DataTablesPlugin;
   toTextPlugin(): OutputPlugin;
   touPlotPlugin(): OutputPlugin;
+  toAngularPlugin(channel:Channel): AngularPlugin;
+  toHtmlPlugin(): HtmlPlugin;
   isAggregated(): boolean;
   type():string;
 }

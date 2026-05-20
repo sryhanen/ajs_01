@@ -50,7 +50,6 @@ import {NotebookCollectionImpl} from './notebookCollectionImpl';
 import {Notebook} from '../notebook/notebook';
 import {PushValue} from '../pushValue/pushValue';
 import {PushValueImpl} from '../pushValue/pushValueImpl';
-import {FakeChangeDetectorRef} from '../pushValue/fakeCdr/fakeChangeDetectorRef';
 import {MessageDTO} from '../message/messageDTO';
 import {NotesInfoDTO} from '../message/notesInfoMessage/notesInfoDTO';
 
@@ -62,7 +61,7 @@ describe('NotebookCollection', () => {
   beforeEach(() => {
     channel = new FakeChannel();
     notebookCollection = new NotebookCollectionImpl(channel);
-    pushCollection = new PushValueImpl(new FakeChangeDetectorRef());
+    pushCollection = new PushValueImpl();
   });
 
   describe('Birth', () => {

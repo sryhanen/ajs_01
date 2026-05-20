@@ -53,6 +53,9 @@ import {DataTablesFormat} from '../format/dataTables/dataTablesFormat';
 import {uPlotFormat} from '../format/uPlot/uPlotFormat';
 import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
 import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/interpreterErrorListenerImpl';
+import {AngularFormat} from '../format/angular/angularFormat';
+import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
+import {HTMLFormat} from '../format/html/htmlFormat';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
@@ -60,12 +63,14 @@ export class OutputContainerImpl implements OutputContainer{
   private readonly _outputSwitcher:OutputSwitcher;
   private readonly _errorListener: InterpreterErrorListener;
 
-  constructor(channel:Channel) {
+  constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._outputFormats = [
       new DataTablesFormat(this),
       new uPlotFormat(this),
       new TextFormat(this),
+      new AngularFormat(this, angularObjectCollection),
+      new HTMLFormat(this)
     ];
     this._outputSwitcher = new OutputSwitcherImpl(this, this._outputFormats);
     this._errorListener = new InterpreterErrorListenerImpl(this);
