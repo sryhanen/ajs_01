@@ -44,17 +44,13 @@
  * a licensee so wish it.
  */
 import {
-  ChangeDetectorRef,
   Component,
-  inject,
-  Input, OnInit,
+  Input, OnInit, signal,
 } from '@angular/core';
 import {OutputSwitcher} from '../../../objects/output/switcher/outputSwitcher';
 import {OutputSwitcherButtonView} from './button/outputSwitcherButtonView';
 import {OutputSwitcherButton} from '../../../objects/output/switcher/button/outputSwitcherButton';
-import {PushValue} from '../../../objects/pushValue/pushValue';
-import {PushValueImpl} from '../../../objects/pushValue/pushValueImpl';
-import {PushValueWithChangeDetection} from '../../../objects/pushValue/pushValueWithChangeDetection';
+import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writableSignalAsPushValue';
 
 @Component({
   selector: 'output-switcher',
@@ -62,14 +58,15 @@ import {PushValueWithChangeDetection} from '../../../objects/pushValue/pushValue
     OutputSwitcherButtonView
   ],
   template: `
-    @if (isSwitchable.value()) {
+    @let status = this.switcherStatus();
+    @if (status.isSwitchable) {
       <div class="btn-group" role="group">
         @for (button of outputSwitcherButtons; track $index) {
           <output-switcher-button class="btn-group" [outputSwitcherButton]="button"
                                   [outputSwitcher]="outputSwitcher"></output-switcher-button>
         }
       </div>
-      @if (isLoading.value()) {
+      @if (status.isLoading) {
         <div class="spinner-border mx-2 text-primary" role="status"></div>
       }
     }
@@ -78,14 +75,9 @@ import {PushValueWithChangeDetection} from '../../../objects/pushValue/pushValue
 export class OutputSwitcherView implements OnInit{
   @Input({required:true}) outputSwitcher:OutputSwitcher;
   @Input({required:true}) outputSwitcherButtons: OutputSwitcherButton[];
-  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
-  protected isSwitchable:PushValue<boolean>;
-  protected isLoading:PushValue<boolean>;
+  protected switcherStatus = signal({isSwitchable:false, isLoading:false});
 
   ngOnInit(): void {
-    this.isSwitchable = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
-    this.isLoading = new PushValueWithChangeDetection(new PushValueImpl(), this.cdr);
-    this.outputSwitcher.pushIsSwitchable(this.isSwitchable);
-    this.outputSwitcher.pushIsLoading(this.isLoading);
+    this.outputSwitcher.status(new WritableSignalAsPushValue(this.switcherStatus));
   }
 }

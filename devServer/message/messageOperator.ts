@@ -58,7 +58,6 @@ import InsertParagraphHandler from './handlers/insertParagraphHandler';
 import {Handler} from './handlers/handler';
 import CompletionListHandler from './handlers/completionListHandler';
 import EditorSettingsHandler from './handlers/editorSettingsHandler';
-import {MessageDTO} from '../../src/app/angular2+/objects/message/messageDTO';
 
 
 export default class MessageOperator {
@@ -84,8 +83,8 @@ export default class MessageOperator {
     this._errorHandler = new ErrorHandler();
   }
 
-  handleMessage(message: MessageDTO<unknown>) {
-    const handler = this._handlers.find(h => h.operation() === message.op);
+  handleMessage(message: object) {
+    const handler = this._handlers.find(h => h.operation() === message['op']);
     if(handler !== undefined) {
       handler.execute(message, this._client);
     }

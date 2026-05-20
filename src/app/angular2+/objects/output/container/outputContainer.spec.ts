@@ -47,16 +47,20 @@ import {OutputContainer} from './outputContainer';
 import {Channel} from '../../channel/channel';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {OutputContainerImpl} from './outputContainerImpl';
-import {MessageDTO} from '../../message/messageDTO';
 import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
+import {PushValue} from '../../pushValue/pushValue';
+import {OutputPlugin} from '../plugins/outputPlugin';
+import {PushValueImpl} from '../../pushValue/pushValueImpl';
 
 describe('OutputContainer', () => {
   let channel:Channel;
   let outputContainer:OutputContainer;
+  let outputPlugin: PushValue<OutputPlugin>;
 
   beforeEach(() => {
     channel = new FakeChannel();
     outputContainer = new OutputContainerImpl(channel, {} as AngularObjectCollection);
+    outputPlugin = new PushValueImpl();
   });
 
   describe('Birth', () => {
@@ -75,33 +79,19 @@ describe('OutputContainer', () => {
     it('Should have error listener', () =>{
       expect(outputContainer.errorListener()).toBeDefined();
     });
+
+    it('Should have outputPlugin stub', () => {
+      outputContainer.outputPlugin(outputPlugin);
+      expect(outputPlugin.value().isStub()).toBe(true);
+    });
   });
 
-  describe('Request and response', () => {
-    it('Should have requested channel', () => {
+  describe('Request', () => {
+    it('Should request channel', () => {
       const channelSpy = vi.spyOn(channel, 'request');
-      expect(channelSpy).toHaveBeenCalledTimes(0);
-
-      const message: MessageDTO<unknown> = {
-        op:'RANDOM_OPERATION',
-        data: {}
-      };
-      outputContainer.request(message);
-      expect(channelSpy).toHaveBeenCalledTimes(1);
-      expect(channelSpy).toHaveBeenCalledWith(message);
-    });
-
-    it('Should have responded outputSwitcher and error listener', () => {
-      const responseData = {test:'test'};
-      const outputSwitcherSpy = vi.spyOn(outputContainer.outputSwitcher(), 'response');
-      const errorListenerSpy = vi.spyOn(outputContainer.errorListener(), 'response');
-      expect(outputSwitcherSpy).toHaveBeenCalledTimes(0);
-      expect(errorListenerSpy).toHaveBeenCalledTimes(0);
-      outputContainer.response(responseData);
-      expect(outputSwitcherSpy).toHaveBeenCalledTimes(1);
-      expect(outputSwitcherSpy).toHaveBeenCalledWith(responseData);
-      expect(errorListenerSpy).toHaveBeenCalledTimes(1);
-      expect(errorListenerSpy).toHaveBeenCalledWith(responseData);
+      const request = {test:'test'};
+      outputContainer.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
     });
   });
 });

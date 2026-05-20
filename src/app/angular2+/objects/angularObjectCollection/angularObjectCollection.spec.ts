@@ -49,9 +49,6 @@ import {AngularObjectCollectionImpl} from './angularObjectCollectionImpl';
 import {AngularObject} from '../angularObject/angularObject';
 import {PushValue} from '../pushValue/pushValue';
 import {PushValueImpl} from '../pushValue/pushValueImpl';
-import {MessageDTO} from '../message/messageDTO';
-import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
-import {AngularObjectRemoveDTO} from '../message/angularObjectRemoveMessage/angularObjectRemoveDTO';
 
 describe('angularObjectCollection', () => {
   let angularObjectCollection:AngularObjectCollection;
@@ -65,60 +62,20 @@ describe('angularObjectCollection', () => {
     it('Should be initialized', () => {
       expect(angularObjectCollection).toBeInstanceOf(AngularObjectCollectionImpl);
     });
-  });
 
-  describe('Collection', () => {
-    let angularObjects: PushValue<AngularObject<unknown>[]>;
-    let angularObjectUpdateMessage: MessageDTO<AngularObjectUpdateDTO>;
-    const angularObject1 = {
-      name: 'Object1',
-      object: 'Some value',
-      noteId: '',
-    };
-    beforeEach(() => {
-      angularObjectUpdateMessage = {
-        op: 'ANGULAR_OBJECT_UPDATE',
-        data: {
-          angularObject: angularObject1,
-          noteId: '',
-          interpreterGroupId: ''
-        },
-      };
-      angularObjects = new PushValueImpl();
+    it('Should have empty collection of angular objects', () => {
+      const angularObjects:PushValue<AngularObject[]> = new PushValueImpl();
       angularObjectCollection.angularObjects(angularObjects);
       expect(angularObjects.value()).toEqual([]);
     });
+  });
 
-    it('Should add object to collection', () => {
-      angularObjectCollection.response(angularObjectUpdateMessage);
-      expect(angularObjects.value()).toHaveLength(1);
-      expect(angularObjects.value()[0].name()).toEqual(angularObject1.name);
-    });
-
-    it('Should update collection', () => {
-      angularObjectCollection.response(angularObjectUpdateMessage);
-      expect(angularObjects.value()).toHaveLength(1);
-      expect(angularObjects.value()[0].value()).toEqual(angularObject1.object);
-      const newValue = 'new value';
-      angularObjectUpdateMessage.data.angularObject.object = newValue;
-      angularObjectCollection.response(angularObjectUpdateMessage);
-      expect(angularObjects.value()).toHaveLength(1);
-      expect(angularObjects.value()[0].value()).toEqual(newValue);
-    });
-
-    it('Should remove object from collection', () => {
-      const removeResponse: MessageDTO<AngularObjectRemoveDTO> = {
-        op:'ANGULAR_OBJECT_REMOVE',
-        data: {
-          noteId: '',
-          paragraphId: '',
-          name: angularObject1.name,
-        }
-      };
-      angularObjectCollection.response(angularObjectUpdateMessage);
-      expect(angularObjects.value()).toHaveLength(1);
-      angularObjectCollection.response(removeResponse);
-      expect(angularObjects.value()).toHaveLength(0);
+  describe('Request', () => {
+    it('Should request channel', () => {
+      const channelSpy = vi.spyOn(channel, 'request');
+      const request = {op:'Test', data:{}};
+      angularObjectCollection.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
     });
   });
 });

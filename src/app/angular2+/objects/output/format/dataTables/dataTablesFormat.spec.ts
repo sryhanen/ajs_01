@@ -46,11 +46,8 @@
 import {DataTablesFormat} from './dataTablesFormat';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
 import {OutputType} from '../../outputType';
-import {ContainerRef} from '../../../containerRef/containerRef';
-import {FakeContainerRef} from '../../../containerRef/fakeContainerRef';
+import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
 
 describe('dataTablesFormat', () => {
   let channel:Channel;
@@ -66,9 +63,13 @@ describe('dataTablesFormat', () => {
       expect(dataTablesFormat).toBeInstanceOf(DataTablesFormat);
     });
 
-    it('Should have switcher button', () =>{
+    it('Should have a switcher button', () =>{
       const buttons = dataTablesFormat.switcherButtons();
       expect(buttons).toHaveLength(1);
+    });
+
+    it('Should have output type', () =>{
+      expect(dataTablesFormat.outputType()).toEqual(OutputType.dataTables);
     });
   });
 
@@ -82,52 +83,17 @@ describe('dataTablesFormat', () => {
     });
   });
 
-  describe('Paragraph output response', () => {
-    let paragraphOutputResponse: MessageDTO<ParagraphOutputDTO>;
-    let containerRef: ContainerRef;
-    let createComponentSpy;
-    let clearSpy;
-    beforeEach(() => {
-      containerRef = new FakeContainerRef();
-      createComponentSpy = vi.spyOn(containerRef, 'createComponent');
-      clearSpy = vi.spyOn(containerRef, 'clear');
-      paragraphOutputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data: {
-          noteId:'',
-          paragraphId:'',
-          output: {
-            data: {},
-            type: OutputType.dataTables,
-          }
-        }
-      };
-      dataTablesFormat.pushContainerRef(containerRef);
-      expect(createComponentSpy).toHaveBeenCalledTimes(0);
-      expect(clearSpy).toHaveBeenCalledTimes(0);
+  describe('Plugin formatting', () => {
+    const plugingData = {
+      data:{},
+      options:{}
+    };
+    it('Should return plugin', () =>{
+      expect(dataTablesFormat.plugin(plugingData)).toBeInstanceOf(DataTablesPluginImpl);
     });
 
-    it('Should create component', () => {
-      dataTablesFormat.response(paragraphOutputResponse);
-      expect(createComponentSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('Should create component only once on sequential output updates', () => {
-      dataTablesFormat.response(paragraphOutputResponse);
-      dataTablesFormat.response(paragraphOutputResponse);
-      expect(createComponentSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('Should clear component', () => {
-      paragraphOutputResponse.data.output = undefined;
-      dataTablesFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('Should clear component', () => {
-      paragraphOutputResponse.data.output.type = 'text';
-      dataTablesFormat.response(paragraphOutputResponse);
-      expect(clearSpy).toHaveBeenCalledTimes(1);
+    it('Should validate plugin data', () =>{
+      expect(() => dataTablesFormat.plugin({})).toThrow();
     });
   });
 });

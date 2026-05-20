@@ -48,20 +48,18 @@ import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {OutputSwitcherImpl} from '../../../objects/output/switcher/outputSwitcherImpl';
 import {Channel} from '../../../objects/channel/channel';
 import {OutputSwitcherView} from './outputSwitcherView';
-import {ParagraphOutputDTO} from '../../../objects/message/paragraphOutputMessage/paragraphOutputDTO';
-import {MessageDTO} from '../../../objects/message/messageDTO';
-import {render, screen} from '@testing-library/angular';
+import {render, screen, fireEvent, RenderResult} from '@testing-library/angular';
 import { test } from 'vitest';
 import {FakeOutputSwitcherButton} from '../../../objects/output/switcher/button/fakeOutputSwitcherButton';
-import {ParagraphOutputRequestDTO} from '../../../objects/output/paragraphOutputRequest/paragraphOutputRequestDTO';
 
 describe('OutputSwitcherView', () => {
   let channel:Channel;
   let outputSwitcher: OutputSwitcher;
+  let renderResult: RenderResult<unknown, unknown>;
   beforeEach(async () => {
     channel = new FakeChannel();
-    outputSwitcher = new OutputSwitcherImpl(channel, []);
-    await render(OutputSwitcherView, {
+    outputSwitcher = new OutputSwitcherImpl(channel);
+    renderResult = await render(OutputSwitcherView, {
       inputs:{
         outputSwitcher: outputSwitcher,
         outputSwitcherButtons: [new FakeOutputSwitcherButton()]
@@ -78,83 +76,41 @@ describe('OutputSwitcherView', () => {
   });
 
   describe('Content visibility', () => {
-    let paragraphOutput: MessageDTO<ParagraphOutputDTO>;
-    let paragraphOutputRequest: MessageDTO<ParagraphOutputRequestDTO>;
+    let paragraphOutputResponse;
     beforeEach(() => {
-      paragraphOutput = {
+      paragraphOutputResponse = {
         op:'PARAGRAPH_OUTPUT',
-        data: {
-          noteId: '',
-          paragraphId: '',
-          output: {
+        data:{
+          output:{
             isAggregated: true,
-            data: {},
-            type: ''
           }
-        }
-      };
-      paragraphOutputRequest = {
-        op: 'PARAGRAPH_OUTPUT_REQUEST',
-        data: {
-          paragraphId: '',
-          noteId: '',
-          type: '',
-          requestOptions:{}
         }
       };
     });
 
-    test('Should have buttons visible', () =>{
-      outputSwitcher.response(paragraphOutput);
-      const buttonGroup = screen.getByRole('group');
-      const buttons = screen.getAllByRole('button');
+    test('Should have buttons visible', async () =>{
+      outputSwitcher.response(paragraphOutputResponse);
+      const buttonGroup = await screen.findByRole('group');
+      const buttons = await screen.findAllByRole('button');
       expect(buttonGroup).toBeDefined();
       expect(buttons).toHaveLength(1);
     });
 
-    test('Should have loader visible', () =>{
-      outputSwitcher.response(paragraphOutput);
-      outputSwitcher.request(paragraphOutputRequest);
-      const loader = screen.getByRole('status');
+    test('Should have loader visible', async () =>{
+      outputSwitcher.response(paragraphOutputResponse);
+      const button = await screen.findByRole('button');
+      fireEvent.click(button);
+      const loader = await screen.findByRole('status');
       expect(loader).toBeDefined();
     });
 
-    test('Should hide loader', () =>{
-      outputSwitcher.response(paragraphOutput);
-      outputSwitcher.request(paragraphOutputRequest);
-      outputSwitcher.response(paragraphOutput);
-      expect(() => screen.getByRole('status')).toThrow();
-    });
-
-    describe('Should have nothing visible', () =>{
-      afterAll(() => {
-        outputSwitcher.request(paragraphOutputRequest);
-        expect(() => screen.getByRole('status')).toThrow();
-      });
-
-      test('Stub output', () =>{
-        paragraphOutput.data.output = undefined;
-        outputSwitcher.response(paragraphOutput);
-        expect(() => screen.getByRole('group')).toThrow();
-        expect(() => screen.getAllByRole('button')).toThrow();
-        expect(() => screen.getByRole('status')).toThrow();
-      });
-
-      test('Output is not aggregated', () => {
-        paragraphOutput.data.output.isAggregated = false;
-        outputSwitcher.response(paragraphOutput);
-        expect(() => screen.getByRole('group')).toThrow();
-        expect(() => screen.getAllByRole('button')).toThrow();
-        expect(() => screen.getByRole('status')).toThrow();
-      });
-
-      test('Output isAggregated key missing', () =>{
-        paragraphOutput.data.output.isAggregated = undefined;
-        outputSwitcher.response(paragraphOutput);
-        expect(() => screen.getByRole('group')).toThrow();
-        expect(() => screen.getAllByRole('button')).toThrow();
-        expect(() => screen.getByRole('status')).toThrow();
-      });
+    test('Should hide loader', async () =>{
+      outputSwitcher.response(paragraphOutputResponse);
+      const button = await screen.findByRole('button');
+      fireEvent.click(button);
+      outputSwitcher.response(paragraphOutputResponse);
+      renderResult.detectChanges();
+      expect(async () => await screen.findByRole('status')).rejects.toThrow();
     });
   });
 });

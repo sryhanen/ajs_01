@@ -45,6 +45,7 @@
  */
 import {OutputContainer} from './outputContainer';
 import {Channel} from '../../channel/channel';
+import {Response} from '../../channel/response';
 import {OutputFormat} from '../format/outputFormat';
 import {OutputSwitcherImpl} from '../switcher/outputSwitcherImpl';
 import {OutputSwitcher} from '../switcher/outputSwitcher';
@@ -56,24 +57,43 @@ import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/inter
 import {AngularFormat} from '../format/angular/angularFormat';
 import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 import {HTMLFormat} from '../format/html/htmlFormat';
+import {ParagraphOutputResponseImpl} from './responses/paragraphOutputResponse/paragraphOutputResponseImpl';
+import {OutputPlugin} from '../plugins/outputPlugin';
+import {PushValue} from '../../pushValue/pushValue';
+import {OutputPluginStub} from '../plugins/outputPluginStub';
+import {PushValueImpl} from '../../pushValue/pushValueImpl';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
   private readonly _outputFormats:OutputFormat[];
   private readonly _outputSwitcher:OutputSwitcher;
   private readonly _errorListener: InterpreterErrorListener;
+  private readonly _responses: Response[];
+  private readonly _outputPluginListeners: PushValue<OutputPlugin>[];
+  private readonly _activePlugin:PushValue<OutputPlugin>;
 
   constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._outputFormats = [
       new DataTablesFormat(this),
-      new uPlotFormat(this),
-      new TextFormat(this),
+      new uPlotFormat(),
+      new TextFormat(),
       new AngularFormat(this, angularObjectCollection),
-      new HTMLFormat(this)
+      new HTMLFormat()
     ];
-    this._outputSwitcher = new OutputSwitcherImpl(this, this._outputFormats);
+    this._outputSwitcher = new OutputSwitcherImpl(this);
     this._errorListener = new InterpreterErrorListenerImpl(this);
+    this._outputPluginListeners = [];
+    this._activePlugin = new PushValueImpl();
+    this._activePlugin.update(new OutputPluginStub());
+    this._responses = [
+      new ParagraphOutputResponseImpl(this, this._outputFormats, this._outputSwitcher, this._activePlugin, this._outputPluginListeners)
+    ];
+  }
+
+  outputPlugin(value: PushValue<OutputPlugin>): void {
+    value.update(this._activePlugin.value());
+    this._outputPluginListeners.push(value);
   }
 
   errorListener(): InterpreterErrorListener {
@@ -93,7 +113,7 @@ export class OutputContainerImpl implements OutputContainer{
   }
 
   response(data: object): void {
-    this._outputSwitcher.response(data);
+    this._responses.forEach(response => response.response(data));
     this._errorListener.response(data);
   }
 }

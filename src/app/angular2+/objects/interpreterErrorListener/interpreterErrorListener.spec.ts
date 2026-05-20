@@ -47,8 +47,6 @@ import {Channel} from '../channel/channel';
 import {InterpreterErrorListener} from './interpreterErrorListener';
 import {FakeChannel} from '../channel/fakeChannel';
 import {InterpreterErrorListenerImpl} from './interpreterErrorListenerImpl';
-import {MessageDTO} from '../message/messageDTO';
-import {InterpreterErrorDTO} from './interpreterErrorDTO';
 
 describe('InterpreterErrorListener', () => {
   let channel:Channel;
@@ -67,7 +65,7 @@ describe('InterpreterErrorListener', () => {
   describe('Request and response', () => {
     const message = 'Something went wrong';
     let toaster;
-    let response: MessageDTO<InterpreterErrorDTO>;
+    let response;
 
     beforeEach(() =>{
       toaster = {

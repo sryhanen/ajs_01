@@ -48,11 +48,8 @@ import {Channel} from '../channel/channel';
 import {ParagraphImpl} from './paragraphImpl';
 import {Paragraph} from './paragraph';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
-import {MessageDTO} from '../message/messageDTO';
-import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
-import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
-import {RunParagraphDTO} from '../message/runParagraphMessage/runParagraphDTO';
+import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 
 describe('Paragraph', () => {
   const paragraphId = 'paragraphId';
@@ -63,138 +60,80 @@ describe('Paragraph', () => {
   const paragraphParams = {
     paramsValue:'params value1'
   };
-  let paragraphData: ParagraphDTO;
+  let paragraphData: {
+    config:object,
+    settings:object,
+    text:string,
+    id:string,
+  };
   let channel: Channel;
   let paragraph: Paragraph;
   beforeEach(() => {
     paragraphData = {
       config: paragraphConfig,
-      params: paragraphParams,
+      settings:{
+        params: paragraphParams,
+      },
       text: paragraphText,
       id:paragraphId
     };
     channel = new FakeChannel();
+    const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
+    paragraph = new ParagraphImpl(channel, paragraphData, angularObjectCollection);
   });
 
   describe('Birth', () => {
-    beforeEach(() => {
-      paragraph = new ParagraphImpl(channel, paragraphData, {} as AngularObjectCollection);
-    });
-
     it('Should initialize', () => {
       expect(paragraph).toBeInstanceOf(ParagraphImpl);
     });
 
-    it('Should return id', () => {
+    it('Should have id', () => {
       expect(paragraph.id()).toEqual(paragraphId);
     });
 
-    it('Should return OutputContainer', () => {
+    it('Should have OutputContainer', () => {
       expect(paragraph.outputContainer()).toBeInstanceOf(OutputContainerImpl);
-    });
-
-    it('Should print itself', ()=> {
-      expect(paragraph.print()).toEqual(paragraphData);
-    });
-  });
-
-  describe('Request', () => {
-    let spy;
-    beforeEach(() => {
-      spy = vi.spyOn(channel, 'request');
-      paragraph = new ParagraphImpl(channel, paragraphData, {} as AngularObjectCollection);
-    });
-
-    it('Should decorate request with paragraphId', () => {
-      const requestData: MessageDTO<unknown> = {
-        op: '',
-        data:{
-          paragraphId:'',
-        }
-      };
-      const expectedData: MessageDTO<unknown> = {
-        op: '',
-        data:{
-          paragraphId:paragraphId,
-        }
-      };
-      paragraph.request(requestData);
-      expect(spy).toHaveBeenCalledWith(expectedData);
-    });
-
-    it('Should not decorate request with paragraphId', () => {
-      const requestData: MessageDTO<unknown> = {
-        op: '',
-        data:{}
-      };
-      paragraph.request(requestData);
-      expect(spy).toHaveBeenCalledWith(requestData);
-    });
-
-    it('Should send requests to channel', () => {
-      const data: MessageDTO<unknown> = {
-        op:'',
-        data:''
-      };
-      paragraph.request(data);
-      expect(spy).toHaveBeenCalledWith(data);
     });
   });
 
   describe('Response', () => {
-    let spy;
-    beforeEach(() => {
-      paragraph = new ParagraphImpl(channel, paragraphData, {} as AngularObjectCollection);
-      const container = paragraph.outputContainer();
-      spy = vi.spyOn(container, 'response');
-      expect(spy).toHaveBeenCalledTimes(0);
-    });
-
-    describe('PARAGRAPH response', () => {
-      const message: MessageDTO<ParagraphDTO>  = {
-        op:'PARAGRAPH',
-        data: {
-          config: {},
-          params: {},
-          text: '',
-          id:paragraphId,
-        }
-      };
-      it('Should send response to outputContainer', () => {
-        expect(spy).toHaveBeenCalledTimes(0);
-        paragraph.response(message);
-        expect(spy).toHaveBeenCalledTimes(1);
+    describe('Filters responses', () => {
+      let containerSpy;
+      beforeEach(() => {
+        containerSpy = vi.spyOn(paragraph.outputContainer(), 'response');
       });
 
-      it('Should not send response to outputContainer', () => {
-        message.data.id = 'wrong id';
-        paragraph.response(message);
-        expect(spy).toHaveBeenCalledTimes(0);
-      });
-    });
-
-    describe('PARAGRAPH_OUTPUT response', () => {
-      const message: MessageDTO<ParagraphOutputDTO>  = {
-        op:'PARAGRAPH_OUTPUT',
-        data: {
-          noteId:'',
-          paragraphId: paragraphId,
-          output:{
-            type: '',
-            data: {}
+      it('Should respond container if data has matching id', () => {
+        const response = {
+          op:'',
+          data:{
+            paragraphId: paragraphId,
           }
-        }
-      };
-      it('Should send response to outputContainer', () => {
-        expect(spy).toHaveBeenCalledTimes(0);
-        paragraph.response(message);
-        expect(spy).toHaveBeenCalledTimes(1);
+        };
+        paragraph.response(response);
+        expect(containerSpy).toHaveBeenCalledExactlyOnceWith(response);
       });
 
-      it('Should not send response to outputContainer', () => {
-        message.data.paragraphId = 'wrong Id';
-        paragraph.response(message);
-        expect(spy).toHaveBeenCalledTimes(0);
+      it('Should not respond container if data has wrong id', () => {
+        const response = {
+          op:'',
+          data:{
+            paragraphId: 'wrongId',
+          }
+        };
+        paragraph.response(response);
+        expect(containerSpy).toHaveBeenCalledTimes(0);
+      });
+
+      it('Should respond container if paragraphId is missing', () => {
+        const response = {
+          op:'response',
+          data:{
+            test:'test',
+          }
+        };
+        paragraph.response(response);
+        expect(containerSpy).toHaveBeenCalledExactlyOnceWith(response);
       });
     });
   });

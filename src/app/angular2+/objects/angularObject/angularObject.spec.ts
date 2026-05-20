@@ -46,27 +46,16 @@
 import {AngularObject} from './angularObject';
 import {AngularObjectImpl} from './angularObjectImpl';
 import {FakeChannel} from '../channel/fakeChannel';
-import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
-import {MessageDTO} from '../message/messageDTO';
-import {AngularObjectUpdatedDTO} from '../message/angularObjectUpdatedMessage/angularObjectUpdatedDTO';
 
 describe('AngularObject', () => {
   const channel = new FakeChannel();
   const name = 'Object 1';
   const value = 'test';
-  let data:AngularObjectUpdateDTO;
-  let angularObject: AngularObject<string>;
+  let data;
+  let angularObject: AngularObject;
 
   beforeEach(() => {
-    data = {
-      angularObject: {
-        name: name,
-        noteId: '',
-        object: value
-      },
-      interpreterGroupId: '',
-      noteId: ''
-    };
+    data = {noteId: '', interpreterGroupId: '', name: name, value: value};
     angularObject = new AngularObjectImpl(channel,data);
   });
 
@@ -82,16 +71,12 @@ describe('AngularObject', () => {
     it('Should have value', () => {
       expect(angularObject.value()).toEqual(value);
     });
-
-    it('Response should throw', () => {
-      expect(() => angularObject.response({})).toThrow();
-    });
   });
 
   describe('Update', () => {
     it('Should create request', () => {
       const newValue = 'New value';
-      const updateRequest: MessageDTO<AngularObjectUpdatedDTO> = {
+      const updateRequest = {
         op: 'ANGULAR_OBJECT_UPDATED',
         data: {
           noteId: '',

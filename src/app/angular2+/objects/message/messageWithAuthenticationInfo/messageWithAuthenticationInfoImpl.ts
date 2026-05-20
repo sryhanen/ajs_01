@@ -45,21 +45,20 @@
  */
 import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
 import {Authentication} from '../../../../shared/objects/security/authentication';
-import {MessageDTO} from '../messageDTO';
+import {Message} from '../message';
 
 export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {
-  private readonly _data: MessageDTO<unknown>;
+  private readonly _message: Message;
   private readonly _authentication:Authentication;
   private readonly _messageId:string;
 
-
-  constructor(data: MessageDTO<unknown>, authentication:Authentication, messageId:string) {
-    this._data = data;
+  constructor(message: Message, authentication:Authentication, messageId:string) {
+    this._message = message;
     this._authentication = authentication;
     this._messageId = messageId;
   }
 
-  print(): MessageDTO<unknown> & {ticket:string, principal:string, roles:string, msgId:string}{
+  print(): { op: string, data: object, ticket:string, principal:string, roles:string, msgId:string }{
     let authenticationInfo = {
       principal: '',
       ticket: '',
@@ -70,7 +69,8 @@ export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticat
       authenticationInfo = ticket;
     }
     return {
-      ...this._data,
+      op: this._message.operation(),
+      data: this._message.data(),
       ...authenticationInfo,
       msgId: this._messageId,
     };

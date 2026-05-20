@@ -45,22 +45,26 @@
  */
 import {AngularObjectCollection} from './angularObjectCollection';
 import {Channel} from '../channel/channel';
-import {MessageDTO} from '../message/messageDTO';
-import {AngularObjectUpdateMessageImpl} from '../message/angularObjectUpdateMessage/angularObjectUpdateMessageImpl';
-import {AngularObjectUpdateDTO} from '../message/angularObjectUpdateMessage/angularObjectUpdateDTO';
+import {Response} from '../channel/response';
 import {PushValue} from '../pushValue/pushValue';
-import {AngularObjectRemoveDTO} from '../message/angularObjectRemoveMessage/angularObjectRemoveDTO';
 import {AngularObject} from '../angularObject/angularObject';
+import {AngularObjectRemoveResponse} from './responses/angularObjectRemove/angularObjectRemoveResponse';
+import {AngularObjectUpdateResponse} from './responses/angularObjectUpdate/angularObjectUpdateResponse';
 
 export class AngularObjectCollectionImpl implements AngularObjectCollection {
   private readonly _channel: Channel;
-  private readonly _angularObjects: AngularObject<unknown>[];
-  private readonly _pushValues: PushValue<AngularObject<unknown>[]>[];
+  private readonly _angularObjects: AngularObject[];
+  private readonly _pushValues: PushValue<AngularObject[]>[];
+  private readonly _responses: Response[];
 
   constructor(channel: Channel) {
     this._channel = channel;
     this._angularObjects = [];
     this._pushValues = [];
+    this._responses = [
+      new AngularObjectRemoveResponse(this._angularObjects, this._pushValues),
+      new AngularObjectUpdateResponse(this, this._angularObjects, this._pushValues)
+    ];
   }
 
   request(data: object): void {
@@ -68,26 +72,10 @@ export class AngularObjectCollectionImpl implements AngularObjectCollection {
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    if(message.op === 'ANGULAR_OBJECT_UPDATE'){
-      const angularObjectUpdateMessage = new AngularObjectUpdateMessageImpl(message.data as AngularObjectUpdateDTO);
-      const angularObject = angularObjectUpdateMessage.toAngularObject(this);
-      const existingAngularObjectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObject.name());
-      if(existingAngularObjectIndex !== -1){
-        this._angularObjects.splice(existingAngularObjectIndex, 1);
-      }
-      this._angularObjects.push(angularObject);
-      this._pushValues.forEach(value => value.update(this._angularObjects));
-    }
-    else if(message.op === 'ANGULAR_OBJECT_REMOVE'){
-      const objectToRemove = message.data as AngularObjectRemoveDTO;
-      const objectIndex = this._angularObjects.findIndex(ao => ao.name() === objectToRemove.name);
-      this._angularObjects.splice(objectIndex, 1);
-      this._pushValues.forEach(value => value.update(this._angularObjects));
-    }
+    this._responses.forEach(response => response.response(data));
   }
 
-  angularObjects(value: PushValue<AngularObject<unknown>[]>): void {
+  angularObjects(value: PushValue<AngularObject[]>): void {
     value.update(this._angularObjects);
     this._pushValues.push(value);
   }

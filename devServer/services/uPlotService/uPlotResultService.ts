@@ -43,10 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {uPlotOutputOptions} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputOptions';
-import {uPlotOutputData} from '../../../src/app/angular2+/objects/output/plugins/uPlotPlugin/uPlotOutputData';
+import uPlot from 'uplot';
 
 export interface uPlotResultService {
-  outputData(): uPlotOutputData;
-  options(graphType:string): uPlotOutputOptions;
+  outputData(): uPlot.AlignedData;
+  options(graphType:string): object;
 }

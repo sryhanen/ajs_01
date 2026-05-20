@@ -47,51 +47,62 @@ import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
 import {OutputContainer} from '../output/container/outputContainer';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
-import {MessageDTO} from '../message/messageDTO';
-import {ParagraphDTO} from '../message/paragraphMessage/paragraphDTO';
-import {ParagraphOutputDTO} from '../message/paragraphOutputMessage/paragraphOutputDTO';
-import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
-import {ParagraphMessageImpl} from '../message/paragraphMessage/paragraphMessageImpl';
+import {SafeJson} from '../safeJson/safeJson';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
+import {MessageImpl} from '../message/messageImpl';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
-  private _paragraph: ParagraphDTO;
+  private readonly _paragraph: SafeJson;
 
-  constructor(channel: Channel, paragraph: ParagraphDTO, angularObjectCollection: AngularObjectCollection) {
+  constructor(channel: Channel, paragraph: object, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
-    this._paragraph = paragraph;
+    this._paragraph = new SafeJsonImpl(paragraph);
     this._outputContainer = new OutputContainerImpl(this, angularObjectCollection);
 
-    const paragraphOutputMessage: MessageDTO<ParagraphOutputDTO> = {
-      op:'PARAGRAPH_OUTPUT',
-      data: {
-        noteId:'',
-        paragraphId:'',
-        output: paragraph.output,
-      }
-    };
-    this._outputContainer.response(paragraphOutputMessage);
+    if(this._paragraph.propertyExists('output')){
+      const paragraphOutput:object = this._paragraph.getProperty('output', 'object');
+      const paragraphOutputMessage = {
+        op:'PARAGRAPH_OUTPUT',
+        data: {
+          noteId:'',
+          paragraphId:'',
+          output: paragraphOutput,
+        }
+      };
+      this._outputContainer.response(paragraphOutputMessage);
+    }
   }
 
   id(): string {
-    return this._paragraph.id;
+    return this._paragraph.getProperty('id', 'string');
   }
 
   outputContainer(): OutputContainer {
     return this._outputContainer;
   }
 
-  print():ParagraphDTO {
-    return this._paragraph;
+  print():object {
+    return {
+      text:this._paragraph.getProperty<string>('text', 'string'),
+      config:this._paragraph.getProperty<object>('config', 'object'),
+      settings: this._paragraph.getProperty<object>('settings', 'object'),
+    };
   }
 
   request(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    if(message.data['paragraphId'] !== undefined) {
-      message.data['paragraphId'] = this.id();
-      this._channel.request(message);
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    const messageData = new SafeJsonImpl(message.data());
+    if(messageData.propertyExists('paragraphId')){
+      const decoratedData = message.data();
+      decoratedData['paragraphId'] = this.id();
+      const decoratedRequest = {
+        op:message.operation(),
+        data:decoratedData,
+      };
+      this._channel.request(decoratedRequest);
     }
     else {
       this._channel.request(data);
@@ -99,19 +110,12 @@ export class ParagraphImpl implements Paragraph{
   }
 
   response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    const op = message.op;
-    if(op === 'PARAGRAPH'){
-      const paragraphMessage = new ParagraphMessageImpl(message.data as ParagraphDTO);
-      if(paragraphMessage.id() === this.id()){
-        this._paragraph = paragraphMessage.toParagraphData();
-        this._outputContainer.response(paragraphMessage.printAsParagraphOutputMessage());
-      }
-    }
-    else if(op === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO);
-      if(paragraphOutputMessage.paragraphId() === this.id()){
-        this._outputContainer.response(message);
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    const messageData = new SafeJsonImpl(message.data());
+    if(messageData.propertyExists('paragraphId')){
+      const paragraphId:string = messageData.getProperty('paragraphId', 'string');
+      if(paragraphId === this.id()){
+        this._outputContainer.response(data);
       }
     }
     else{

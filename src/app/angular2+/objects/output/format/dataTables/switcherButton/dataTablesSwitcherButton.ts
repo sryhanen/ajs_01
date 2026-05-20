@@ -45,8 +45,6 @@
  */
 import {OutputSwitcherButton} from '../../../switcher/button/outputSwitcherButton';
 import {OutputType} from '../../../outputType';
-import {MessageDTO} from '../../../../message/messageDTO';
-import {ParagraphOutputRequestDTO} from '../../../paragraphOutputRequest/paragraphOutputRequestDTO';
 
 export class DataTableSwitcherButton implements OutputSwitcherButton {
   private readonly _type:string = OutputType.dataTables;
@@ -59,7 +57,15 @@ export class DataTableSwitcherButton implements OutputSwitcherButton {
     return this._type;
   }
 
-  requestData(): MessageDTO<ParagraphOutputRequestDTO> {
+  requestData(): {
+    op: 'PARAGRAPH_OUTPUT_REQUEST',
+    data:{
+      paragraphId: string
+      noteId: string
+      type: string
+      requestOptions: object
+    }
+  } {
     return {
       op:'PARAGRAPH_OUTPUT_REQUEST',
       data: {

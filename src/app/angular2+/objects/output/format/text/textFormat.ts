@@ -45,64 +45,31 @@
  */
 import {OutputFormat} from '../outputFormat';
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
-import {OutputSwitcherButtonStub} from '../../switcher/button/outputSwitcherButtonStub';
-import {TextView} from '../../../../components/output/plugins/textView/textView';
-import {Channel} from '../../../channel/channel';
-import {ParagraphOutputDTO} from '../../../message/paragraphOutputMessage/paragraphOutputDTO';
-import {MessageDTO} from '../../../message/messageDTO';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ContainerRef} from '../../../containerRef/containerRef';
-import {TextPluginStub} from '../../plugins/textPlugin/textPluginStub';
+import {OutputType} from '../../outputType';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {TextPluginImpl} from '../../plugins/textPlugin/textPluginImpl';
 import {OutputPlugin} from '../../plugins/outputPlugin';
 
 export class TextFormat implements OutputFormat {
-  private readonly _channel:Channel;
   private readonly _switcherButtons: OutputSwitcherButton[];
-  private readonly _viewComponent: new () => TextView;
-  private readonly _containerRefs: ContainerRef[];
-  private readonly _pluginStub: OutputPlugin;
-  private _plugin: OutputPlugin;
+  private readonly _outputType: string;
 
-  constructor(channel: Channel) {
-    this._channel = channel;
-    this._viewComponent = TextView;
-    this._switcherButtons = [new OutputSwitcherButtonStub()];
-    this._containerRefs = [];
-    this._pluginStub = new TextPluginStub();
-    this._plugin = this._pluginStub;
+  constructor() {
+    this._outputType = OutputType.text;
+    this._switcherButtons = [];
   }
 
-  pushContainerRef(value:ContainerRef): void {
-    this._containerRefs.push(value);
-    if(!this._plugin.isStub()){
-      value.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]);
-    }
+  plugin(paragraphOutputData: object): OutputPlugin {
+    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
+    const outputData:string = safeParagraphOutputData.getProperty('data', 'string');
+    return new TextPluginImpl(outputData);
   }
 
   switcherButtons(): OutputSwitcherButton[] {
     return this._switcherButtons;
   }
 
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(data: object): void {
-    const message = data as MessageDTO<unknown>;
-    const op = message.op;
-    if(op === 'PARAGRAPH_OUTPUT'){
-      const output = new ParagraphOutputMessageImpl(message.data as ParagraphOutputDTO).toOutput();
-      if(output.isStub()){
-        this._plugin = this._pluginStub;
-        this._containerRefs.forEach(containerRef => containerRef.clear());
-      }
-      else{
-        this._containerRefs.forEach(containerRef => containerRef.clear());
-        this._plugin = output.toTextPlugin();
-        if(!this._plugin.isStub()){
-          this._containerRefs.forEach(containerRef => containerRef.createComponent(this._viewComponent, [{name:'plugin', value: this._plugin}]));
-        }
-      }
-    }
+  outputType(): string {
+    return this._outputType;
   }
 }

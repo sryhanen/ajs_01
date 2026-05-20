@@ -77,7 +77,7 @@ describe('WebAppRoot', () => {
     it('request() should evoke websocket request', () => {
       const spy = vi.spyOn(webSocketService, 'sendNewEvent');
       expect(spy).toHaveBeenCalledTimes(0);
-      webAppRoot.request({});
+      webAppRoot.request({op:'', data:{}});
       expect(spy).toHaveBeenCalledTimes(1);
     });
 
@@ -85,7 +85,7 @@ describe('WebAppRoot', () => {
       const notebookCollection = webAppRoot.rootObject();
       const spy = vi.spyOn(notebookCollection, 'response');
       expect(spy).toHaveBeenCalledTimes(0);
-      webAppRoot.response({});
+      webAppRoot.response({op:'', data:{}});
       expect(spy).toHaveBeenCalledTimes(1);
     });
   });

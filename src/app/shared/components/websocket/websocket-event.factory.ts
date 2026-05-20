@@ -41,7 +41,7 @@ function WebsocketEventFactory($rootScope,
   });
 
   pingIntervalId = setInterval(function () {
-    websocketCalls.sendNewEvent({op: 'PING'});
+    websocketCalls.sendNewEvent({op: 'PING', data:{}});
   }, 10000);
 
   websocketCalls.sendNewEvent = function (data) {
