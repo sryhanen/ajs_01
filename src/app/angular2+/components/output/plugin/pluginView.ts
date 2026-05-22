@@ -53,12 +53,12 @@ import {OutputPlugin} from '../../../objects/output/plugins/outputPlugin';
   `,
 })
 export class PluginView implements AfterViewInit {
-  @Input({required:true}) plugin: OutputPlugin;
+  @Input({required:true}) outputPlugin: OutputPlugin;
   @ViewChild('anchor') anchor: ElementRef;
 
   ngAfterViewInit(): void {
-    if(!this.plugin.isStub()){
-      this.plugin.render(this.anchor.nativeElement);
+    if(!this.outputPlugin.isStub()){
+      this.outputPlugin.render(this.anchor.nativeElement);
     }
   }
 }

@@ -65,7 +65,7 @@ export class OutputPluginDirective {
       else{
         newInstance = this.viewContainer.createComponent(PluginView);
       }
-      newInstance.setInput('plugin', this.outputPlugin());
+      newInstance.setInput('outputPlugin', this.outputPlugin());
     }
   });
 }
