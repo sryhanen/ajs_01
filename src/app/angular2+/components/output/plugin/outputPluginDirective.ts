@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ComponentRef, Directive, effect, inject, input, ViewContainerRef} from '@angular/core';
+import {ComponentRef, Directive, effect, inject, Input, ViewContainerRef, WritableSignal} from '@angular/core';
 import {OutputPlugin} from '../../../objects/output/plugins/outputPlugin';
 import {AngularView} from './angular/angularView';
 import {PluginView} from './pluginView';
@@ -51,10 +51,9 @@ import {OutputType} from '../../../objects/output/outputType';
 
 @Directive({
   selector: '[output-plugin]',
-  inputs: [{name:'outputPlugin', required:true}],
 })
 export class OutputPluginDirective {
-  outputPlugin = input.required<OutputPlugin>();
+  @Input({required:true}) outputPlugin: WritableSignal<OutputPlugin>;
   private viewContainer = inject(ViewContainerRef);
   private pluginChanged = effect(() => {
     this.viewContainer.clear();

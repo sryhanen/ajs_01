@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input, model, OnInit} from '@angular/core';
+import {Component, Input, OnInit, signal} from '@angular/core';
 import {OutputContainer} from '../../../objects/output/container/outputContainer';
 import {OutputSwitcherView} from '../switcher/outputSwitcherView';
 import {InterpreterErrorDirective} from '../../../directives/interpreterErrorDirective';
@@ -70,7 +70,7 @@ import {OutputPlugin} from '../../../objects/output/plugins/outputPlugin';
 export class OutputContainerView implements OnInit {
   @Input({required:true}) outputContainer: OutputContainer;
   protected outputSwitcherButtons: OutputSwitcherButton[];
-  outputPlugin = model<OutputPlugin>(new OutputPluginStub());
+  outputPlugin = signal<OutputPlugin>(new OutputPluginStub());
 
   ngOnInit(): void {
     this.outputSwitcherButtons = this.outputContainer.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
