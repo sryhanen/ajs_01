@@ -43,22 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {ComponentRef, Directive, effect, inject, Input, ViewContainerRef, WritableSignal} from '@angular/core';
 import {OutputPlugin} from '../../../objects/output/plugins/outputPlugin';
+import {AngularView} from './angular/angularView';
+import {PluginView} from './pluginView';
+import {OutputType} from '../../../objects/output/outputType';
 
-@Component({
-  selector: 'output-plugin',
-  template: `
-    <div #anchor></div>
-  `,
+@Directive({
+  selector: '[output-plugin]',
 })
-export class PluginView implements AfterViewInit {
-  @Input({required:true}) outputPlugin: OutputPlugin;
-  @ViewChild('anchor') anchor: ElementRef;
-
-  ngAfterViewInit(): void {
-    if(!this.outputPlugin.isStub()){
-      this.outputPlugin.render(this.anchor.nativeElement);
+export class OutputPluginDirective {
+  @Input({required:true}) outputPlugin: WritableSignal<OutputPlugin>;
+  private viewContainer = inject(ViewContainerRef);
+  private pluginChanged = effect(() => {
+    this.viewContainer.clear();
+    if(!this.outputPlugin().isStub()){
+      let newInstance: ComponentRef<AngularView | PluginView>;
+      if(this.outputPlugin().outputType() === OutputType.angular){
+        newInstance = this.viewContainer.createComponent(AngularView);
+      }
+      else{
+        newInstance = this.viewContainer.createComponent(PluginView);
+      }
+      newInstance.setInput('outputPlugin', this.outputPlugin());
     }
-  }
+  });
 }

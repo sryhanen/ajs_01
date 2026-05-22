@@ -43,22 +43,63 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {Component, signal} from '@angular/core';
+import {OutputPluginDirective} from './outputPluginDirective';
 import {OutputPlugin} from '../../../objects/output/plugins/outputPlugin';
+import {render, screen} from '@testing-library/angular';
+import {OutputPluginStub} from '../../../objects/output/plugins/outputPluginStub';
+import {FakeOutputPlugin} from '../../../objects/output/fakeOutputPlugin';
 
-@Component({
-  selector: 'output-plugin',
-  template: `
-    <div #anchor></div>
-  `,
-})
-export class PluginView implements AfterViewInit {
-  @Input({required:true}) outputPlugin: OutputPlugin;
-  @ViewChild('anchor') anchor: ElementRef;
+describe('OutputPluginDirective', () => {
+  const testId = 'testId';
+  const testData = 'test data to render';
+  const testPlugin: OutputPlugin = new FakeOutputPlugin();
+  const stubPlugin: OutputPlugin = new OutputPluginStub();
 
-  ngAfterViewInit(): void {
-    if(!this.outputPlugin.isStub()){
-      this.outputPlugin.render(this.anchor.nativeElement);
+  beforeEach(() => {
+    testPlugin.render = (anchorElement: HTMLElement) => {
+      anchorElement.innerHTML = testData;
+    };
+  });
+
+  describe('Rendering with a plugin', () => {
+    @Component({
+      template: `
+          <div output-plugin [outputPlugin]="outputPlugin" data-testid="testId"></div>
+      `,
+      imports: [OutputPluginDirective],
+    })
+    class FixtureComponent {
+      outputPlugin = signal(testPlugin);
+      testId = testId;
     }
-  }
-}
+
+    it('Should render', async () => {
+      await render(FixtureComponent);
+      const directiveAnchor = screen.getByTestId(testId);
+      const renderedPlugin = screen.getByText(testData);
+      expect(directiveAnchor).toBeDefined();
+      expect(renderedPlugin).toBeDefined();
+    });
+  });
+
+  describe('Rendering without a plugin', () => {
+    @Component({
+      template: `
+          <div output-plugin [outputPlugin]="outputPlugin" data-testid="testId"></div>
+      `,
+      imports: [OutputPluginDirective],
+    })
+    class FixtureComponent {
+      outputPlugin = signal(stubPlugin);
+      testId = testId;
+    }
+
+    test('Should render without plugin', async () => {
+      await render(FixtureComponent);
+      const directiveAnchor = screen.getByTestId(testId);
+      expect(directiveAnchor).toBeDefined();
+      expect(() => screen.getByText(testData)).toThrow();
+    });
+  });
+});

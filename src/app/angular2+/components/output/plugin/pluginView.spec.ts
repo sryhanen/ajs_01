@@ -43,22 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {render, screen} from '@testing-library/angular';
+import {PluginView} from './pluginView';
 import {OutputPlugin} from '../../../objects/output/plugins/outputPlugin';
+import {FakeOutputPlugin} from '../../../objects/output/fakeOutputPlugin';
 
-@Component({
-  selector: 'output-plugin',
-  template: `
-    <div #anchor></div>
-  `,
-})
-export class PluginView implements AfterViewInit {
-  @Input({required:true}) outputPlugin: OutputPlugin;
-  @ViewChild('anchor') anchor: ElementRef;
+describe('PluginView', () => {
+  const testData = 'test data';
+  let outputPlugin:OutputPlugin;
 
-  ngAfterViewInit(): void {
-    if(!this.outputPlugin.isStub()){
-      this.outputPlugin.render(this.anchor.nativeElement);
-    }
-  }
-}
+  beforeEach(async () => {
+    outputPlugin = new FakeOutputPlugin();
+    outputPlugin.render = (anchorElement:HTMLElement) => {
+      anchorElement.innerHTML = testData;
+    };
+    await render(PluginView, {
+      inputs:{outputPlugin:outputPlugin},
+    });
+  });
+
+  describe('Birth', () => {
+    it('Should render', () => {
+      expect(screen.getByText(testData)).toBeDefined();
+    });
+  });
+});

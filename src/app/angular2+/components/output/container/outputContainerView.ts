@@ -43,54 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, inject, Input, OnInit, signal, effect, ViewContainerRef, ComponentRef} from '@angular/core';
+import {Component, Input, OnInit, signal} from '@angular/core';
 import {OutputContainer} from '../../../objects/output/container/outputContainer';
 import {OutputSwitcherView} from '../switcher/outputSwitcherView';
 import {InterpreterErrorDirective} from '../../../directives/interpreterErrorDirective';
 import {OutputSwitcherButton} from '../../../objects/output/switcher/button/outputSwitcherButton';
-import {PluginView} from '../plugin/pluginView';
 import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writableSignalAsPushValue';
 import {OutputPluginStub} from '../../../objects/output/plugins/outputPluginStub';
-import {OutputType} from '../../../objects/output/outputType';
-import {AngularView} from '../plugin/angular/angularView';
+import {OutputPluginDirective} from '../plugin/outputPluginDirective';
+import {OutputPlugin} from '../../../objects/output/plugins/outputPlugin';
 
 @Component({
   selector: 'output-container',
   imports: [
     OutputSwitcherView,
     InterpreterErrorDirective,
+    OutputPluginDirective,
   ],
   template: `
-      <output-switcher [interpreter-error-popup]="outputContainer.errorListener()" [outputSwitcher]="outputContainer.outputSwitcher()" [outputSwitcherButtons]="outputSwitcherButtons"></output-switcher>
-      <ng-content></ng-content>
+    <output-switcher [interpreter-error-popup]="outputContainer.errorListener()"
+                     [outputSwitcher]="outputContainer.outputSwitcher()"
+                     [outputSwitcherButtons]="outputSwitcherButtons"></output-switcher>
+    <ng-container output-plugin [outputPlugin]="outputPlugin"></ng-container>
   `
 })
 export class OutputContainerView implements OnInit {
   @Input({required:true}) outputContainer: OutputContainer;
   protected outputSwitcherButtons: OutputSwitcherButton[];
-  private viewContainer = inject(ViewContainerRef);
-  protected plugin= signal(new OutputPluginStub());
-  private previousInstance: ComponentRef<AngularView | PluginView>;
-  private pluginChange = effect(() => {
-    if(!this.plugin().isStub()){
-      let newInstance: ComponentRef<AngularView | PluginView>;
-      if(this.plugin().outputType() === OutputType.angular){
-        newInstance = this.viewContainer.createComponent(AngularView);
-      }
-      else{
-        newInstance = this.viewContainer.createComponent(PluginView);
-      }
-
-      newInstance.setInput('plugin', this.plugin());
-      if(this.previousInstance !== undefined){
-        this.previousInstance.destroy();
-      }
-      this.previousInstance = newInstance;
-    }
-  });
+  outputPlugin = signal<OutputPlugin>(new OutputPluginStub());
 
   ngOnInit(): void {
     this.outputSwitcherButtons = this.outputContainer.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
-    this.outputContainer.outputPlugin(new WritableSignalAsPushValue(this.plugin));
+    this.outputContainer.outputPlugin(new WritableSignalAsPushValue(this.outputPlugin));
   }
 }
