@@ -43,12 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input, OnInit, signal} from '@angular/core';
+import {ChangeDetectorRef, Component, effect, inject, Input, OnInit, signal} from '@angular/core';
 import {NotebookView} from '../notebook/notebookView';
 import {NotebookCollection} from '../../objects/notebookCollection/notebookCollection';
 import {webAppRoot} from '../../objects/webAppRoot/webAppRootImpl';
-import {WritableSignalAsPushValue} from '../writableSignalAsPushValue/writableSignalAsPushValue';
 import {Notebook} from '../../objects/notebook/notebook';
+import {WritableSignalArrayAsPushValue} from '../writableSignalArrayAsPushValue/writableSignalArrayAsPushValue';
+import {PushValue} from '../../objects/pushValue/pushValue';
 
 @Component({
   selector: 'notebook-collection',
@@ -56,8 +57,8 @@ import {Notebook} from '../../objects/notebook/notebook';
     NotebookView
   ],
   template: `
-    @for (notebook of notebooks(); track notebook.id()) {
-        <notebook [noteId]="noteId" [paragraphId]="paragraphId" [notebook]="notebook"></notebook>
+    @for (notebook of notebooks.value(); track notebook) {
+      <notebook [noteId]="noteId" [paragraphId]="paragraphId" [notebook]="notebook"></notebook>
     }
   `
 })
@@ -65,10 +66,16 @@ export class NotebookCollectionView implements OnInit {
   @Input({required:true}) noteId: string;
   @Input({required:true}) paragraphId: string;
   private collection: NotebookCollection;
-  protected notebooks = signal<Notebook[]>([]);
+  protected notebooks:PushValue<Notebook[]>;
+  private cdr = inject(ChangeDetectorRef);
+  private change = effect(() => {
+    this.notebooks.value();
+    this.cdr.detectChanges();
+  });
 
   ngOnInit() {
     this.collection = webAppRoot.rootObject();
-    this.collection.notebooks(new WritableSignalAsPushValue(this.notebooks));
+    this.notebooks = new WritableSignalArrayAsPushValue(signal<Notebook[]>([]));
+    this.collection.notebooks(this.notebooks);
   }
 }
