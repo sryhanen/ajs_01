@@ -43,32 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input, OnInit, signal} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Notebook} from '../../objects/notebook/notebook';
-import {ParagraphView} from '../paragraph/paragraphView';
-import {WritableSignalAsPushValue} from '../writableSignalAsPushValue/writableSignalAsPushValue';
-import {Paragraph} from '../../objects/paragraph/paragraph';
+import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
 
 @Component({
   selector: 'notebook',
   imports: [
-    ParagraphView
+    ParagraphCollectionView
   ],
   template: `
     @if(noteId === notebook.id()){
-      @for(paragraph of this.paragraphs(); track paragraph){
-        <paragraph [paragraphId]="paragraphId" [paragraph]="paragraph"></paragraph>
-      }
+      <paragraph-collection [paragraphCollection]="notebook.paragraphCollection()" [paragraphId]="paragraphId"></paragraph-collection>
     }
   `
 })
-export class NotebookView implements OnInit {
+export class NotebookView {
   @Input({required:true}) noteId: string;
   @Input({required:true}) paragraphId: string;
   @Input({required:true}) notebook: Notebook;
-  protected paragraphs = signal<Paragraph[]>([]);
-
-  ngOnInit() {
-    this.notebook.paragraphs(new WritableSignalAsPushValue(this.paragraphs));
-  }
 }

@@ -74,19 +74,9 @@ describe('Notebook', () => {
       expect(notebook).toBeInstanceOf(NotebookImpl);
     });
 
-    it('Should have paragraphs', () =>{
+    it('Should have ParagraphCollection', () =>{
       notebook = new NotebookImpl(channel, notebookData);
-      const paragraphs = new PushValueImpl<Paragraph[]>();
-      notebook.paragraphs(paragraphs);
-      expect(paragraphs.value()).toHaveLength(1);
-    });
-
-    it('Should not have paragraphs', () =>{
-      delete notebookData.paragraphs;
-      notebook = new NotebookImpl(channel, notebookData);
-      const paragraphs = new PushValueImpl<Paragraph[]>();
-      notebook.paragraphs(paragraphs);
-      expect(paragraphs.value()).toEqual([]);
+      expect(notebook.paragraphCollection()).toBeDefined();
     });
 
     it('Should have id', () => {
@@ -103,7 +93,7 @@ describe('Notebook', () => {
       beforeEach(() => {
         notebook = new NotebookImpl(channel, notebookData);
         paragraphs = new PushValueImpl<Paragraph[]>();
-        notebook.paragraphs(paragraphs);
+        notebook.paragraphCollection().paragraphs(paragraphs);
         paragraphSpy = vi.spyOn(paragraphs.value()[0], 'response');
       });
 

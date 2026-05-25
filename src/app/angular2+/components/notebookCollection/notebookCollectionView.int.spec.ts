@@ -62,7 +62,6 @@ describe('NotebookCollectionView integration', () => {
     fixture.componentInstance.noteId = 'noteId';
     fixture.componentInstance.paragraphId = 'paragraphId';
     fixture.detectChanges();
-    fixture.detectChanges();
   });
 
   describe('Birth', () => {
