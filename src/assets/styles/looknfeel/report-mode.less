@@ -1,0 +1,142 @@
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+
+/* Report mode */
+
+.report-mode {
+  #notebookPage {
+    background: var(--grey-100);
+    min-height: calc(100vh - 106px);
+  }
+  .paragraph-box {
+    border: 0;
+    border-radius: 0;
+    min-height: 0;
+    background: #F7FAFC;
+  }
+  .paragraph-box:hover {
+    border: 0;
+  }
+  .paragraph-box {
+    padding: 0 !important;
+    margin: 0 0 30px !important;
+  }
+  .graphContainer {
+    margin-bottom: 0 !important;
+  }
+  .paragraph {
+    min-height: 32px;
+    padding: 0 0 10px;
+    .control {
+      display: none !important;
+    }
+  }
+  .collapse-button {
+    margin-top: -3px;
+  }
+  .btn-collapse {
+    border-left: 2px solid var(--grey-200);
+    border-bottom: 2px solid var(--grey-200);
+    border-right: 2px solid var(--grey-200);
+  }
+  .note-action-container {
+    border-bottom: 2px solid var(--grey-200);
+    .label-btn > .btn, .label-btn > .btn-group > .btn, .label-btn > .btn-group > .dropdown > .btn {
+      display: none;
+    }
+    .label-btn > .btn.rm-show,
+    .label-btn > .btn-group > .btn.rm-show,
+    .label-btn > .btn-group.rm-show > .btn {
+      display: inline-block;
+    }
+  }
+  .permissions {
+    box-shadow: none;
+    border-left: 2px solid var(--grey-200);
+  }
+  .executionTime, .nv-controlsWrap, .lastEmptyParagraph {
+    display: none;
+  }
+  .notebookContent {
+    margin-left: -20px;
+    margin-right: -15px;
+  }
+  .new-paragraph {
+    display: none;
+  }
+  .editor {
+    display: none;
+  }
+  .dpl-time {
+    display: none;
+  }
+  .paragraph-footer {
+    display: none;
+  }
+  .timeset-info {
+    display: none;
+  }
+}
+
+.dark-mode.report-mode {
+  #notebookPage {
+    background: var(--dm-grey-800);
+  }
+  .btn-collapse {
+    border-left: 2px solid var(--dm-grey-500);
+    border-bottom: 2px solid var(--dm-grey-500);
+    border-right: 2px solid var(--dm-grey-500);
+  }
+  .note-action-container {
+    border-bottom: 2px solid var(--dm-grey-500);
+  }
+  .permissions {
+    border-left: 2px solid var(--dm-grey-500);
+  }
+  .paragraph-box {
+    background: var(--dm-grey-800);
+  }
+}

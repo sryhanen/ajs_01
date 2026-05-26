@@ -2686,6 +2686,7 @@ div.dtsp-panesContainer div.dtsp-searchPane div.dtsp-topRow button {
 .note-action .btn-collapse {
   background: var(--grey-000);
   border-radius: 0 0 10px 10px;
+  box-shadow: 0 5px 5px -2px var(--grey-400);
 }
 .note-action .btn-collapse:after {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='%237F9CF5'%3e%3cpath d='M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z'/%3e%3c/svg%3e");
@@ -2707,11 +2708,13 @@ div.dtsp-panesContainer div.dtsp-searchPane div.dtsp-topRow button {
   border-color: var(--grey-000);
 }
 .note-action .btn-collapse:focus {
-  box-shadow: none;
+  box-shadow: 0 5px 5px -2px var(--grey-400);
 }
 .note-action .note-action-container {
   background: white;
   max-height: 50px;
+  box-shadow: 0 1px 5px var(--grey-400);
+  border-bottom: 1px solid var(--grey-300);
 }
 @media only screen and (max-width: 1200px) {
   .note-action .note-action-container {
@@ -2752,15 +2755,21 @@ div.dtsp-panesContainer div.dtsp-searchPane div.dtsp-topRow button {
 }
 .dark-mode .note-action .btn-collapse {
   background: var(--dm-grey-700);
+  box-shadow: 0 5px 5px -2px var(--dm-grey-900);
 }
 .dark-mode .note-action .btn-collapse:after {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='%2370EDD9'%3e%3cpath d='M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z'/%3e%3c/svg%3e");
+}
+.dark-mode .note-action .btn-collapse:focus {
+  box-shadow: 0 5px 5px -2px var(--dm-grey-900);
 }
 .dark-mode .note-action .btn-collapse:not(.collapsed):after {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='%23B8C5F7'%3e%3cpath d='M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z'/%3e%3c/svg%3e");
 }
 .dark-mode .note-action .note-action-container {
   background: var(--dm-grey-700);
+  box-shadow: 0 1px 5px var(--dm-grey-900);
+  border-bottom: 1px solid var(--dm-grey-700);
 }
 .dark-mode .note-action .fas,
 .dark-mode .note-action .far {
@@ -2908,6 +2917,7 @@ div.dtsp-panesContainer div.dtsp-searchPane div.dtsp-topRow button {
 }
 /* Add New Paragraph */
 .new-paragraph {
+  padding: 15px 30px 5px;
   cursor: pointer;
   color: var(--grey-600);
   text-transform: uppercase;
@@ -2966,476 +2976,34 @@ div.dtsp-panesContainer div.dtsp-searchPane div.dtsp-topRow button {
   opacity: 0.6 !important;
   pointer-events: none;
 }
-/* Notebook views */
-.default-mode .btn-collapse {
-  box-shadow: 0 5px 5px -2px var(--grey-400);
-}
-.default-mode .btn-collapse:focus {
-  box-shadow: 0 5px 5px -2px var(--grey-400);
-}
-.default-mode .note-action-container {
-  box-shadow: 0 1px 5px var(--grey-400);
-  border-bottom: 1px solid var(--grey-300);
-}
-.default-mode .new-paragraph {
-  padding: 15px 30px 5px;
-}
-.default-mode .paragraph-box {
+.paragraph-box {
   border: none;
   box-shadow: 2px 4px 10px var(--grey-400), 0 1px 5px var(--grey-500);
 }
-.default-mode .paragraph-output {
+.dark-mode .paragraph-box {
+  box-shadow: 2px 4px 10px var(--dm-grey-900), 0 1px 5px var(--dm-grey-900);
+}
+.paragraph-output {
   margin: 20px 0;
 }
-.default-mode .editor,
-.default-mode .executionTime,
-.default-mode .nv-controlsWrap {
+.editor,
+.executionTime,
+.nv-controlsWrap {
   display: block;
 }
-.default-mode .paragraph-col .focused {
+.paragraph-col .focused {
   box-shadow: 0 2px 7px var(--grey-400);
   border-color: white;
 }
-.default-mode .ng-toast.ng-toast--top {
-  top: 100px;
-}
-.default-mode .graphContainer {
-  padding-top: 20px;
-}
-.dark-mode.default-mode .btn-collapse {
-  box-shadow: 0 5px 5px -2px var(--dm-grey-900);
-}
-.dark-mode.default-mode .btn-collapse:focus {
-  box-shadow: 0 5px 5px -2px var(--dm-grey-900);
-}
-.dark-mode.default-mode .note-action-container {
-  box-shadow: 0 1px 5px var(--dm-grey-900);
-  border-bottom: 1px solid var(--dm-grey-700);
-}
-.dark-mode.default-mode .paragraph-col .focused {
+.dark-mode .paragraph-col .focused {
   box-shadow: 0 2px 7px var(--dm-grey-900);
   border-color: var(--dm-grey-700);
 }
-.dark-mode.default-mode .paragraph-box {
-  box-shadow: 2px 4px 10px var(--dm-grey-900), 0 1px 5px var(--dm-grey-900);
-}
-.lite-mode #notebookPage {
-  background: var(--grey-100);
-  min-height: calc(100vh - 106px);
-}
-.lite-mode .note-action .collapse-button {
-  margin-top: -2px;
-}
-.lite-mode .note-action .btn-collapse {
-  border-top: 2px solid var(--grey-000);
-  border-left: 2px solid var(--grey-300);
-  border-bottom: 2px solid var(--grey-300);
-  border-right: 2px solid var(--grey-300);
-}
-.lite-mode .note-action .note-action-container {
-  border-bottom: 2px solid var(--grey-300);
-}
-.lite-mode .new-paragraph {
-  padding: 15px 15px 0;
-}
-.lite-mode .paragraph-box {
-  padding: 0 !important;
-}
-.lite-mode .paragraph-box {
-  border-radius: 10px;
-  border: 2px solid var(--grey-300);
-}
-.lite-mode .paragraph .control {
-  margin: 0;
-  padding: 5px 15px;
-  border-radius: 10px 10px 0 0;
-  border-bottom: 2px solid var(--grey-300);
-  background: var(--grey-000);
-}
-.lite-mode .paragraph .title {
-  padding: 5px 15px;
-  border-bottom: 2px solid var(--grey-300);
-  border-top: 2px solid var(--grey-300);
-  margin-top: -2px;
-}
-.lite-mode .paragraph .paragraph-title .paragraph-title-inactive {
-  margin: 5px 15px;
-}
-.lite-mode .paragraph .paragraph-editor {
-  border-bottom: 2px solid var(--grey-300);
-}
-.lite-mode .paragraph .paragraph-editor .editor {
-  background: var(--grey-300);
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-}
-.lite-mode .paragraph .runControl {
-  background: var(--grey-300);
-}
-.lite-mode .paragraph .execution-time,
-.lite-mode .paragraph .elapsed-time {
-  padding: 5px 15px;
-  margin-top: 0;
-  border-top: 2px solid var(--grey-300);
-}
-.lite-mode .plainTextContainer {
-  border-top: 2px solid var(--grey-300);
-}
-.lite-mode .paragraph-footer {
-  padding: 0;
-}
-.lite-mode .result-view {
-  margin: 10px 15px;
-}
-.lite-mode .result-chart {
-  margin: 0;
-  padding: 10px 15px;
-  border-top: 2px solid var(--grey-300);
-  border-bottom: 2px solid var(--grey-300);
-}
-.lite-mode .table-display .option {
-  border-radius: 0;
-}
-.lite-mode .graphContainer {
-  border-top: 2px solid var(--grey-300);
-  padding: 10px 0 0;
-}
-.lite-mode .markdown-body {
-  padding: 0 15px 10px;
-}
-.lite-mode .dpl-table {
-  margin-top: 0;
-}
-.lite-mode .zeppelin-datatables {
-  padding: 10px 15px 0;
-  border-top: 2px solid var(--grey-300);
-}
-.lite-mode table.dataTable.table-striped > tbody > tr.odd > * {
-  background: var(--grey-200);
-}
-.lite-mode table.table-bordered.dataTable th:first-child,
-.lite-mode table.table-bordered.dataTable th:first-child,
-.lite-mode table.table-bordered.dataTable td:first-child,
-.lite-mode table.table-bordered.dataTable td:first-child {
-  border-left-width: 0;
-}
-.lite-mode table.table-bordered.dataTable th:last-child,
-.lite-mode table.table-bordered.dataTable th:last-child,
-.lite-mode table.table-bordered.dataTable td:last-child,
-.lite-mode table.table-bordered.dataTable td:last-child {
-  border-right-width: 0;
-}
-.lite-mode .table > thead > tr > th,
-.lite-mode .table > tbody > tr > th,
-.lite-mode .table > tfoot > tr > th,
-.lite-mode .table > thead > tr > td,
-.lite-mode .table > tbody > tr > td,
-.lite-mode .table > tfoot > tr > td {
-  padding: 5px 15px !important;
-}
-.lite-mode table.dataTable thead > tr > th.sorting::before,
-.lite-mode table.dataTable thead > tr > th.sorting_asc::before,
-.lite-mode table.dataTable thead > tr > th.sorting_desc::before,
-.lite-mode table.dataTable thead > tr > th.sorting_asc_disabled::before,
-.lite-mode table.dataTable thead > tr > th.sorting_desc_disabled::before,
-.lite-mode table.dataTable thead > tr > td.sorting::before,
-.lite-mode table.dataTable thead > tr > td.sorting_asc::before,
-.lite-mode table.dataTable thead > tr > td.sorting_desc::before,
-.lite-mode table.dataTable thead > tr > td.sorting_asc_disabled::before,
-.lite-mode table.dataTable thead > tr > td.sorting_desc_disabled::before {
-  bottom: 32%;
-}
-.lite-mode table.dataTable thead > tr > th.sorting::after,
-.lite-mode table.dataTable thead > tr > th.sorting_asc::after,
-.lite-mode table.dataTable thead > tr > th.sorting_desc::after,
-.lite-mode table.dataTable thead > tr > th.sorting_asc_disabled::after,
-.lite-mode table.dataTable thead > tr > th.sorting_desc_disabled::after,
-.lite-mode table.dataTable thead > tr > td.sorting::after,
-.lite-mode table.dataTable thead > tr > td.sorting_asc::after,
-.lite-mode table.dataTable thead > tr > td.sorting_desc::after,
-.lite-mode table.dataTable thead > tr > td.sorting_asc_disabled::after,
-.lite-mode table.dataTable thead > tr > td.sorting_desc_disabled::after {
-  top: 22%;
-}
-.lite-mode .dataTables_wrapper .dtsp-panes {
-  padding: 0 15px;
-}
-.lite-mode .dataTables_wrapper .dataTables_info {
-  font-size: 14px;
-  margin-left: 15px;
-}
-.lite-mode .dataTables_wrapper .dataTables_length {
-  margin-left: 15px;
-}
-.lite-mode .dataTables_wrapper .dataTables_length label {
-  font-size: 14px;
-}
-.lite-mode .dataTables_wrapper .dataTables_length select {
-  padding: 2px 10px 0;
-  font-size: 14px;
-}
-.lite-mode .dataTables_wrapper .dataTables_filter {
-  margin-right: 15px;
-}
-.lite-mode .dataTables_wrapper .dataTables_filter label {
-  font-size: 14px;
-}
-.lite-mode .dataTables_wrapper .dataTables_filter input {
-  padding: 1px 10px;
-  font-size: 14px;
-  min-height: 24px;
-}
-.lite-mode .dataTables_wrapper .dataTables_paginate {
-  margin-right: 15px;
-}
-.lite-mode .dataTables_wrapper .dataTables_paginate .paginate_button .page-link {
-  padding: 3px 10px;
-  font-size: 14px;
-}
-.lite-mode .dt-buttons .btn {
-  padding: 2px 5px;
-  font-size: 12px;
-}
-.lite-mode .dpl-log {
-  padding: 5px 15px;
-  border-top: 2px solid var(--grey-300);
-}
-.lite-mode .dpl-log .btn-small {
-  font-size: 12px;
-}
-.lite-mode .log-message {
-  font-size: 12px;
-}
-.lite-mode .log-message h3 {
-  font-size: 12px;
-}
-.lite-mode .plainTextContent {
-  padding: 5px 15px;
-}
-.lite-mode .timeset-info {
-  margin: 10px 15px 12px;
-}
-.dark-mode.lite-mode #notebookPage {
-  background: var(--dm-grey-800);
-}
-.dark-mode.lite-mode .note-action .btn-collapse {
-  border-top: 2px solid var(--dm-grey-700);
-  border-left: 2px solid var(--dm-grey-500);
-  border-bottom: 2px solid var(--dm-grey-500);
-  border-right: 2px solid var(--dm-grey-500);
-}
-.dark-mode.lite-mode .note-action .note-action-container,
-.dark-mode.lite-mode .paragraph-box,
-.dark-mode.lite-mode .paragraph .title,
-.dark-mode.lite-mode .plainTextContainer,
-.dark-mode.lite-mode .paragraph .execution-time,
-.dark-mode.lite-mode .paragraph .elapsed-time,
-.dark-mode.lite-mode .paragraph .paragraph-editor,
-.dark-mode.lite-mode .graphContainer,
-.dark-mode.lite-mode .result-chart,
-.dark-mode.lite-mode .zeppelin-datatables,
-.dark-mode.lite-mode .dpl-log {
-  border-color: var(--dm-grey-500);
-}
-.dark-mode.lite-mode .paragraph .control {
-  border-color: var(--dm-grey-500);
-  background: var(--dm-grey-700);
-}
-.dark-mode.lite-mode .paragraph .editor {
-  background: var(--dm-grey-600);
-}
-.dark-mode.lite-mode .paragraph .runControl {
-  background: var(--dm-grey-600);
-}
-.simple-mode .collapse-button {
-  margin-top: -2px;
-}
-.simple-mode .btn-collapse {
-  border-left: 2px solid var(--grey-300);
-  border-bottom: 2px solid var(--grey-300);
-  border-right: 2px solid var(--grey-300);
-}
-.simple-mode .notebook-content {
-  margin-left: -15px;
-  margin-right: -15px;
-}
-.simple-mode .note-action-container {
-  border-bottom: 2px solid var(--grey-300);
-}
-.simple-mode .permissions {
-  box-shadow: none;
-  border-left: 2px solid var(--grey-300);
-}
-.simple-mode .new-paragraph {
-  padding: 15px 70px 5px;
-}
-.simple-mode .paragraph-box {
-  border: 2px solid var(--grey-300);
-  min-height: 20px;
-  box-shadow: none;
-}
-.simple-mode .paragraph-box:hover {
-  background: var(--grey-000);
-}
-.simple-mode .paragraph-box:hover .control,
-.simple-mode .paragraph-box:hover .paragraph-footer {
-  opacity: 1;
-}
-.simple-mode .paragraph-box {
-  padding: 0 70px 30px !important;
-}
-.simple-mode .paragraph {
-  min-height: 32px;
-}
-.simple-mode .paragraph .control {
-  background: transparent;
-  padding: 15px 0;
-  border-radius: 0;
-  margin: 0;
-}
-.simple-mode .paragraph .control,
-.simple-mode .paragraph .paragraph-footer {
-  opacity: 0;
-  transition: all 0.5s ease-in-out;
-}
-.simple-mode .paragraph .paragraph-footer-elapsed {
-  height: 0;
-  float: right;
-  z-index: 99;
-}
-.simple-mode .paragraph-output {
-  margin: 15px 0;
-}
-.simple-mode .paragraph-col .focused {
-  border-color: var(--grey-400);
-}
-.simple-mode .editor,
-.simple-mode .execution-time,
-.simple-mode .nv-controlsWrap {
-  display: block;
-}
-.simple-mode .result-chart {
-  margin: 0 -70px 1.5rem;
-  padding: 40px 70px;
-}
-.dark-mode.simple-mode .btn-collapse {
-  border-left: 2px solid var(--dm-grey-500);
-  border-bottom: 2px solid var(--dm-grey-500);
-  border-right: 2px solid var(--dm-grey-500);
-}
-.dark-mode.simple-mode .note-action-container {
-  border-bottom: 2px solid var(--dm-grey-500);
-}
-.dark-mode.simple-mode .permissions {
-  border-left: 2px solid var(--dm-grey-500);
-}
-.dark-mode.simple-mode .paragraph .control {
-  background: transparent;
-}
-.dark-mode.simple-mode .paragraph-box {
-  border: none;
-  box-shadow: none;
-}
-.dark-mode.simple-mode .paragraph-box:hover {
-  background: #333e68;
-  border: none;
-}
-.dark-mode.simple-mode .paragraph-col .focused {
-  box-shadow: 1px 2px 7px var(--dm-grey-900);
-}
-.report-mode #notebookPage {
-  background: var(--grey-100);
-  min-height: calc(100vh - 106px);
-}
-.report-mode .paragraph-box {
-  border: 0;
-  border-radius: 0;
-  min-height: 0;
-  background: #F7FAFC;
-}
-.report-mode .paragraph-box:hover {
-  border: 0;
-}
-.report-mode .paragraph-box {
-  padding: 0 !important;
-  margin: 0 0 30px !important;
-}
-.report-mode .graphContainer {
-  margin-bottom: 0 !important;
-}
-.report-mode .paragraph {
-  min-height: 32px;
-  padding: 0 0 10px;
-}
-.report-mode .paragraph .control {
-  display: none !important;
-}
-.report-mode .collapse-button {
-  margin-top: -3px;
-}
-.report-mode .btn-collapse {
-  border-left: 2px solid var(--grey-200);
-  border-bottom: 2px solid var(--grey-200);
-  border-right: 2px solid var(--grey-200);
-}
-.report-mode .note-action-container {
-  border-bottom: 2px solid var(--grey-200);
-}
-.report-mode .note-action-container .label-btn > .btn,
-.report-mode .note-action-container .label-btn > .btn-group > .btn,
-.report-mode .note-action-container .label-btn > .btn-group > .dropdown > .btn {
-  display: none;
-}
-.report-mode .note-action-container .label-btn > .btn.rm-show,
-.report-mode .note-action-container .label-btn > .btn-group > .btn.rm-show,
-.report-mode .note-action-container .label-btn > .btn-group.rm-show > .btn {
-  display: inline-block;
-}
-.report-mode .permissions {
-  box-shadow: none;
-  border-left: 2px solid var(--grey-200);
-}
-.report-mode .executionTime,
-.report-mode .nv-controlsWrap,
-.report-mode .lastEmptyParagraph {
-  display: none;
-}
-.report-mode .notebookContent {
-  margin-left: -20px;
-  margin-right: -15px;
-}
-.report-mode .new-paragraph {
-  display: none;
-}
-.report-mode .editor {
-  display: none;
-}
-.report-mode .dpl-time {
-  display: none;
-}
-.report-mode .paragraph-footer {
-  display: none;
-}
-.report-mode .timeset-info {
-  display: none;
-}
-.dark-mode.report-mode #notebookPage {
-  background: var(--dm-grey-800);
-}
-.dark-mode.report-mode .btn-collapse {
-  border-left: 2px solid var(--dm-grey-500);
-  border-bottom: 2px solid var(--dm-grey-500);
-  border-right: 2px solid var(--dm-grey-500);
-}
-.dark-mode.report-mode .note-action-container {
-  border-bottom: 2px solid var(--dm-grey-500);
-}
-.dark-mode.report-mode .permissions {
-  border-left: 2px solid var(--dm-grey-500);
-}
-.dark-mode.report-mode .paragraph-box {
-  background: var(--dm-grey-800);
+.ng-toast.ng-toast--top {
+  top: 100px;
+}
+.graphContainer {
+  padding-top: 20px;
 }
 /* Notebook Permissions */
 .permissions {
@@ -4502,6 +4070,145 @@ table.dataTable .timestamp-table {
 .paragraph-col.col-md-6 .dataTables_wrapper .dataTables_info {
   float: none;
   text-align: right;
+}
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+/* Report mode */
+.report-mode #notebookPage {
+  background: var(--grey-100);
+  min-height: calc(100vh - 106px);
+}
+.report-mode .paragraph-box {
+  border: 0;
+  border-radius: 0;
+  min-height: 0;
+  background: #F7FAFC;
+}
+.report-mode .paragraph-box:hover {
+  border: 0;
+}
+.report-mode .paragraph-box {
+  padding: 0 !important;
+  margin: 0 0 30px !important;
+}
+.report-mode .graphContainer {
+  margin-bottom: 0 !important;
+}
+.report-mode .paragraph {
+  min-height: 32px;
+  padding: 0 0 10px;
+}
+.report-mode .paragraph .control {
+  display: none !important;
+}
+.report-mode .collapse-button {
+  margin-top: -3px;
+}
+.report-mode .btn-collapse {
+  border-left: 2px solid var(--grey-200);
+  border-bottom: 2px solid var(--grey-200);
+  border-right: 2px solid var(--grey-200);
+}
+.report-mode .note-action-container {
+  border-bottom: 2px solid var(--grey-200);
+}
+.report-mode .note-action-container .label-btn > .btn,
+.report-mode .note-action-container .label-btn > .btn-group > .btn,
+.report-mode .note-action-container .label-btn > .btn-group > .dropdown > .btn {
+  display: none;
+}
+.report-mode .note-action-container .label-btn > .btn.rm-show,
+.report-mode .note-action-container .label-btn > .btn-group > .btn.rm-show,
+.report-mode .note-action-container .label-btn > .btn-group.rm-show > .btn {
+  display: inline-block;
+}
+.report-mode .permissions {
+  box-shadow: none;
+  border-left: 2px solid var(--grey-200);
+}
+.report-mode .executionTime,
+.report-mode .nv-controlsWrap,
+.report-mode .lastEmptyParagraph {
+  display: none;
+}
+.report-mode .notebookContent {
+  margin-left: -20px;
+  margin-right: -15px;
+}
+.report-mode .new-paragraph {
+  display: none;
+}
+.report-mode .editor {
+  display: none;
+}
+.report-mode .dpl-time {
+  display: none;
+}
+.report-mode .paragraph-footer {
+  display: none;
+}
+.report-mode .timeset-info {
+  display: none;
+}
+.dark-mode.report-mode #notebookPage {
+  background: var(--dm-grey-800);
+}
+.dark-mode.report-mode .btn-collapse {
+  border-left: 2px solid var(--dm-grey-500);
+  border-bottom: 2px solid var(--dm-grey-500);
+  border-right: 2px solid var(--dm-grey-500);
+}
+.dark-mode.report-mode .note-action-container {
+  border-bottom: 2px solid var(--dm-grey-500);
+}
+.dark-mode.report-mode .permissions {
+  border-left: 2px solid var(--dm-grey-500);
+}
+.dark-mode.report-mode .paragraph-box {
+  background: var(--dm-grey-800);
 }
 /*
  * Teragrep User Interface (ajs_01)
