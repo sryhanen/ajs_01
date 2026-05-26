@@ -56,7 +56,7 @@ import {By} from '@angular/platform-browser';
 import {ParagraphView} from '../paragraph/paragraphView';
 import {Paragraph} from '../../objects/paragraph/paragraph';
 
-describe('ParagraphCollectionView', () => {
+describe('ParagraphCollectionView integration', () => {
   const channel:Channel = new FakeChannel();
   const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
   const paraId1 = 'para1';
