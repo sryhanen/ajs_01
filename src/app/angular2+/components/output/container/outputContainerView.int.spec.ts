@@ -43,39 +43,51 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {render} from '@testing-library/angular';
-import {OutputContainer} from '../../../objects/output/container/outputContainer';
 import {Channel} from '../../../objects/channel/channel';
+import {AngularObjectCollection} from '../../../objects/angularObjectCollection/angularObjectCollection';
+import {OutputContainer} from '../../../objects/output/container/outputContainer';
+import {FakeToasterService} from '../../../../shared/components/Toaster/fakeToasterService';
 import {FakeChannel} from '../../../objects/channel/fakeChannel';
+import {AngularObjectCollectionImpl} from '../../../objects/angularObjectCollection/angularObjectCollectionImpl';
 import {OutputContainerImpl} from '../../../objects/output/container/outputContainerImpl';
 import {OutputContainerView} from './outputContainerView';
 import {ToasterService} from '../../../../shared/components/Toaster/notifications.service';
-import {FakeToasterService} from '../../../../shared/components/Toaster/fakeToasterService';
-import {AngularObjectCollection} from '../../../objects/angularObjectCollection/angularObjectCollection';
-import {AngularObjectCollectionImpl} from '../../../objects/angularObjectCollection/angularObjectCollectionImpl';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
+import {OutputPluginDirective} from '../plugin/outputPluginDirective';
+import {OutputSwitcherView} from '../switcher/outputSwitcherView';
 
-describe('OutputContainerView', () => {
-  let channel:Channel;
-  let angularObjectCollection: AngularObjectCollection;
-  let outputContainer: OutputContainer;
-  let toaster: FakeToasterService;
+describe('OutputContainerView integration', () => {
+  const channel:Channel = new FakeChannel();
+  const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
+  const outputContainer: OutputContainer = new OutputContainerImpl(channel, angularObjectCollection);
+  const toaster: FakeToasterService = new FakeToasterService();
+  let fixture: ComponentFixture<OutputContainerView>;
 
   beforeEach(() => {
-    channel = new FakeChannel();
-    angularObjectCollection = new AngularObjectCollectionImpl(channel);
-    outputContainer = new OutputContainerImpl(channel, angularObjectCollection);
-    toaster = new FakeToasterService();
+    TestBed.configureTestingModule({
+      providers: [
+        {provide:ToasterService, useValue: toaster}
+      ]
+    });
+    fixture = TestBed.createComponent(OutputContainerView);
+    fixture.componentInstance.outputContainer = outputContainer;
+    fixture.detectChanges();
   });
 
   describe('Birth', () => {
-    it('Should have been initialized', async () => {
-      const { container } = await render(OutputContainerView, {
-        inputs:{outputContainer:outputContainer},
-        providers:[
-          {provide:ToasterService, useValue: toaster}
-        ]
-      });
-      expect(container).toBeDefined();
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have output plugin directive', () => {
+      const outputPluginDirective = fixture.debugElement.queryAll(By.directive(OutputPluginDirective));
+      expect(outputPluginDirective).toBeTruthy();
+    });
+
+    it('Should have output switcher view', () => {
+      const outputSwitcherView = fixture.debugElement.queryAll(By.directive(OutputSwitcherView));
+      expect(outputSwitcherView).toBeTruthy();
     });
   });
 });
