@@ -52,7 +52,7 @@ import ParagraphImpl from '../../data/paragraph/paragraphImpl';
 import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
 import NoteService from '../../services/noteService';
-import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
+import {OutputType} from '../../../src/app/objects/output/outputType';
 
 export default class RunParagraphHandler implements Handler<RunParagraphMessage>{
   private readonly _noteService: NoteService;

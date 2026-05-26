@@ -43,33 +43,49 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ParagraphImpl from './paragraphImpl';
-import {SparkPara} from './sparkPara';
-import {DataTablesService} from '../../services/dataService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
-import {OutputType} from '../../../src/app/objects/output/outputType';
+import {Notebook} from '../../../objects/notebook/notebook';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {NotebookView} from './notebookView';
+import {NotebookImpl} from '../../../objects/notebook/notebookImpl';
+import {FakeChannel} from '../../../objects/channel/fakeChannel';
+import {Channel} from '../../../objects/channel/channel';
+import {By} from '@angular/platform-browser';
+import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
 
-export default class ParagraphFactory{
-  private readonly _dataTablesService : DataTablesService;
+describe('NotebookView integration', () => {
+  let fixture: ComponentFixture<NotebookView>;
+  const channel:Channel = new FakeChannel();
+  const noteId = 'noteId';
+  const paragraphId = 'paragraphId';
+  const notebookData = {
+    id:noteId
+  };
+  let notebook: Notebook;
 
-  constructor() {
-    this._dataTablesService = new DataTablesServiceImpl();
-  }
+  beforeEach(() => {
+    notebook = new NotebookImpl(channel, notebookData);
+    fixture = TestBed.createComponent(NotebookView);
+    fixture.componentInstance.noteId = noteId;
+    fixture.componentInstance.paragraphId = paragraphId;
+    fixture.componentInstance.notebook = notebook;
+    fixture.detectChanges();
+  });
 
-  paragraphCollection() {
-    const baseData = this._dataTablesService.rawData(50);
-    const output1 = {
-      type: OutputType.dataTables,
-      data: this._dataTablesService.paginated(baseData, 0, 50,1),
-      options: this._dataTablesService.options(baseData),
-      isAggregated: true,
-    };
-    const para1 = new ParagraphImpl('FINISHED', output1,'%dpl\n *raw data query*', '');
-    const output2 = {
-      type: OutputType.text,
-      data: 'Error: 1291kmfv910yht1 g1rj190+2u90',
-    };
-    const para2 = new ParagraphImpl('FINISHED', output2,'%dpl\n *raw data query fails*', '');
-    return [para1, para2, SparkPara];
-  }
-}
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have rendered ParagraphCollection', () => {
+      const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
+      expect(paragraphCollection).toBeTruthy();
+    });
+
+    it('Should not display ParagraphCollection if noteId does not match', () => {
+      fixture.componentRef.setInput('noteId', 'wrongId');
+      fixture.detectChanges();
+      const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
+      expect(paragraphCollection).not.toBeTruthy();
+    });
+  });
+});

@@ -14,7 +14,7 @@
 
 import angular from 'angular';
 import _ from 'lodash';
-import {WebSocketService} from '../../../angular2+/objects/webSocket/service/webSocketService';
+import {WebSocketService} from '../../../objects/webSocket/service/webSocketService';
 
 angular.module('zeppelinWebApp').factory('websocketEvents', ['$rootScope', '$location', 'saveAsService', 'ToasterService', 'CrossControllerDataTransfer', 'LoginService', 'webSocketService', WebsocketEventFactory]);
 

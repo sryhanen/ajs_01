@@ -51,8 +51,8 @@ import './downgraded-components';
 import {wsMessageListenerProvider, WebsocketMessageProvider, ToasterProvider} from './upgraded-providers';
 import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
 import { provideHttpClient } from '@angular/common/http';
-import {WebSocketServiceImpl} from './angular2+/objects/webSocket/service/webSocketServiceImpl';
-import {webAppRoot} from './angular2+/objects/webAppRoot/webAppRootImpl';
+import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
+import {webAppRoot} from './objects/webAppRoot/webAppRootImpl';
 
 @NgModule({
   declarations: [],

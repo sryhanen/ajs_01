@@ -43,33 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ParagraphImpl from './paragraphImpl';
-import {SparkPara} from './sparkPara';
-import {DataTablesService} from '../../services/dataService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
-import {OutputType} from '../../../src/app/objects/output/outputType';
+import {render, screen} from '@testing-library/angular';
+import {PluginView} from './pluginView';
+import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
+import {FakeOutputPlugin} from '../../../../objects/output/fakeOutputPlugin';
 
-export default class ParagraphFactory{
-  private readonly _dataTablesService : DataTablesService;
+describe('PluginView', () => {
+  const testData = 'test data';
+  let outputPlugin:OutputPlugin;
 
-  constructor() {
-    this._dataTablesService = new DataTablesServiceImpl();
-  }
-
-  paragraphCollection() {
-    const baseData = this._dataTablesService.rawData(50);
-    const output1 = {
-      type: OutputType.dataTables,
-      data: this._dataTablesService.paginated(baseData, 0, 50,1),
-      options: this._dataTablesService.options(baseData),
-      isAggregated: true,
+  beforeEach(async () => {
+    outputPlugin = new FakeOutputPlugin();
+    outputPlugin.render = (anchorElement:HTMLElement) => {
+      anchorElement.innerHTML = testData;
     };
-    const para1 = new ParagraphImpl('FINISHED', output1,'%dpl\n *raw data query*', '');
-    const output2 = {
-      type: OutputType.text,
-      data: 'Error: 1291kmfv910yht1 g1rj190+2u90',
-    };
-    const para2 = new ParagraphImpl('FINISHED', output2,'%dpl\n *raw data query fails*', '');
-    return [para1, para2, SparkPara];
-  }
-}
+    await render(PluginView, {
+      inputs:{outputPlugin:outputPlugin},
+    });
+  });
+
+  describe('Birth', () => {
+    it('Should render', () => {
+      expect(screen.getByText(testData)).toBeDefined();
+    });
+  });
+});
