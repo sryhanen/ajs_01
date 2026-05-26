@@ -60,7 +60,7 @@ describe('OutputSwitcherButtonView', () => {
   beforeEach(async () => {
     outputSwitcherButton = new FakeOutputSwitcherButton();
     channel = new FakeChannel();
-    outputSwitcher = new OutputSwitcherImpl(channel, []);
+    outputSwitcher = new OutputSwitcherImpl(channel);
     await render(OutputSwitcherButtonView, {
       inputs:{
         outputSwitcherButton:outputSwitcherButton,
