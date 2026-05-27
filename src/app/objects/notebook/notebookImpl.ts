@@ -64,8 +64,8 @@ export class NotebookImpl implements Notebook {
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
-    this._angularObjectCollection = new AngularObjectCollectionImpl(this);
     this._paragraphCollection = new ParagraphCollectionImpl(this, this.initialParagraphs(), this._angularObjectCollection);
+    this._angularObjectCollection = new AngularObjectCollectionImpl(this._paragraphCollection);
   }
 
   private initialParagraphs(): Paragraph[] {
