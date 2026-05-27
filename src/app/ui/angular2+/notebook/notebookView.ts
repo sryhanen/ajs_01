@@ -53,13 +53,10 @@ import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectio
     ParagraphCollectionView
   ],
   template: `
-    @if(noteId === notebook.id()){
-      <paragraph-collection [paragraphCollection]="notebook.paragraphCollection()" [paragraphId]="paragraphId"></paragraph-collection>
-    }
+    <paragraph-collection [paragraphCollection]="notebook.paragraphCollection()" [paragraphId]="paragraphId"></paragraph-collection>
   `
 })
 export class NotebookView {
-  @Input({required:true}) noteId: string;
   @Input({required:true}) paragraphId: string;
   @Input({required:true}) notebook: Notebook;
 }

@@ -59,7 +59,7 @@ describe('NotebookCollectionView integration', () => {
     webSocketService = new FakeWebSocketService();
     webAppRoot.initialize(webSocketService);
     fixture = TestBed.createComponent(NotebookCollectionView);
-    fixture.componentInstance.noteId = 'noteId';
+    fixture.componentInstance.noteId = 'note1';
     fixture.componentInstance.paragraphId = 'paragraphId';
     fixture.detectChanges();
   });
@@ -82,7 +82,6 @@ describe('NotebookCollectionView integration', () => {
         data:{
           notes:[
             {name:'note1', id:'note1'},
-            {name:'note2', id:'note2'}
           ]
         }
       };
@@ -90,9 +89,16 @@ describe('NotebookCollectionView integration', () => {
       fixture.detectChanges();
     });
 
-    it('Should have rendered notebooks on response', () =>{
+    it('Should have render notebook on response', () =>{
       const notebooks = fixture.debugElement.queryAll(By.directive(NotebookView));
-      expect(notebooks).toHaveLength(2);
+      expect(notebooks).toHaveLength(1);
+    });
+
+    it('Should not render notebook on response if noteId does not match', () =>{
+      fixture.componentRef.setInput('noteId', 'wrongId');
+      fixture.detectChanges();
+      const notebooks = fixture.debugElement.queryAll(By.directive(NotebookView));
+      expect(notebooks).toHaveLength(0);
     });
 
     it('Should replace previous notebooks on response', () =>{

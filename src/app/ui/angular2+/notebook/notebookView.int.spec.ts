@@ -65,7 +65,6 @@ describe('NotebookView integration', () => {
   beforeEach(() => {
     notebook = new NotebookImpl(channel, notebookData);
     fixture = TestBed.createComponent(NotebookView);
-    fixture.componentInstance.noteId = noteId;
     fixture.componentInstance.paragraphId = paragraphId;
     fixture.componentInstance.notebook = notebook;
     fixture.detectChanges();
@@ -79,13 +78,6 @@ describe('NotebookView integration', () => {
     it('Should have rendered ParagraphCollection', () => {
       const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
       expect(paragraphCollection).toBeTruthy();
-    });
-
-    it('Should not display ParagraphCollection if noteId does not match', () => {
-      fixture.componentRef.setInput('noteId', 'wrongId');
-      fixture.detectChanges();
-      const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
-      expect(paragraphCollection).not.toBeTruthy();
     });
   });
 });
