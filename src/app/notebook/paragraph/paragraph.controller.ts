@@ -158,6 +158,18 @@ function ParagraphCtrl($scope,
     initializeDefault($scope.paragraph.config);
   };
 
+  $scope.isParagraphRunning = function ():boolean {
+    let isParagraphRunning:boolean;
+    const status =$scope.paragraph.status;
+    if (status === undefined) {
+      isParagraphRunning = false;
+    }
+    else{
+      isParagraphRunning = status === ParagraphStatus.PENDING || status === ParagraphStatus.RUNNING;
+    }
+    return isParagraphRunning;
+  };
+
   $scope.$on('noteRunningStatus', function(event, status) {
     $scope.isNoteRunning = status;
     if($scope.editor){
