@@ -122,7 +122,7 @@ describe('AngularPluginAjs', () => {
       angularObjectCollection.angularObjects(angularObjects);
       angularObjectCollection.response(angularObjectResponse1);
       angularObjectCollection.response(angularObjectResponse2);
-      angularPluginAjs.plugin = angularPlugin;
+      angularPluginAjs.outputPlugin = angularPlugin;
       angularPluginAjs.$postLink();
     });
 

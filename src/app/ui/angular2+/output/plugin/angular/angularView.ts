@@ -53,9 +53,9 @@ import {AngularPlugin} from '../../../../../objects/output/plugins/angularPlugin
     AngularViewUpgradeModule
   ],
   template: `
-    <ajs-angular-view [plugin]="plugin"></ajs-angular-view>
+    <ajs-angular-view [outputPlugin]="outputPlugin"></ajs-angular-view>
   `
 })
 export class AngularView {
-  @Input({required:true}) plugin: AngularPlugin;
+  @Input({required:true}) outputPlugin: AngularPlugin;
 }

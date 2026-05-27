@@ -51,7 +51,7 @@ import {AngularPlugin} from '../../../../../objects/output/plugins/angularPlugin
   selector: 'ajs-angular-view'
 })
 export class AngularViewUpgradeModule extends UpgradeComponent {
-  @Input({required:true}) plugin: AngularPlugin;
+  @Input({required:true}) outputPlugin: AngularPlugin;
 
   constructor(
     @Inject(ElementRef) elementRef: ElementRef,

@@ -54,7 +54,7 @@ export class AngularPluginAjs implements IPostLink{
   private readonly $compile;
   readonly $scope: IScope;
   private readonly $element;
-  plugin!: AngularPlugin;
+  outputPlugin!: AngularPlugin;
 
   private _angularObjects: PushValue<AngularObject[]>;
 
@@ -70,7 +70,7 @@ export class AngularPluginAjs implements IPostLink{
 
   $postLink() {
     this._angularObjects = new PushValueImpl();
-    this.plugin.angularObjectCollection().angularObjects(this._angularObjects);
+    this.outputPlugin.angularObjectCollection().angularObjects(this._angularObjects);
     this.watchAngularObjects();
     this.render();
   };
@@ -85,7 +85,7 @@ export class AngularPluginAjs implements IPostLink{
         params: {}
       },
     };
-    this.plugin.request(runParagraphMessage);
+    this.outputPlugin.request(runParagraphMessage);
   }
 
   private angularBind(name:string, value:string, paragraphId:string) {
@@ -98,8 +98,7 @@ export class AngularPluginAjs implements IPostLink{
         paragraphId: paragraphId
       },
     };
-    this.plugin.request(angularObjectClientBindMessage);
-
+    this.outputPlugin.request(angularObjectClientBindMessage);
   }
 
   private angularUnbind(name:string, paragraphId:string) {
@@ -111,7 +110,7 @@ export class AngularPluginAjs implements IPostLink{
         paragraphId: paragraphId
       },
     };
-    this.plugin.request(angularObjectClientUnbindMessage);
+    this.outputPlugin.request(angularObjectClientUnbindMessage);
   }
 
   private watchAngularObjects() {
@@ -132,7 +131,7 @@ export class AngularPluginAjs implements IPostLink{
   }
 
   private compile(): void {
-    const compiledElements = this.$compile(this.plugin.template())(this.$scope);
+    const compiledElements = this.$compile(this.outputPlugin.template())(this.$scope);
     const targetDiv = this.$element[0].querySelector('#anchor');
     angular.element(targetDiv).empty();
     angular.element(targetDiv).append(compiledElements);
@@ -156,7 +155,7 @@ export const angularPluginAjs = {
       <div id="anchor"></div>
     `,
   bindings: {
-    plugin: '=',
+    outputPlugin: '=',
   },
   controller: AngularPluginAjs
 };
