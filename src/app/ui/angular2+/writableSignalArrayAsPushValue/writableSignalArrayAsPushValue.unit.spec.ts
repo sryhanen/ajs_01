@@ -43,33 +43,44 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ParagraphImpl from './paragraphImpl';
-import {SparkPara} from './sparkPara';
-import {DataTablesService} from '../../services/dataService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
-import {OutputType} from '../../../src/app/objects/output/outputType';
 
-export default class ParagraphFactory{
-  private readonly _dataTablesService : DataTablesService;
+import {PushValue} from '../../../objects/pushValue/pushValue';
+import {WritableSignalArrayAsPushValue} from './writableSignalArrayAsPushValue';
+import {signal, WritableSignal} from '@angular/core';
 
-  constructor() {
-    this._dataTablesService = new DataTablesServiceImpl();
-  }
+describe('WritableSignalArrayAsPushValue', () => {
+  let writableSignal: WritableSignal<object[]>;
+  let writableSignalArrayAsPushValue: PushValue<object[]>;
 
-  paragraphCollection() {
-    const baseData = this._dataTablesService.rawData(50);
-    const output1 = {
-      type: OutputType.dataTables,
-      data: this._dataTablesService.paginated(baseData, 0, 50,1),
-      options: this._dataTablesService.options(baseData),
-      isAggregated: true,
-    };
-    const para1 = new ParagraphImpl('FINISHED', output1,'%dpl\n *raw data query*', '');
-    const output2 = {
-      type: OutputType.text,
-      data: 'Error: 1291kmfv910yht1 g1rj190+2u90',
-    };
-    const para2 = new ParagraphImpl('FINISHED', output2,'%dpl\n *raw data query fails*', '');
-    return [para1, para2, SparkPara];
-  }
-}
+  beforeEach(() => {
+    writableSignal = signal([]);
+    writableSignalArrayAsPushValue = new WritableSignalArrayAsPushValue(writableSignal);
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(writableSignalArrayAsPushValue).toBeInstanceOf(WritableSignalArrayAsPushValue);
+    });
+
+    it('Should have empty list', () => {
+      expect(writableSignalArrayAsPushValue.value()).toEqual([]);
+    });
+  });
+
+  describe('Value update', () => {
+    let newValue:{test:string}[];
+    beforeEach(() => {
+      newValue = [{test:'test'}, {test:'test2'}];
+      writableSignalArrayAsPushValue.update(newValue);
+    });
+
+    it('Should have updated value', () => {
+      expect(writableSignalArrayAsPushValue.value()).toEqual(newValue);
+    });
+
+    it('Should have empty list after update', () => {
+      writableSignalArrayAsPushValue.update([]);
+      expect(writableSignalArrayAsPushValue.value()).toEqual([]);
+    });
+  });
+});

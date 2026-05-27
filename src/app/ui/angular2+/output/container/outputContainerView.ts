@@ -43,33 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ParagraphImpl from './paragraphImpl';
-import {SparkPara} from './sparkPara';
-import {DataTablesService} from '../../services/dataService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
-import {OutputType} from '../../../src/app/objects/output/outputType';
+import {Component, Input, OnInit, signal} from '@angular/core';
+import {OutputContainer} from '../../../../objects/output/container/outputContainer';
+import {OutputSwitcherView} from '../switcher/outputSwitcherView';
+import {InterpreterErrorDirective} from '../../interpreterError/interpreterErrorDirective';
+import {OutputSwitcherButton} from '../../../../objects/output/switcher/button/outputSwitcherButton';
+import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writableSignalAsPushValue';
+import {OutputPluginStub} from '../../../../objects/output/plugins/outputPluginStub';
+import {OutputPluginDirective} from '../plugin/outputPluginDirective';
+import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
-export default class ParagraphFactory{
-  private readonly _dataTablesService : DataTablesService;
+@Component({
+  selector: 'output-container',
+  imports: [
+    OutputSwitcherView,
+    InterpreterErrorDirective,
+    OutputPluginDirective,
+  ],
+  template: `
+    <output-switcher [interpreter-error-popup]="outputContainer.errorListener()"
+                     [outputSwitcher]="outputContainer.outputSwitcher()"
+                     [outputSwitcherButtons]="outputSwitcherButtons"></output-switcher>
+    <ng-container output-plugin [outputPlugin]="outputPlugin"></ng-container>
+  `
+})
+export class OutputContainerView implements OnInit {
+  @Input({required:true}) outputContainer: OutputContainer;
+  protected outputSwitcherButtons: OutputSwitcherButton[];
+  outputPlugin = signal<OutputPlugin>(new OutputPluginStub());
 
-  constructor() {
-    this._dataTablesService = new DataTablesServiceImpl();
-  }
-
-  paragraphCollection() {
-    const baseData = this._dataTablesService.rawData(50);
-    const output1 = {
-      type: OutputType.dataTables,
-      data: this._dataTablesService.paginated(baseData, 0, 50,1),
-      options: this._dataTablesService.options(baseData),
-      isAggregated: true,
-    };
-    const para1 = new ParagraphImpl('FINISHED', output1,'%dpl\n *raw data query*', '');
-    const output2 = {
-      type: OutputType.text,
-      data: 'Error: 1291kmfv910yht1 g1rj190+2u90',
-    };
-    const para2 = new ParagraphImpl('FINISHED', output2,'%dpl\n *raw data query fails*', '');
-    return [para1, para2, SparkPara];
+  ngOnInit(): void {
+    this.outputSwitcherButtons = this.outputContainer.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
+    this.outputContainer.outputPlugin(new WritableSignalAsPushValue(this.outputPlugin));
   }
 }

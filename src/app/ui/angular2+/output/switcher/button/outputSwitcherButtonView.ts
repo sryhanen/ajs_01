@@ -43,33 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ParagraphImpl from './paragraphImpl';
-import {SparkPara} from './sparkPara';
-import {DataTablesService} from '../../services/dataService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
-import {OutputType} from '../../../src/app/objects/output/outputType';
+import {Component, Input} from '@angular/core';
+import {OutputSwitcherButton} from '../../../../../objects/output/switcher/button/outputSwitcherButton';
+import {OutputSwitcher} from '../../../../../objects/output/switcher/outputSwitcher';
 
-export default class ParagraphFactory{
-  private readonly _dataTablesService : DataTablesService;
-
-  constructor() {
-    this._dataTablesService = new DataTablesServiceImpl();
-  }
-
-  paragraphCollection() {
-    const baseData = this._dataTablesService.rawData(50);
-    const output1 = {
-      type: OutputType.dataTables,
-      data: this._dataTablesService.paginated(baseData, 0, 50,1),
-      options: this._dataTablesService.options(baseData),
-      isAggregated: true,
-    };
-    const para1 = new ParagraphImpl('FINISHED', output1,'%dpl\n *raw data query*', '');
-    const output2 = {
-      type: OutputType.text,
-      data: 'Error: 1291kmfv910yht1 g1rj190+2u90',
-    };
-    const para2 = new ParagraphImpl('FINISHED', output2,'%dpl\n *raw data query fails*', '');
-    return [para1, para2, SparkPara];
-  }
+@Component({
+  selector: 'output-switcher-button',
+  template: `
+    <button class="btn btn-secondary"
+            type="button"
+            title="{{outputSwitcherButton.title()}}"
+            (click)="outputSwitcher.requestFormatSwitch(outputSwitcherButton)">
+      <i class="{{outputSwitcherButton.icon()}}"></i>
+    </button>
+  `
+})
+export class OutputSwitcherButtonView{
+  @Input({required:true}) outputSwitcherButton:OutputSwitcherButton;
+  @Input({required:true}) outputSwitcher:OutputSwitcher;
 }

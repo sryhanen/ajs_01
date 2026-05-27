@@ -48,7 +48,7 @@ import {Handler} from './handler';
 import {receiveOperation, sendOperation} from '../webSocketOperations';
 import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
-import {OutputType} from '../../../src/app/angular2+/objects/output/outputType';
+import {OutputType} from '../../../src/app/objects/output/outputType';
 import {uPlotResultService} from '../../services/uPlotService/uPlotResultService';
 import {uPlotResultServiceImpl} from '../../services/uPlotService/uPlotResultServiceImpl';
 
