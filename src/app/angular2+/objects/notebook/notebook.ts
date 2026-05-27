@@ -44,10 +44,9 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
-import {Paragraph} from '../paragraph/paragraph';
-import {PushValue} from '../pushValue/pushValue';
+import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 
 export interface Notebook extends Channel{
   id(): string;
-  paragraphs(value:PushValue<Paragraph[]>):void;
+  paragraphCollection():ParagraphCollection;
 }

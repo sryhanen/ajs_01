@@ -43,23 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Notebook} from '../../objects/notebook/notebook';
-import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
+import {WritableSignal} from '@angular/core';
+import {PushValue} from '../../objects/pushValue/pushValue';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    ParagraphCollectionView
-  ],
-  template: `
-    @if(noteId === notebook.id()){
-      <paragraph-collection [paragraphCollection]="notebook.paragraphCollection()" [paragraphId]="paragraphId"></paragraph-collection>
-    }
-  `
-})
-export class NotebookView {
-  @Input({required:true}) noteId: string;
-  @Input({required:true}) paragraphId: string;
-  @Input({required:true}) notebook: Notebook;
+export class WritableSignalArrayAsPushValue<T> implements PushValue<T[]> {
+  private readonly _writableSignal: WritableSignal<T[]>;
+
+  constructor(writableSignal: WritableSignal<T[]>) {
+    this._writableSignal = writableSignal;
+  }
+
+  update(newValue: T[]): void {
+    this._writableSignal.update(() =>
+      [...newValue]
+    );
+  }
+
+  value(): T[] {
+    return this._writableSignal();
+  }
 }

@@ -46,7 +46,6 @@
 import {Notebook} from './notebook';
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
-import {PushValue} from '../pushValue/pushValue';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
@@ -80,8 +79,8 @@ export class NotebookImpl implements Notebook {
     return paragraphs;
   }
 
-  paragraphs(value:PushValue<Paragraph[]>): void {
-    this._paragraphCollection.paragraphs(value);
+  paragraphCollection(): ParagraphCollection {
+    return this._paragraphCollection;
   }
 
   id(): string {

@@ -43,23 +43,44 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Notebook} from '../../objects/notebook/notebook';
-import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    ParagraphCollectionView
-  ],
-  template: `
-    @if(noteId === notebook.id()){
-      <paragraph-collection [paragraphCollection]="notebook.paragraphCollection()" [paragraphId]="paragraphId"></paragraph-collection>
-    }
-  `
-})
-export class NotebookView {
-  @Input({required:true}) noteId: string;
-  @Input({required:true}) paragraphId: string;
-  @Input({required:true}) notebook: Notebook;
-}
+import {PushValue} from '../../objects/pushValue/pushValue';
+import {WritableSignalArrayAsPushValue} from './writableSignalArrayAsPushValue';
+import {signal, WritableSignal} from '@angular/core';
+
+describe('WritableSignalArrayAsPushValue', () => {
+  let writableSignal: WritableSignal<object[]>;
+  let writableSignalArrayAsPushValue: PushValue<object[]>;
+
+  beforeEach(() => {
+    writableSignal = signal([]);
+    writableSignalArrayAsPushValue = new WritableSignalArrayAsPushValue(writableSignal);
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(writableSignalArrayAsPushValue).toBeInstanceOf(WritableSignalArrayAsPushValue);
+    });
+
+    it('Should have empty list', () => {
+      expect(writableSignalArrayAsPushValue.value()).toEqual([]);
+    });
+  });
+
+  describe('Value update', () => {
+    let newValue:{test:string}[];
+    beforeEach(() => {
+      newValue = [{test:'test'}, {test:'test2'}];
+      writableSignalArrayAsPushValue.update(newValue);
+    });
+
+    it('Should have updated value', () => {
+      expect(writableSignalArrayAsPushValue.value()).toEqual(newValue);
+    });
+
+    it('Should have empty list after update', () => {
+      writableSignalArrayAsPushValue.update([]);
+      expect(writableSignalArrayAsPushValue.value()).toEqual([]);
+    });
+  });
+});

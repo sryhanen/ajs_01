@@ -43,46 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputSwitcherButton} from '../../../../objects/output/switcher/button/outputSwitcherButton';
-import {FakeOutputSwitcherButton} from '../../../../objects/output/switcher/button/fakeOutputSwitcherButton';
-import {OutputSwitcherButtonView} from './outputSwitcherButtonView';
-import {fireEvent, render, screen} from '@testing-library/angular';
-import {OutputSwitcher} from '../../../../objects/output/switcher/outputSwitcher';
-import {OutputSwitcherImpl} from '../../../../objects/output/switcher/outputSwitcherImpl';
-import {FakeChannel} from '../../../../objects/channel/fakeChannel';
-import {Channel} from '../../../../objects/channel/channel';
+import {Component, Input, OnInit, signal} from '@angular/core';
+import {ParagraphCollection} from '../../objects/paragraphCollection/paragraphCollection';
+import {Paragraph} from '../../objects/paragraph/paragraph';
+import {ParagraphView} from '../paragraph/paragraphView';
+import {WritableSignalArrayAsPushValue} from '../writableSignalArrayAsPushValue/writableSignalArrayAsPushValue';
+import {PushValue} from '../../objects/pushValue/pushValue';
 
-describe('OutputSwitcherButtonView', () => {
-  let channel: Channel;
-  let outputSwitcherButton:OutputSwitcherButton;
-  let outputSwitcher: OutputSwitcher;
+@Component({
+  selector: 'paragraph-collection',
+  imports: [
+    ParagraphView
+  ],
+  template: `
+    @for (paragraph of this.paragraphs.value(); track paragraph) {
+      <paragraph [paragraphId]="paragraphId" [paragraph]="paragraph"></paragraph>
+    }
+  `
+})
+export class ParagraphCollectionView implements OnInit {
+  @Input({required:true}) paragraphId: string;
+  @Input({required:true}) paragraphCollection: ParagraphCollection;
+  protected paragraphSignal = signal<Paragraph[]>([]);
+  protected paragraphs: PushValue<Paragraph[]>;
 
-  beforeEach(async () => {
-    outputSwitcherButton = new FakeOutputSwitcherButton();
-    channel = new FakeChannel();
-    outputSwitcher = new OutputSwitcherImpl(channel, []);
-    await render(OutputSwitcherButtonView, {
-      inputs:{
-        outputSwitcherButton:outputSwitcherButton,
-        outputSwitcher:outputSwitcher
-      }
-    });
-  });
-
-  describe('Birth', () =>{
-    test('Should be created', () => {
-      const button = screen.getByRole('button');
-      expect(button).toBeDefined();
-    });
-  });
-
-  describe('Request', () =>{
-    test('Should send request on click', () => {
-      const spy = vi.spyOn(outputSwitcherButton, 'requestData');
-      const button = screen.getByRole('button');
-      expect(spy).toHaveBeenCalledTimes(0);
-      fireEvent.click(button);
-      expect(spy).toHaveBeenCalledTimes(1);
-    });
-  });
-});
+  ngOnInit():void {
+    this.paragraphs = new WritableSignalArrayAsPushValue(this.paragraphSignal);
+    this.paragraphCollection.paragraphs(this.paragraphs);
+  }
+}

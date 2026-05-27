@@ -43,23 +43,34 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Notebook} from '../../objects/notebook/notebook';
-import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
+import {PushValue} from '../../objects/pushValue/pushValue';
+import {WritableSignalAsPushValue} from './writableSignalAsPushValue';
+import {signal, WritableSignal} from '@angular/core';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    ParagraphCollectionView
-  ],
-  template: `
-    @if(noteId === notebook.id()){
-      <paragraph-collection [paragraphCollection]="notebook.paragraphCollection()" [paragraphId]="paragraphId"></paragraph-collection>
-    }
-  `
-})
-export class NotebookView {
-  @Input({required:true}) noteId: string;
-  @Input({required:true}) paragraphId: string;
-  @Input({required:true}) notebook: Notebook;
-}
+describe('WritableSignalAsPushValue', () => {
+  let writableSignal: WritableSignal<string>;
+  let writableSignalAsPushValue: PushValue<string>;
+
+  beforeEach(() => {
+    writableSignal = signal('');
+    writableSignalAsPushValue = new WritableSignalAsPushValue(writableSignal);
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(writableSignalAsPushValue).toBeInstanceOf(WritableSignalAsPushValue);
+    });
+
+    it('Should have initial value', () => {
+      expect(writableSignalAsPushValue.value()).toEqual('');
+    });
+  });
+
+  describe('Value update', () => {
+    it('Should update value', () => {
+      const newValue = 'New value';
+      writableSignalAsPushValue.update(newValue);
+      expect(writableSignalAsPushValue.value()).toEqual(newValue);
+    });
+  });
+});

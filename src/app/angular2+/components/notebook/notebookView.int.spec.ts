@@ -43,23 +43,49 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
 import {Notebook} from '../../objects/notebook/notebook';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {NotebookView} from './notebookView';
+import {NotebookImpl} from '../../objects/notebook/notebookImpl';
+import {FakeChannel} from '../../objects/channel/fakeChannel';
+import {Channel} from '../../objects/channel/channel';
+import {By} from '@angular/platform-browser';
 import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    ParagraphCollectionView
-  ],
-  template: `
-    @if(noteId === notebook.id()){
-      <paragraph-collection [paragraphCollection]="notebook.paragraphCollection()" [paragraphId]="paragraphId"></paragraph-collection>
-    }
-  `
-})
-export class NotebookView {
-  @Input({required:true}) noteId: string;
-  @Input({required:true}) paragraphId: string;
-  @Input({required:true}) notebook: Notebook;
-}
+describe('NotebookView integration', () => {
+  let fixture: ComponentFixture<NotebookView>;
+  const channel:Channel = new FakeChannel();
+  const noteId = 'noteId';
+  const paragraphId = 'paragraphId';
+  const notebookData = {
+    id:noteId
+  };
+  let notebook: Notebook;
+
+  beforeEach(() => {
+    notebook = new NotebookImpl(channel, notebookData);
+    fixture = TestBed.createComponent(NotebookView);
+    fixture.componentInstance.noteId = noteId;
+    fixture.componentInstance.paragraphId = paragraphId;
+    fixture.componentInstance.notebook = notebook;
+    fixture.detectChanges();
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have rendered ParagraphCollection', () => {
+      const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
+      expect(paragraphCollection).toBeTruthy();
+    });
+
+    it('Should not display ParagraphCollection if noteId does not match', () => {
+      fixture.componentRef.setInput('noteId', 'wrongId');
+      fixture.detectChanges();
+      const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
+      expect(paragraphCollection).not.toBeTruthy();
+    });
+  });
+});
