@@ -56,25 +56,29 @@ import {DefaultRequest} from './requests/default/defaultRequest';
 import {RunParagraphRequest} from './requests/runParagraph/runParagraphRequest';
 import {DefaultResponse} from './responses/default/defaultResponse';
 import {ParagraphCollection} from './paragraphCollection';
+import {ParagraphImpl} from '../paragraph/paragraphImpl';
+import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _paragraphs: Paragraph[];
   private readonly _pushParagraphs: PushValue<Paragraph[]>[];
   private readonly _responses: Response[];
   private readonly _requests: Request[];
+  private readonly _angularObjectCollection: AngularObjectCollection;
 
-  constructor(channel: Channel, paragraphs: Paragraph[], angularObjectCollection: AngularObjectCollection) {
-    this._paragraphs = paragraphs;
+  constructor(channel: Channel, initialParagraphData: object[]) {
+    this._angularObjectCollection = new AngularObjectCollectionImpl(this);
+    this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph, this._angularObjectCollection));
     this._pushParagraphs = [];
     this._responses = [
       new DefaultResponse(this._paragraphs),
-      new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs, angularObjectCollection),
-      new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs, angularObjectCollection),
+      new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs, this._angularObjectCollection),
+      new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs, this._angularObjectCollection),
       new ParagraphRemovedResponse(this._paragraphs, this._pushParagraphs),
     ];
     this._requests = [
-      new DefaultRequest(this),
-      new RunParagraphRequest(this, this._paragraphs)
+      new DefaultRequest(channel),
+      new RunParagraphRequest(channel, this._paragraphs)
     ];
   }
 

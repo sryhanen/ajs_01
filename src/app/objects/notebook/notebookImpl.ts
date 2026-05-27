@@ -45,39 +45,34 @@
  */
 import {Notebook} from './notebook';
 import {Channel} from '../channel/channel';
-import {Paragraph} from '../paragraph/paragraph';
-import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
-import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {SafeJson} from '../safeJson/safeJson';
 import {MessageImpl} from '../message/messageImpl';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
-import {ParagraphImpl} from '../paragraph/paragraphImpl';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
   private readonly _notebook: SafeJson;
-  private readonly _angularObjectCollection: AngularObjectCollection;
   private readonly _paragraphCollection: ParagraphCollection;
 
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
-    this._angularObjectCollection = new AngularObjectCollectionImpl(this);
-    this._paragraphCollection = new ParagraphCollectionImpl(this, this.initialParagraphs(), this._angularObjectCollection);
+    this._paragraphCollection = new ParagraphCollectionImpl(this, this.initialParagraphData());
   }
 
-  private initialParagraphs(): Paragraph[] {
-    const paragraphs: Paragraph[] = [];
+  private initialParagraphData(): object[] {
+    let initialParagraphData: object[];
     if(this._notebook.propertyExists('paragraphs')) {
-      const paragraphDataListing:Array<object> = this._notebook.getProperty('paragraphs', 'object');
-      for (const paragraphData of paragraphDataListing) {
-        paragraphs.push(new ParagraphImpl(this, paragraphData, this._angularObjectCollection));
-      }
+      initialParagraphData = this._notebook.getProperty('paragraphs', 'object');
     }
-    return paragraphs;
+    else{
+      initialParagraphData = [];
+    }
+    return initialParagraphData;
   }
+
 
   paragraphCollection(): ParagraphCollection {
     return this._paragraphCollection;
@@ -119,6 +114,5 @@ export class NotebookImpl implements Notebook {
 
   private respondChildren(data:object): void {
     this._paragraphCollection.response(data);
-    this._angularObjectCollection.response(data);
   }
 }

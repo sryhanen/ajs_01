@@ -47,31 +47,26 @@ import {ParagraphCollection} from '../../../objects/paragraphCollection/paragrap
 import {ParagraphCollectionImpl} from '../../../objects/paragraphCollection/paragraphCollectionImpl';
 import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {Channel} from '../../../objects/channel/channel';
-import {AngularObjectCollection} from '../../../objects/angularObjectCollection/angularObjectCollection';
-import {AngularObjectCollectionImpl} from '../../../objects/angularObjectCollection/angularObjectCollectionImpl';
-import {ParagraphImpl} from '../../../objects/paragraph/paragraphImpl';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ParagraphCollectionView} from './paragraphCollectionView';
 import {By} from '@angular/platform-browser';
 import {ParagraphView} from '../paragraph/paragraphView';
-import {Paragraph} from '../../../objects/paragraph/paragraph';
 
 describe('ParagraphCollectionView integration', () => {
   const channel:Channel = new FakeChannel();
-  const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
   const paraId1 = 'para1';
-  let initialParagraphs: Paragraph[];
+  let initialParagraphs: object[];
   let paragraphCollection: ParagraphCollection;
 
   let fixture: ComponentFixture<ParagraphCollectionView>;
 
   beforeEach(() => {
     initialParagraphs  = [
-      new ParagraphImpl(channel, {id:paraId1}, angularObjectCollection),
-      new ParagraphImpl(channel, {id:'para2'}, angularObjectCollection),
-      new ParagraphImpl(channel, {id:'para3'}, angularObjectCollection),
+      {id:paraId1},
+      {id:'para2'},
+      {id:'para3'},
     ];
-    paragraphCollection = new ParagraphCollectionImpl(channel, initialParagraphs, angularObjectCollection);
+    paragraphCollection = new ParagraphCollectionImpl(channel, initialParagraphs);
     fixture = TestBed.createComponent(ParagraphCollectionView);
     fixture.componentInstance.paragraphCollection = paragraphCollection;
     fixture.componentInstance.paragraphId = 'paragraphId';
@@ -90,7 +85,7 @@ describe('ParagraphCollectionView integration', () => {
 
     it('Should not have paragraphs visible', () => {
       fixture.destroy();
-      const emptyCollection = new ParagraphCollectionImpl(channel, [], angularObjectCollection);
+      const emptyCollection = new ParagraphCollectionImpl(channel, []);
       fixture = TestBed.createComponent(ParagraphCollectionView);
       fixture.componentInstance.paragraphCollection = emptyCollection;
       fixture.componentInstance.paragraphId = 'paragraphId';
