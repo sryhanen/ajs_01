@@ -71,7 +71,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph, this._angularObjectCollection));
     this._pushParagraphs = [];
     this._responses = [
-      new DefaultResponse(this._paragraphs),
+      new DefaultResponse(this._paragraphs, this._angularObjectCollection),
       new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs, this._angularObjectCollection),
       new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs, this._angularObjectCollection),
       new ParagraphRemovedResponse(this._paragraphs, this._pushParagraphs),
