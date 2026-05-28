@@ -65,7 +65,7 @@ export class ParagraphImpl implements Paragraph{
     if(this._paragraph.propertyExists('output')){
       const output = this._paragraph.getProperty<object>('output', 'object');
       if(output['data'] === undefined || output['type'] === undefined){
-        console.warn(`Output data not processed, format invalid: ${JSON.stringify(output)}`);
+        console.error(`Output data not processed, format invalid: ${JSON.stringify(output)}`);
       }
       else{
         const paragraphOutput:object = this._paragraph.getProperty('output', 'object');
