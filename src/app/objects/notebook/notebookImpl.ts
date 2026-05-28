@@ -50,6 +50,7 @@ import {SafeJson} from '../safeJson/safeJson';
 import {MessageImpl} from '../message/messageImpl';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
+import {ParagraphCollectionStub} from '../paragraphCollection/paragraphCollectionStub';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
@@ -59,18 +60,18 @@ export class NotebookImpl implements Notebook {
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
-    this._paragraphCollection = new ParagraphCollectionImpl(this, this.initialParagraphData());
+    this._paragraphCollection = this.initializedParagraphCollection();
   }
 
-  private initialParagraphData(): object[] {
-    let initialParagraphData: object[];
+  private initializedParagraphCollection(): ParagraphCollection {
+    let paragraphCollection: ParagraphCollection;
     if(this._notebook.propertyExists('paragraphs')) {
-      initialParagraphData = this._notebook.getProperty('paragraphs', 'object');
+      paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
     }
     else{
-      initialParagraphData = [];
+      paragraphCollection = new ParagraphCollectionStub();
     }
-    return initialParagraphData;
+    return paragraphCollection;
   }
 
 
@@ -104,15 +105,17 @@ export class NotebookImpl implements Notebook {
     const messageData = new SafeJsonImpl(message.data());
     if(messageData.propertyExists('noteId')){
       if(messageData.getProperty('noteId', 'string') === this.id()){
-        this.respondChildren(data);
+        this.respondParagraphCollection(data);
       }
     }
     else{
-      this.respondChildren(data);
+      this.respondParagraphCollection(data);
     }
   }
 
-  private respondChildren(data:object): void {
-    this._paragraphCollection.response(data);
+  private respondParagraphCollection(data:object): void {
+    if(!this._paragraphCollection.isStub()){
+      this._paragraphCollection.response(data);
+    }
   }
 }

@@ -58,7 +58,10 @@ describe('NotebookView integration', () => {
   const noteId = 'noteId';
   const paragraphId = 'paragraphId';
   const notebookData = {
-    id:noteId
+    id:noteId,
+    paragraphs:[
+      {id:'paragraph1'}
+    ]
   };
   let notebook: Notebook;
 
@@ -78,6 +81,14 @@ describe('NotebookView integration', () => {
     it('Should have rendered ParagraphCollection', () => {
       const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
       expect(paragraphCollection).toBeTruthy();
+    });
+
+    it('Should not rendered ParagraphCollection if notebook is partial', () => {
+      notebook = new NotebookImpl(channel, {id: noteId});
+      fixture.componentRef.setInput('notebook', notebook);
+      fixture.detectChanges();
+      const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
+      expect(paragraphCollection).not.toBeTruthy();
     });
   });
 });

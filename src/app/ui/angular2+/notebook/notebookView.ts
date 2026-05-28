@@ -53,7 +53,11 @@ import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectio
     ParagraphCollectionView
   ],
   template: `
-    <paragraph-collection [paragraphCollection]="notebook.paragraphCollection()" [paragraphId]="paragraphId"></paragraph-collection>
+    @let paragraphCollection = notebook.paragraphCollection();
+    @if(!paragraphCollection.isStub()) {
+      <paragraph-collection [paragraphCollection]="paragraphCollection" [paragraphId]="paragraphId"></paragraph-collection>
+    }
+
   `
 })
 export class NotebookView {
