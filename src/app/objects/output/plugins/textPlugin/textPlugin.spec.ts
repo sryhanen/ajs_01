@@ -67,11 +67,19 @@ describe('TextPlugin', () => {
       expect(textPlugin.isStub()).toBe(false);
     });
   });
-  describe('Render', () => {
-    it('Should bind table to the html element', () => {
-      const htmlElement = document.createElement('div');
+  describe('Rendering', () => {
+    let htmlElement: HTMLElement;
+    beforeEach(() => {
+      htmlElement = document.createElement('div');
       textPlugin.render(htmlElement);
+    });
+
+    it('Should have bound data to the html element', () => {
       expect(htmlElement.innerHTML).toContain(textData);
+    });
+
+    it('Should have set class property', () =>{
+      expect(htmlElement.classList.toString()).toEqual('plain-text');
     });
   });
 });
