@@ -58,7 +58,9 @@ import {PushValue} from '../../../objects/pushValue/pushValue';
   ],
   template: `
     @for (notebook of notebooks.value(); track notebook) {
-      <notebook [noteId]="noteId" [paragraphId]="paragraphId" [notebook]="notebook"></notebook>
+      @if(notebook.id() === noteId){
+        <notebook [paragraphId]="paragraphId" [notebook]="notebook"></notebook>
+      }
     }
   `
 })

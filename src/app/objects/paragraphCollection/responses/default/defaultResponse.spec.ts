@@ -54,12 +54,13 @@ import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angu
 describe('DefaultResponse', () => {
   let paragraphs:Paragraph[];
   let defaultResponse:DefaultResponse;
+  let angularObjectCollection: AngularObjectCollection;
 
   beforeEach(() => {
     const channel: Channel = new FakeChannel();
-    const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
+    angularObjectCollection = new AngularObjectCollectionImpl(channel);
     paragraphs = [new ParagraphImpl(channel, {}, angularObjectCollection)];
-    defaultResponse = new DefaultResponse(paragraphs);
+    defaultResponse = new DefaultResponse(paragraphs, angularObjectCollection);
   });
 
   describe('Birth', () => {
@@ -69,14 +70,24 @@ describe('DefaultResponse', () => {
   });
 
   describe('Response', () => {
-    it('Should response paragraphs', ()=> {
-      const paragraphSpy = vi.spyOn(paragraphs[0], 'response');
-      const response = {
-        op:'',
-        data:{}
-      };
+    const response = {
+      op:'',
+      data:{}
+    };
+    let paragraphSpy;
+    let angularObjectCollectionSpy;
+    beforeEach(() => {
+      paragraphSpy = vi.spyOn(paragraphs[0], 'response');
+      angularObjectCollectionSpy = vi.spyOn(angularObjectCollection, 'response');
       defaultResponse.response(response);
+    });
+
+    it('Should have responded paragraphs', ()=> {
       expect(paragraphSpy).toHaveBeenCalledExactlyOnceWith(response);
+    });
+
+    it('Should have responded angular object collection', ()=> {
+      expect(angularObjectCollectionSpy).toHaveBeenCalledExactlyOnceWith(response);
     });
   });
 });

@@ -63,6 +63,7 @@ export class TextPluginImpl implements OutputPlugin {
   }
 
   render(anchorElement: HTMLElement): void {
+    anchorElement.classList.add('plain-text');
     anchorElement.innerHTML = this._ansiUp.ansi_to_html(this._outputData);
   }
 

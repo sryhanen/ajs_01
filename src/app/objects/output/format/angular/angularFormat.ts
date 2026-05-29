@@ -70,9 +70,7 @@ export class AngularFormat implements OutputFormat {
   }
 
   plugin(paragraphOutputData: object): OutputPlugin {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const data:object = safeParagraphOutputData.getProperty('data', 'object');
-    const template:string = new SafeJsonImpl(data).getProperty('data', 'string');
+    const template:string = new SafeJsonImpl(paragraphOutputData).getProperty('data', 'string');
     return new AngularPluginImpl(this._channel, template, this._angularObjectCollection);
   }
 

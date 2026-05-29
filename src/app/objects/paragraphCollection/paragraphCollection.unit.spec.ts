@@ -43,52 +43,49 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Notebook} from '../../../objects/notebook/notebook';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {NotebookView} from './notebookView';
-import {NotebookImpl} from '../../../objects/notebook/notebookImpl';
-import {FakeChannel} from '../../../objects/channel/fakeChannel';
-import {Channel} from '../../../objects/channel/channel';
-import {By} from '@angular/platform-browser';
-import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
+import {ParagraphCollection} from './paragraphCollection';
+import {ParagraphCollectionImpl} from './paragraphCollectionImpl';
+import {FakeChannel} from '../channel/fakeChannel';
+import {Channel} from '../channel/channel';
+import {PushValueImpl} from '../pushValue/pushValueImpl';
+import {Paragraph} from '../paragraph/paragraph';
 
-describe('NotebookView integration', () => {
-  let fixture: ComponentFixture<NotebookView>;
-  const channel:Channel = new FakeChannel();
-  const noteId = 'noteId';
-  const paragraphId = 'paragraphId';
-  const notebookData = {
-    id:noteId,
-    paragraphs:[
-      {id:'paragraph1'}
-    ]
-  };
-  let notebook: Notebook;
-
+describe('ParagraphCollection unit test', () => {
+  const channel: Channel = new FakeChannel();
+  const initialparagraphData: object[] = [
+    {id:'para1'},
+    {id:'para2'},
+  ];
+  let paragraphCollection: ParagraphCollection;
   beforeEach(() => {
-    notebook = new NotebookImpl(channel, notebookData);
-    fixture = TestBed.createComponent(NotebookView);
-    fixture.componentInstance.paragraphId = paragraphId;
-    fixture.componentInstance.notebook = notebook;
-    fixture.detectChanges();
+    paragraphCollection = new ParagraphCollectionImpl(channel, initialparagraphData);
   });
 
   describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(fixture.componentInstance).toBeDefined();
+    it('Should be initialized', ()=>{
+      expect(paragraphCollection).toBeInstanceOf(ParagraphCollectionImpl);
     });
 
-    it('Should have rendered ParagraphCollection', () => {
-      const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
-      expect(paragraphCollection).toBeTruthy();
+    it('Should not be a stub', ()=>{
+      expect(paragraphCollection.isStub()).toBe(false);
     });
 
-    it('Should not rendered ParagraphCollection if notebook is partial', () => {
-      notebook = new NotebookImpl(channel, {id: noteId});
-      fixture.componentRef.setInput('notebook', notebook);
-      fixture.detectChanges();
-      const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
-      expect(paragraphCollection).not.toBeTruthy();
+    it('Should have paragraphs', ()=>{
+      const paragraphs = new PushValueImpl<Paragraph[]>();
+      paragraphCollection.paragraphs(paragraphs);
+      expect(paragraphs.value()).toHaveLength(2);
+    });
+  });
+
+  describe('Request', ()=> {
+    it('Should request channel', () => {
+      const requestSpy = vi.spyOn(channel, 'request');
+      const request =  {
+        op:'test',
+        data:'testdata'
+      };
+      paragraphCollection.request(request);
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
     });
   });
 });

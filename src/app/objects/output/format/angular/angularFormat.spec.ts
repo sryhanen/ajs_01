@@ -76,10 +76,7 @@ describe('AngularFormat', () => {
 
   describe('Plugin formatting', () => {
     const pluginData = {
-      data:{
-        data:
-          '<h1>{{test}}</h1>'
-      }
+      data:'<h1>{{test}}</h1>'
     };
 
     it('Should return plugin', () => {
