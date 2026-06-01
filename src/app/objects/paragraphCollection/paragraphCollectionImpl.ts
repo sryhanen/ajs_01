@@ -64,16 +64,15 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _pushParagraphs: PushValue<Paragraph[]>[];
   private readonly _responses: Response[];
   private readonly _requests: Request[];
-  private readonly _angularObjectCollection: AngularObjectCollection;
 
   constructor(channel: Channel, initialParagraphData: object[]) {
-    this._angularObjectCollection = new AngularObjectCollectionImpl(this);
-    this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph, this._angularObjectCollection));
+    const angularObjectCollection = new AngularObjectCollectionImpl(this);
+    this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph, angularObjectCollection));
     this._pushParagraphs = [];
     this._responses = [
-      new DefaultResponse(this._paragraphs, this._angularObjectCollection),
-      new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs, this._angularObjectCollection),
-      new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs, this._angularObjectCollection),
+      new DefaultResponse(this._paragraphs),
+      new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs, angularObjectCollection),
+      new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs, angularObjectCollection),
       new ParagraphRemovedResponse(this._paragraphs, this._pushParagraphs),
     ];
     this._requests = [
@@ -94,7 +93,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   response(data: object): void {
     this._responses.forEach(response => response.response(data));
   }
-  
+
   isStub(): boolean {
     return false;
   }

@@ -55,12 +55,14 @@ import {MessageImpl} from '../message/messageImpl';
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
+  private readonly _angularObjectCollection: AngularObjectCollection;
   private readonly _paragraph: SafeJson;
 
   constructor(channel: Channel, paragraph: object, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
-    this._outputContainer = new OutputContainerImpl(this, angularObjectCollection);
+    this._angularObjectCollection = angularObjectCollection;
+    this._outputContainer = new OutputContainerImpl(this, this._angularObjectCollection);
 
     if(this._paragraph.propertyExists('output')){
       const paragraphOutput = this._paragraph.getProperty<object>('output', 'object');
@@ -121,10 +123,12 @@ export class ParagraphImpl implements Paragraph{
       const paragraphId:string = messageData.getProperty('paragraphId', 'string');
       if(paragraphId === this.id()){
         this._outputContainer.response(data);
+        this._angularObjectCollection.response(data);
       }
     }
     else{
       this._outputContainer.response(data);
+      this._angularObjectCollection.response(data);
     }
   }
 }
