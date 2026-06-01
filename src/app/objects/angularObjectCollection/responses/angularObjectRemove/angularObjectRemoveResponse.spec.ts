@@ -54,9 +54,12 @@ import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 describe('AngularObjectRemoveResponse', () => {
   const defaultAngularObjectData =  {
     noteId: 'noteId',
+    paragraphId: 'paragraphId',
     interpreterGroupId: 'interpreterGroupId',
-    name: 'object1',
-    value: 'value1'
+    angularObject: {
+      name: 'object1',
+      value: 'value1'
+    }
   };
   let channel:Channel;
   let defaultAngularObject: AngularObject;
@@ -84,7 +87,7 @@ describe('AngularObjectRemoveResponse', () => {
       response = {
         op:'ANGULAR_OBJECT_REMOVE',
         data: {
-          name: defaultAngularObjectData.name,
+          name: defaultAngularObjectData.angularObject.name,
         }
       };
     });
