@@ -45,19 +45,15 @@
  */
 import {Response} from '../../../channel/response';
 import {Paragraph} from '../../../paragraph/paragraph';
-import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 
 export class DefaultResponse implements Response {
   private readonly _paragraphs: Paragraph[];
-  private readonly _angularObjectCollection: AngularObjectCollection;
 
-  constructor(paragraphs: Paragraph[], angularObjectCollection: AngularObjectCollection) {
+  constructor(paragraphs: Paragraph[]) {
     this._paragraphs = paragraphs;
-    this._angularObjectCollection = angularObjectCollection;
   }
 
   response(data: object) {
     this._paragraphs.forEach(paragraph => paragraph.response(data));
-    this._angularObjectCollection.response(data);
   }
 }

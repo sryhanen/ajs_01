@@ -46,16 +46,20 @@
 import {AngularObject} from './angularObject';
 import {AngularObjectImpl} from './angularObjectImpl';
 import {FakeChannel} from '../channel/fakeChannel';
+import {Mock} from 'vitest';
 
 describe('AngularObject', () => {
   const channel = new FakeChannel();
   const name = 'Object 1';
   const value = 'test';
-  let data;
+  const noteId = 'noteId';
+  const paragraphId = 'paragraphId';
+  const interpreterGroupId = 'interpreterGroupId';
+  let data: {noteId:string, paragraphId:string, interpreterGroupId:string, angularObject:{name: string, object: unknown}};
   let angularObject: AngularObject;
 
   beforeEach(() => {
-    data = {noteId: '', interpreterGroupId: '', name: name, value: value};
+    data = {noteId:noteId, paragraphId:paragraphId, interpreterGroupId:interpreterGroupId, angularObject:{name: name, object: value}};
     angularObject = new AngularObjectImpl(channel,data);
   });
 
@@ -74,22 +78,36 @@ describe('AngularObject', () => {
   });
 
   describe('Update', () => {
-    it('Should create request', () => {
-      const newValue = 'New value';
-      const updateRequest = {
+    const newValue = 'New value';
+    let updateRequest;
+    let requestSpy:Mock;
+    beforeEach(() => {
+      updateRequest = {
         op: 'ANGULAR_OBJECT_UPDATED',
         data: {
-          noteId: '',
+          noteId: noteId,
+          paragraphId: paragraphId,
           name: name,
           value: newValue,
-          interpreterGroupId: ''
+          interpreterGroupId: interpreterGroupId,
         },
       };
-      const spy = vi.spyOn(angularObject, 'request');
-      expect(spy).toHaveBeenCalledTimes(0);
+      requestSpy = vi.spyOn(angularObject, 'request');
+      expect(requestSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('Should create request with paragraphId', () => {
       angularObject.update(newValue);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(updateRequest);
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(updateRequest);
+    });
+
+    it('Should create request without paragraphId', () => {
+      delete data.paragraphId;
+      delete updateRequest.data.paragraphId;
+      angularObject = new AngularObjectImpl(channel,data);
+      requestSpy = vi.spyOn(angularObject, 'request');
+      angularObject.update(newValue);
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(updateRequest);
     });
   });
 });

@@ -54,9 +54,12 @@ import {AngularObjectUpdateResponse} from './angularObjectUpdateResponse';
 describe('AngularObjectUpdateResponse', () => {
   const defaultAngularObjectData =  {
     noteId: 'noteId',
+    paragraphId: 'paragraphId',
     interpreterGroupId: 'interpreterGroupId',
-    name: 'object1',
-    value: 'value1'
+    angularObject:{
+      name: 'object1',
+      value: 'value1'
+    }
   };
   let channel:Channel;
   let defaultAngularObject: AngularObject;
@@ -88,7 +91,7 @@ describe('AngularObjectUpdateResponse', () => {
           noteId: 'noteId',
           interpreterGroupId: 'interpreterGroupId',
           angularObject:{
-            name: defaultAngularObjectData.name,
+            name: defaultAngularObjectData.angularObject.name,
             object: newValue
           }
         }
@@ -98,7 +101,7 @@ describe('AngularObjectUpdateResponse', () => {
     it('Should update object in the collection', () => {
       angularObjectUpdateResponse.response(response);
       expect(angularObjects).toHaveLength(1);
-      expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.name);
+      expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.angularObject.name);
       expect(angularObjects[0].value()).toEqual(newValue);
       expect(pushValues[0].value()).toEqual(angularObjects);
     });
