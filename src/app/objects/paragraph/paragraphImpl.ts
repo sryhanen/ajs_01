@@ -99,10 +99,14 @@ export class ParagraphImpl implements Paragraph{
     };
   }
 
+  private shouldDecorateRequest(messageOperation:string, messageData:SafeJson):boolean {
+    return messageData.propertyExists('paragraphId') && (messageOperation !== 'ANGULAR_OBJECT_CLIENT_BIND' && messageOperation !== 'ANGULAR_OBJECT_CLIENT_UNBIND');
+  }
+
   request(data: object): void {
     const message = new MessageImpl(new SafeJsonImpl(data));
     const messageData = new SafeJsonImpl(message.data());
-    if(messageData.propertyExists('paragraphId')){
+    if(this.shouldDecorateRequest(message.operation(), messageData)){
       const decoratedData = message.data();
       decoratedData['paragraphId'] = this.id();
       const decoratedRequest = {

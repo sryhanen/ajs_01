@@ -137,4 +137,60 @@ describe('Paragraph', () => {
       });
     });
   });
+
+  describe('Request decoration', () => {
+    let request: {
+      op:string,
+      data:{
+        paragraphId:string,
+      }
+    };
+    let channelSpy;
+    beforeEach(() => {
+      channelSpy = vi.spyOn(channel, 'request');
+      request = {
+        op:'',
+        data:{
+          paragraphId: '',
+        }
+      };
+    });
+
+    it('Should decorate if paragraphId exists', () => {
+      const expectedRequest = {
+        op:'',
+        data:{
+          paragraphId: paragraphId,
+        }
+      };
+      paragraph.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+
+    it('Should not decorate if operation is ANGULAR_OBJECT_CLIENT_BIND', () => {
+      const operation = 'ANGULAR_OBJECT_CLIENT_BIND';
+      request.op = operation;
+      const expectedRequest = {
+        op:operation,
+        data:{
+          paragraphId: '',
+        }
+      };
+      paragraph.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+
+    it('Should not decorate if operation is ANGULAR_OBJECT_CLIENT_UNBIND', () => {
+      const operation = 'ANGULAR_OBJECT_CLIENT_UNBIND';
+      request.op = operation;
+      const expectedRequest = {
+        op:operation,
+        data:{
+          paragraphId: '',
+        }
+      };
+      paragraph.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
 });
