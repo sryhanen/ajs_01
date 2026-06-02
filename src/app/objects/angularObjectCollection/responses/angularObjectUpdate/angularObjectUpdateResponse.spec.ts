@@ -98,7 +98,7 @@ describe('AngularObjectUpdateResponse', () => {
       };
     });
 
-    it('Should update object in the collection if paragraphId matches', () => {
+    it('Should update object in the collection', () => {
       angularObjectUpdateResponse.response(response);
       expect(angularObjects).toHaveLength(1);
       expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.name);
@@ -106,7 +106,7 @@ describe('AngularObjectUpdateResponse', () => {
       expect(pushValues[0].value()).toEqual(angularObjects);
     });
 
-    it('Should add new object to the collection if object with same key does not exists', () => {
+    it('Should add new object to the collection', () => {
       const newName = 'object2';
       response.data.angularObject.name = newName;
       angularObjectUpdateResponse.response(response);
