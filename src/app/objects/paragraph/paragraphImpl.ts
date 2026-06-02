@@ -132,7 +132,6 @@ export class ParagraphImpl implements Paragraph{
     }
     else{
       this._outputContainer.response(data);
-      this._angularObjectCollection.response(data);
     }
   }
 }
