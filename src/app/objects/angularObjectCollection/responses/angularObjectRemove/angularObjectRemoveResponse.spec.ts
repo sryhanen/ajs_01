@@ -55,12 +55,10 @@ describe('AngularObjectRemoveResponse', () => {
   const defaultAngularObjectData =  {
     noteId: 'noteId',
     paragraphId: 'paragraphId',
-    interpreterGroupId: 'interpreterGroupId',
-    angularObject: {
-      name: 'object1',
-      value: 'value1'
-    }
+    name: 'object1',
+    value: 'value1'
   };
+  const interpreterGroupId = 'interpreterGroupId';
   let channel:Channel;
   let defaultAngularObject: AngularObject;
   let angularObjects: AngularObject[];
@@ -69,7 +67,7 @@ describe('AngularObjectRemoveResponse', () => {
 
   beforeEach(() => {
     channel = new FakeChannel();
-    defaultAngularObject = new AngularObjectImpl(channel, defaultAngularObjectData);
+    defaultAngularObject = new AngularObjectImpl(channel, defaultAngularObjectData, interpreterGroupId);
     angularObjects = [defaultAngularObject];
     pushValues = [new PushValueImpl()];
     angularObjectRemoveResponse = new AngularObjectRemoveResponse(angularObjects, pushValues);
@@ -87,7 +85,7 @@ describe('AngularObjectRemoveResponse', () => {
       response = {
         op:'ANGULAR_OBJECT_REMOVE',
         data: {
-          name: defaultAngularObjectData.angularObject.name,
+          name: defaultAngularObjectData.name,
         }
       };
     });

@@ -47,6 +47,7 @@ import {Request} from '../channel/request';
 
 export interface AngularObject extends Request{
   name(): string;
+  paragraphId():string;
   value(): unknown;
   update(value:unknown):void;
 }

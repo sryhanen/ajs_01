@@ -71,11 +71,11 @@ export class AngularObjectUpdateResponse implements Response {
       const interpreterGroupId:string = angularObjectUpdateData.getProperty('interpreterGroupId', 'string');
       const angularObject = new AngularObjectImpl(this._channel, angularObjectData, interpreterGroupId);
       const existingAngularObjectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObject.name());
-      if(existingAngularObjectIndex === -1){
-        this._angularObjects.push(angularObject);
+      if(existingAngularObjectIndex !== -1 && this._angularObjects[existingAngularObjectIndex].paragraphId() === angularObject.paragraphId()){
+        this._angularObjects.splice(existingAngularObjectIndex, 1, angularObject);
       }
       else{
-        this._angularObjects.splice(existingAngularObjectIndex, 1, angularObject);
+        this._angularObjects.push(angularObject);
       }
       this._pushValues.forEach(value => value.update(this._angularObjects));
     }

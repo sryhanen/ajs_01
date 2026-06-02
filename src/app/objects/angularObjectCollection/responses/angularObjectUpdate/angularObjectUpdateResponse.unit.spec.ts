@@ -52,14 +52,13 @@ import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 import {AngularObjectUpdateResponse} from './angularObjectUpdateResponse';
 
 describe('AngularObjectUpdateResponse', () => {
+  const interpreterGroupId = 'interpreterGroupId';
+  const paragraphId = 'paragraphId';
   const defaultAngularObjectData =  {
+    name: 'object1',
+    value: 'value1',
     noteId: 'noteId',
-    paragraphId: 'paragraphId',
-    interpreterGroupId: 'interpreterGroupId',
-    angularObject:{
-      name: 'object1',
-      value: 'value1'
-    }
+    paragraphId: paragraphId,
   };
   let channel:Channel;
   let defaultAngularObject: AngularObject;
@@ -69,7 +68,7 @@ describe('AngularObjectUpdateResponse', () => {
 
   beforeEach(() => {
     channel = new FakeChannel();
-    defaultAngularObject = new AngularObjectImpl(channel, defaultAngularObjectData);
+    defaultAngularObject = new AngularObjectImpl(channel, defaultAngularObjectData, interpreterGroupId);
     angularObjects = [defaultAngularObject];
     pushValues = [new PushValueImpl()];
     angularObjectUpdateResponse = new AngularObjectUpdateResponse(channel, angularObjects, pushValues);
@@ -91,22 +90,30 @@ describe('AngularObjectUpdateResponse', () => {
           noteId: 'noteId',
           interpreterGroupId: 'interpreterGroupId',
           angularObject:{
-            name: defaultAngularObjectData.angularObject.name,
+            name: defaultAngularObjectData.name,
+            paragraphId: paragraphId,
             object: newValue
           }
         }
       };
     });
 
-    it('Should update object in the collection', () => {
+    it('Should update object in the collection if paragraphId matches', () => {
       angularObjectUpdateResponse.response(response);
       expect(angularObjects).toHaveLength(1);
-      expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.angularObject.name);
+      expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.name);
       expect(angularObjects[0].value()).toEqual(newValue);
       expect(pushValues[0].value()).toEqual(angularObjects);
     });
 
-    it('Should add new object to the collection', () => {
+    it('Should add new object in the collection if paragraphId does not match', () => {
+      response.data.angularObject.paragraphId = 'newParagraphId';
+      angularObjectUpdateResponse.response(response);
+      expect(angularObjects).toHaveLength(2);
+      expect(pushValues[0].value()).toEqual(angularObjects);
+    });
+
+    it('Should add new object to the collection if object with same key does not exists', () => {
       const newName = 'object2';
       response.data.angularObject.name = newName;
       angularObjectUpdateResponse.response(response);

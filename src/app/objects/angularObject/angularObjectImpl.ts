@@ -77,6 +77,17 @@ export class AngularObjectImpl implements AngularObject{
     return this._angularObjectData['object'];
   }
 
+  paragraphId(): string {
+    let paragraphId:string;
+    if(this._safeAngularObjectData.propertyExists('paragraphId')){
+      paragraphId = this._safeAngularObjectData.getProperty<string>('paragraphId', 'string');
+    }
+    else{
+      paragraphId = '';
+    }
+    return paragraphId;
+  }
+
   private updateRequest(value:unknown): object {
     const message = {
       op: 'ANGULAR_OBJECT_UPDATED',
