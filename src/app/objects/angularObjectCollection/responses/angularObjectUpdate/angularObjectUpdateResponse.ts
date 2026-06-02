@@ -66,7 +66,10 @@ export class AngularObjectUpdateResponse implements Response {
   response(data: object) {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'ANGULAR_OBJECT_UPDATE'){
-      const angularObject = new AngularObjectImpl(this._channel, message.data());
+      const angularObjectUpdateData = new SafeJsonImpl(message.data());
+      const angularObjectData:object = angularObjectUpdateData.getProperty('angularObject', 'object');
+      const interpreterGroupId:string = angularObjectUpdateData.getProperty('interpreterGroupId', 'string');
+      const angularObject = new AngularObjectImpl(this._channel, angularObjectData, interpreterGroupId);
       const existingAngularObjectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObject.name());
       if(existingAngularObjectIndex === -1){
         this._angularObjects.push(angularObject);
