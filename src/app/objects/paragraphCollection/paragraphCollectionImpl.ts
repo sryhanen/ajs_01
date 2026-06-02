@@ -46,7 +46,6 @@
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
 import {PushValue} from '../pushValue/pushValue';
-import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {Response} from '../channel/response';
 import {Request} from '../channel/request';
 import {ParagraphResponse} from './responses/paragraph/paragraphResponse';
@@ -57,7 +56,6 @@ import {RunParagraphRequest} from './requests/runParagraph/runParagraphRequest';
 import {DefaultResponse} from './responses/default/defaultResponse';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
-import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _paragraphs: Paragraph[];
@@ -66,13 +64,12 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _requests: Request[];
 
   constructor(channel: Channel, initialParagraphData: object[]) {
-    const angularObjectCollection = new AngularObjectCollectionImpl(this);
-    this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph, angularObjectCollection));
+    this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph));
     this._pushParagraphs = [];
     this._responses = [
       new DefaultResponse(this._paragraphs),
-      new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs, angularObjectCollection),
-      new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs, angularObjectCollection),
+      new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs),
+      new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs),
       new ParagraphRemovedResponse(this._paragraphs, this._pushParagraphs),
     ];
     this._requests = [

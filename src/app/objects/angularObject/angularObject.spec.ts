@@ -55,12 +55,12 @@ describe('AngularObject', () => {
   const noteId = 'noteId';
   const paragraphId = 'paragraphId';
   const interpreterGroupId = 'interpreterGroupId';
-  let data: {noteId:string, paragraphId:string, interpreterGroupId:string, angularObject:{name: string, object: unknown}};
+  let data:object;
   let angularObject: AngularObject;
 
   beforeEach(() => {
-    data = {noteId:noteId, paragraphId:paragraphId, interpreterGroupId:interpreterGroupId, angularObject:{name: name, object: value}};
-    angularObject = new AngularObjectImpl(channel,data);
+    data = {noteId:noteId, paragraphId:paragraphId, name: name, object: value};
+    angularObject = new AngularObjectImpl(channel, data, interpreterGroupId);
   });
 
   describe('Birth', () => {
@@ -102,9 +102,9 @@ describe('AngularObject', () => {
     });
 
     it('Should create request without paragraphId', () => {
-      delete data.paragraphId;
+      delete data['paragraphId'];
       delete updateRequest.data.paragraphId;
-      angularObject = new AngularObjectImpl(channel,data);
+      angularObject = new AngularObjectImpl(channel,data, interpreterGroupId);
       requestSpy = vi.spyOn(angularObject, 'request');
       angularObject.update(newValue);
       expect(requestSpy).toHaveBeenCalledExactlyOnceWith(updateRequest);

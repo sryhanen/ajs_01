@@ -45,20 +45,20 @@
  */
 import {AngularObject} from './angularObject';
 import {Channel} from '../channel/channel';
-import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
+import {SafeJson} from '../safeJson/safeJson';
 
 export class AngularObjectImpl implements AngularObject{
   private readonly _channel:Channel;
-  private readonly _angularObjectData:SafeJson;
-  private readonly _angularObject:object;
-  private readonly _value:unknown;
+  private readonly _angularObjectData:object;
+  private readonly _safeAngularObjectData:SafeJson;
+  private readonly _interpreterGroupId:string;
 
-  constructor(channel:Channel, angularObjectData:object) {
+  constructor(channel:Channel, angularObjectData:object, interpreterGroupId:string) {
     this._channel = channel;
-    this._angularObjectData = new SafeJsonImpl(angularObjectData);
-    this._angularObject = this._angularObjectData.getProperty('angularObject', 'object');
-    this._value = this._angularObject['object'];
+    this._safeAngularObjectData = new SafeJsonImpl(angularObjectData);
+    this._angularObjectData = angularObjectData;
+    this._interpreterGroupId = interpreterGroupId;
   }
 
   request(data: object): void {
@@ -70,26 +70,25 @@ export class AngularObjectImpl implements AngularObject{
   }
 
   name(): string {
-    const safeAngularObject = new SafeJsonImpl(this._angularObject);
-    return safeAngularObject.getProperty('name', 'string');
+    return this._safeAngularObjectData.getProperty('name', 'string');
   }
 
   value(): unknown {
-    return this._value;
+    return this._angularObjectData['object'];
   }
 
   private updateRequest(value:unknown): object {
     const message = {
       op: 'ANGULAR_OBJECT_UPDATED',
       data: {
-        noteId: this._angularObjectData.getProperty('noteId', 'string'),
-        name: this.name(),
+        noteId: this._safeAngularObjectData.getProperty('noteId', 'string'),
+        name: this._safeAngularObjectData.getProperty('name', 'string'),
         value: value,
-        interpreterGroupId: this._angularObjectData.getProperty('interpreterGroupId', 'string')
+        interpreterGroupId: this._interpreterGroupId
       },
     };
-    if( this._angularObjectData.propertyExists('paragraphId')){
-      message.data['paragraphId']= this._angularObjectData.getProperty('paragraphId', 'string');
+    if(this._safeAngularObjectData.propertyExists('paragraphId')){
+      message.data['paragraphId'] = this._safeAngularObjectData.getProperty<string>('paragraphId', 'string');
     }
     return message;
   }

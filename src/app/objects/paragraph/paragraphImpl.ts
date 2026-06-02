@@ -51,6 +51,7 @@ import {AngularObjectCollection} from '../angularObjectCollection/angularObjectC
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {MessageImpl} from '../message/messageImpl';
+import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
@@ -58,10 +59,10 @@ export class ParagraphImpl implements Paragraph{
   private readonly _angularObjectCollection: AngularObjectCollection;
   private readonly _paragraph: SafeJson;
 
-  constructor(channel: Channel, paragraph: object, angularObjectCollection: AngularObjectCollection) {
+  constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
-    this._angularObjectCollection = angularObjectCollection;
+    this._angularObjectCollection = new AngularObjectCollectionImpl(this);
     this._outputContainer = new OutputContainerImpl(this, this._angularObjectCollection);
 
     if(this._paragraph.propertyExists('output')){
