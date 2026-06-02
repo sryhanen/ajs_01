@@ -47,7 +47,6 @@ import {Channel} from '../../../channel/channel';
 import {Response} from '../../../channel/response';
 import {Paragraph} from '../../../paragraph/paragraph';
 import {PushValue} from '../../../pushValue/pushValue';
-import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
@@ -56,13 +55,11 @@ export class ParagraphResponse implements Response {
   private readonly _channel: Channel;
   private readonly _paragraphs: Paragraph[];
   private readonly _pushParagraphs: PushValue<Paragraph[]>[];
-  private readonly _angularObjectCollection: AngularObjectCollection;
 
-  constructor(channel: Channel, paragraphs: Paragraph[], pushParagraphs: PushValue<Paragraph[]>[], angularObjectCollection: AngularObjectCollection) {
+  constructor(channel: Channel, paragraphs: Paragraph[], pushParagraphs: PushValue<Paragraph[]>[]) {
     this._channel = channel;
     this._paragraphs = paragraphs;
     this._pushParagraphs = pushParagraphs;
-    this._angularObjectCollection = angularObjectCollection;
   }
 
   response(data: object): void {
@@ -71,7 +68,7 @@ export class ParagraphResponse implements Response {
     }
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'PARAGRAPH') {
-      const newParagraph = new ParagraphImpl(this._channel, message.data(), this._angularObjectCollection);
+      const newParagraph = new ParagraphImpl(this._channel, message.data());
       const paragraphIndex = this._paragraphs.findIndex(paragraph => paragraph.id() === newParagraph.id());
       if(paragraphIndex === -1){
         throw new Error(`Paragraph update failed: Paragraph "${newParagraph.id()}" not found in current collection.`);

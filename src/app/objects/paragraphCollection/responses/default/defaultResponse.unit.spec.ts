@@ -48,14 +48,18 @@ import {DefaultResponse} from './defaultResponse';
 import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {Channel} from '../../../channel/channel';
+import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
+import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
 
 describe('DefaultResponse', () => {
   let paragraphs:Paragraph[];
   let defaultResponse:DefaultResponse;
+  let angularObjectCollection: AngularObjectCollection;
 
   beforeEach(() => {
     const channel: Channel = new FakeChannel();
-    paragraphs = [new ParagraphImpl(channel, {})];
+    angularObjectCollection = new AngularObjectCollectionImpl(channel);
+    paragraphs = [new ParagraphImpl(channel, {}, angularObjectCollection)];
     defaultResponse = new DefaultResponse(paragraphs);
   });
 
