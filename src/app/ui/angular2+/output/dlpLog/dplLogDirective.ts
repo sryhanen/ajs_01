@@ -43,7 +43,17 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Directive, effect, inject, Input, OnInit, signal, ViewContainerRef, WritableSignal} from '@angular/core';
+import {
+  ComponentRef,
+  Directive,
+  effect,
+  inject,
+  Input,
+  OnInit,
+  signal,
+  ViewContainerRef,
+  WritableSignal
+} from '@angular/core';
 import {DplLog} from '../../../../objects/output/dplLog/dplLog';
 import {DplLogData} from '../../../../objects/output/dplLog/dplLogData/dplLogData';
 import {DplLogDataStub} from '../../../../objects/output/dplLog/dplLogData/dplLogDataStub';
@@ -57,10 +67,11 @@ export class DplLogDirective implements OnInit {
   @Input({required:true}) dplLog: DplLog;
   private _dplLogData: WritableSignal<DplLogData>;
   private viewContainer = inject(ViewContainerRef);
+  private _componentRef: ComponentRef<DplLogDataView>;
   private _renderWhenData = effect(() => {
-    if(!this._dplLogData().isStub()){
-      const component = this.viewContainer.createComponent(DplLogDataView);
-      component.setInput('dplLogData', this._dplLogData);
+    if(!this._dplLogData().isStub() && this._componentRef === undefined){
+      this._componentRef = this.viewContainer.createComponent(DplLogDataView);
+      this._componentRef.setInput('dplLogData', this._dplLogData);
     }
   });
 
