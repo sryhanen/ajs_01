@@ -43,32 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Request} from '../../channel/request';
-import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {MessageImpl} from '../../message/messageImpl';
-import {ParagraphData} from '../paragraphData/paragraphData';
+import {Request} from '../../../channel/request';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../../../message/messageImpl';
 
-export class CommitParagraphRequest implements Request {
+export class DefaultRequest implements Request {
   private readonly _request: Request;
-  private readonly _paragraphData: ParagraphData;
 
-  constructor(request: Request, paragraphData: ParagraphData) {
+  constructor(request: Request) {
     this._request = request;
-    this._paragraphData = paragraphData;
   }
 
-  request(data: object): void {
+  request(data:object) {
     const message = new MessageImpl(new SafeJsonImpl(data));
-    if(message.operation() === 'COMMIT_PARAGRAPH'){
-      const commitParagraphData = message.data();
-      commitParagraphData['title'] = this._paragraphData.title();
-      commitParagraphData['config'] = this._paragraphData.config();
-      commitParagraphData['params'] = this._paragraphData.settings();
-      const decoratedRequest = {
-        op:message.operation(),
-        data:commitParagraphData
-      };
-      this._request.request(decoratedRequest);
+    if(message.operation() !== 'COMMIT_PARAGRAPH'){
+      this._request.request(data);
     }
   }
 }
