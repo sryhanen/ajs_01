@@ -43,44 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {DplLogDataProperty} from './dplLogDataProperty';
+import {DplLogDataPropertyImpl} from './dplLogDataPropertyImpl';
 
-import {Response} from '../../../channel/response';
-import {AngularObject} from '../../../angularObject/angularObject';
-import {PushValue} from '../../../pushValue/pushValue';
-import {Channel} from '../../../channel/channel';
-import {MessageImpl} from '../../../message/messageImpl';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
+describe('DplLogDataProperty unit test', () => {
+  const initialValue = 'Initial value';
+  let dplLogDataProperty: DplLogDataProperty;
 
-export class AngularObjectUpdateResponse implements Response {
-  private readonly _channel: Channel;
-  private readonly _angularObjects: AngularObject[];
-  private readonly _pushValues: PushValue<AngularObject[]>[];
+  beforeEach(() => {
+    dplLogDataProperty = new DplLogDataPropertyImpl(initialValue);
+  });
 
-  constructor(channel: Channel, angularObjects: AngularObject[], pushValues: PushValue<AngularObject[]>[]) {
-    this._channel = channel;
-    this._angularObjects = angularObjects;
-    this._pushValues = pushValues;
-  }
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(dplLogDataProperty).toBeDefined();
+    });
 
-  response(data: object) {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    if(message.operation() === 'ANGULAR_OBJECT_UPDATE'){
-      const angularObjectUpdateData = new SafeJsonImpl(message.data());
-      const angularObjectData:object = angularObjectUpdateData.getProperty('angularObject', 'object');
-      const interpreterGroupId:string = angularObjectUpdateData.getProperty('interpreterGroupId', 'string');
-      const angularObject = new AngularObjectImpl(this._channel, angularObjectData, interpreterGroupId);
-      if(angularObject.name() === 'timeMsg' || angularObject.name() === 'batchMsg' || angularObject.name() === 'message'){
-        return;
-      }
-      const existingAngularObjectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObject.name());
-      if(existingAngularObjectIndex === -1){
-        this._angularObjects.push(angularObject);
-      }
-      else{
-        this._angularObjects.splice(existingAngularObjectIndex, 1, angularObject);
-      }
-      this._pushValues.forEach(value => value.update(this._angularObjects));
-    }
-  }
-}
+    it('Should have value', () => {
+      expect(dplLogDataProperty.value()).toEqual(initialValue);
+    });
+
+    it('Should not be a stub', () =>  {
+      expect(dplLogDataProperty.isStub()).toBe(false);
+    });
+  });
+});

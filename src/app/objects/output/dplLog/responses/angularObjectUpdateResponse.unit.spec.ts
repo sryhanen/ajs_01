@@ -43,46 +43,33 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
-import {AngularObject} from '../../../angularObject/angularObject';
-import {PushValue} from '../../../pushValue/pushValue';
-import {FakeChannel} from '../../../channel/fakeChannel';
-import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
-import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 import {AngularObjectUpdateResponse} from './angularObjectUpdateResponse';
+import {PushValueImpl} from '../../../pushValue/pushValueImpl';
+import {PushValue} from '../../../pushValue/pushValue';
+import {DplLogData} from '../dplLogData/dplLogData';
 
-describe('AngularObjectUpdateResponse', () => {
-  const interpreterGroupId = 'interpreterGroupId';
-  const paragraphId = 'paragraphId';
-  const defaultAngularObjectData =  {
-    name: 'object1',
-    object: 'value1',
-    noteId: 'noteId',
-    paragraphId: paragraphId,
-  };
-  let channel:Channel;
-  let defaultAngularObject: AngularObject;
-  let angularObjects: AngularObject[];
-  let pushValues:PushValue<AngularObject[]>[];
-  let angularObjectUpdateResponse:AngularObjectUpdateResponse;
+describe('AngularObjectUpdateResponse unit test', () => {
+  let angularObjectUpdateResponse: AngularObjectUpdateResponse;
+  let pushValues: PushValue<DplLogData>[];
 
   beforeEach(() => {
-    channel = new FakeChannel();
-    defaultAngularObject = new AngularObjectImpl(channel, defaultAngularObjectData, interpreterGroupId);
-    angularObjects = [defaultAngularObject];
     pushValues = [new PushValueImpl()];
-    angularObjectUpdateResponse = new AngularObjectUpdateResponse(channel, angularObjects, pushValues);
+    angularObjectUpdateResponse = new AngularObjectUpdateResponse(pushValues);
   });
+
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(angularObjectUpdateResponse).toBeInstanceOf(AngularObjectUpdateResponse);
+      expect(angularObjectUpdateResponse).toBeDefined();
     });
   });
 
   describe('Response', () => {
     let response;
-    const newValue = 'value 2';
+    let angularObject: {
+      name:string,
+      object:string
+    };
     beforeEach(() => {
       response = {
         op:'ANGULAR_OBJECT_UPDATE',
@@ -90,42 +77,50 @@ describe('AngularObjectUpdateResponse', () => {
           noteId: 'noteId',
           interpreterGroupId: 'interpreterGroupId',
           angularObject:{
-            name: defaultAngularObjectData.name,
-            paragraphId: paragraphId,
-            object: newValue
+            name: '',
+            object: ''
           }
         }
       };
     });
 
-    it('Should update object in the collection', () => {
+    it('Should update batchMessage if object name is batchMsg', () => {
+      angularObject = {
+        name:'batchMsg',
+        object:'batchMsg'
+      };
+      response.data.angularObject = angularObject;
       angularObjectUpdateResponse.response(response);
-      expect(angularObjects).toHaveLength(1);
-      expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.name);
-      expect(angularObjects[0].value()).toEqual(newValue);
-      expect(pushValues[0].value()).toEqual(angularObjects);
+      const updatedBatchMessage = pushValues[0].value().batchMessage();
+      expect(updatedBatchMessage.value()).toEqual(angularObject.object);
+      expect(pushValues[0].value().timeMessage().isStub()).toBe(true);
+      expect(pushValues[0].value().message().isStub()).toBe(true);
     });
 
-    it('Should add new object to the collection', () => {
-      const newName = 'object2';
-      response.data.angularObject.name = newName;
+    it('Should update timeMessage if object name is timeMsg', () => {
+      angularObject = {
+        name:'timeMsg',
+        object:'timeMsg'
+      };
+      response.data.angularObject = angularObject;
       angularObjectUpdateResponse.response(response);
-      expect(angularObjects).toHaveLength(2);
-      expect(angularObjects[1].name()).toEqual(newName);
-      expect(angularObjects[1].value()).toEqual(newValue);
-      expect(pushValues[0].value()).toEqual(angularObjects);
+      const updatedTimeMessage = pushValues[0].value().timeMessage();
+      expect(updatedTimeMessage.value()).toEqual(angularObject.object);
+      expect(pushValues[0].value().batchMessage().isStub()).toBe(true);
+      expect(pushValues[0].value().message().isStub()).toBe(true);
     });
 
-    it('Should not update if object name is batchMsg, timeMsg or message', () => {
-      response.data.angularObject.name = 'batchMsg';
+    it('Should update message if object name is message', () => {
+      angularObject = {
+        name:'message',
+        object:'message'
+      };
+      response.data.angularObject = angularObject;
       angularObjectUpdateResponse.response(response);
-      response.data.angularObject.name = 'timeMsg';
-      angularObjectUpdateResponse.response(response);
-      response.data.angularObject.name = 'message';
-      angularObjectUpdateResponse.response(response);
-      expect(angularObjects).toHaveLength(1);
-      expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.name);
-      expect(angularObjects[0].value()).toEqual(defaultAngularObjectData.object);
+      const updatedMessage = pushValues[0].value().message();
+      expect(updatedMessage.value()).toEqual(angularObject.object);
+      expect(pushValues[0].value().batchMessage().isStub()).toBe(true);
+      expect(pushValues[0].value().timeMessage().isStub()).toBe(true);
     });
   });
 });

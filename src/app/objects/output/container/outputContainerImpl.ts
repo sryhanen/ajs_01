@@ -62,6 +62,8 @@ import {OutputPlugin} from '../plugins/outputPlugin';
 import {PushValue} from '../../pushValue/pushValue';
 import {OutputPluginStub} from '../plugins/outputPluginStub';
 import {PushValueImpl} from '../../pushValue/pushValueImpl';
+import {DplLog} from '../dplLog/dplLog';
+import {DplLogImpl} from '../dplLog/dplLogImpl';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
@@ -71,6 +73,7 @@ export class OutputContainerImpl implements OutputContainer{
   private readonly _responses: Response[];
   private readonly _outputPluginListeners: PushValue<OutputPlugin>[];
   private readonly _activePlugin:PushValue<OutputPlugin>;
+  private readonly _dplLog:DplLog;
 
   constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
@@ -86,9 +89,15 @@ export class OutputContainerImpl implements OutputContainer{
     this._outputPluginListeners = [];
     this._activePlugin = new PushValueImpl();
     this._activePlugin.update(new OutputPluginStub());
+    this._dplLog = new DplLogImpl();
     this._responses = [
       new ParagraphOutputResponseImpl(this, this._outputFormats, this._outputSwitcher, this._activePlugin, this._outputPluginListeners)
     ];
+
+  }
+
+  dplLog(): DplLog {
+    return this._dplLog;
   }
 
   outputPlugin(value: PushValue<OutputPlugin>): void {
@@ -115,5 +124,6 @@ export class OutputContainerImpl implements OutputContainer{
   response(data: object): void {
     this._responses.forEach(response => response.response(data));
     this._errorListener.response(data);
+    this._dplLog.response(data);
   }
 }

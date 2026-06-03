@@ -87,7 +87,21 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
         op: sendOperation.progress,
         data:{progress: i*5, id:paragraphId},
       };
+      const dplLog = {
+        op:'ANGULAR_OBJECT_UPDATE',
+        data:{
+          interpreterGroupId:'',
+          noteId:this._noteService.lastNoteId(),
+          paragraphId:message.data.id,
+          angularObject:{
+            name:'message',
+            object: `progress: ${i*2.523893}`,
+            paragraphId:message.data.id,
+          }
+        }
+      };
       messageQueue.push(progress);
+      messageQueue.push(dplLog);
     }
 
     const draws = 5;

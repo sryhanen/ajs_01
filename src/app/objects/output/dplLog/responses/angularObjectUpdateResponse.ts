@@ -43,44 +43,53 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-
 import {Response} from '../../../channel/response';
-import {AngularObject} from '../../../angularObject/angularObject';
 import {PushValue} from '../../../pushValue/pushValue';
-import {Channel} from '../../../channel/channel';
+import {DplLogData} from '../dplLogData/dplLogData';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
+import {DplLogDataStub} from '../dplLogData/dplLogDataStub';
+import {DplLogDataProperty} from '../dplLogData/dplLogDataProperty/dplLogDataProperty';
+import {DplLogDataPropertyStub} from '../dplLogData/dplLogDataProperty/dplLogDataPropertyStub';
+import {DplLogDataPropertyImpl} from '../dplLogData/dplLogDataProperty/dplLogDataPropertyImpl';
+import {DplLogDataImpl} from '../dplLogData/dplLogDataImpl';
 
-export class AngularObjectUpdateResponse implements Response {
-  private readonly _channel: Channel;
-  private readonly _angularObjects: AngularObject[];
-  private readonly _pushValues: PushValue<AngularObject[]>[];
+export class AngularObjectUpdateResponse implements Response{
+  private readonly _dplLogDataPushValues:PushValue<DplLogData>[];
+  private _dplLogData:DplLogData;
+  private _batchMessage:DplLogDataProperty;
+  private _timeMessage:DplLogDataProperty;
+  private _message:DplLogDataProperty;
 
-  constructor(channel: Channel, angularObjects: AngularObject[], pushValues: PushValue<AngularObject[]>[]) {
-    this._channel = channel;
-    this._angularObjects = angularObjects;
-    this._pushValues = pushValues;
+  constructor(dplLogDataPushValues:PushValue<DplLogData>[]) {
+    this._dplLogDataPushValues = dplLogDataPushValues;
+    this._dplLogData = new DplLogDataStub();
+    this._batchMessage = new DplLogDataPropertyStub();
+    this._timeMessage = new DplLogDataPropertyStub();
+    this._message = new DplLogDataPropertyStub();
   }
 
-  response(data: object) {
+  response(data: object): void {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'ANGULAR_OBJECT_UPDATE'){
       const angularObjectUpdateData = new SafeJsonImpl(message.data());
-      const angularObjectData:object = angularObjectUpdateData.getProperty('angularObject', 'object');
-      const interpreterGroupId:string = angularObjectUpdateData.getProperty('interpreterGroupId', 'string');
-      const angularObject = new AngularObjectImpl(this._channel, angularObjectData, interpreterGroupId);
-      if(angularObject.name() === 'timeMsg' || angularObject.name() === 'batchMsg' || angularObject.name() === 'message'){
-        return;
+      const angularObjectData = new SafeJsonImpl(angularObjectUpdateData.getProperty<object>('angularObject', 'object'));
+      const angularObjectName = angularObjectData.getProperty<string>('name', 'string');
+      const angularObjectValue = angularObjectUpdateData.getProperty<object>('angularObject', 'object')['object'];
+      if(angularObjectName === 'batchMsg'){
+        this._batchMessage = new DplLogDataPropertyImpl(angularObjectValue);
       }
-      const existingAngularObjectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObject.name());
-      if(existingAngularObjectIndex === -1){
-        this._angularObjects.push(angularObject);
+      else if(angularObjectName === 'timeMsg'){
+        this._timeMessage = new DplLogDataPropertyImpl(angularObjectValue);
+      }
+      else if(angularObjectName === 'message'){
+        this._message = new DplLogDataPropertyImpl(angularObjectValue);
       }
       else{
-        this._angularObjects.splice(existingAngularObjectIndex, 1, angularObject);
+        return;
       }
-      this._pushValues.forEach(value => value.update(this._angularObjects));
+      this._dplLogData = new DplLogDataImpl(this._batchMessage, this._timeMessage, this._message);
+      this._dplLogDataPushValues.forEach(value => value.update(this._dplLogData));
     }
   }
 }

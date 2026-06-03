@@ -43,44 +43,43 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {DplLogData} from './dplLogData';
+import {DplLogDataImpl} from './dplLogDataImpl';
+import {DplLogDataProperty} from './dplLogDataProperty/dplLogDataProperty';
+import {DplLogDataPropertyImpl} from './dplLogDataProperty/dplLogDataPropertyImpl';
 
-import {Response} from '../../../channel/response';
-import {AngularObject} from '../../../angularObject/angularObject';
-import {PushValue} from '../../../pushValue/pushValue';
-import {Channel} from '../../../channel/channel';
-import {MessageImpl} from '../../../message/messageImpl';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
+describe('DplLogData unit test', () => {
+  let batchMessage: DplLogDataProperty;
+  let timeMessage: DplLogDataProperty;
+  let message: DplLogDataProperty;
+  let dplLogData: DplLogData;
 
-export class AngularObjectUpdateResponse implements Response {
-  private readonly _channel: Channel;
-  private readonly _angularObjects: AngularObject[];
-  private readonly _pushValues: PushValue<AngularObject[]>[];
+  beforeEach(() => {
+    batchMessage = new DplLogDataPropertyImpl('batchMessage');
+    timeMessage = new DplLogDataPropertyImpl('timeMessage');
+    message = new DplLogDataPropertyImpl('message');
+    dplLogData = new DplLogDataImpl(batchMessage, timeMessage, message);
+  });
 
-  constructor(channel: Channel, angularObjects: AngularObject[], pushValues: PushValue<AngularObject[]>[]) {
-    this._channel = channel;
-    this._angularObjects = angularObjects;
-    this._pushValues = pushValues;
-  }
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(dplLogData).toBeDefined();
+    });
 
-  response(data: object) {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    if(message.operation() === 'ANGULAR_OBJECT_UPDATE'){
-      const angularObjectUpdateData = new SafeJsonImpl(message.data());
-      const angularObjectData:object = angularObjectUpdateData.getProperty('angularObject', 'object');
-      const interpreterGroupId:string = angularObjectUpdateData.getProperty('interpreterGroupId', 'string');
-      const angularObject = new AngularObjectImpl(this._channel, angularObjectData, interpreterGroupId);
-      if(angularObject.name() === 'timeMsg' || angularObject.name() === 'batchMsg' || angularObject.name() === 'message'){
-        return;
-      }
-      const existingAngularObjectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObject.name());
-      if(existingAngularObjectIndex === -1){
-        this._angularObjects.push(angularObject);
-      }
-      else{
-        this._angularObjects.splice(existingAngularObjectIndex, 1, angularObject);
-      }
-      this._pushValues.forEach(value => value.update(this._angularObjects));
-    }
-  }
-}
+    it('Should have batchMessage', () => {
+      expect(dplLogData.batchMessage()).toEqual(batchMessage);
+    });
+
+    it('Should have timeMessage', () => {
+      expect(dplLogData.timeMessage()).toEqual(timeMessage);
+    });
+
+    it('Should have message', () => {
+      expect(dplLogData.message()).toEqual(message);
+    });
+
+    it('Should not be stub', () => {
+      expect(dplLogData.isStub()).toBe(false);
+    });
+  });
+});
