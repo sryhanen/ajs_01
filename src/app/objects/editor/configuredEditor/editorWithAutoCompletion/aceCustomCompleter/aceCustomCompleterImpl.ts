@@ -43,48 +43,63 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {DoBootstrap, NgModule, provideAppInitializer, inject, provideZonelessChangeDetection} from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { UpgradeModule } from '@angular/upgrade/static';
-import './ajs-imports';
-import './downgraded-components';
-import {
-  wsMessageListenerProvider,
-  WebsocketMessageProvider,
-  ToasterProvider,
-  EditorWithStateBroadcastOnFocusProvider
-} from './upgraded-providers';
-import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
-import { provideHttpClient } from '@angular/common/http';
-import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {webAppRoot} from './objects/webAppRoot/webAppRootImpl';
+import ace, {Ace} from 'ace-builds';
+import {Response} from '../../../../channel/response';
+import {CompletionListResponse} from './responses/completionList/completionListResponse';
+import {PushValue} from '../../../../pushValue/pushValue';
+import {PushValueImpl} from '../../../../pushValue/pushValueImpl';
+import {AceCustomCompleter} from './aceCustomCompleter';
+import {Channel} from '../../../../channel/channel';
+import {EditorSettingResponse} from './responses/editorSetting/editorSettingResponse';
 
-@NgModule({
-  declarations: [],
-  imports: [
-    BrowserModule,
-    UpgradeModule,
-  ],
-  providers: [
-    provideZonelessChangeDetection(),
-    provideHttpClient(),
-    AuthenticationServiceImpl,
-    provideAppInitializer(() => {
-      webAppRoot.initialize(inject(WebSocketServiceImpl));
-      const authService = inject(AuthenticationServiceImpl);
-      return authService.requestTicket();
-    }),
-    wsMessageListenerProvider,
-    WebsocketMessageProvider,
-    ToasterProvider,
-    EditorWithStateBroadcastOnFocusProvider
-  ]
-})
+export class AceCustomCompleterImpl implements AceCustomCompleter {
+  private readonly _channel:Channel;
+  private readonly _paragraphId:string;
+  private readonly _callback: PushValue<Ace.CompleterCallback>;
+  private readonly _responses: Response[];
 
-export class AppModule implements DoBootstrap {
-  private upgrade = inject(UpgradeModule);
+  constructor(channel:Channel, paragraphId:string, aceEditSession: ace.EditSession) {
+    this._channel = channel;
+    this._paragraphId = paragraphId;
+    this._callback = new PushValueImpl();
+    this._responses = [
+      new CompletionListResponse(this._callback),
+      new EditorSettingResponse(aceEditSession)
+    ];
+  }
 
-  ngDoBootstrap() {
-    this.upgrade.bootstrap(document.body, ['zeppelinWebApp'], {strictDi: true});
+  requestCompletions(editorValue: string): void {
+    const completionsRequest = {
+      op: 'COMPLETION',
+      data: {
+        id: this._paragraphId,
+        buf: editorValue,
+        cursor: editorValue.length,
+      },
+    };
+    this._channel.request(completionsRequest);
+  }
+
+  requestEditorSetting(editorValue:string):void{
+    const editorSettingRequest = {
+      op:'EDITOR_SETTING',
+      data:{
+        paragraphId:this._paragraphId,
+        paragraphText: editorValue
+      }
+    };
+    this._channel.request(editorSettingRequest);
+  }
+
+  getCompletions(editor: ace.Editor, session: ace.EditSession, position: Ace.Point, prefix: string, callback: Ace.CompleterCallback): void{
+    this._callback.update(callback);
+  }
+
+  response(data: object) {
+    this._responses.forEach(response => response.response(data));
+  }
+
+  isStub(): boolean {
+    return false;
   }
 }

@@ -74,7 +74,7 @@ export default class ParagraphImpl implements ParagraphDTO {
     },
     colWidth: 12.0,
     editorMode: 'ace/mode/dpl',
-    fontSize: 9.0,
+    fontSize: 12.0,
     title: true,
     results: {},
     enabled: true
@@ -83,7 +83,7 @@ export default class ParagraphImpl implements ParagraphDTO {
   constructor(status: string, output?: object, text?: string, title?: string, id = 'p'.concat(Math.random().toString(36).slice(2, 12))) {
     this.id = id;
     this.status = status;
-    this.text = text;
+    this.text = text ? text: '';
     this.title = title;
     this.output = output;
   }

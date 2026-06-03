@@ -43,50 +43,33 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {ParagraphOutputData} from './paragraphOutputData';
+import {ParagraphOutputDataImpl} from './paragraphOutputDataImpl';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
-}
+describe('ParagraphOutputData unit test', () => {
+  let paragraphOutputData: ParagraphOutputData;
+  const outputData:{type:string, data:object, options?:object, isAggregated?:boolean} = {
+    type:'type',
+    data:{},
+    options:{},
+    isAggregated:false,
+  };
 
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
+  beforeEach(() => {
+    paragraphOutputData = new ParagraphOutputDataImpl(outputData);
+  });
 
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(paragraphOutputData).toBeDefined();
+    });
 
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
+    it('Should not be stub', () => {
+      expect(paragraphOutputData.isStub()).toBe(false);
+    });
 
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};
+    it('Should have outputData', () => {
+      expect(paragraphOutputData.print()).toEqual(outputData);
+    });
+  });
+});

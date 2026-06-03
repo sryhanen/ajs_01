@@ -43,50 +43,25 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {Response} from '../../../../../../channel/response';
+import ace from 'ace-builds';
+import {MessageImpl} from '../../../../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../../../../safeJson/safeJsonImpl';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
+export class EditorSettingResponse implements Response {
+  private readonly _aceEditSession: ace.EditSession;
+
+  constructor(aceEditSession: ace.EditSession){
+    this._aceEditSession = aceEditSession;
+  }
+
+  response(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'EDITOR_SETTING'){
+      const editorSettingsData = new SafeJsonImpl(message.data());
+      const editorProperty = new SafeJsonImpl(editorSettingsData.getProperty<object>('editor', 'object'));
+      const language = editorProperty.getProperty<string>('language', 'string');
+      this._aceEditSession.setMode(`ace/mode/${language}`);
+    }
+  }
 }
-
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
-
-
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
-
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};

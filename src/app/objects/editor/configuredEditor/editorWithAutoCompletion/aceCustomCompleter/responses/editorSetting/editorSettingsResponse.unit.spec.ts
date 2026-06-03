@@ -43,50 +43,41 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {EditorSettingResponse} from './editorSettingResponse';
+import ace from 'ace-builds';
+import {Response} from '../../../../../../channel/response';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
-}
+describe('EditorSettingsResponse unit test', () => {
+  let editorSettingsResponse:Response;
+  let aceEditor: ace.Editor;
 
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
+  beforeEach(() => {
+    const element = document.createElement('div');
+    aceEditor = ace.edit(element);
+    editorSettingsResponse = new EditorSettingResponse(aceEditor.getSession());
+  });
 
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(editorSettingsResponse).toBeDefined();
+    });
+  });
 
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
+  describe('Response', () => {
+    const editorSettingResponseMessage = {
+      op:'EDITOR_SETTING',
+      data:{
+        editor:{
+          language:'python'
+        },
+      }
+    };
 
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};
+    it('Should set mode', () => {
+      const expectedMode = 'ace/mode/python';
+      const modeSpy = vi.spyOn(aceEditor.getSession(), 'setMode');
+      editorSettingsResponse.response(editorSettingResponseMessage);
+      expect(modeSpy).toHaveBeenCalledExactlyOnceWith(expectedMode);
+    });
+  });
+});

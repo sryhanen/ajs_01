@@ -46,14 +46,17 @@
 import {Component, Input} from '@angular/core';
 import {Paragraph} from '../../../objects/paragraph/paragraph';
 import {OutputContainerView} from '../output/container/outputContainerView';
+import {EditorView} from '../editor/editorView';
 
 @Component({
   selector: 'paragraph',
   imports: [
-    OutputContainerView
+    OutputContainerView,
+    EditorView
   ],
   template: `
     @if (paragraphId === paragraph.id()) {
+      <editor [editor]="paragraph.editor()" [paragraphId]="paragraphId"></editor>
       <output-container [outputContainer]="paragraph.outputContainer()"></output-container>
     }
   `

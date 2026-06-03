@@ -43,50 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import ace from 'ace-builds';
+import {AceCustomCompleter} from './aceCustomCompleter/aceCustomCompleter';
+import {ConfiguredEditor} from '../configuredEditor';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
+export class EditorWithAutoCompletionImpl implements ConfiguredEditor{
+  private readonly _editor: ace.Editor;
+  private readonly _aceCustomCompleter: AceCustomCompleter;
+
+  constructor(editor:ace.Editor, aceCustomCompleter:AceCustomCompleter) {
+    this._editor = editor;
+    this._aceCustomCompleter = aceCustomCompleter;
+  }
+
+  aceEditor(): ace.Editor {
+    const langTools = ace.require('ace/ext/language_tools');
+    langTools.setCompleters([this._aceCustomCompleter, langTools.keyWordCompleter, langTools.snippetCompleter, langTools.textCompleter]);
+    this._editor.commands.on('exec', (eventData)=> {
+      if(eventData.command.name === 'startAutocomplete') {
+        this._aceCustomCompleter.requestCompletions(this._editor.getValue());
+      }
+    });
+    this._editor.on('change', (delta:ace.Ace.Delta)=> {
+      if(delta.start.row === 0) {
+        this._aceCustomCompleter.requestEditorSetting(this._editor.getValue());
+      }
+    });
+    return this._editor;
+  }
 }
-
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
-
-
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
-
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};

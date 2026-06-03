@@ -43,50 +43,50 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
+import {Editor} from '../../../objects/editor/editor';
+import {EditorView} from './editorView';
 import {
   EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+} from '../../angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {
+  EditorWithStateBroadcastOnFocus
+} from '../../angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocus';
+import ace from 'ace-builds';
+import {render, screen} from '@testing-library/angular';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
-}
+describe('EditorView integration', () => {
+  const editor:Editor = {
+    aceEditor(htmlElement: HTMLElement): ace.Editor{
+      return ace.edit(htmlElement);
+    }
+  };
+  const fakeEditorWithStateBroadcastOnFocus:EditorWithStateBroadcastOnFocus = {
+    editor(editor: ace.Editor, paragraphId: string): ace.Editor{
+      return editor;
+    }
+  };
+  let componentInstance: EditorView;
 
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
+  beforeEach(async () => {
+    const renderResult = await render(EditorView, {
+      inputs:{
+        paragraphId: 'paragraphId',
+        editor: editor
+      },
+      providers:[
+        {provide:EditorWithStateBroadcastOnFocusImpl, useValue: fakeEditorWithStateBroadcastOnFocus}
+      ]
+    });
+    componentInstance = renderResult.fixture.componentInstance;
+  });
 
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(componentInstance).toBeDefined();
+    });
 
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
-
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};
+    it('Should have created editor', () => {
+      expect(screen.getByRole('textbox')).toBeDefined();
+    });
+  });
+});

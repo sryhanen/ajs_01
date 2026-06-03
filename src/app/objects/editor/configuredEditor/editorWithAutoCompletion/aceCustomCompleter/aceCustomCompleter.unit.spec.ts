@@ -43,50 +43,65 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {AceCustomCompleter} from './aceCustomCompleter';
+import {FakeChannel} from '../../../../channel/fakeChannel';
+import {Channel} from '../../../../channel/channel';
+import {AceCustomCompleterImpl} from './aceCustomCompleterImpl';
+import ace from 'ace-builds';
+import {Mock} from 'vitest';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
-}
+describe('AceCustomCompleter unit test', () => {
+  let requestSpy: Mock;
+  let channel:Channel;
+  const paragraphId = 'paragraphId';
+  let aceCustomCompleter: AceCustomCompleter;
 
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
+  beforeEach(() => {
+    channel = new FakeChannel();
+    const aceEditor = ace.edit(document.createElement('div'));
+    aceCustomCompleter = new AceCustomCompleterImpl(channel, paragraphId, aceEditor.getSession());
+  });
 
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(aceCustomCompleter).toBeDefined();
+    });
 
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
+    it('Should not be stub', () => {
+      expect(aceCustomCompleter.isStub()).toBe(false);
+    });
+  });
 
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
+  describe('Behavior', () => {
+    const paragraphText = 'paragraphText';
+    beforeEach(() => {
+      requestSpy = vi.spyOn(channel, 'request');
+      expect(requestSpy).toHaveBeenCalledTimes(0);
+    });
 
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
+    it('RequestEditorSetting should request channel', () => {
+      const expectedRequest= {
+        op:'EDITOR_SETTING',
+        data:{
+          paragraphId:paragraphId,
+          paragraphText:paragraphText
+        }
+      };
+      aceCustomCompleter.requestEditorSetting(paragraphText);
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
 
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};
+    it('RequestCompletions should request channel', () => {
+      const expectedRequest = {
+        op:'COMPLETION',
+        data:{
+          id:paragraphId,
+          buf:paragraphText,
+          cursor:paragraphText.length
+        }
+      };
+      aceCustomCompleter.requestCompletions(paragraphText);
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
+});

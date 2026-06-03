@@ -43,50 +43,55 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {CompletionListResponse} from './completionListResponse';
+import {PushValueImpl} from '../../../../../../pushValue/pushValueImpl';
+import {Response} from '../../../../../../channel/response';
+import {PushValue} from '../../../../../../pushValue/pushValue';
+import {Ace} from 'ace-builds';
+import {Mock} from 'vitest';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
-}
+describe('CompletionListResponse unit test', () => {
+  let completionListResponse:Response;
+  let callbackPushValue: PushValue<Ace.CompleterCallback>;
+  beforeEach(() => {
+    callbackPushValue = new PushValueImpl();
+    completionListResponse = new CompletionListResponse(callbackPushValue);
+  });
 
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(completionListResponse).toBeDefined();
+    });
+  });
 
+  describe('Response', () => {
+    const completions = [
+      {name:'completion1', value:'value1'},
+      {name:'completion2', value:'value2'},
+      {name:'completion3', value:'value3'},
+    ];
+    const completionListResponseMessage = {
+      op:'COMPLETION_LIST',
+      data:{
+        completions:completions
+      }
+    };
+    let callback:Mock;
 
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
+    beforeEach(() => {
+      callback = vi.fn();
+    });
 
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
+    it('Should not evoke callback if pushValue does not contain callback', () => {
+      completionListResponse.response(completionListResponseMessage);
+      expect(callback).toHaveBeenCalledTimes(0);
+    });
 
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
+    it('Should evoke callback', () => {
+      callbackPushValue.update(callback);
+      completionListResponse.response(completionListResponseMessage);
+      expect(callback).toHaveBeenCalledExactlyOnceWith(null, completions);
+    });
 
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};
+  });
+});
