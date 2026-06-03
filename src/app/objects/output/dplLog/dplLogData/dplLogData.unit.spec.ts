@@ -43,29 +43,43 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {DplLog} from './dplLog';
-import {PushValue} from '../../pushValue/pushValue';
-import {DplLogData} from './dplLogData/dplLogData';
-import {Response} from '../../channel/response';
-import {AngularObjectUpdateResponse} from './responses/angularObjectUpdateResponse';
+import {DplLogData} from './dplLogData';
+import {DplLogDataImpl} from './dplLogDataImpl';
+import {DplLogDataProperty} from './dplLogDataProperty/dplLogDataProperty';
+import {DplLogDataPropertyImpl} from './dplLogDataProperty/dplLogDataPropertyImpl';
 
-export class DplLogImpl implements DplLog{
-  private readonly _dplLogDataPushValues:PushValue<DplLogData>[];
-  private readonly _responses: Response[];
+describe('DplLogData unit test', () => {
+  let batchMessage: DplLogDataProperty;
+  let timeMessage: DplLogDataProperty;
+  let message: DplLogDataProperty;
+  let dplLogData: DplLogData;
 
-  constructor(){
-    this._dplLogDataPushValues = [];
-    this._responses = [
-      new AngularObjectUpdateResponse(this._dplLogDataPushValues)
-    ];
-  }
+  beforeEach(() => {
+    batchMessage = new DplLogDataPropertyImpl('batchMessage');
+    timeMessage = new DplLogDataPropertyImpl('timeMessage');
+    message = new DplLogDataPropertyImpl('message');
+    dplLogData = new DplLogDataImpl(batchMessage, timeMessage, message);
+  });
 
-  dplLogData(dplLogData:PushValue<DplLogData>): void{
-    this._dplLogDataPushValues.push(dplLogData);
-  }
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(dplLogData).toBeDefined();
+    });
 
-  response(data: object) {
-    this._responses.forEach(response => response.response(data));
-  }
-}
+    it('Should have batchMessage', () => {
+      expect(dplLogData.batchMessage()).toEqual(batchMessage);
+    });
 
+    it('Should have timeMessage', () => {
+      expect(dplLogData.timeMessage()).toEqual(timeMessage);
+    });
+
+    it('Should have message', () => {
+      expect(dplLogData.message()).toEqual(message);
+    });
+
+    it('Should not be stub', () => {
+      expect(dplLogData.isStub()).toBe(false);
+    });
+  });
+});

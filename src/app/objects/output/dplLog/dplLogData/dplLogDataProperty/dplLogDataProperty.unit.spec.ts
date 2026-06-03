@@ -43,29 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {DplLog} from './dplLog';
-import {PushValue} from '../../pushValue/pushValue';
-import {DplLogData} from './dplLogData/dplLogData';
-import {Response} from '../../channel/response';
-import {AngularObjectUpdateResponse} from './responses/angularObjectUpdateResponse';
+import {DplLogDataProperty} from './dplLogDataProperty';
+import {DplLogDataPropertyImpl} from './dplLogDataPropertyImpl';
 
-export class DplLogImpl implements DplLog{
-  private readonly _dplLogDataPushValues:PushValue<DplLogData>[];
-  private readonly _responses: Response[];
+describe('DplLogDataProperty unit test', () => {
+  const initialValue = 'Initial value';
+  let dplLogDataProperty: DplLogDataProperty;
 
-  constructor(){
-    this._dplLogDataPushValues = [];
-    this._responses = [
-      new AngularObjectUpdateResponse(this._dplLogDataPushValues)
-    ];
-  }
+  beforeEach(() => {
+    dplLogDataProperty = new DplLogDataPropertyImpl(initialValue);
+  });
 
-  dplLogData(dplLogData:PushValue<DplLogData>): void{
-    this._dplLogDataPushValues.push(dplLogData);
-  }
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(dplLogDataProperty).toBeDefined();
+    });
 
-  response(data: object) {
-    this._responses.forEach(response => response.response(data));
-  }
-}
+    it('Should have value', () => {
+      expect(dplLogDataProperty.value()).toEqual(initialValue);
+    });
 
+    it('Should not be a stub', () =>  {
+      expect(dplLogDataProperty.isStub()).toBe(false);
+    });
+  });
+});

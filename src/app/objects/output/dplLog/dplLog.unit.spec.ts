@@ -44,28 +44,17 @@
  * a licensee so wish it.
  */
 import {DplLog} from './dplLog';
-import {PushValue} from '../../pushValue/pushValue';
-import {DplLogData} from './dplLogData/dplLogData';
-import {Response} from '../../channel/response';
-import {AngularObjectUpdateResponse} from './responses/angularObjectUpdateResponse';
+import {DplLogImpl} from './dplLogImpl';
 
-export class DplLogImpl implements DplLog{
-  private readonly _dplLogDataPushValues:PushValue<DplLogData>[];
-  private readonly _responses: Response[];
+describe('DplLog unit tests', () => {
+  let dplLog:DplLog;
+  beforeEach(() => {
+    dplLog = new DplLogImpl();
+  });
 
-  constructor(){
-    this._dplLogDataPushValues = [];
-    this._responses = [
-      new AngularObjectUpdateResponse(this._dplLogDataPushValues)
-    ];
-  }
-
-  dplLogData(dplLogData:PushValue<DplLogData>): void{
-    this._dplLogDataPushValues.push(dplLogData);
-  }
-
-  response(data: object) {
-    this._responses.forEach(response => response.response(data));
-  }
-}
-
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(dplLog).toBeDefined();
+    });
+  });
+});
