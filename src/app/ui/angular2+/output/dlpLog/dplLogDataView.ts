@@ -49,7 +49,7 @@ import {DplLogData} from '../../../../objects/output/dplLog/dplLogData/dplLogDat
 @Component({
   selector: 'dpl-log-data',
   template: `
-    <div class="dpl-log">
+    <div class="dpl-log paragraph-footer-elapsed">
       <p>
         <button
           type="button"
