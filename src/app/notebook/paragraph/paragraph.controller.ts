@@ -967,6 +967,12 @@ function ParagraphCtrl($scope,
     }
   });
 
+  $scope.$on('editorFocused', function(event, data:{focus:boolean, paragraphId:string}) {
+    if($scope.paragraph.id === data.paragraphId){
+      $scope.focusParagraph(data.focus);
+    }
+  });
+
   $scope.focusParagraph = (value:boolean)=>{
     $scope.paragraphFocused = value;
   };
