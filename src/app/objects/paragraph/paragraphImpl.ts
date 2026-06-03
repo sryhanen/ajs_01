@@ -136,6 +136,7 @@ export class ParagraphImpl implements Paragraph{
       if(paragraphId === this.id()){
         this._outputContainer.response(data);
         this._angularObjectCollection.response(data);
+        this._editor.response(data);
       }
     }
     else{
