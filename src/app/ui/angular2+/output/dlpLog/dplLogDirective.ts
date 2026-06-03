@@ -73,6 +73,10 @@ export class DplLogDirective implements OnInit {
       this._componentRef = this.viewContainer.createComponent(DplLogDataView);
       this._componentRef.setInput('dplLogData', this._dplLogData);
     }
+    else if(this._dplLogData().isStub() && this._componentRef !== undefined){
+      this.viewContainer.clear();
+      this._componentRef = undefined;
+    }
   });
 
   ngOnInit() {
