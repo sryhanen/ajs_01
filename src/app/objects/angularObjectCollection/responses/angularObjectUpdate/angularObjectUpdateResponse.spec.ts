@@ -115,5 +115,17 @@ describe('AngularObjectUpdateResponse', () => {
       expect(angularObjects[1].value()).toEqual(newValue);
       expect(pushValues[0].value()).toEqual(angularObjects);
     });
+
+    it('Should not update if object name is batchMsg, timeMsg or message', () => {
+      response.data.angularObject.name = 'batchMsg';
+      angularObjectUpdateResponse.response(response);
+      response.data.angularObject.name = 'timeMsg';
+      angularObjectUpdateResponse.response(response);
+      response.data.angularObject.name = 'message';
+      angularObjectUpdateResponse.response(response);
+      expect(angularObjects).toHaveLength(1);
+      expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.angularObject.name);
+      expect(angularObjects[0].value()).toEqual(defaultAngularObjectData.angularObject.object);
+    });
   });
 });
