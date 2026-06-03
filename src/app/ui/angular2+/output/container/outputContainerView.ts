@@ -52,6 +52,7 @@ import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writabl
 import {OutputPluginStub} from '../../../../objects/output/plugins/outputPluginStub';
 import {OutputPluginDirective} from '../plugin/outputPluginDirective';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
+import {DplLogDirective} from '../dlpLog/dplLogDirective';
 
 @Component({
   selector: 'output-container',
@@ -59,12 +60,14 @@ import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
     OutputSwitcherView,
     InterpreterErrorDirective,
     OutputPluginDirective,
+    DplLogDirective,
   ],
   template: `
     <output-switcher [interpreter-error-popup]="outputContainer.errorListener()"
                      [outputSwitcher]="outputContainer.outputSwitcher()"
                      [outputSwitcherButtons]="outputSwitcherButtons"></output-switcher>
     <ng-container output-plugin [outputPlugin]="outputPlugin"></ng-container>
+    <ng-container dpl-log [dplLog]="outputContainer.dplLog()"></ng-container>
   `
 })
 export class OutputContainerView implements OnInit {

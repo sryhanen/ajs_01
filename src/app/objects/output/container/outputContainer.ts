@@ -49,10 +49,12 @@ import {OutputFormat} from '../format/outputFormat';
 import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
 import {OutputPlugin} from '../plugins/outputPlugin';
 import {PushValue} from '../../pushValue/pushValue';
+import {DplLog} from '../dplLog/dplLog';
 
 export interface OutputContainer extends Channel{
   outputSwitcher(): OutputSwitcher;
   outputFormats(): OutputFormat[];
   errorListener(): InterpreterErrorListener;
+  dplLog(): DplLog;
   outputPlugin(pushValue: PushValue<OutputPlugin>): void;
 }
