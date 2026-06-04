@@ -56,7 +56,7 @@ describe('AngularObjectUpdateResponse', () => {
   const paragraphId = 'paragraphId';
   const defaultAngularObjectData =  {
     name: 'object1',
-    value: 'value1',
+    object: 'value1',
     noteId: 'noteId',
     paragraphId: paragraphId,
   };
@@ -124,8 +124,8 @@ describe('AngularObjectUpdateResponse', () => {
       response.data.angularObject.name = 'message';
       angularObjectUpdateResponse.response(response);
       expect(angularObjects).toHaveLength(1);
-      expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.angularObject.name);
-      expect(angularObjects[0].value()).toEqual(defaultAngularObjectData.angularObject.object);
+      expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.name);
+      expect(angularObjects[0].value()).toEqual(defaultAngularObjectData.object);
     });
   });
 });
