@@ -43,50 +43,61 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {ParagraphData} from './paragraphData';
+import {SafeJson} from '../../safeJson/safeJson';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {ParagraphOutputData} from './paragraphOutputData/paragraphOutputData';
+import {ParagraphOutputDataImpl} from './paragraphOutputData/paragraphOutputDataImpl';
+import {ParagraphOutputDataStub} from './paragraphOutputData/paragraphOutputDataStub';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
+export class ParagraphDataImpl implements ParagraphData {
+  private readonly _paragraphData: SafeJson;
+
+  constructor(paragraphData: object) {
+    this._paragraphData = new SafeJsonImpl(paragraphData);
+  }
+
+  id(): string {
+    return this._paragraphData.getProperty('id', 'string');
+  }
+
+  config(): object {
+    return this._paragraphData.getProperty('config', 'object');
+  }
+
+  settings(): object {
+    return this._paragraphData.getProperty('settings', 'object');
+  }
+
+  status(): string {
+    return this._paragraphData.getProperty('status', 'string');
+  }
+
+  text(): string {
+    return this._paragraphData.getProperty('text', 'string');
+  }
+
+  title(): string {
+    let title:string;
+    if(this._paragraphData.propertyExists('title')) {
+      title = this._paragraphData.getProperty('title', 'string');
+    }
+    else{
+      title = '';
+    }
+    return title;
+  }
+
+  output(): ParagraphOutputData {
+    let paragraphOutputData:ParagraphOutputData = new ParagraphOutputDataStub();
+    if(this._paragraphData.propertyExists('output')) {
+      const outputData:object = this._paragraphData.getProperty('output', 'object');
+      const safeOutputData = new SafeJsonImpl(outputData);
+      if(safeOutputData.propertyExists('type') && safeOutputData.propertyExists('data')) {
+        paragraphOutputData = new ParagraphOutputDataImpl(outputData);
+      }
+    }
+    return paragraphOutputData;
+  }
+
 }
-
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
-
-
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
-
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};

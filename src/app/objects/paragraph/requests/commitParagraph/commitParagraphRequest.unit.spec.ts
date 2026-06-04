@@ -43,50 +43,50 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {Channel} from '../../../channel/channel';
+import {Request} from '../../../channel/request';
+import {CommitParagraphRequest} from './commitParagraphRequest';
+import {ParagraphData} from '../../paragraphData/paragraphData';
+import {ParagraphDataImpl} from '../../paragraphData/paragraphDataImpl';
+import {FakeChannel} from '../../../channel/fakeChannel';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
-}
+describe('CommitParagraphRequest unit test', () => {
+  let channel: Channel;
+  let paragraphData: ParagraphData;
+  let commitParagraphRequest: Request;
+  beforeEach(() => {
+    channel = new FakeChannel();
+    paragraphData = new ParagraphDataImpl({
+      title:'title',
+      config:{},
+      settings:{}
+    });
+    commitParagraphRequest = new CommitParagraphRequest(channel, paragraphData);
+  });
 
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(commitParagraphRequest).toBeDefined();
+    });
+  });
 
-
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
-
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};
+  describe('Request', () => {
+    it('Should decorate COMMIT_PARAGRAPH request', () => {
+      const request = {
+        op:'COMMIT_PARAGRAPH',
+        data:{}
+      };
+      const expectedRequest = {
+        op:'COMMIT_PARAGRAPH',
+        data:{
+          title: paragraphData.title(),
+          config: paragraphData.config(),
+          params: paragraphData.settings()
+        }
+      };
+      const requestSpy = vi.spyOn(channel, 'request');
+      commitParagraphRequest.request(request);
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
+});

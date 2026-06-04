@@ -43,50 +43,36 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {ConfiguredEditor} from '../configuredEditor';
+import ace from 'ace-builds';
+import {Request} from '../../../channel/request';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
+export class EditorWithAutoCommit implements ConfiguredEditor {
+  private readonly _editor: ace.Editor;
+  private readonly _request:Request;
+  private readonly _paragraphId:string;
+
+  constructor(editor:ace.Editor, request:Request, paragraphId:string) {
+    this._editor = editor;
+    this._request = request;
+    this._paragraphId = paragraphId;
+  }
+
+  aceEditor(): ace.Editor {
+    this._editor.on('change', () => {
+      const commitParagraphRequest = {
+        op:'COMMIT_PARAGRAPH',
+        data:{
+          id: this._paragraphId,
+          noteId: '',
+          title: '',
+          paragraph: this._editor.getValue(),
+          config: '',
+          params: '',
+        }
+      };
+      this._request.request(commitParagraphRequest);
+    });
+    return this._editor;
+  }
 }
-
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
-
-
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
-
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};

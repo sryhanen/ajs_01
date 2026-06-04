@@ -52,24 +52,22 @@ import {AngularObjectCollectionImpl} from '../../../objects/angularObjectCollect
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ParagraphView} from './paragraphView';
 import {By} from '@angular/platform-browser';
-import {OutputContainerView} from '../output/container/outputContainerView';
-import {ToasterService} from '../../../shared/components/Toaster/notifications.service';
-import {FakeToasterService} from '../../../shared/components/Toaster/fakeToasterService';
+import {OutputContainerViewFake} from '../output/container/outputContainerViewFake';
+import {EditorViewFake} from '../editor/editorViewFake';
 
 describe('ParagraphView integration', () => {
   const paragraphId = 'paragraphId';
   const channel:Channel = new FakeChannel();
   const angularObjectCollection:AngularObjectCollection = new AngularObjectCollectionImpl(channel);
-  const toaster = new FakeToasterService();
   let paragraph:Paragraph;
   let fixture: ComponentFixture<ParagraphView>;
 
   beforeEach(async () => {
     paragraph = new ParagraphImpl(channel, {id:paragraphId}, angularObjectCollection);
-    TestBed.configureTestingModule({
-      providers: [
-        {provide:ToasterService, useValue: toaster}
-      ]
+    TestBed.overrideComponent(ParagraphView, {
+      set: {
+        imports: [EditorViewFake, OutputContainerViewFake],
+      },
     });
     fixture = TestBed.createComponent(ParagraphView);
     fixture.componentInstance.paragraphId = 'paragraphId';
@@ -83,15 +81,30 @@ describe('ParagraphView integration', () => {
     });
 
     it('Should have output container', () => {
-      const outputContainer = fixture.debugElement.query(By.directive(OutputContainerView));
+      const outputContainer = fixture.debugElement.query(By.css('output-container'));
       expect(outputContainer).toBeTruthy();
     });
 
-    it('Should have no output container if paragraphId does not match', () => {
-      fixture.componentRef.setInput('paragraphId', 'wrongId');
-      fixture.detectChanges();
-      const outputContainer = fixture.debugElement.query(By.directive(OutputContainerView));
-      expect(outputContainer).not.toBeTruthy();
+    it('Should have editor', () => {
+      const outputContainer = fixture.debugElement.query(By.css('editor'));
+      expect(outputContainer).toBeTruthy();
+    });
+
+    describe('ParagraphId does not match', () =>{
+      beforeEach(() => {
+        fixture.componentRef.setInput('paragraphId', 'wrongId');
+        fixture.detectChanges();
+      });
+
+      it('Should not have output container', () => {
+        const outputContainer = fixture.debugElement.query(By.css('output-container'));
+        expect(outputContainer).not.toBeTruthy();
+      });
+
+      it('Should not have editor', () => {
+        const outputContainer = fixture.debugElement.query(By.css('editor'));
+        expect(outputContainer).not.toBeTruthy();
+      });
     });
   });
 });

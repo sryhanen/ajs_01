@@ -45,58 +45,69 @@
  */
 import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
+import {Request} from '../channel/request';
 import {OutputContainer} from '../output/container/outputContainer';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
-import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {MessageImpl} from '../message/messageImpl';
+import {EditorImpl} from '../editor/editorImpl';
+import {Editor} from '../editor/editor';
+import {CommitParagraphRequest} from './requests/commitParagraph/commitParagraphRequest';
+import {DefaultRequest} from './requests/default/defaultRequest';
+import {ParagraphData} from './paragraphData/paragraphData';
+import {ParagraphDataImpl} from './paragraphData/paragraphDataImpl';
 import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
   private readonly _angularObjectCollection: AngularObjectCollection;
-  private readonly _paragraph: SafeJson;
+  private readonly _paragraphData: ParagraphData;
+  private readonly _requests: Request[];
+  private readonly _editor:EditorImpl;
 
-  constructor(channel: Channel, paragraph: object) {
+  constructor(channel: Channel, paragraphData: object) {
     this._channel = channel;
-    this._paragraph = new SafeJsonImpl(paragraph);
+    this._paragraphData = new ParagraphDataImpl(paragraphData);
     this._angularObjectCollection = new AngularObjectCollectionImpl(this);
     this._outputContainer = new OutputContainerImpl(this, this._angularObjectCollection);
-
-    if(this._paragraph.propertyExists('output')){
-      const paragraphOutput = this._paragraph.getProperty<object>('output', 'object');
-      if(paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined){
-        console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
-      }
-      else{
-        const paragraphOutputMessage = {
-          op:'PARAGRAPH_OUTPUT',
-          data: {
-            noteId:'',
-            paragraphId:'',
-            output: paragraphOutput,
-          }
-        };
-        this._outputContainer.response(paragraphOutputMessage);
-      }
+    this._editor = new EditorImpl(this, this._paragraphData);
+    const paragraphDataOutput = this._paragraphData.output();
+    if(!paragraphDataOutput.isStub()){
+      const paragraphOutputMessage = {
+        op:'PARAGRAPH_OUTPUT',
+        data: {
+          noteId:'',
+          paragraphId:'',
+          output: paragraphDataOutput.print(),
+        }
+      };
+      this._outputContainer.response(paragraphOutputMessage);
     }
+    this._requests = [
+      new CommitParagraphRequest(this._channel, this._paragraphData),
+      new DefaultRequest(this._channel)
+    ];
   }
 
   id(): string {
-    return this._paragraph.getProperty('id', 'string');
+    return this._paragraphData.id();
   }
 
   outputContainer(): OutputContainer {
     return this._outputContainer;
   }
 
+  editor(): Editor {
+    return this._editor;
+  }
+
   print():object {
     return {
-      text:this._paragraph.getProperty<string>('text', 'string'),
-      config:this._paragraph.getProperty<object>('config', 'object'),
-      settings: this._paragraph.getProperty<object>('settings', 'object'),
+      text:this._paragraphData.text(),
+      config:this._paragraphData.config(),
+      settings: this._paragraphData.settings(),
     };
   }
 
@@ -110,10 +121,10 @@ export class ParagraphImpl implements Paragraph{
         op:message.operation(),
         data:decoratedData,
       };
-      this._channel.request(decoratedRequest);
+      this._requests.forEach(request => request.request(decoratedRequest));
     }
     else {
-      this._channel.request(data);
+      this._requests.forEach(request => request.request(data));
     }
   }
 
@@ -125,11 +136,13 @@ export class ParagraphImpl implements Paragraph{
       if(paragraphId === this.id()){
         this._outputContainer.response(data);
         this._angularObjectCollection.response(data);
+        this._editor.response(data);
       }
     }
     else{
       this._outputContainer.response(data);
       this._angularObjectCollection.response(data);
+      this._editor.response(data);
     }
   }
 }

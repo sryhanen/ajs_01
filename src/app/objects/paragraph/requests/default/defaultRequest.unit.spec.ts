@@ -43,50 +43,47 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {Channel} from '../../../channel/channel';
+import {Request} from '../../../channel/request';
+import {DefaultRequest} from './defaultRequest';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
-}
+describe('Paragraph default request unit test', () => {
+  let defaultRequest: Request;
+  let channel: Channel;
+  beforeEach(() => {
+    channel = new FakeChannel();
+    defaultRequest = new DefaultRequest(channel);
+  });
 
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
+  describe('Birth', () => {
+    it('Should be initialized', () =>  {
+      expect(defaultRequest).toBeDefined();
+    });
+  });
 
+  describe('Request', () => {
+    let requestSpy;
+    beforeEach(() => {
+      requestSpy = vi.spyOn(channel, 'request');
+    });
 
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
+    it('Should request channel', () => {
+      const request = {
+        op:'test',
+        data:{}
+      };
+      defaultRequest.request(request);
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+    });
 
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};
+    it('Should not request channel', () => {
+      const request = {
+        op:'COMMIT_PARAGRAPH',
+        data:{}
+      };
+      defaultRequest.request(request);
+      expect(requestSpy).toHaveBeenCalledTimes(0);
+    });
+  });
+});

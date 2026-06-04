@@ -43,50 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import Stubable from '../../../../shared/interfaces/stubable';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
+export interface ParagraphOutputData extends Stubable{
+  print(): object;
 }
-
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
-
-
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
-
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};

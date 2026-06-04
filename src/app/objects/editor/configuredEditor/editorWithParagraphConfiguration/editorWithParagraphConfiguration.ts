@@ -43,50 +43,53 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {ConfiguredEditor} from '../configuredEditor';
+import ace from 'ace-builds';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {ParagraphData} from '../../../paragraph/paragraphData/paragraphData';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
+export class EditorWithParagraphConfiguration implements ConfiguredEditor {
+  private readonly _editor: ace.Editor;
+  private readonly _paragraphData:ParagraphData;
+
+  constructor(editor: ace.Editor, paragraphData:ParagraphData){
+    this._editor = editor;
+    this._paragraphData = paragraphData;
+  }
+
+  aceEditor(): ace.Editor {
+    this.setInitialtext();
+    this.setLineNumberVisibility();
+    this.setFontSize();
+    this.toggleParagraphDisableClass();
+    return this._editor;
+  }
+
+  private toggleParagraphDisableClass():void{
+    const paragraphStatus = this._paragraphData.status();
+    const editorIsDisabled = paragraphStatus === 'RUNNING' || paragraphStatus === 'PENDING';
+    this._editor.setReadOnly(editorIsDisabled);
+    this._editor.setStyle('paragraph-disable', editorIsDisabled);
+  }
+
+  private setLineNumberVisibility():void{
+    const config = new SafeJsonImpl(this._paragraphData.config());
+    if(config.propertyExists('lineNumbers')){
+      this._editor.renderer.setShowGutter(config.getProperty('lineNumbers', 'boolean'));
+    }
+  }
+
+  private setFontSize(){
+    const config = new SafeJsonImpl(this._paragraphData.config());
+    if(config.propertyExists('fontSize')){
+      this._editor.setOptions({
+        fontSize: config.getProperty('fontSize', 'number'),
+      });
+    }
+  }
+
+  private setInitialtext():void {
+    this._editor.setValue(this._paragraphData.text());
+    this._editor.clearSelection();
+  }
 }
-
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
-
-
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
-
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};

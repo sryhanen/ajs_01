@@ -43,50 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './shared/components/websocket/wsMessageListenerImpl';
-import {WebsocketMessageService} from './shared/components/websocket/websocket-message.service';
-import {ToasterService} from './shared/components/Toaster/notifications.service';
-import {
-  EditorWithStateBroadcastOnFocusImpl
-} from './ui/angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {Response} from '../../../../../../channel/response';
+import {SafeJsonImpl} from '../../../../../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../../../../../../message/messageImpl';
+import {Ace} from 'ace-builds';
+import {PushValue} from '../../../../../../pushValue/pushValue';
 
-export function wsMessageListenerFactory(i) {
-  return i.get('wsMessageListener');
+export class CompletionListResponse implements Response {
+  private readonly _callback: PushValue<Ace.CompleterCallback>;
+  private _completions: Ace.Completion[];
+
+  constructor(callback: PushValue<Ace.CompleterCallback>) {
+    this._callback = callback;
+  }
+
+  response(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'COMPLETION_LIST'){
+      const completionListData = new SafeJsonImpl(message.data());
+      const completionsProperty:object[] = completionListData.getProperty('completions', 'object');
+      this._completions = completionsProperty.map(completionObject => {
+        const safeCompletionObject = new SafeJsonImpl(completionObject);
+        return {
+          name: safeCompletionObject.getProperty<string>('name', 'string'),
+          value: safeCompletionObject.getProperty<string>('value', 'string'),
+        };
+      });
+      if(this._callback.value()){
+        this._callback.value()(null, this._completions);
+      }
+    }
+  }
 }
-
-export const wsMessageListenerProvider = {
-  provide: WsMessageListenerImpl,
-  useFactory: wsMessageListenerFactory,
-  deps: ['$injector']
-};
-
-
-export function WebsocketMessageFactory(i) {
-  return i.get('websocketMsgSrv');
-}
-
-export const WebsocketMessageProvider = {
-  provide: WebsocketMessageService,
-  useFactory: WebsocketMessageFactory,
-  deps: ['$injector']
-};
-
-export function ToasterFactory(i) {
-  return i.get('ToasterService');
-}
-
-export const ToasterProvider = {
-  provide: ToasterService,
-  useFactory: ToasterFactory,
-  deps: ['$injector']
-};
-
-export function EditorWithStateBroadcastOnFocusFactory(i) {
-  return i.get('editorWithStateBroadcastOnFocus');
-}
-
-export const EditorWithStateBroadcastOnFocusProvider = {
-  provide: EditorWithStateBroadcastOnFocusImpl,
-  useFactory: EditorWithStateBroadcastOnFocusFactory,
-  deps: ['$injector']
-};
