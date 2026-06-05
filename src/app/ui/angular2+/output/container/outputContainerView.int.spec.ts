@@ -59,8 +59,7 @@ import {OutputSwitcherView} from '../switcher/outputSwitcherView';
 
 describe('OutputContainerView integration', () => {
   const channel:Channel = new FakeChannel();
-  const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
-  const outputContainer: OutputContainer = new OutputContainerImpl(channel, angularObjectCollection);
+  const outputContainer: OutputContainer = new OutputContainerImpl(channel);
   const toaster: FakeToasterService = new FakeToasterService();
   let fixture: ComponentFixture<OutputContainerView>;
 

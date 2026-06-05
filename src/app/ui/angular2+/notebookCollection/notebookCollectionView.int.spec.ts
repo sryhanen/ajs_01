@@ -60,7 +60,6 @@ describe('NotebookCollectionView integration', () => {
     webAppRoot.initialize(webSocketService);
     fixture = TestBed.createComponent(NotebookCollectionView);
     fixture.componentInstance.noteId = 'note1';
-    fixture.componentInstance.paragraphId = 'paragraphId';
     fixture.detectChanges();
   });
 

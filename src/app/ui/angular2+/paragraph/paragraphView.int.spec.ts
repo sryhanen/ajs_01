@@ -47,8 +47,6 @@ import {Paragraph} from '../../../objects/paragraph/paragraph';
 import {ParagraphImpl} from '../../../objects/paragraph/paragraphImpl';
 import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {Channel} from '../../../objects/channel/channel';
-import {AngularObjectCollection} from '../../../objects/angularObjectCollection/angularObjectCollection';
-import {AngularObjectCollectionImpl} from '../../../objects/angularObjectCollection/angularObjectCollectionImpl';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ParagraphView} from './paragraphView';
 import {By} from '@angular/platform-browser';
@@ -58,19 +56,17 @@ import {EditorViewFake} from '../editor/editorViewFake';
 describe('ParagraphView integration', () => {
   const paragraphId = 'paragraphId';
   const channel:Channel = new FakeChannel();
-  const angularObjectCollection:AngularObjectCollection = new AngularObjectCollectionImpl(channel);
   let paragraph:Paragraph;
   let fixture: ComponentFixture<ParagraphView>;
 
-  beforeEach(async () => {
-    paragraph = new ParagraphImpl(channel, {id:paragraphId}, angularObjectCollection);
+  beforeEach(() => {
+    paragraph = new ParagraphImpl(channel, {id:paragraphId});
     TestBed.overrideComponent(ParagraphView, {
       set: {
         imports: [EditorViewFake, OutputContainerViewFake],
       },
     });
     fixture = TestBed.createComponent(ParagraphView);
-    fixture.componentInstance.paragraphId = 'paragraphId';
     fixture.componentInstance.paragraph = paragraph;
     fixture.detectChanges();
   });
@@ -88,23 +84,6 @@ describe('ParagraphView integration', () => {
     it('Should have editor', () => {
       const outputContainer = fixture.debugElement.query(By.css('editor'));
       expect(outputContainer).toBeTruthy();
-    });
-
-    describe('ParagraphId does not match', () =>{
-      beforeEach(() => {
-        fixture.componentRef.setInput('paragraphId', 'wrongId');
-        fixture.detectChanges();
-      });
-
-      it('Should not have output container', () => {
-        const outputContainer = fixture.debugElement.query(By.css('output-container'));
-        expect(outputContainer).not.toBeTruthy();
-      });
-
-      it('Should not have editor', () => {
-        const outputContainer = fixture.debugElement.query(By.css('editor'));
-        expect(outputContainer).not.toBeTruthy();
-      });
     });
   });
 });

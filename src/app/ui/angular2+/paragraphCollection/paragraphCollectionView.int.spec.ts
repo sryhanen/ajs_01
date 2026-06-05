@@ -50,7 +50,7 @@ import {Channel} from '../../../objects/channel/channel';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ParagraphCollectionView} from './paragraphCollectionView';
 import {By} from '@angular/platform-browser';
-import {ParagraphView} from '../paragraph/paragraphView';
+import {ParagraphViewFake} from '../paragraph/paragraphViewFake';
 
 describe('ParagraphCollectionView integration', () => {
   const channel:Channel = new FakeChannel();
@@ -67,9 +67,13 @@ describe('ParagraphCollectionView integration', () => {
       {id:'para3'},
     ];
     paragraphCollection = new ParagraphCollectionImpl(channel, initialParagraphs);
+    TestBed.overrideComponent(ParagraphCollectionView, {
+      set: {
+        imports: [ParagraphViewFake],
+      },
+    });
     fixture = TestBed.createComponent(ParagraphCollectionView);
     fixture.componentInstance.paragraphCollection = paragraphCollection;
-    fixture.componentInstance.paragraphId = 'paragraphId';
     fixture.detectChanges();
   });
 
@@ -79,7 +83,7 @@ describe('ParagraphCollectionView integration', () => {
     });
 
     it('Should have paragraphs visible', () =>{
-      const paragraphs = fixture.debugElement.queryAll(By.directive(ParagraphView));
+      const paragraphs = fixture.debugElement.queryAll(By.css('paragraph'));
       expect(paragraphs).toHaveLength(3);
     });
 
@@ -88,9 +92,8 @@ describe('ParagraphCollectionView integration', () => {
       const emptyCollection = new ParagraphCollectionImpl(channel, []);
       fixture = TestBed.createComponent(ParagraphCollectionView);
       fixture.componentInstance.paragraphCollection = emptyCollection;
-      fixture.componentInstance.paragraphId = 'paragraphId';
       fixture.detectChanges();
-      const paragraphs = fixture.debugElement.queryAll(By.directive(ParagraphView));
+      const paragraphs = fixture.debugElement.queryAll(By.css('paragraph'));
       expect(paragraphs).toHaveLength(0);
     });
   });
@@ -108,7 +111,7 @@ describe('ParagraphCollectionView integration', () => {
       };
       paragraphCollection.response(paragraphAddedResponse);
       fixture.detectChanges();
-      const paragraphs = fixture.debugElement.queryAll(By.directive(ParagraphView));
+      const paragraphs = fixture.debugElement.queryAll(By.css('paragraph'));
       expect(paragraphs).toHaveLength(4);
     });
 
@@ -121,7 +124,7 @@ describe('ParagraphCollectionView integration', () => {
       };
       paragraphCollection.response(paragraphRemovedResponse);
       fixture.detectChanges();
-      const paragraphs = fixture.debugElement.queryAll(By.directive(ParagraphView));
+      const paragraphs = fixture.debugElement.queryAll(By.css('paragraph'));
       expect(paragraphs).toHaveLength(2);
     });
   });

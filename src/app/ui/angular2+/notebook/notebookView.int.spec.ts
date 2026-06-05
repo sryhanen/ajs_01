@@ -50,13 +50,12 @@ import {NotebookImpl} from '../../../objects/notebook/notebookImpl';
 import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {Channel} from '../../../objects/channel/channel';
 import {By} from '@angular/platform-browser';
-import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
+import {ParagraphCollectionViewFake} from '../paragraphCollection/paragraphCollectionViewFake';
 
 describe('NotebookView integration', () => {
   let fixture: ComponentFixture<NotebookView>;
   const channel:Channel = new FakeChannel();
   const noteId = 'noteId';
-  const paragraphId = 'paragraphId';
   const notebookData = {
     id:noteId,
     paragraphs:[
@@ -67,8 +66,12 @@ describe('NotebookView integration', () => {
 
   beforeEach(() => {
     notebook = new NotebookImpl(channel, notebookData);
+    TestBed.overrideComponent(NotebookView, {
+      set: {
+        imports:[ParagraphCollectionViewFake],
+      },
+    });
     fixture = TestBed.createComponent(NotebookView);
-    fixture.componentInstance.paragraphId = paragraphId;
     fixture.componentInstance.notebook = notebook;
     fixture.detectChanges();
   });
@@ -79,7 +82,7 @@ describe('NotebookView integration', () => {
     });
 
     it('Should have rendered ParagraphCollection', () => {
-      const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
+      const paragraphCollection = fixture.debugElement.query(By.css('paragraph-collection'));
       expect(paragraphCollection).toBeTruthy();
     });
 
@@ -87,7 +90,7 @@ describe('NotebookView integration', () => {
       notebook = new NotebookImpl(channel, {id: noteId});
       fixture.componentRef.setInput('notebook', notebook);
       fixture.detectChanges();
-      const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
+      const paragraphCollection = fixture.debugElement.query(By.css('paragraph-collection'));
       expect(paragraphCollection).not.toBeTruthy();
     });
   });
