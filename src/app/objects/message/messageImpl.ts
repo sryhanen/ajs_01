@@ -62,4 +62,11 @@ export class MessageImpl implements Message{
     const key = 'op';
     return this._safeJson.getProperty(key, 'string');
   }
+
+  message(): { op: string; data: object } {
+    return  {
+      op:this.operation(),
+      data: this.data()
+    };
+  }
 }

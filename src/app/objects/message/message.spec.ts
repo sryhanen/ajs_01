@@ -27,5 +27,9 @@ describe('Message', () => {
     it('Should have data', () => {
       expect(message.data()).toEqual(json.data);
     });
+
+    it('Should have message', () => {
+      expect(message.message()).toEqual(json);
+    });
   });
 });

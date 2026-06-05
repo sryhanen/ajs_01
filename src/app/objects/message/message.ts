@@ -46,4 +46,8 @@
 export interface Message{
   data():object;
   operation():string;
+  message():{
+    op:string;
+    data:object;
+  }
 }
