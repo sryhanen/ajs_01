@@ -62,6 +62,7 @@ export class EditorImpl implements Editor, Channel{
   private readonly _channel:Channel;
   private readonly _paragraphData: ParagraphData;
   private _aceCustomCompleter: AceCustomCompleter;
+  private _editor: ace.Editor;
 
   constructor(channel:Channel, paragraphData: ParagraphData) {
     this._channel = channel;
@@ -79,7 +80,11 @@ export class EditorImpl implements Editor, Channel{
     this._channel.request(data);
   }
 
-  aceEditor(htmlElement:HTMLElement): ace.Editor{
+  editorReference(): ace.Editor {
+    return this._editor;
+  }
+
+  initialize(htmlElement:HTMLElement): void{
     this.setBasePath();
     const paragraphId:string = this._paragraphData.id();
     const editor = ace.edit(htmlElement);
@@ -99,7 +104,7 @@ export class EditorImpl implements Editor, Channel{
             ).aceEditor(), this, this._paragraphData
           ).aceEditor()
         ).aceEditor(), this._aceCustomCompleter);
-    return configuredEditor.aceEditor();
+    this._editor = configuredEditor.aceEditor();
   }
 
   private setBasePath(): void {

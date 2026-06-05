@@ -57,6 +57,6 @@ export class EditorView implements AfterViewInit {
   @ViewChild('editorAnchor') editorAnchor: ElementRef;
 
   ngAfterViewInit() {
-    this.editor.aceEditor(this.editorAnchor.nativeElement);
+    this.editor.initialize(this.editorAnchor.nativeElement);
   }
 }

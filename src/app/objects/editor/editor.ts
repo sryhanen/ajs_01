@@ -46,5 +46,6 @@
 import ace from 'ace-builds';
 
 export interface Editor{
-  aceEditor(htmlElement:HTMLElement): ace.Editor;
+  initialize(htmlElement:HTMLElement): void;
+  editorReference():ace.Editor;
 }

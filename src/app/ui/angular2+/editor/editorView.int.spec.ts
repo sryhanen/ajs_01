@@ -56,7 +56,10 @@ import {render, screen} from '@testing-library/angular';
 
 describe('EditorView integration', () => {
   const editor:Editor = {
-    aceEditor(htmlElement: HTMLElement): ace.Editor{
+    editorReference(): ace.Editor {
+      return undefined;
+    },
+    initialize(htmlElement: HTMLElement): ace.Editor{
       return ace.edit(htmlElement);
     }
   };
@@ -70,7 +73,6 @@ describe('EditorView integration', () => {
   beforeEach(async () => {
     const renderResult = await render(EditorView, {
       inputs:{
-        paragraphId: 'paragraphId',
         editor: editor
       },
       providers:[
