@@ -47,16 +47,18 @@ import {Component, Input} from '@angular/core';
 import {Paragraph} from '../../../objects/paragraph/paragraph';
 import {OutputContainerView} from '../output/container/outputContainerView';
 import {EditorView} from '../editor/editorView';
+import {RunParagraphButton} from './paragraphActions/runParagraphButton/runParagraphButton';
 
 @Component({
   selector: 'paragraph',
   imports: [
     OutputContainerView,
-    EditorView
+    EditorView,
+    RunParagraphButton
   ],
   template: `
-    <div>
-      {{paragraph.paragraphData().id()}}
+    <div class="paragraph-box">
+      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
       <editor [editor]="paragraph.editor()"></editor>
       <output-container [outputContainer]="paragraph.outputContainer()"></output-container>
     </div>
