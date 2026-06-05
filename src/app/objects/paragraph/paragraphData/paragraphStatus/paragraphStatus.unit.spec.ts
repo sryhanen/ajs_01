@@ -80,4 +80,16 @@ describe('ParagraphStatus unit test', () => {
       expect(paragraphStatus.isRunning()).toBe(false);
     });
   });
+
+  describe('IsPending method', () => {
+    it('Should be true if status is PENDING', () => {
+      paragraphStatus = new ParagraphStatusImpl(new SafeJsonImpl({status:'PENDING'}));
+      expect(paragraphStatus.isPending()).toBe(true);
+    });
+
+    it('Should be false', () => {
+      paragraphStatus = new ParagraphStatusImpl(new SafeJsonImpl({status:''}));
+      expect(paragraphStatus.isPending()).toBe(false);
+    });
+  });
 });

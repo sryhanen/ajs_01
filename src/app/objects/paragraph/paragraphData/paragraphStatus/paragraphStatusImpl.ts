@@ -53,6 +53,10 @@ export class ParagraphStatusImpl implements ParagraphStatus {
     this._paragraphData = paragraphData;
   }
 
+  isPending(): boolean {
+    return this.printStatus() === 'PENDING';
+  }
+
   isRunning(): boolean {
     const status = this.printStatus();
     return status === 'PENDING' || status === 'RUNNING';

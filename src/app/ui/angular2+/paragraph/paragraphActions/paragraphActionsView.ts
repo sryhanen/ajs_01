@@ -43,8 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface ParagraphStatus {
-  isRunning(): boolean;
-  isPending(): boolean;
-  printStatus(): string;
+import {Component, Input} from '@angular/core';
+import {Paragraph} from '../../../../objects/paragraph/paragraph';
+import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
+import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
+
+@Component({
+  selector: 'paragraph-actions',
+  imports: [
+    ParagraphStatusView,
+    RunParagraphButton
+  ],
+  template: `
+    <div class="control d-flex align-items-center">
+      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
+      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
+    </div>
+  `
+})
+export class ParagraphActionsView {
+  @Input({required:true}) paragraph: Paragraph;
 }
