@@ -44,6 +44,7 @@
  * a licensee so wish it.
  */
 import {ParagraphOutputData} from './paragraphOutputData/paragraphOutputData';
+import {ParagraphStatus} from './paragraphStatus/paragraphStatus';
 
 export interface ParagraphData {
   id():string;
@@ -51,6 +52,6 @@ export interface ParagraphData {
   settings():object;
   text():string;
   title():string;
-  status():string;
+  status():ParagraphStatus;
   output():ParagraphOutputData;
 }

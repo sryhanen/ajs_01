@@ -49,6 +49,8 @@ import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {ParagraphOutputData} from './paragraphOutputData/paragraphOutputData';
 import {ParagraphOutputDataImpl} from './paragraphOutputData/paragraphOutputDataImpl';
 import {ParagraphOutputDataStub} from './paragraphOutputData/paragraphOutputDataStub';
+import {ParagraphStatusImpl} from './paragraphStatus/paragraphStatusImpl';
+import {ParagraphStatus} from './paragraphStatus/paragraphStatus';
 
 export class ParagraphDataImpl implements ParagraphData {
   private readonly _paragraphData: SafeJson;
@@ -69,8 +71,8 @@ export class ParagraphDataImpl implements ParagraphData {
     return this._paragraphData.getProperty('settings', 'object');
   }
 
-  status(): string {
-    return this._paragraphData.getProperty('status', 'string');
+  status(): ParagraphStatus {
+    return new ParagraphStatusImpl(this._paragraphData);
   }
 
   text(): string {

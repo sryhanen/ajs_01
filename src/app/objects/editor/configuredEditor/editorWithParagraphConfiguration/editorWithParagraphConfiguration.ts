@@ -66,8 +66,7 @@ export class EditorWithParagraphConfiguration implements ConfiguredEditor {
   }
 
   private toggleParagraphDisableClass():void{
-    const paragraphStatus = this._paragraphData.status();
-    const editorIsDisabled = paragraphStatus === 'RUNNING' || paragraphStatus === 'PENDING';
+    const editorIsDisabled = this._paragraphData.status().isRunning();
     this._editor.setReadOnly(editorIsDisabled);
     this._editor.setStyle('paragraph-disable', editorIsDisabled);
   }

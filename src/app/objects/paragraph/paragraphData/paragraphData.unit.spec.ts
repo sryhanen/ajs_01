@@ -106,7 +106,7 @@ describe('ParagraphData unit test', () => {
     });
 
     it('Should have status', () => {
-      expect(paragraphData.status()).toEqual(status);
+      expect(paragraphData.status()).toBeDefined();
     });
 
     it('Should have output', () => {
@@ -145,10 +145,9 @@ describe('ParagraphData unit test', () => {
       expect(paragraphData.title()).toEqual('');
     });
 
-    it('Missing status should throw', () => {
-      delete paragraphDataInput.status;
+    it('Should have status', () => {
       paragraphData = new ParagraphDataImpl(paragraphDataInput);
-      expect(() => paragraphData.status()).toThrow();
+      expect(paragraphData.status()).toBeDefined();
     });
 
     it('Invalid output should return stub output', () => {

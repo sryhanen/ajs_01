@@ -48,7 +48,7 @@ import {Paragraph} from '../../../paragraph/paragraph';
 import {Channel} from '../../../channel/channel';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {RunParagraphMessageImpl} from '../../../message/runParagraph/runParagraphMessageImpl';
+import {RunParagraphMessage} from '../../../message/runParagraph/runParagraphMessage';
 
 export class RunParagraphRequest implements Request {
   private readonly _channel: Channel;
@@ -68,7 +68,7 @@ export class RunParagraphRequest implements Request {
       if(decoratorParagraph === undefined){
         throw new Error(`Failed to decorate run paragraph request: paragraph "${paragraphId}" not found in collection`);
       }
-      this._channel.request(new RunParagraphMessageImpl(decoratorParagraph.paragraphData()).message());
+      this._channel.request(new RunParagraphMessage(decoratorParagraph.paragraphData()).message());
     }
   }
 }
