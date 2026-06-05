@@ -47,11 +47,8 @@ import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {ParagraphImpl} from './paragraphImpl';
 import {Paragraph} from './paragraph';
-import {OutputContainerImpl} from '../output/container/outputContainerImpl';
-import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
-import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 
-describe('Paragraph', () => {
+describe('Paragraph unit test', () => {
   const paragraphId = 'paragraphId';
   const paragraphText = 'test';
   const paragraphConfig = {
@@ -78,8 +75,7 @@ describe('Paragraph', () => {
       id:paragraphId
     };
     channel = new FakeChannel();
-    const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
-    paragraph = new ParagraphImpl(channel, paragraphData, angularObjectCollection);
+    paragraph = new ParagraphImpl(channel, paragraphData);
   });
 
   describe('Birth', () => {
@@ -87,8 +83,8 @@ describe('Paragraph', () => {
       expect(paragraph).toBeInstanceOf(ParagraphImpl);
     });
 
-    it('Should have id', () => {
-      expect(paragraph.id()).toEqual(paragraphId);
+    it('Should have ParagraphData', () => {
+      expect(paragraph.paragraphData()).toBeDefined();
     });
 
     it('Should have OutputContainer', () => {

@@ -48,8 +48,6 @@ import {RunParagraphRequest} from './runParagraphRequest';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {Channel} from '../../../channel/channel';
 import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
-import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
-import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
 
 describe('RunParagraphRequest', () => {
   let channel: Channel;
@@ -61,9 +59,8 @@ describe('RunParagraphRequest', () => {
     prop:'config prop'
   };
   const paragraphSettings = {
-    params:{
-      prop:'config prop'
-    }
+    params:{},
+    forms:{}
   };
   const defaultParagraphData = {
     id: paragraphId,
@@ -75,8 +72,7 @@ describe('RunParagraphRequest', () => {
 
   beforeEach(() => {
     channel = new FakeChannel();
-    const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
-    defaultParagraph = new ParagraphImpl(channel, defaultParagraphData, angularObjectCollection);
+    defaultParagraph = new ParagraphImpl(channel, defaultParagraphData);
     paragraphs = [defaultParagraph];
     runParagraphRequest = new RunParagraphRequest(channel, paragraphs);
   });
@@ -105,7 +101,7 @@ describe('RunParagraphRequest', () => {
           id:paragraphId,
           paragraph:paragraphText,
           config:paragraphConfig,
-          params:paragraphSettings.params
+          params:paragraphSettings
         }
       };
       const channelSpy = vi.spyOn(channel, 'request');
