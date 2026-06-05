@@ -43,28 +43,48 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ConfiguredEditor} from '../configuredEditor';
-import ace from 'ace-builds';
-import {Request} from '../../../channel/request';
-import {ParagraphData} from '../../../paragraph/paragraphData/paragraphData';
-import {CommitParagraphMessage} from '../../../message/commitParagraph/commitParagraphMessage';
+import {Message} from '../message';
+import {ParagraphData} from '../../paragraph/paragraphData/paragraphData';
 
-export class EditorWithAutoCommit implements ConfiguredEditor {
-  private readonly _editor: ace.Editor;
-  private readonly _request:Request;
-  private readonly _paragraphData:ParagraphData;
+export class CommitParagraphMessage implements Message{
+  private readonly _updatedProperties: {name:string, value:unknown}[];
+  private readonly _paragraphData: ParagraphData;
 
-  constructor(editor:ace.Editor, request:Request, paragraphData:ParagraphData) {
-    this._editor = editor;
-    this._request = request;
+  constructor(paragraphData: ParagraphData, updatedProperties: {name:string, value:unknown}[]) {
     this._paragraphData = paragraphData;
+    this._updatedProperties = updatedProperties;
   }
 
-  aceEditor(): ace.Editor {
-    this._editor.on('change', () => {
-      const commitParagraphMessage = new CommitParagraphMessage(this._paragraphData, [{name:'paragraph', value:this._editor.getValue()}]);
-      this._request.request(commitParagraphMessage.message());
+  data(): object {
+    const data = {
+      id: this._paragraphData.id(),
+      noteId: '',
+      title: this._paragraphData.title(),
+      paragraph: this._paragraphData.text(),
+      config: this._paragraphData.config(),
+      params: this._paragraphData.settings(),
+    };
+    this._updatedProperties.forEach(property => {
+      if(!(property.name in data)){
+        const validKeys:string[] = [];
+        for (const key in data) {
+          validKeys.push(`"${key}"`);
+        }
+        throw new Error(`Given property "${property.name}" is not in paragraphData. Valid keys are "${validKeys.join(', ')}"."`);
+      }
+      data[property.name] = property.value;
     });
-    return this._editor;
+    return data;
+  }
+
+  message(): { op: string; data: object } {
+    return {
+      op: this.operation(),
+      data: this.data(),
+    };
+  }
+
+  operation(): string {
+    return 'COMMIT_PARAGRAPH';
   }
 }
