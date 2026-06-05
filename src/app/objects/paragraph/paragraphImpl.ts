@@ -45,15 +45,12 @@
  */
 import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
-import {Request} from '../channel/request';
 import {OutputContainer} from '../output/container/outputContainer';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {MessageImpl} from '../message/messageImpl';
 import {EditorImpl} from '../editor/editorImpl';
 import {Editor} from '../editor/editor';
-import {CommitParagraphRequest} from './requests/commitParagraph/commitParagraphRequest';
-import {DefaultRequest} from './requests/default/defaultRequest';
 import {ParagraphData} from './paragraphData/paragraphData';
 import {ParagraphDataImpl} from './paragraphData/paragraphDataImpl';
 
@@ -61,7 +58,6 @@ export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
   private readonly _paragraphData: ParagraphData;
-  private readonly _requests: Request[];
   private readonly _editor:EditorImpl;
 
   constructor(channel: Channel, paragraphData: object) {
@@ -81,10 +77,6 @@ export class ParagraphImpl implements Paragraph{
       };
       this._outputContainer.response(paragraphOutputMessage);
     }
-    this._requests = [
-      new CommitParagraphRequest(this._channel, this._paragraphData),
-      new DefaultRequest(this._channel)
-    ];
   }
 
   paragraphData(): ParagraphData {
@@ -109,10 +101,10 @@ export class ParagraphImpl implements Paragraph{
         op:message.operation(),
         data:decoratedData,
       };
-      this._requests.forEach(request => request.request(decoratedRequest));
+      this._channel.request(decoratedRequest);
     }
     else {
-      this._requests.forEach(request => request.request(data));
+      this._channel.request(data);
     }
   }
 

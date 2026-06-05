@@ -46,16 +46,17 @@
 import {ConfiguredEditor} from '../configuredEditor';
 import ace from 'ace-builds';
 import {Request} from '../../../channel/request';
+import {ParagraphData} from '../../../paragraph/paragraphData/paragraphData';
 
 export class EditorWithAutoCommit implements ConfiguredEditor {
   private readonly _editor: ace.Editor;
   private readonly _request:Request;
-  private readonly _paragraphId:string;
+  private readonly _paragraphData:ParagraphData;
 
-  constructor(editor:ace.Editor, request:Request, paragraphId:string) {
+  constructor(editor:ace.Editor, request:Request, paragraphData:ParagraphData) {
     this._editor = editor;
     this._request = request;
-    this._paragraphId = paragraphId;
+    this._paragraphData = paragraphData;
   }
 
   aceEditor(): ace.Editor {
@@ -63,12 +64,12 @@ export class EditorWithAutoCommit implements ConfiguredEditor {
       const commitParagraphRequest = {
         op:'COMMIT_PARAGRAPH',
         data:{
-          id: this._paragraphId,
+          id: this._paragraphData.id(),
           noteId: '',
-          title: '',
+          title: this._paragraphData.title(),
           paragraph: this._editor.getValue(),
-          config: '',
-          params: '',
+          config: this._paragraphData.config(),
+          params: this._paragraphData.settings(),
         }
       };
       this._request.request(commitParagraphRequest);

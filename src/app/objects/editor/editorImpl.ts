@@ -96,7 +96,7 @@ export class EditorImpl implements Editor, Channel{
                   ).aceEditor()
                 ).aceEditor()
               ).aceEditor()
-            ).aceEditor(), this, paragraphId
+            ).aceEditor(), this, this._paragraphData
           ).aceEditor()
         ).aceEditor(), this._aceCustomCompleter);
     return configuredEditor.aceEditor();
