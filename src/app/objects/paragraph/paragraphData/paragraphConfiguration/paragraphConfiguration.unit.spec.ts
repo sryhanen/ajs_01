@@ -43,16 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphOutputData} from './paragraphOutputData/paragraphOutputData';
-import {ParagraphStatus} from './paragraphStatus/paragraphStatus';
-import {ParagraphConfiguration} from './paragraphConfiguration/paragraphConfiguration';
+import {ParagraphConfiguration} from './paragraphConfiguration';
+import {ParagraphConfigurationImpl} from './paragraphConfigurationImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
-export interface ParagraphData {
-  id():string;
-  config():ParagraphConfiguration;
-  settings():object;
-  text():string;
-  title():string;
-  status():ParagraphStatus;
-  output():ParagraphOutputData;
-}
+describe('ParagraphConfiguration unit test', () => {
+  let paragraphConfiguration: ParagraphConfiguration;
+
+  beforeEach(() => {
+    paragraphConfiguration = new ParagraphConfigurationImpl(new SafeJsonImpl({lineNumbers: true}));
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(paragraphConfiguration).toBeDefined();
+    });
+
+    it('LineNumberVisible should be true', () => {
+      expect(paragraphConfiguration.lineNumbersAreVisible()).toBe(true);
+    });
+
+    it('LineNumberVisible should be false', () => {
+      paragraphConfiguration = new ParagraphConfigurationImpl(new SafeJsonImpl({lineNumbers: false}));
+      expect(paragraphConfiguration.lineNumbersAreVisible()).toBe(false);
+    });
+  });
+});

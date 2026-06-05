@@ -51,6 +51,7 @@ import {ParagraphOutputDataImpl} from './paragraphOutputData/paragraphOutputData
 import {ParagraphOutputDataStub} from './paragraphOutputData/paragraphOutputDataStub';
 import {ParagraphStatusImpl} from './paragraphStatus/paragraphStatusImpl';
 import {ParagraphStatus} from './paragraphStatus/paragraphStatus';
+import {ParagraphConfiguration} from './paragraphConfiguration/paragraphConfiguration';
 
 export class ParagraphDataImpl implements ParagraphData {
   private readonly _paragraphData: SafeJson;
@@ -63,7 +64,7 @@ export class ParagraphDataImpl implements ParagraphData {
     return this._paragraphData.getProperty('id', 'string');
   }
 
-  config(): object {
+  config(): ParagraphConfiguration {
     return this._paragraphData.getProperty('config', 'object');
   }
 

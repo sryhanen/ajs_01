@@ -43,16 +43,17 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphOutputData} from './paragraphOutputData/paragraphOutputData';
-import {ParagraphStatus} from './paragraphStatus/paragraphStatus';
-import {ParagraphConfiguration} from './paragraphConfiguration/paragraphConfiguration';
+import {ParagraphConfiguration} from './paragraphConfiguration';
+import {SafeJson} from '../../../safeJson/safeJson';
 
-export interface ParagraphData {
-  id():string;
-  config():ParagraphConfiguration;
-  settings():object;
-  text():string;
-  title():string;
-  status():ParagraphStatus;
-  output():ParagraphOutputData;
+export class ParagraphConfigurationImpl implements ParagraphConfiguration {
+  private readonly _paragraphConfig:SafeJson;
+
+  constructor(paragraphConfig:SafeJson) {
+    this._paragraphConfig = paragraphConfig;
+  }
+
+  lineNumbersAreVisible(): boolean {
+    return this._paragraphConfig.getProperty('lineNumbers', 'boolean');
+  }
 }

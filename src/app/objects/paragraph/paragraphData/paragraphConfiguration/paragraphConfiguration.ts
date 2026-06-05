@@ -43,16 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphOutputData} from './paragraphOutputData/paragraphOutputData';
-import {ParagraphStatus} from './paragraphStatus/paragraphStatus';
-import {ParagraphConfiguration} from './paragraphConfiguration/paragraphConfiguration';
-
-export interface ParagraphData {
-  id():string;
-  config():ParagraphConfiguration;
-  settings():object;
-  text():string;
-  title():string;
-  status():ParagraphStatus;
-  output():ParagraphOutputData;
+export interface ParagraphConfiguration {
+  lineNumbersAreVisible():boolean;
 }
