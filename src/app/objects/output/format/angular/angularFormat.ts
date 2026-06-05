@@ -51,6 +51,7 @@ import {AngularPluginImpl} from '../../plugins/angularPlugin/angularPluginImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {OutputType} from '../../outputType';
 import {OutputPlugin} from '../../plugins/outputPlugin';
+import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
 
 export class AngularFormat implements OutputFormat {
   private readonly _channel: Channel;
@@ -58,9 +59,9 @@ export class AngularFormat implements OutputFormat {
   private readonly _switcherButtons: OutputSwitcherButton[];
   private readonly _outputType:string;
 
-  constructor(channel: Channel, angularObjectCollection:AngularObjectCollection) {
+  constructor(channel: Channel) {
     this._channel = channel;
-    this._angularObjectCollection = angularObjectCollection;
+    this._angularObjectCollection = new AngularObjectCollectionImpl(this._channel);
     this._switcherButtons = [];
     this._outputType = OutputType.angular;
   }

@@ -55,7 +55,7 @@ import {EditorView} from '../editor/editorView';
     EditorView
   ],
   template: `
-    @if (paragraphId === paragraph.id()) {
+    @if (paragraphId === paragraph.paragraphData().id()) {
       <editor [editor]="paragraph.editor()" [paragraphId]="paragraphId"></editor>
       <output-container [outputContainer]="paragraph.outputContainer()"></output-container>
     }

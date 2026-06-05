@@ -48,7 +48,6 @@ import {Channel} from '../channel/channel';
 import {Request} from '../channel/request';
 import {OutputContainer} from '../output/container/outputContainer';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
-import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {MessageImpl} from '../message/messageImpl';
 import {EditorImpl} from '../editor/editorImpl';
@@ -57,12 +56,10 @@ import {CommitParagraphRequest} from './requests/commitParagraph/commitParagraph
 import {DefaultRequest} from './requests/default/defaultRequest';
 import {ParagraphData} from './paragraphData/paragraphData';
 import {ParagraphDataImpl} from './paragraphData/paragraphDataImpl';
-import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
-  private readonly _angularObjectCollection: AngularObjectCollection;
   private readonly _paragraphData: ParagraphData;
   private readonly _requests: Request[];
   private readonly _editor:EditorImpl;
@@ -70,8 +67,7 @@ export class ParagraphImpl implements Paragraph{
   constructor(channel: Channel, paragraphData: object) {
     this._channel = channel;
     this._paragraphData = new ParagraphDataImpl(paragraphData);
-    this._angularObjectCollection = new AngularObjectCollectionImpl(this);
-    this._outputContainer = new OutputContainerImpl(this, this._angularObjectCollection);
+    this._outputContainer = new OutputContainerImpl(this);
     this._editor = new EditorImpl(this, this._paragraphData);
     const paragraphDataOutput = this._paragraphData.output();
     if(!paragraphDataOutput.isStub()){
@@ -91,8 +87,8 @@ export class ParagraphImpl implements Paragraph{
     ];
   }
 
-  id(): string {
-    return this._paragraphData.id();
+  paragraphData(): ParagraphData {
+    return this._paragraphData;
   }
 
   outputContainer(): OutputContainer {
@@ -103,20 +99,12 @@ export class ParagraphImpl implements Paragraph{
     return this._editor;
   }
 
-  print():object {
-    return {
-      text:this._paragraphData.text(),
-      config:this._paragraphData.config(),
-      settings: this._paragraphData.settings(),
-    };
-  }
-
   request(data: object): void {
     const message = new MessageImpl(new SafeJsonImpl(data));
     const messageData = new SafeJsonImpl(message.data());
     if(messageData.propertyExists('paragraphId')){
       const decoratedData = message.data();
-      decoratedData['paragraphId'] = this.id();
+      decoratedData['paragraphId'] = this._paragraphData.id();
       const decoratedRequest = {
         op:message.operation(),
         data:decoratedData,
@@ -133,15 +121,13 @@ export class ParagraphImpl implements Paragraph{
     const messageData = new SafeJsonImpl(message.data());
     if(messageData.propertyExists('paragraphId')){
       const paragraphId:string = messageData.getProperty('paragraphId', 'string');
-      if(paragraphId === this.id()){
+      if(paragraphId === this._paragraphData.id()){
         this._outputContainer.response(data);
-        this._angularObjectCollection.response(data);
         this._editor.response(data);
       }
     }
     else{
       this._outputContainer.response(data);
-      this._angularObjectCollection.response(data);
       this._editor.response(data);
     }
   }

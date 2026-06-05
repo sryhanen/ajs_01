@@ -66,7 +66,7 @@ export class ParagraphRemovedResponse implements Response {
       }
       const paragraphRemovedData = new SafeJsonImpl(message.data());
       const removedParagraphId:string = paragraphRemovedData.getProperty('id', 'string');
-      const removedParagraphIndex = this._paragraphs.findIndex(paragraph => paragraph.id() === removedParagraphId);
+      const removedParagraphIndex = this._paragraphs.findIndex(paragraph => paragraph.paragraphData().id() === removedParagraphId);
       if(removedParagraphIndex === -1) {
         throw new Error(`Paragraph delete failed: Paragraph "${removedParagraphId}" not found in current collection.`);
       }

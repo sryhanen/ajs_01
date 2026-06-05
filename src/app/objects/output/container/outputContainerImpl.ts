@@ -55,7 +55,6 @@ import {uPlotFormat} from '../format/uPlot/uPlotFormat';
 import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
 import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/interpreterErrorListenerImpl';
 import {AngularFormat} from '../format/angular/angularFormat';
-import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 import {HTMLFormat} from '../format/html/htmlFormat';
 import {ParagraphOutputResponseImpl} from './responses/paragraphOutputResponse/paragraphOutputResponseImpl';
 import {OutputPlugin} from '../plugins/outputPlugin';
@@ -75,13 +74,13 @@ export class OutputContainerImpl implements OutputContainer{
   private readonly _activePlugin:PushValue<OutputPlugin>;
   private readonly _dplLog:DplLog;
 
-  constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
+  constructor(channel:Channel) {
     this._channel = channel;
     this._outputFormats = [
       new DataTablesFormat(this),
       new uPlotFormat(),
       new TextFormat(),
-      new AngularFormat(this, angularObjectCollection),
+      new AngularFormat(this),
       new HTMLFormat()
     ];
     this._outputSwitcher = new OutputSwitcherImpl(this);

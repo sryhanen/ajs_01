@@ -46,10 +46,10 @@
 import {Channel} from '../channel/channel';
 import {OutputContainer} from '../output/container/outputContainer';
 import {Editor} from '../editor/editor';
+import {ParagraphData} from './paragraphData/paragraphData';
 
 export interface Paragraph extends Channel {
   outputContainer(): OutputContainer;
-  id(): string;
-  print(): object;
   editor():Editor;
+  paragraphData():ParagraphData;
 }

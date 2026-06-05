@@ -69,9 +69,9 @@ export class ParagraphResponse implements Response {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'PARAGRAPH') {
       const newParagraph = new ParagraphImpl(this._channel, message.data());
-      const paragraphIndex = this._paragraphs.findIndex(paragraph => paragraph.id() === newParagraph.id());
+      const paragraphIndex = this._paragraphs.findIndex(paragraph => paragraph.paragraphData().id() === newParagraph.paragraphData().id());
       if(paragraphIndex === -1){
-        throw new Error(`Paragraph update failed: Paragraph "${newParagraph.id()}" not found in current collection.`);
+        throw new Error(`Paragraph update failed: Paragraph "${newParagraph.paragraphData().id()}" not found in current collection.`);
       }
       this._paragraphs.splice(paragraphIndex, 1, newParagraph);
       this._pushParagraphs.forEach(value => value.update(this._paragraphs));

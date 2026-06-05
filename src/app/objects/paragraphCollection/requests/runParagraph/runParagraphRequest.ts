@@ -64,7 +64,7 @@ export class RunParagraphRequest implements Request {
     if(message.operation() === 'RUN_PARAGRAPH'){
       const runParagraphData = new SafeJsonImpl(message.data());
       const paragraphId:string = runParagraphData.getProperty('id', 'string');
-      const decoratorParagraph = this._paragraphs.find(paragraph => paragraph.id() === paragraphId);
+      const decoratorParagraph = this._paragraphs.find(paragraph => paragraph.paragraphData().id() === paragraphId);
       if(decoratorParagraph === undefined){
         throw new Error(`Failed to decorate run paragraph request: paragraph "${paragraphId}" not found in collection`);
       }
@@ -74,11 +74,10 @@ export class RunParagraphRequest implements Request {
 
   private decoratedMessage(message:Message, decoratorParagraph:Paragraph):object {
     const data = message.data();
-    const decoratorData = new SafeJsonImpl(decoratorParagraph.print());
-    data['paragraph'] = decoratorData.getProperty<string>('text', 'string');
-    data['config'] = decoratorData.getProperty<object>('config', 'object');
-    const settings = decoratorData.getProperty<object>('settings', 'object');
-    data['params'] = new SafeJsonImpl(settings).getProperty<object>('params', 'object');
+    const decoratorParagraphData = decoratorParagraph.paragraphData();
+    data['paragraph'] = decoratorParagraphData.text();
+    data['config'] = decoratorParagraphData.config();
+    data['params'] = decoratorParagraphData.settings();
     return {
       op: message.operation(),
       data: data
