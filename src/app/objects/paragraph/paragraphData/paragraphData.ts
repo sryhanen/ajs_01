@@ -45,11 +45,10 @@
  */
 import {ParagraphOutputData} from './paragraphOutputData/paragraphOutputData';
 import {ParagraphStatus} from './paragraphStatus/paragraphStatus';
-import {ParagraphConfiguration} from './paragraphConfiguration/paragraphConfiguration';
 
 export interface ParagraphData {
   id():string;
-  config():ParagraphConfiguration;
+  config():object;
   settings():object;
   text():string;
   title():string;

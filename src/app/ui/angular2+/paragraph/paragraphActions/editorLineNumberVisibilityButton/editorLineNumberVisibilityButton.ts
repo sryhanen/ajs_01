@@ -46,6 +46,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Paragraph} from '../../../../../objects/paragraph/paragraph';
 import {CommitParagraphMessage} from '../../../../../objects/message/commitParagraph/commitParagraphMessage';
+import {
+  ParagraphConfigurationImpl
+} from '../../../../../objects/paragraph/paragraphData/paragraphConfiguration/paragraphConfigurationImpl';
+import {SafeJsonImpl} from '../../../../../objects/safeJson/safeJsonImpl';
 
 @Component({
   selector: 'editor-line-number-visibility-button',
@@ -63,7 +67,8 @@ export class EditorLineNumberVisibilityButton implements OnInit {
   protected lineNumbersAreVisible:boolean;
 
   ngOnInit():void {
-    this.lineNumbersAreVisible = this.paragraph.paragraphData().config().lineNumbersAreVisible();
+    const paragraphConfig = new ParagraphConfigurationImpl(new SafeJsonImpl(this.paragraph.paragraphData().config()));
+    this.lineNumbersAreVisible = paragraphConfig.lineNumbersAreVisible();
   }
 
   toggleVisibility():void {

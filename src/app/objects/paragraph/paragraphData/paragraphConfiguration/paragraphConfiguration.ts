@@ -45,4 +45,5 @@
  */
 export interface ParagraphConfiguration {
   lineNumbersAreVisible():boolean;
+  titleIsVisible():boolean;
 }

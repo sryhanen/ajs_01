@@ -56,4 +56,8 @@ export class ParagraphConfigurationImpl implements ParagraphConfiguration {
   lineNumbersAreVisible(): boolean {
     return this._paragraphConfig.getProperty('lineNumbers', 'boolean');
   }
+
+  titleIsVisible(): boolean {
+    return this._paragraphConfig.getProperty('title', 'boolean');
+  }
 }

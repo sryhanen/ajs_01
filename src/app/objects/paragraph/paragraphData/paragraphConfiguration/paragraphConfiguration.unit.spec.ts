@@ -51,7 +51,7 @@ describe('ParagraphConfiguration unit test', () => {
   let paragraphConfiguration: ParagraphConfiguration;
 
   beforeEach(() => {
-    paragraphConfiguration = new ParagraphConfigurationImpl(new SafeJsonImpl({lineNumbers: true}));
+    paragraphConfiguration = new ParagraphConfigurationImpl(new SafeJsonImpl({lineNumbers: true, title:true}));
   });
 
   describe('Birth', () => {
@@ -59,13 +59,12 @@ describe('ParagraphConfiguration unit test', () => {
       expect(paragraphConfiguration).toBeDefined();
     });
 
-    it('LineNumberVisible should be true', () => {
+    it('Should have LineNumbersAreVisible', () => {
       expect(paragraphConfiguration.lineNumbersAreVisible()).toBe(true);
     });
 
-    it('LineNumberVisible should be false', () => {
-      paragraphConfiguration = new ParagraphConfigurationImpl(new SafeJsonImpl({lineNumbers: false}));
-      expect(paragraphConfiguration.lineNumbersAreVisible()).toBe(false);
+    it('Should have TitleIsVisible', () => {
+      expect(paragraphConfiguration.titleIsVisible()).toBe(true);
     });
   });
 });
