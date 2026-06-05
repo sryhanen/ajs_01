@@ -59,14 +59,13 @@ import {PushValue} from '../../../objects/pushValue/pushValue';
   template: `
     @for (notebook of notebooks.value(); track notebook) {
       @if(notebook.id() === noteId){
-        <notebook [paragraphId]="paragraphId" [notebook]="notebook"></notebook>
+        <notebook [notebook]="notebook"></notebook>
       }
     }
   `
 })
 export class NotebookCollectionView implements OnInit {
   @Input({required:true}) noteId: string;
-  @Input({required:true}) paragraphId: string;
   private collection: NotebookCollection;
   protected notebooks:PushValue<Notebook[]>;
   private cdr = inject(ChangeDetectorRef);

@@ -55,13 +55,13 @@ import {EditorView} from '../editor/editorView';
     EditorView
   ],
   template: `
-    @if (paragraphId === paragraph.paragraphData().id()) {
-      <editor [editor]="paragraph.editor()" [paragraphId]="paragraphId"></editor>
+    <div>
+      {{paragraph.paragraphData().id()}}
+      <editor [editor]="paragraph.editor()"></editor>
       <output-container [outputContainer]="paragraph.outputContainer()"></output-container>
-    }
+    </div>
   `
 })
 export class ParagraphView {
-  @Input({required:true}) paragraphId: string;
   @Input({required:true}) paragraph: Paragraph;
 }

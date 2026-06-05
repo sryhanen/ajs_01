@@ -55,12 +55,11 @@ import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectio
   template: `
     @let paragraphCollection = notebook.paragraphCollection();
     @if(!paragraphCollection.isStub()) {
-      <paragraph-collection [paragraphCollection]="paragraphCollection" [paragraphId]="paragraphId"></paragraph-collection>
+      <paragraph-collection [paragraphCollection]="paragraphCollection"></paragraph-collection>
     }
 
   `
 })
 export class NotebookView {
-  @Input({required:true}) paragraphId: string;
   @Input({required:true}) notebook: Notebook;
 }

@@ -57,12 +57,11 @@ import {PushValue} from '../../../objects/pushValue/pushValue';
   ],
   template: `
     @for (paragraph of this.paragraphs.value(); track paragraph) {
-      <paragraph [paragraphId]="paragraphId" [paragraph]="paragraph"></paragraph>
+      <paragraph [paragraph]="paragraph"></paragraph>
     }
   `
 })
 export class ParagraphCollectionView implements OnInit {
-  @Input({required:true}) paragraphId: string;
   @Input({required:true}) paragraphCollection: ParagraphCollection;
   protected paragraphSignal = signal<Paragraph[]>([]);
   protected paragraphs: PushValue<Paragraph[]>;

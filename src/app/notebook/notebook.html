@@ -134,13 +134,16 @@ limitations under the License.
         </div>
       </div>
       <!-- Include the paragraphs according to the note, pass the note to init function -->
+
+      <notebook-collection  [note-id]="note.id"></notebook-collection>
+
+      <!-- Legacy paragraph, delete when feature done
       <div id="{{currentParagraph.id}}_paragraphColumn_main"
            ng-hide="currentParagraph.title === 'hideMeSparkPinger' && $index === 0"
            ng-repeat="currentParagraph in note.paragraphs"
            ng-controller="ParagraphCtrl"
            ng-init="init(currentParagraph, note)"
            ng-class="columnWidthClass(currentParagraph.config.colWidth)">
-        <!-- see ZEPPELIN-2806 viewport-watch> -->
         <div class="new-paragraph"
              ng-click="insertNew('above')"
              ng-hide="viewOnly || asIframe || revisionView"
@@ -161,6 +164,7 @@ limitations under the License.
           Add Paragraph
         </div>
       </div>
+      -->
     </div>
   </div>
 </div>
