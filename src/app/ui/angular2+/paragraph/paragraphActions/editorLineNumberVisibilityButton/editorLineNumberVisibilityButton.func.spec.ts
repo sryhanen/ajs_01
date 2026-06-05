@@ -43,27 +43,44 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
+import {Paragraph} from '../../../../../objects/paragraph/paragraph';
+import {ComponentFixture} from '@angular/core/testing';
+import {render, screen} from '@testing-library/angular';
+import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton';
+import {ParagraphImpl} from '../../../../../objects/paragraph/paragraphImpl';
+import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
+import {Channel} from '../../../../../objects/channel/channel';
 
-@Component({
-  selector: 'paragraph-actions',
-  imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton
-  ],
-  template: `
-    <div class="control d-flex align-items-center">
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
-  `
-})
-export class ParagraphActionsView {
-  @Input({required:true}) paragraph: Paragraph;
-}
+describe('EditorLineNumberVisibilityButton functional test', () => {
+  let paragraph: Paragraph;
+  let channel: Channel;
+  let fixture: ComponentFixture<EditorLineNumberVisibilityButton>;
+
+  beforeEach(async () => {
+    channel = new FakeChannel();
+    paragraph = new ParagraphImpl(channel, {
+      id:'paragraphId',
+      text:'paragraph text',
+      config:{
+        lineNumbers:true,
+      },
+      settings:{},
+    });
+    const renderResult = await render(EditorLineNumberVisibilityButton, {
+      inputs:{
+        paragraph: paragraph
+      }
+    });
+    fixture = renderResult.fixture;
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have rendered button', () => {
+      expect(screen.getByRole('button')).toBeDefined();
+    });
+  });
+});

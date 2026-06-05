@@ -43,27 +43,36 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
+import {Component, Input, OnInit} from '@angular/core';
+import {Paragraph} from '../../../../../objects/paragraph/paragraph';
+import {CommitParagraphMessage} from '../../../../../objects/message/commitParagraph/commitParagraphMessage';
 
 @Component({
-  selector: 'paragraph-actions',
-  imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton
-  ],
+  selector: 'editor-line-number-visibility-button',
   template: `
-    <div class="control d-flex align-items-center">
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
+    @let title = lineNumbersAreVisible ? 'Hide line numbers' : 'Show line numbers';
+    <i class="fas fa-list-ol"
+       [title]="title"
+       role="button"
+       (click)="toggleVisibility()">
+    </i>
   `
 })
-export class ParagraphActionsView {
-  @Input({required:true}) paragraph: Paragraph;
+export class EditorLineNumberVisibilityButton implements OnInit {
+  @Input({required:true}) paragraph:Paragraph;
+  protected lineNumbersAreVisible:boolean;
+
+  ngOnInit():void {
+    this.lineNumbersAreVisible = this.paragraph.paragraphData().config().lineNumbersAreVisible();
+  }
+
+  toggleVisibility():void {
+    this.lineNumbersAreVisible = !this.lineNumbersAreVisible;
+    this.paragraph.editor().editorReference().renderer.setShowGutter(this.lineNumbersAreVisible);
+    const newConfig = {
+      lineNumbers: this.lineNumbersAreVisible,
+    };
+    const commitParagraphMessage = new CommitParagraphMessage(this.paragraph.paragraphData(), [{name:'config', value:newConfig}]);
+    this.paragraph.request(commitParagraphMessage.message());
+  }
 }
