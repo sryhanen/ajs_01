@@ -43,13 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {RunParagraphMessage} from './runParagraphMessage';
 import {ParagraphData} from '../../paragraph/paragraphData/paragraphData';
 import {ParagraphDataImpl} from '../../paragraph/paragraphData/paragraphDataImpl';
-import {RunParagraphMessageImpl} from './runParagraphMessageImpl';
+import {RunParagraphMessage} from './runParagraphMessage';
+import {Message} from '../message';
 
 describe('RunParagraphMessage unit test', () => {
-  let runParagraphMessage: RunParagraphMessage;
+  let runParagraphMessage: Message;
   let paragraphData: ParagraphData;
 
   beforeEach(() => {
@@ -59,7 +59,7 @@ describe('RunParagraphMessage unit test', () => {
       config:{},
       settings:{}
     });
-    runParagraphMessage = new RunParagraphMessageImpl(paragraphData);
+    runParagraphMessage = new RunParagraphMessage(paragraphData);
   });
 
   describe('Birth', () => {

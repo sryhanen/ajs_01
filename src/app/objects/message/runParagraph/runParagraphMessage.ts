@@ -43,11 +43,33 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {ParagraphData} from '../../paragraph/paragraphData/paragraphData';
 import {Message} from '../message';
 
-export interface RunParagraphMessage extends Message {
-  message(): {
-    op:string;
-    data:object;
-  };
+export class RunParagraphMessage implements Message {
+  private readonly _paragraphData:ParagraphData;
+
+  constructor(paragraphData:ParagraphData) {
+    this._paragraphData = paragraphData;
+  }
+
+  data(): object {
+    return {
+      id:this._paragraphData.id(),
+      paragraph:this._paragraphData.text(),
+      config:this._paragraphData.config(),
+      params:this._paragraphData.settings()
+    };
+  }
+
+  message(): { op: string; data: object } {
+    return {
+      op: this.operation(),
+      data: this.data(),
+    };
+  }
+
+  operation(): string {
+    return 'RUN_PARAGRAPH';
+  }
 }
