@@ -43,30 +43,40 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
-import {ParagraphTitleVisibilityButton} from './paragraphTitleVisibilityButton/paragraphTitleVisibilityButton';
+import {Component, Input, OnInit} from '@angular/core';
+import {CommitParagraphMessage} from '../../../../../objects/message/commitParagraph/commitParagraphMessage';
+import {Paragraph} from '../../../../../objects/paragraph/paragraph';
+import {
+  ParagraphConfigurationImpl
+} from '../../../../../objects/paragraph/paragraphData/paragraphConfiguration/paragraphConfigurationImpl';
+import {SafeJsonImpl} from '../../../../../objects/safeJson/safeJsonImpl';
 
 @Component({
-  selector: 'paragraph-actions',
-  imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton,
-    ParagraphTitleVisibilityButton
-  ],
+  selector: 'paragraph-title-visibility-button',
   template: `
-    <div class="control d-flex align-items-center">
-      <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
+    @let title = isTitleVisible ? 'Hide title':'Show title';
+    <i class="fas fa-font me-3"
+       role="button"
+       (click)="toggleTitle()"
+       [title]="title">
+    </i>
   `
 })
-export class ParagraphActionsView {
+export class ParagraphTitleVisibilityButton implements OnInit {
   @Input({required:true}) paragraph: Paragraph;
+  protected isTitleVisible: boolean;
+
+  ngOnInit(){
+    const paragraphConfiguration = new ParagraphConfigurationImpl(new SafeJsonImpl(this.paragraph.paragraphData().config()));
+    this.isTitleVisible = paragraphConfiguration.titleIsVisible();
+  }
+
+  toggleTitle() {
+    this.isTitleVisible = !this.isTitleVisible;
+    const paragraphData = this.paragraph.paragraphData();
+    const newConfig = paragraphData.config();
+    newConfig['title'] = this.isTitleVisible;
+    const commitParagraphMessage = new CommitParagraphMessage(paragraphData, [{name:'config', value:newConfig }]);
+    this.paragraph.request(commitParagraphMessage.message());
+  }
 }

@@ -43,30 +43,69 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
-import {ParagraphTitleVisibilityButton} from './paragraphTitleVisibilityButton/paragraphTitleVisibilityButton';
+import {fireEvent, render, screen} from '@testing-library/angular';
+import {ParagraphTitleVisibilityButton} from './paragraphTitleVisibilityButton';
+import {Paragraph} from '../../../../../objects/paragraph/paragraph';
+import {ComponentFixture} from '@angular/core/testing';
+import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
+import {ParagraphImpl} from '../../../../../objects/paragraph/paragraphImpl';
+import {Channel} from '../../../../../objects/channel/channel';
 
-@Component({
-  selector: 'paragraph-actions',
-  imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton,
-    ParagraphTitleVisibilityButton
-  ],
-  template: `
-    <div class="control d-flex align-items-center">
-      <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
-  `
-})
-export class ParagraphActionsView {
-  @Input({required:true}) paragraph: Paragraph;
-}
+describe('ParagraphTitleVisibility functional test', () => {
+  let paragraph:Paragraph;
+  let channel:Channel;
+  let fixture: ComponentFixture<ParagraphTitleVisibilityButton>;
+
+  beforeEach(async () => {
+    channel = new FakeChannel();
+    paragraph = new ParagraphImpl(channel, {
+      id: '',
+      text: '',
+      config:{
+        title:true
+      },
+      settings:{}
+    });
+    const renderResult = await render(ParagraphTitleVisibilityButton, {
+      inputs:{
+        paragraph: paragraph
+      }
+    });
+    fixture = renderResult.fixture;
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized',  () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have rendered button', () => {
+      expect(screen.getByRole('button')).toBeDefined();
+    });
+  });
+
+  describe('User interaction', () => {
+    let requestSpy;
+    beforeEach(() => {
+      requestSpy = vi.spyOn(channel, 'request');
+    });
+
+    it('Should send expected request on click',  () => {
+      const expectedRequest = {
+        op:'COMMIT_PARAGRAPH',
+        data:{
+          id:'',
+          paragraph:'',
+          title:'',
+          noteId:'',
+          config:{
+            title:false
+          },
+          params:{}
+        }
+      };
+      fireEvent.click(screen.getByRole('button'));
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
+});
