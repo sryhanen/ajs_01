@@ -55,7 +55,7 @@ import {SafeJsonImpl} from '../../../../../objects/safeJson/safeJsonImpl';
   selector: 'editor-line-number-visibility-button',
   template: `
     @let title = lineNumbersAreVisible ? 'Hide line numbers' : 'Show line numbers';
-    <i class="fas fa-list-ol"
+    <i class="fas fa-list-ol me-2"
        [title]="title"
        role="button"
        (click)="toggleVisibility()">

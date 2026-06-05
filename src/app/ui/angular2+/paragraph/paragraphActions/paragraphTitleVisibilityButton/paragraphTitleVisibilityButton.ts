@@ -55,7 +55,7 @@ import {SafeJsonImpl} from '../../../../../objects/safeJson/safeJsonImpl';
   selector: 'paragraph-title-visibility-button',
   template: `
     @let title = isTitleVisible ? 'Hide title':'Show title';
-    <i class="fas fa-font me-3"
+    <i class="fas fa-font me-2"
        role="button"
        (click)="toggleTitle()"
        [title]="title">
