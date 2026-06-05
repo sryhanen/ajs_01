@@ -43,38 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Message} from './message';
-import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {MessageImpl} from './messageImpl';
+import {Message} from '../message';
 
-describe('Message', () => {
-  const json = {
-    op:'operation',
-    data:{
-      test:'test'
-    }
-  };
-  let message:Message;
+export class CancelParagraphMessage implements Message{
+  private readonly _paragraphId:string;
 
-  describe('Birth', () => {
-    beforeEach(() => {
-      message = new MessageImpl(new SafeJsonImpl(json));
-    });
+  constructor(paragraphId:string) {
+    this._paragraphId = paragraphId;
+  }
 
-    it('Should have been initialized', () => {
-      expect(message).toBeInstanceOf(MessageImpl);
-    });
+  data(): object {
+    return {
+      id:this._paragraphId,
+    };
+  }
 
-    it('Should have operation', () => {
-      expect(message.operation()).toEqual(json.op);
-    });
+  message(): { op: string; data: object } {
+    return {
+      op: this.operation(),
+      data: this.data()
+    };
+  }
 
-    it('Should have data', () => {
-      expect(message.data()).toEqual(json.data);
-    });
-
-    it('Should have message', () => {
-      expect(message.message()).toEqual(json);
-    });
-  });
-});
+  operation(): string {
+    return 'CANCEL_PARAGRAPH';
+  }
+}

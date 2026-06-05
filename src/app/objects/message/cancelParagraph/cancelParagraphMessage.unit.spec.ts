@@ -43,38 +43,41 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Message} from './message';
-import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {MessageImpl} from './messageImpl';
+import {Message} from '../message';
+import {CancelParagraphMessage} from './cancelParagraphMessage';
 
-describe('Message', () => {
-  const json = {
-    op:'operation',
-    data:{
-      test:'test'
-    }
-  };
-  let message:Message;
+describe('CancelParagraphMessage unit test', () => {
+  let cancelParagraphMessage: Message;
+  const paragraphId = 'paragraphId';
+
+  beforeEach(() => {
+    cancelParagraphMessage = new CancelParagraphMessage(paragraphId);
+  });
 
   describe('Birth', () => {
-    beforeEach(() => {
-      message = new MessageImpl(new SafeJsonImpl(json));
-    });
+    const expectedOperation = 'CANCEL_PARAGRAPH';
+    const expectedData = {
+      id:paragraphId
+    };
 
-    it('Should have been initialized', () => {
-      expect(message).toBeInstanceOf(MessageImpl);
+    it('Should be initialized', () => {
+      expect(cancelParagraphMessage).toBeDefined();
     });
 
     it('Should have operation', () => {
-      expect(message.operation()).toEqual(json.op);
+      expect(cancelParagraphMessage.operation()).toEqual(expectedOperation);
     });
 
     it('Should have data', () => {
-      expect(message.data()).toEqual(json.data);
+      expect(cancelParagraphMessage.data()).toEqual(expectedData);
     });
 
     it('Should have message', () => {
-      expect(message.message()).toEqual(json);
+      const expectedMessage = {
+        op:expectedOperation,
+        data:expectedData
+      };
+      expect(cancelParagraphMessage.message()).toEqual(expectedMessage);
     });
   });
 });
