@@ -65,6 +65,8 @@ export default class ParagraphImpl implements ParagraphDTO {
     forms: {}
   };
   readonly config = {
+    editorHide:true,
+    tableHide:true,
     lineNumbers: true,
     editorSetting: {
       language: 'dpl',
