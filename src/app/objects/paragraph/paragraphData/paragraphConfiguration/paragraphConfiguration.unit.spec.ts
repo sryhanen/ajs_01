@@ -66,5 +66,13 @@ describe('ParagraphConfiguration unit test', () => {
     it('Should have TitleIsVisible', () => {
       expect(paragraphConfiguration.titleIsVisible()).toBe(true);
     });
+
+    it('Should have outputIsVisible', () => {
+      expect(paragraphConfiguration.outputIsVisible()).toBe(false);
+    });
+
+    it('Should have editorIsVisible', () => {
+      expect(paragraphConfiguration.editorIsVisible()).toBe(false);
+    });
   });
 });

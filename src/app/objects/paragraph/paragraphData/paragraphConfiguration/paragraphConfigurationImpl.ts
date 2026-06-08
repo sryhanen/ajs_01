@@ -60,4 +60,26 @@ export class ParagraphConfigurationImpl implements ParagraphConfiguration {
   titleIsVisible(): boolean {
     return this._paragraphConfig.getProperty('title', 'boolean');
   }
+
+  editorIsVisible(): boolean {
+    let editorIsVisible:boolean;
+    if(this._paragraphConfig.propertyExists('editorHide')){
+      editorIsVisible = this._paragraphConfig.getProperty('editorHide', 'boolean');
+    }
+    else{
+      editorIsVisible = false;
+    }
+    return editorIsVisible;
+  }
+
+  outputIsVisible(): boolean {
+    let outputIsVisible:boolean;
+    if(this._paragraphConfig.propertyExists('tableHide')){
+      outputIsVisible = this._paragraphConfig.getProperty('tableHide', 'boolean');
+    }
+    else{
+      outputIsVisible = false;
+    }
+    return outputIsVisible;
+  }
 }

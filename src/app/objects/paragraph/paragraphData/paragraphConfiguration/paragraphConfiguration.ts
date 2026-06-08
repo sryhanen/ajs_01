@@ -46,4 +46,6 @@
 export interface ParagraphConfiguration {
   lineNumbersAreVisible():boolean;
   titleIsVisible():boolean;
+  editorIsVisible():boolean;
+  outputIsVisible():boolean;
 }

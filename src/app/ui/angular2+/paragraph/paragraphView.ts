@@ -43,11 +43,15 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {Paragraph} from '../../../objects/paragraph/paragraph';
 import {OutputContainerView} from '../output/container/outputContainerView';
 import {EditorView} from '../editor/editorView';
 import {ParagraphActionsView} from './paragraphActions/paragraphActionsView';
+import {
+  ParagraphConfigurationImpl
+} from '../../../objects/paragraph/paragraphData/paragraphConfiguration/paragraphConfigurationImpl';
+import {SafeJsonImpl} from '../../../objects/safeJson/safeJsonImpl';
 
 @Component({
   selector: 'paragraph',
@@ -59,11 +63,23 @@ import {ParagraphActionsView} from './paragraphActions/paragraphActionsView';
   template: `
     <div class="paragraph-box paragraph">
       <paragraph-actions [paragraph]="paragraph"></paragraph-actions>
-      <editor [editor]="paragraph.editor()"></editor>
-      <output-container [outputContainer]="paragraph.outputContainer()"></output-container>
+      @if(editorIsVisible){
+        <editor [editor]="paragraph.editor()"></editor>
+      }
+      @if(outputIsVisible){
+        <output-container [outputContainer]="paragraph.outputContainer()"></output-container>
+      }
     </div>
   `
 })
-export class ParagraphView {
+export class ParagraphView implements OnInit {
   @Input({required:true}) paragraph: Paragraph;
+  protected editorIsVisible = false;
+  protected outputIsVisible = false;
+
+  ngOnInit() {
+    const config = new ParagraphConfigurationImpl(new SafeJsonImpl(this.paragraph.paragraphData().config()));
+    this.editorIsVisible = config.editorIsVisible();
+    this.outputIsVisible = config.outputIsVisible();
+  }
 }
