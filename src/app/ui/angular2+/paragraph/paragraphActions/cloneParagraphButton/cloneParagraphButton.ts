@@ -44,35 +44,30 @@
  * a licensee so wish it.
  */
 import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
-import {ParagraphTitleVisibilityButton} from './paragraphTitleVisibilityButton/paragraphTitleVisibilityButton';
-import {ClearParagraphOutputButton} from './clearParagraphOutputButton/clearParagraphOutputButton';
-import {CloneParagraphButton} from './cloneParagraphButton/cloneParagraphButton';
+import {Paragraph} from '../../../../../objects/paragraph/paragraph';
+import {NgClass} from '@angular/common';
+import {CopyParagraphMessage} from '../../../../../objects/message/copyParagraph/copyParagraphMessage';
 
 @Component({
-  selector: 'paragraph-actions',
+  selector: 'clone-paragraph-button',
   imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton,
-    ParagraphTitleVisibilityButton,
-    ClearParagraphOutputButton,
-    CloneParagraphButton
+    NgClass
   ],
   template: `
-    <div class="control d-flex align-items-center">
-      <clone-paragraph-button [paragraph]="paragraph"></clone-paragraph-button>
-      <clear-paragraph-output-button [paragraph]="paragraph"></clear-paragraph-output-button>
-      <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
+    @let isParagraphRunning = paragraph.paragraphData().status().isRunning();
+    <i class="fas fa-copy me-3"
+       title="Clone paragraph"
+       role="button"
+       (click)="sendCopyParagraphMessage()"
+       [ngClass]="{'item-disable': isParagraphRunning}">
+    </i>
   `
 })
-export class ParagraphActionsView {
-  @Input({required:true}) paragraph: Paragraph;
+export class CloneParagraphButton {
+  @Input({required:true}) paragraph:Paragraph;
+
+  sendCopyParagraphMessage(): void {
+    const copyParagraphMessage = new CopyParagraphMessage(this.paragraph.paragraphData());
+    this.paragraph.request(copyParagraphMessage.message());
+  }
 }

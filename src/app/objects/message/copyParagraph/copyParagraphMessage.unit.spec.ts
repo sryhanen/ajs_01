@@ -43,36 +43,54 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
-import {ParagraphTitleVisibilityButton} from './paragraphTitleVisibilityButton/paragraphTitleVisibilityButton';
-import {ClearParagraphOutputButton} from './clearParagraphOutputButton/clearParagraphOutputButton';
-import {CloneParagraphButton} from './cloneParagraphButton/cloneParagraphButton';
+import {Message} from '../message';
+import {CopyParagraphMessage} from './copyParagraphMessage';
+import {ParagraphData} from '../../paragraph/paragraphData/paragraphData';
+import {ParagraphDataImpl} from '../../paragraph/paragraphData/paragraphDataImpl';
 
-@Component({
-  selector: 'paragraph-actions',
-  imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton,
-    ParagraphTitleVisibilityButton,
-    ClearParagraphOutputButton,
-    CloneParagraphButton
-  ],
-  template: `
-    <div class="control d-flex align-items-center">
-      <clone-paragraph-button [paragraph]="paragraph"></clone-paragraph-button>
-      <clear-paragraph-output-button [paragraph]="paragraph"></clear-paragraph-output-button>
-      <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
-  `
-})
-export class ParagraphActionsView {
-  @Input({required:true}) paragraph: Paragraph;
-}
+describe('CopyParagraphMessage unit test', () => {
+  let copyParagraphMessage: Message;
+  let paragraphData: ParagraphData;
+  const paragraphProperties = {
+    id:'paragraphId',
+    text:'text',
+    title:'title',
+    config:{},
+    settings:{}
+  };
+
+  beforeEach(() => {
+    paragraphData = new ParagraphDataImpl(paragraphProperties);
+    copyParagraphMessage = new CopyParagraphMessage(paragraphData);
+  });
+
+  describe('Birth', () => {
+    const expectedData = {
+      index:0,
+      paragraph:paragraphProperties.text,
+      title:paragraphProperties.title,
+      config:paragraphProperties.config,
+      params:paragraphProperties.settings
+    };
+
+    it('Should be initialized', () => {
+      expect(copyParagraphMessage).toBeDefined();
+    });
+
+    it('Should have operation', () => {
+      expect(copyParagraphMessage.operation()).toEqual('COPY_PARAGRAPH');
+    });
+
+    it('Should have data', () => {
+      expect(copyParagraphMessage.data()).toEqual(expectedData);
+    });
+
+    it('Should have message', () => {
+      const expectedMessage = {
+        op:'COPY_PARAGRAPH',
+        data:expectedData
+      };
+      expect(copyParagraphMessage.message()).toEqual(expectedMessage);
+    });
+  });
+});

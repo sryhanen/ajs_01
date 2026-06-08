@@ -43,36 +43,34 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
-import {ParagraphTitleVisibilityButton} from './paragraphTitleVisibilityButton/paragraphTitleVisibilityButton';
-import {ClearParagraphOutputButton} from './clearParagraphOutputButton/clearParagraphOutputButton';
-import {CloneParagraphButton} from './cloneParagraphButton/cloneParagraphButton';
+import {Message} from '../message';
+import {ParagraphData} from '../../paragraph/paragraphData/paragraphData';
 
-@Component({
-  selector: 'paragraph-actions',
-  imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton,
-    ParagraphTitleVisibilityButton,
-    ClearParagraphOutputButton,
-    CloneParagraphButton
-  ],
-  template: `
-    <div class="control d-flex align-items-center">
-      <clone-paragraph-button [paragraph]="paragraph"></clone-paragraph-button>
-      <clear-paragraph-output-button [paragraph]="paragraph"></clear-paragraph-output-button>
-      <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
-  `
-})
-export class ParagraphActionsView {
-  @Input({required:true}) paragraph: Paragraph;
+export class CopyParagraphMessage implements Message{
+  private readonly _paragraphData: ParagraphData;
+
+  constructor(paragraphData: ParagraphData) {
+    this._paragraphData = paragraphData;
+  }
+
+  data(): object {
+    return {
+      index:0,
+      title:this._paragraphData.title(),
+      paragraph:this._paragraphData.text(),
+      config:this._paragraphData.config(),
+      params:this._paragraphData.settings()
+    };
+  }
+
+  message(): { op: string; data: object } {
+    return {
+      op: this.operation(),
+      data: this.data()
+    };
+  }
+
+  operation(): string {
+    return 'COPY_PARAGRAPH';
+  }
 }
