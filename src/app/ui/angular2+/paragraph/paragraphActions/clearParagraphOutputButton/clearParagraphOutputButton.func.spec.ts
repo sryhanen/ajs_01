@@ -43,33 +43,55 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
-import {ParagraphTitleVisibilityButton} from './paragraphTitleVisibilityButton/paragraphTitleVisibilityButton';
-import {ClearParagraphOutputButton} from './clearParagraphOutputButton/clearParagraphOutputButton';
+import {render, screen, fireEvent} from '@testing-library/angular';
+import {ComponentFixture} from '@angular/core/testing';
+import {ClearParagraphOutputButton} from './clearParagraphOutputButton';
+import {Paragraph} from '../../../../../objects/paragraph/paragraph';
+import {ParagraphImpl} from '../../../../../objects/paragraph/paragraphImpl';
+import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
+import {Channel} from '../../../../../objects/channel/channel';
 
-@Component({
-  selector: 'paragraph-actions',
-  imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton,
-    ParagraphTitleVisibilityButton,
-    ClearParagraphOutputButton
-  ],
-  template: `
-    <div class="control d-flex align-items-center">
-      <clear-paragraph-output-button [paragraph]="paragraph"></clear-paragraph-output-button>
-      <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
-  `
-})
-export class ParagraphActionsView {
-  @Input({required:true}) paragraph: Paragraph;
-}
+describe('ClearParagraphOutputButton functional test', () => {
+  let fixture: ComponentFixture<ClearParagraphOutputButton>;
+  let channel:Channel;
+  let paragraph:Paragraph;
+
+  beforeEach(async () => {
+    channel = new FakeChannel();
+    paragraph = new ParagraphImpl(channel, {id:'paragraphId', status:'FINISHED'});
+    const renderResult = await render(ClearParagraphOutputButton, {
+      inputs:{
+        paragraph: paragraph
+      }
+    });
+    fixture = renderResult.fixture;
+  });
+
+  describe('Birth', () => {
+    it('Should have rendered', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have button visible', () => {
+      expect(screen.getByRole('button')).toBeDefined();
+    });
+  });
+
+  describe('User interaction', () => {
+    let requestSpy;
+    beforeEach(() => {
+      requestSpy = vi.spyOn(channel, 'request');
+    });
+
+    it('Should send request on button click', () => {
+      fireEvent.click(screen.getByRole('button'));
+      const expectedMessage = {
+        op:'PARAGRAPH_CLEAR_OUTPUT',
+        data:{
+          id:'paragraphId'
+        }
+      };
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedMessage);
+    });
+  });
+});

@@ -44,32 +44,32 @@
  * a licensee so wish it.
  */
 import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
-import {ParagraphTitleVisibilityButton} from './paragraphTitleVisibilityButton/paragraphTitleVisibilityButton';
-import {ClearParagraphOutputButton} from './clearParagraphOutputButton/clearParagraphOutputButton';
+import {Paragraph} from '../../../../../objects/paragraph/paragraph';
+import {
+  ParagraphClearOutputMessage
+} from '../../../../../objects/message/paragraphClearOutput/paragraphClearOutputMessage';
+import {NgClass} from '@angular/common';
 
 @Component({
-  selector: 'paragraph-actions',
+  selector: 'clear-paragraph-output-button',
   imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton,
-    ParagraphTitleVisibilityButton,
-    ClearParagraphOutputButton
+    NgClass
   ],
   template: `
-    <div class="control d-flex align-items-center">
-      <clear-paragraph-output-button [paragraph]="paragraph"></clear-paragraph-output-button>
-      <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
+    @let isParagraphRunning = paragraph.paragraphData().status().isRunning();
+    <i class="fas fa-eraser me-3"
+       role="button"
+       title="Clear output"
+       (click)="sendClearParagraphOutputMessage()"
+       [ngClass]="{'item-disable': isParagraphRunning}">
+    </i>
   `
 })
-export class ParagraphActionsView {
-  @Input({required:true}) paragraph: Paragraph;
+export class ClearParagraphOutputButton {
+  @Input({required:true}) paragraph:Paragraph;
+
+  sendClearParagraphOutputMessage(){
+    const paragraphClearOutputMessage = new ParagraphClearOutputMessage(this.paragraph.paragraphData().id());
+    this.paragraph.request(paragraphClearOutputMessage.message());
+  }
 }

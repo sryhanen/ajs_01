@@ -43,33 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
-import {ParagraphTitleVisibilityButton} from './paragraphTitleVisibilityButton/paragraphTitleVisibilityButton';
-import {ClearParagraphOutputButton} from './clearParagraphOutputButton/clearParagraphOutputButton';
+import {ParagraphClearOutputMessage} from './paragraphClearOutputMessage';
+import {Message} from '../message';
 
-@Component({
-  selector: 'paragraph-actions',
-  imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton,
-    ParagraphTitleVisibilityButton,
-    ClearParagraphOutputButton
-  ],
-  template: `
-    <div class="control d-flex align-items-center">
-      <clear-paragraph-output-button [paragraph]="paragraph"></clear-paragraph-output-button>
-      <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
-  `
-})
-export class ParagraphActionsView {
-  @Input({required:true}) paragraph: Paragraph;
-}
+describe('ParagraphClearOutputMessage unit test', () => {
+  const paragraphId = 'paragraphId';
+  let paragraphClearOutputMessage: Message;
+  beforeEach(() => {
+    paragraphClearOutputMessage = new ParagraphClearOutputMessage(paragraphId);
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(paragraphClearOutputMessage).toBeDefined();
+    });
+
+    it('Should have operation', () => {
+      expect(paragraphClearOutputMessage.operation()).toEqual('PARAGRAPH_CLEAR_OUTPUT');
+    });
+
+    it('Should have data', () => {
+      expect(paragraphClearOutputMessage.data()).toEqual({id: paragraphId});
+    });
+
+    it('Should have message', () => {
+      const expectedMessage = {
+        op:'PARAGRAPH_CLEAR_OUTPUT',
+        data:{
+          id:paragraphId
+        }
+      };
+      expect(paragraphClearOutputMessage.message()).toEqual(expectedMessage);
+    });
+  });
+});
