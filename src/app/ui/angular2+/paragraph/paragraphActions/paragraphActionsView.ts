@@ -67,15 +67,19 @@ import {HideOutputButton} from './hideOutputButton/hideOutputButton';
     HideOutputButton
   ],
   template: `
-    <div class="control d-flex align-items-center">
-      <hide-editor-button [paragraph]="paragraph"></hide-editor-button>
-      <hide-output-button [paragraph]="paragraph"></hide-output-button>
-      <clone-paragraph-button [paragraph]="paragraph"></clone-paragraph-button>
-      <clear-paragraph-output-button [paragraph]="paragraph"></clear-paragraph-output-button>
-      <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
+    <div class="control d-flex flex-fill align-items-center">
+      <div class="responsive-col d-flex align-items-center">
+        <hide-editor-button [paragraph]="paragraph"></hide-editor-button>
+        <hide-output-button [paragraph]="paragraph"></hide-output-button>
+        <clone-paragraph-button [paragraph]="paragraph"></clone-paragraph-button>
+        <clear-paragraph-output-button [paragraph]="paragraph"></clear-paragraph-output-button>
+        <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
+        <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
+      </div>
+      <div class="ms-auto d-flex align-items-center">
+        <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
+        <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
+      </div>
     </div>
   `
 })
