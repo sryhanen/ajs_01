@@ -43,42 +43,44 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
-import {Paragraph} from '../../../../objects/paragraph/paragraph';
-import {ParagraphStatusView} from './paragraphStatusView/paragraphStatusView';
-import {RunParagraphButton} from './runParagraphButton/runParagraphButton';
-import {EditorLineNumberVisibilityButton} from './editorLineNumberVisibilityButton/editorLineNumberVisibilityButton';
-import {ParagraphTitleVisibilityButton} from './paragraphTitleVisibilityButton/paragraphTitleVisibilityButton';
-import {ClearParagraphOutputButton} from './clearParagraphOutputButton/clearParagraphOutputButton';
-import {CloneParagraphButton} from './cloneParagraphButton/cloneParagraphButton';
-import {HideEditorButton} from './hideEditorButton/hideEditorButton';
-import {HideOutputButton} from './hideOutputButton/hideOutputButton';
+import {Component, Input, OnInit} from '@angular/core';
+import {Paragraph} from '../../../../../objects/paragraph/paragraph';
+import {
+  ParagraphConfigurationImpl
+} from '../../../../../objects/paragraph/paragraphData/paragraphConfiguration/paragraphConfigurationImpl';
+import {SafeJsonImpl} from '../../../../../objects/safeJson/safeJsonImpl';
+import {CommitParagraphMessage} from '../../../../../objects/message/commitParagraph/commitParagraphMessage';
 
 @Component({
-  selector: 'paragraph-actions',
-  imports: [
-    ParagraphStatusView,
-    RunParagraphButton,
-    EditorLineNumberVisibilityButton,
-    ParagraphTitleVisibilityButton,
-    ClearParagraphOutputButton,
-    CloneParagraphButton,
-    HideEditorButton,
-    HideOutputButton
-  ],
+  selector: 'hide-output-button',
   template: `
-    <div class="control d-flex align-items-center">
-      <hide-editor-button [paragraph]="paragraph"></hide-editor-button>
-      <hide-output-button [paragraph]="paragraph"></hide-output-button>
-      <clone-paragraph-button [paragraph]="paragraph"></clone-paragraph-button>
-      <clear-paragraph-output-button [paragraph]="paragraph"></clear-paragraph-output-button>
-      <paragraph-title-visibility-button [paragraph]="paragraph"></paragraph-title-visibility-button>
-      <editor-line-number-visibility-button [paragraph]="paragraph"></editor-line-number-visibility-button>
-      <paragraph-status-view [paragraphData]="paragraph.paragraphData()"></paragraph-status-view>
-      <run-paragraph-button [paragraph]="paragraph"></run-paragraph-button>
-    </div>
+    @let className = outputIsVisible ? 'fas fa-book' : 'fa-book-open';
+    @let title = outputIsVisible ? 'Hide output' : 'Show output';
+    <i class="me-3 fas {{className}}"
+       title="{{title}}"
+       role="button"
+       (click)="sendCommitParagraphMessage()"
+    >
+    </i>
   `
 })
-export class ParagraphActionsView {
-  @Input({required:true}) paragraph: Paragraph;
+export class HideOutputButton implements OnInit {
+  @Input({required:true}) paragraph:Paragraph;
+  protected outputIsVisible:boolean;
+
+  ngOnInit() {
+    const config = new ParagraphConfigurationImpl(new SafeJsonImpl(this.paragraph.paragraphData().config()));
+    this.outputIsVisible = config.outputIsVisible();
+  }
+
+  sendCommitParagraphMessage():void {
+    this.outputIsVisible = !this.outputIsVisible;
+    const newConfig = this.paragraph.paragraphData().config();
+    newConfig['tableHide'] = this.outputIsVisible;
+    const updatedProperties = [
+      {name:'config', value:newConfig},
+    ];
+    const commitParagraphMessage = new CommitParagraphMessage(this.paragraph.paragraphData(), updatedProperties);
+    this.paragraph.request(commitParagraphMessage.message());
+  };
 }
