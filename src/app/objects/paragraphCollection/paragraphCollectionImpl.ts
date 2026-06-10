@@ -46,7 +46,6 @@
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
 import {PushValue} from '../pushValue/pushValue';
-import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {Response} from '../channel/response';
 import {Request} from '../channel/request';
 import {ParagraphResponse} from './responses/paragraph/paragraphResponse';
@@ -81,9 +80,8 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     ];
   }
 
-  paragraphs(value:PushValue<Paragraph[]>):void {
-    value.update(this._paragraphs);
-    this._pushParagraphs.push(value);
+  paragraphs():Paragraph[] {
+    return this._paragraphs;
   }
 
   request(data: object): void {
