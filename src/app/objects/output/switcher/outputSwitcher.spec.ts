@@ -47,22 +47,17 @@ import {Channel} from '../../channel/channel';
 import {OutputSwitcher} from './outputSwitcher';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {OutputSwitcherImpl} from './outputSwitcherImpl';
-import {PushValue} from '../../pushValue/pushValue';
-import {PushValueImpl} from '../../pushValue/pushValueImpl';
 import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {FakeOutputSwitcherButton} from './button/fakeOutputSwitcherButton';
 
 describe('OutputSwitcher', () => {
   let channel:Channel;
   let outputSwitcher: OutputSwitcher;
-  let switcherStatus: PushValue<{isSwitchable:boolean, isLoading:boolean}>;
   const switcherButton: OutputSwitcherButton = new FakeOutputSwitcherButton();
 
   beforeEach(() => {
     channel = new FakeChannel();
     outputSwitcher = new OutputSwitcherImpl(channel);
-    switcherStatus = new PushValueImpl();
-    outputSwitcher.status(switcherStatus);
   });
 
   describe('Birth', () => {
@@ -83,9 +78,8 @@ describe('OutputSwitcher', () => {
     });
 
     it('Should be loading', () => {
-      const status = switcherStatus.value();
-      expect(status.isLoading).toBe(true);
-      expect(status.isSwitchable).toBe(false);
+      expect(outputSwitcher.status().isLoading).toBe(true);
+      expect(outputSwitcher.status().isSwitchable).toBe(false);
     });
   });
 
@@ -135,14 +129,14 @@ describe('OutputSwitcher', () => {
       };
     });
     it('Has default status', () => {
-      expect(switcherStatus.value().isSwitchable).toBe(false);
-      expect(switcherStatus.value().isLoading).toBe(false);
+      expect(outputSwitcher.status().isSwitchable).toBe(false);
+      expect(outputSwitcher.status().isLoading).toBe(false);
     });
 
     it('Is switchable and not loading after response', () => {
       response.data.output.isAggregated = true;
       outputSwitcher.response(response);
-      const status = switcherStatus.value();
+      const status = outputSwitcher.status();
       expect(status.isLoading).toBe(false);
       expect(status.isSwitchable).toBe(true);
     });
@@ -150,14 +144,14 @@ describe('OutputSwitcher', () => {
     it('Is not switchable and not loading after response', () => {
       response.data.output.isAggregated = false;
       outputSwitcher.response(response);
-      const status = switcherStatus.value();
+      const status = outputSwitcher.status();
       expect(status.isLoading).toBe(false);
       expect(status.isSwitchable).toBe(false);
     });
 
     it('Is not switchable and not loading after response', () => {
       outputSwitcher.response(response);
-      const status = switcherStatus.value();
+      const status = outputSwitcher.status();
       expect(status.isLoading).toBe(false);
       expect(status.isSwitchable).toBe(false);
     });

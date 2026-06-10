@@ -43,14 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, signal} from '@angular/core';
+import {Component} from '@angular/core';
 import {OutputPluginDirective} from './outputPluginDirective';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 import {render, screen} from '@testing-library/angular';
 import {OutputPluginStub} from '../../../../objects/output/plugins/outputPluginStub';
 import {FakeOutputPlugin} from '../../../../objects/output/fakeOutputPlugin';
 
-describe('OutputPluginDirective', () => {
+describe('OutputPluginDirective integration test', () => {
   const testId = 'testId';
   const testData = 'test data to render';
   const testPlugin: OutputPlugin = new FakeOutputPlugin();
@@ -70,7 +70,7 @@ describe('OutputPluginDirective', () => {
       imports: [OutputPluginDirective],
     })
     class FixtureComponent {
-      outputPlugin = signal(testPlugin);
+      outputPlugin = testPlugin;
       testId = testId;
     }
 
@@ -91,7 +91,7 @@ describe('OutputPluginDirective', () => {
       imports: [OutputPluginDirective],
     })
     class FixtureComponent {
-      outputPlugin = signal(stubPlugin);
+      outputPlugin= stubPlugin;
       testId = testId;
     }
 
