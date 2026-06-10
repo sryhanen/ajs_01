@@ -46,12 +46,14 @@
 import {Directive, ElementRef, Inject, Injector, Input} from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
 import {AngularPlugin} from '../../../../../objects/output/plugins/angularPlugin/angularPlugin';
+import {AngularObject} from '../../../../../objects/angularObject/angularObject';
 
 @Directive({
   selector: 'ajs-angular-view'
 })
 export class AngularViewUpgradeModule extends UpgradeComponent {
   @Input({required:true}) outputPlugin: AngularPlugin;
+  @Input({required:true}) angularObjects: AngularObject[];
 
   constructor(
     @Inject(ElementRef) elementRef: ElementRef,
