@@ -46,7 +46,6 @@
 import {Channel} from '../../../channel/channel';
 import {Response} from '../../../channel/response';
 import {Paragraph} from '../../../paragraph/paragraph';
-import {PushValue} from '../../../pushValue/pushValue';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
@@ -54,12 +53,10 @@ import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
 export class ParagraphResponse implements Response {
   private readonly _channel: Channel;
   private readonly _paragraphs: Paragraph[];
-  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
 
-  constructor(channel: Channel, paragraphs: Paragraph[], pushParagraphs: PushValue<Paragraph[]>[]) {
+  constructor(channel: Channel, paragraphs: Paragraph[]) {
     this._channel = channel;
     this._paragraphs = paragraphs;
-    this._pushParagraphs = pushParagraphs;
   }
 
   response(data: object): void {
@@ -74,7 +71,6 @@ export class ParagraphResponse implements Response {
         throw new Error(`Paragraph update failed: Paragraph "${newParagraph.id()}" not found in current collection.`);
       }
       this._paragraphs.splice(paragraphIndex, 1, newParagraph);
-      this._pushParagraphs.forEach(value => value.update(this._paragraphs));
     }
   }
 }

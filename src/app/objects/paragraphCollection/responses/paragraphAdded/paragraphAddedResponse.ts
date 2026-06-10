@@ -45,7 +45,6 @@
  */
 import {Response} from '../../../channel/response';
 import {Paragraph} from '../../../paragraph/paragraph';
-import {PushValue} from '../../../pushValue/pushValue';
 import {Channel} from '../../../channel/channel';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../../message/messageImpl';
@@ -54,12 +53,10 @@ import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
 export class ParagraphAddedResponse implements Response{
   private readonly _channel: Channel;
   private readonly _paragraphs: Paragraph[];
-  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
 
-  constructor(channel: Channel, paragraphs: Paragraph[], pushParagraphs: PushValue<Paragraph[]>[]) {
+  constructor(channel: Channel, paragraphs: Paragraph[]) {
     this._channel = channel;
     this._paragraphs = paragraphs;
-    this._pushParagraphs = pushParagraphs;
   }
 
   response(data:object):void{
@@ -70,7 +67,6 @@ export class ParagraphAddedResponse implements Response{
       const paragraphIndex:number = paragraphAddedData.getProperty('index', 'number');
       const newParagraph = new ParagraphImpl(this._channel, paragraphData);
       this._paragraphs.splice(paragraphIndex, 0, newParagraph);
-      this._pushParagraphs.forEach(pushParagraph => pushParagraph.update(this._paragraphs));
     }
   }
 }

@@ -45,7 +45,6 @@
  */
 import {Response} from '../../../channel/response';
 import {Notebook} from '../../../notebook/notebook';
-import {PushValue} from '../../../pushValue/pushValue';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {Channel} from '../../../channel/channel';
@@ -54,12 +53,10 @@ import {NotebookImpl} from '../../../notebook/notebookImpl';
 export class NoteResponse implements Response {
   private readonly _channel:Channel;
   private readonly _notebooks: Notebook[];
-  private readonly _pushCollection:PushValue<Notebook[]>[];
 
-  constructor(channel:Channel, notebooks:Notebook[], pushCollection:PushValue<Notebook[]>[]) {
+  constructor(channel:Channel, notebooks:Notebook[]) {
     this._channel = channel;
     this._notebooks = notebooks;
-    this._pushCollection = pushCollection;
   }
 
   response(data: object) {
@@ -75,7 +72,6 @@ export class NoteResponse implements Response {
       else{
         this._notebooks.splice(noteIndex, 1, newNotebook);
       }
-      this._pushCollection.forEach(pushValue => pushValue.update(this._notebooks));
     }
   }
 }

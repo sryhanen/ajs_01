@@ -59,18 +59,20 @@ import {ParagraphImpl} from '../paragraph/paragraphImpl';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _paragraphs: Paragraph[];
-  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
   private readonly _responses: Response[];
   private readonly _requests: Request[];
 
   constructor(channel: Channel, initialParagraphData: object[]) {
     this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph));
-    this._pushParagraphs = [];
+    this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph));
     this._responses = [
       new DefaultResponse(this._paragraphs),
-      new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs),
-      new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs),
-      new ParagraphRemovedResponse(this._paragraphs, this._pushParagraphs),
+      new ParagraphResponse(channel, this._paragraphs),
+      new ParagraphAddedResponse(channel, this._paragraphs),
+      new ParagraphRemovedResponse(this._paragraphs),
+      new ParagraphResponse(channel, this._paragraphs),
+      new ParagraphAddedResponse(channel, this._paragraphs),
+      new ParagraphRemovedResponse(this._paragraphs),
     ];
     this._requests = [
       new DefaultRequest(channel),

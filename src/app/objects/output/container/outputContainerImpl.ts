@@ -45,7 +45,6 @@
  */
 import {OutputContainer} from './outputContainer';
 import {Channel} from '../../channel/channel';
-import {Response} from '../../channel/response';
 import {OutputFormat} from '../format/outputFormat';
 import {OutputSwitcherImpl} from '../switcher/outputSwitcherImpl';
 import {OutputSwitcher} from '../switcher/outputSwitcher';
