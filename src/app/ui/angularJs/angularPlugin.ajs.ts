@@ -44,8 +44,6 @@
  * a licensee so wish it.
  */
 import angular, {IPostLink, IScope} from 'angular';
-import {PushValue} from '../../objects/pushValue/pushValue';
-import {PushValueImpl} from '../../objects/pushValue/pushValueImpl';
 import {AngularObject} from '../../objects/angularObject/angularObject';
 import {AngularPlugin} from '../../objects/output/plugins/angularPlugin/angularPlugin';
 
@@ -55,8 +53,7 @@ export class AngularPluginAjs implements IPostLink{
   readonly $scope: IScope;
   private readonly $element;
   outputPlugin!: AngularPlugin;
-
-  private _angularObjects: PushValue<AngularObject[]>;
+  angularObjects!: AngularObject[];
 
   constructor($compile, $scope: IScope, $element) {
     this.$compile = $compile;
@@ -69,8 +66,6 @@ export class AngularPluginAjs implements IPostLink{
   }
 
   $postLink() {
-    this._angularObjects = new PushValueImpl();
-    this.outputPlugin.angularObjectCollection().angularObjects(this._angularObjects);
     this.watchAngularObjects();
     this.render();
   };
@@ -114,9 +109,9 @@ export class AngularPluginAjs implements IPostLink{
   }
 
   private watchAngularObjects() {
-    const variableAlias = this._angularObjects;
+    const variableAlias = this.angularObjects;
     this.$scope.$watchCollection(
-      function() { return variableAlias.value(); },
+      function() { return variableAlias; },
       (newValue, oldValue) => {
         if(oldValue !== newValue) {
           this.render();
@@ -138,7 +133,7 @@ export class AngularPluginAjs implements IPostLink{
   }
 
   private bindVariablesToScope(): void {
-    for(const angularObject of this._angularObjects.value()){
+    for(const angularObject of this.angularObjects){
       const key = angularObject.name();
       this.$scope[key] = angularObject.value();
       this.$scope.$watch(key, function(newValue, oldValue){
@@ -156,6 +151,7 @@ export const angularPluginAjs = {
     `,
   bindings: {
     outputPlugin: '=',
+    angularObjects: '='
   },
   controller: AngularPluginAjs
 };

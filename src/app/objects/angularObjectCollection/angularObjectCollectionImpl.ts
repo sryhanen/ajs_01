@@ -75,8 +75,7 @@ export class AngularObjectCollectionImpl implements AngularObjectCollection {
     this._responses.forEach(response => response.response(data));
   }
 
-  angularObjects(value: PushValue<AngularObject[]>): void {
-    value.update(this._angularObjects);
-    this._pushValues.push(value);
+  angularObjects(): AngularObject[] {
+    return this._angularObjects;
   }
 }
