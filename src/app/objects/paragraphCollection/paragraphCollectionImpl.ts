@@ -45,7 +45,6 @@
  */
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
-import {PushValue} from '../pushValue/pushValue';
 import {Response} from '../channel/response';
 import {Request} from '../channel/request';
 import {ParagraphResponse} from './responses/paragraph/paragraphResponse';
