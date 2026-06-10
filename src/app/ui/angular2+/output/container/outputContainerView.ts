@@ -43,15 +43,15 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input, OnInit, signal} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {OutputContainer} from '../../../../objects/output/container/outputContainer';
 import {OutputSwitcherView} from '../switcher/outputSwitcherView';
 import {InterpreterErrorDirective} from '../../interpreterError/interpreterErrorDirective';
 import {OutputSwitcherButton} from '../../../../objects/output/switcher/button/outputSwitcherButton';
-import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writableSignalAsPushValue';
-import {OutputPluginStub} from '../../../../objects/output/plugins/outputPluginStub';
 import {OutputPluginDirective} from '../plugin/outputPluginDirective';
-import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
+import {webAppRoot} from '../../../../objects/webAppRoot/webAppRootImpl';
+import {OutputContainerAngularDrawImpl} from './outputContainerAngularDrawImpl';
+import {OutputContainerAngularDraw} from './outputContainerAngularDraw';
 
 @Component({
   selector: 'output-container',
@@ -61,19 +61,20 @@ import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
     OutputPluginDirective,
   ],
   template: `
-    <output-switcher [interpreter-error-popup]="outputContainer.errorListener()"
-                     [outputSwitcher]="outputContainer.outputSwitcher()"
+    <output-switcher [interpreter-error-popup]="outputContainerAngularDraw.errorListener()"
+                     [outputSwitcher]="outputContainerAngularDraw.outputSwitcher()"
                      [outputSwitcherButtons]="outputSwitcherButtons"></output-switcher>
-    <ng-container output-plugin [outputPlugin]="outputPlugin"></ng-container>
+    <ng-container output-plugin [outputPlugin]="outputContainerAngularDraw.outputPlugin()"></ng-container>
   `
 })
 export class OutputContainerView implements OnInit {
   @Input({required:true}) outputContainer: OutputContainer;
   protected outputSwitcherButtons: OutputSwitcherButton[];
-  outputPlugin = signal<OutputPlugin>(new OutputPluginStub());
+  protected outputContainerAngularDraw:OutputContainerAngularDraw;
 
   ngOnInit(): void {
-    this.outputSwitcherButtons = this.outputContainer.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
-    this.outputContainer.outputPlugin(new WritableSignalAsPushValue(this.outputPlugin));
+    this.outputContainerAngularDraw = new OutputContainerAngularDrawImpl(this.outputContainer);
+    this.outputSwitcherButtons = this.outputContainerAngularDraw.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
+    webAppRoot.addAngularDraw(this.outputContainerAngularDraw);
   }
 }
