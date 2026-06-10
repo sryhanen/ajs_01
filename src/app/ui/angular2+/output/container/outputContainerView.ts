@@ -61,8 +61,8 @@ import {OutputContainerAngularDraw} from './outputContainerAngularDraw';
     OutputPluginDirective,
   ],
   template: `
-    <output-switcher [interpreter-error-popup]="outputContainerAngularDraw.errorListener()"
-                     [outputSwitcher]="outputContainerAngularDraw.outputSwitcher()"
+    <output-switcher [interpreter-error-popup]="outputContainer.errorListener()"
+                     [outputSwitcher]="outputContainer.outputSwitcher()"
                      [outputSwitcherButtons]="outputSwitcherButtons"></output-switcher>
     <ng-container output-plugin [outputPlugin]="outputContainerAngularDraw.outputPlugin()"></ng-container>
   `
@@ -74,7 +74,7 @@ export class OutputContainerView implements OnInit {
 
   ngOnInit(): void {
     this.outputContainerAngularDraw = new OutputContainerAngularDrawImpl(this.outputContainer);
-    this.outputSwitcherButtons = this.outputContainerAngularDraw.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
+    this.outputSwitcherButtons = this.outputContainer.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
     webAppRoot.addAngularDraw(this.outputContainerAngularDraw);
   }
 }
