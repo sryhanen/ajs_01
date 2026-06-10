@@ -1,7 +1,4 @@
 import {OutputContainerAngularDraw} from './outputContainerAngularDraw';
-import {OutputSwitcher} from '../../../../objects/output/switcher/outputSwitcher';
-import {OutputFormat} from '../../../../objects/output/format/outputFormat';
-import {InterpreterErrorListener} from '../../../../objects/interpreterErrorListener/interpreterErrorListener';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 import {OutputContainer} from '../../../../objects/output/container/outputContainer';
 
@@ -16,18 +13,6 @@ export class OutputContainerAngularDrawImpl implements OutputContainerAngularDra
 
   draw():void {
     this._outputPlugin = this._outputContainer.outputPlugin();
-  }
-
-  outputSwitcher(): OutputSwitcher {
-    return this._outputContainer.outputSwitcher();
-  }
-
-  outputFormats(): OutputFormat[]{
-    return this._outputContainer.outputFormats();
-  }
-
-  errorListener(): InterpreterErrorListener{
-    return this._outputContainer.errorListener();
   }
 
   outputPlugin(): OutputPlugin{
