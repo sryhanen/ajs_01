@@ -86,9 +86,8 @@ export class OutputSwitcherImpl implements OutputSwitcher {
     return this._activeButton;
   }
 
-  status(value: PushValue<{isSwitchable:boolean, isLoading:boolean}>):void {
-    value.update(this._status);
-    this._pushStatus.push(value);
+  status():{isSwitchable:boolean, isLoading:boolean} {
+    return this._status;
   }
 
   response(data: object): void {
