@@ -43,9 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {Notebook} from '../../../objects/notebook/notebook';
 import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
+import {NotebookAngularDraw} from './notebookAngularDraw';
+import {NotebookAngularDrawImpl} from './notebookAngularDrawImpl';
+import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 
 @Component({
   selector: 'notebook',
@@ -53,14 +56,19 @@ import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectio
     ParagraphCollectionView
   ],
   template: `
-    @let paragraphCollection = notebook.paragraphCollection();
+    @let paragraphCollection = notebookAngularDraw.paragraphCollection();
     @if(!paragraphCollection.isStub()) {
       <paragraph-collection [paragraphCollection]="paragraphCollection" [paragraphId]="paragraphId"></paragraph-collection>
     }
-
   `
 })
-export class NotebookView {
+export class NotebookView implements OnInit {
   @Input({required:true}) paragraphId: string;
   @Input({required:true}) notebook: Notebook;
+  protected notebookAngularDraw:NotebookAngularDraw;
+
+  ngOnInit() {
+    this.notebookAngularDraw = new NotebookAngularDrawImpl(this.notebook);
+    webAppRoot.addAngularDraw(this.notebookAngularDraw);
+  }
 }

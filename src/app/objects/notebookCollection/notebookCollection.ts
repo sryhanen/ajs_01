@@ -45,8 +45,7 @@
  */
 import {Channel} from '../channel/channel';
 import {Notebook} from '../notebook/notebook';
-import {PushValue} from '../pushValue/pushValue';
 
 export interface NotebookCollection extends Channel{
-  notebooks(value: PushValue<Notebook[]>):void;
+  notebooks():Notebook[];
 }
