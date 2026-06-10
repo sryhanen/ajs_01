@@ -61,7 +61,7 @@ describe('NotebookCollectionView integration', () => {
     fixture = TestBed.createComponent(NotebookCollectionView);
     fixture.componentInstance.noteId = 'note1';
     fixture.componentInstance.paragraphId = 'paragraphId';
-    fixture.detectChanges();
+    fixture.changeDetectorRef.detectChanges();
   });
 
   describe('Birth', () => {
@@ -86,7 +86,7 @@ describe('NotebookCollectionView integration', () => {
         }
       };
       webAppRoot.response(notesInfoMessage);
-      fixture.detectChanges();
+      fixture.changeDetectorRef.detectChanges();
     });
 
     it('Should have render notebook on response', () =>{
@@ -96,7 +96,7 @@ describe('NotebookCollectionView integration', () => {
 
     it('Should not render notebook on response if noteId does not match', () =>{
       fixture.componentRef.setInput('noteId', 'wrongId');
-      fixture.detectChanges();
+      fixture.changeDetectorRef.detectChanges();
       const notebooks = fixture.debugElement.queryAll(By.directive(NotebookView));
       expect(notebooks).toHaveLength(0);
     });
@@ -109,7 +109,7 @@ describe('NotebookCollectionView integration', () => {
         }
       };
       webAppRoot.response(emptyNotebookListResponse);
-      fixture.detectChanges();
+      fixture.changeDetectorRef.detectChanges();
       const notebooks = fixture.debugElement.queryAll(By.directive(NotebookView));
       expect(notebooks).toHaveLength(0);
     });
