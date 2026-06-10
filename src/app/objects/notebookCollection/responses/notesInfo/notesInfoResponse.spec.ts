@@ -47,21 +47,15 @@ import {NotesInfoResponse} from './notesInfoResponse';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {Channel} from '../../../channel/channel';
 import {Notebook} from '../../../notebook/notebook';
-import {PushValue} from '../../../pushValue/pushValue';
-import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 
 describe('NotesInfoResponse', () => {
     let channel:Channel;
     let notebookCollection: Notebook[];
-    let pushValue: PushValue<Notebook[]>;
-    let pushCollection: PushValue<Notebook[]>[];
     let notebookCollectionUpdate: NotesInfoResponse;
     beforeEach(() => {
       channel  = new FakeChannel();
       notebookCollection = [];
-      pushValue = new PushValueImpl();
-      pushCollection = [pushValue];
-      notebookCollectionUpdate = new NotesInfoResponse(notebookCollection, pushCollection, channel);
+      notebookCollectionUpdate = new NotesInfoResponse(notebookCollection, channel);
     });
 
     describe('Birth', () => {
@@ -84,10 +78,8 @@ describe('NotesInfoResponse', () => {
       };
       it('Updates notebookCollection and pushCollection', () => {
         expect(notebookCollection).toHaveLength(0);
-        const pushCollectionSpy = vi.spyOn(pushCollection[0], 'update');
         notebookCollectionUpdate.response(updateResponse);
         expect(notebookCollection).toHaveLength(2);
-        expect(pushCollectionSpy).toHaveBeenCalledExactlyOnceWith(notebookCollection);
       });
     });
 });

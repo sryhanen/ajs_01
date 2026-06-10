@@ -46,9 +46,6 @@
 import {FakeChannel} from '../channel/fakeChannel';
 import {AngularObjectCollection} from './angularObjectCollection';
 import {AngularObjectCollectionImpl} from './angularObjectCollectionImpl';
-import {AngularObject} from '../angularObject/angularObject';
-import {PushValue} from '../pushValue/pushValue';
-import {PushValueImpl} from '../pushValue/pushValueImpl';
 
 describe('angularObjectCollection', () => {
   let angularObjectCollection:AngularObjectCollection;
@@ -64,9 +61,7 @@ describe('angularObjectCollection', () => {
     });
 
     it('Should have empty collection of angular objects', () => {
-      const angularObjects:PushValue<AngularObject[]> = new PushValueImpl();
-      angularObjectCollection.angularObjects(angularObjects);
-      expect(angularObjects.value()).toEqual([]);
+      expect(angularObjectCollection.angularObjects()).toEqual([]);
     });
   });
 

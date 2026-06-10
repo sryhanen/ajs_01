@@ -44,17 +44,14 @@
  * a licensee so wish it.
  */
 import {Notebook} from '../../../notebook/notebook';
-import {PushValue} from '../../../pushValue/pushValue';
 import {Channel} from '../../../channel/channel';
 import {NoteResponse} from './noteResponse';
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 import {NotebookImpl} from '../../../notebook/notebookImpl';
 
 describe('NoteResponse', () => {
   let channel:Channel;
   let notebooks: Notebook[];
-  let pushCollection:PushValue<Notebook[]>[];
   let noteResponse: NoteResponse;
   let initialNotebook: Notebook;
   const initialNotebookId = 'initialNotebookId';
@@ -64,8 +61,7 @@ describe('NoteResponse', () => {
     channel = new FakeChannel();
     initialNotebook = new NotebookImpl(channel, {id:initialNotebookId, name:initialNotebookName});
     notebooks = [initialNotebook];
-    pushCollection = [new PushValueImpl()];
-    noteResponse = new NoteResponse(channel, notebooks, pushCollection);
+    noteResponse = new NoteResponse(channel, notebooks);
   });
 
   describe('Birth', () => {
@@ -87,7 +83,6 @@ describe('NoteResponse', () => {
       expect(notebooks).toHaveLength(1);
       noteResponse.response(response);
       expect(notebooks).toHaveLength(2);
-      expect(pushCollection[0].value()).toEqual(notebooks);
     });
 
     it('Should replace existing notebook', () => {
@@ -103,7 +98,6 @@ describe('NoteResponse', () => {
       noteResponse.response(response);
       expect(notebooks).toHaveLength(1);
       expect(notebooks[0]).not.toEqual(previousNotebook);
-      expect(pushCollection[0].value()).toEqual(notebooks);
     });
   });
 });

@@ -47,7 +47,6 @@ import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphCollectionImpl} from './paragraphCollectionImpl';
 import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
-import {PushValueImpl} from '../pushValue/pushValueImpl';
 import {Paragraph} from '../paragraph/paragraph';
 
 describe('ParagraphCollection unit test', () => {
@@ -71,9 +70,7 @@ describe('ParagraphCollection unit test', () => {
     });
 
     it('Should have paragraphs', ()=>{
-      const paragraphs = new PushValueImpl<Paragraph[]>();
-      paragraphCollection.paragraphs(paragraphs);
-      expect(paragraphs.value()).toHaveLength(2);
+      expect(paragraphCollection.paragraphs()).toHaveLength(2);
     });
   });
 

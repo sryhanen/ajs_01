@@ -44,31 +44,27 @@
   * a licensee so wish it.
 */
 import {Paragraph} from '../../../paragraph/paragraph';
-import {PushValue} from '../../../pushValue/pushValue';
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {Channel} from '../../../channel/channel';
 import {ParagraphAddedResponse} from './paragraphAddedResponse';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
-import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 
 describe('ParagraphAddedResponse', () => {
   let channel:Channel;
   let paragraphs:Paragraph[];
-  let pushParagraphs: PushValue<Paragraph[]>[];
   let angularObjectCollection: AngularObjectCollection;
   let paragraphAddedResponse: ParagraphAddedResponse;
 
   beforeEach(() => {
     channel = new FakeChannel();
     paragraphs = [];
-    pushParagraphs = [new PushValueImpl()];
     angularObjectCollection = new AngularObjectCollectionImpl(channel);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      paragraphAddedResponse = new ParagraphAddedResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
+      paragraphAddedResponse = new ParagraphAddedResponse(channel, paragraphs, angularObjectCollection);
       expect(paragraphAddedResponse).toBeInstanceOf(ParagraphAddedResponse);
     });
   });
@@ -86,11 +82,9 @@ describe('ParagraphAddedResponse', () => {
     };
 
     it('Should add paragraph', () => {
-      paragraphAddedResponse = new ParagraphAddedResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
-      const pushParagraphSpy = vi.spyOn(pushParagraphs[0], 'update');
+      paragraphAddedResponse = new ParagraphAddedResponse(channel, paragraphs, angularObjectCollection);
       paragraphAddedResponse.response(response);
       expect(paragraphs).toHaveLength(1);
-      expect(pushParagraphSpy).toHaveBeenCalledExactlyOnceWith(paragraphs);
     });
   });
 });

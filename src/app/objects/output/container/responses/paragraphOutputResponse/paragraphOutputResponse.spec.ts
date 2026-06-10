@@ -52,10 +52,6 @@ import {OutputSwitcherImpl} from '../../../switcher/outputSwitcherImpl';
 import {DataTablesFormat} from '../../../format/dataTables/dataTablesFormat';
 import {uPlotFormat} from '../../../format/uPlot/uPlotFormat';
 import {OutputType} from '../../../outputType';
-import {PushValueImpl} from '../../../../pushValue/pushValueImpl';
-import {OutputPlugin} from '../../../plugins/outputPlugin';
-import {PushValue} from '../../../../pushValue/pushValue';
-import {OutputPluginStub} from '../../../plugins/outputPluginStub';
 
 describe('ParagraphOutputResponse', () => {
   let channel:Channel;
@@ -63,8 +59,6 @@ describe('ParagraphOutputResponse', () => {
   let uPlotOutputFormat: OutputFormat;
   let outputFormats:OutputFormat[];
   let outputSwitcher:OutputSwitcher;
-  let activePlugin:PushValue<OutputPlugin>;
-  let outputPluginListeners:PushValue<OutputPlugin>[];
   let paragraphOutputResponse:ParagraphOutputResponseImpl;
 
   beforeEach(() => {
@@ -73,10 +67,7 @@ describe('ParagraphOutputResponse', () => {
     uPlotOutputFormat = new uPlotFormat();
     outputFormats = [dataTablesOutputFormat, uPlotOutputFormat];
     outputSwitcher = new OutputSwitcherImpl(channel);
-    activePlugin = new PushValueImpl();
-    activePlugin.update(new OutputPluginStub());
-    outputPluginListeners = [new PushValueImpl()];
-    paragraphOutputResponse = new ParagraphOutputResponseImpl(channel, outputFormats, outputSwitcher, activePlugin, outputPluginListeners);
+    paragraphOutputResponse = new ParagraphOutputResponseImpl(channel, outputFormats, outputSwitcher);
   });
 
   describe('Birth', () => {
@@ -107,36 +98,33 @@ describe('ParagraphOutputResponse', () => {
         }
       };
     });
-
     describe('Active plugin is updated', () => {
       beforeEach(() => {
         paragraphOutputResponse.response(paragraphOutputResponseMessage);
       });
 
       it('Should update active plugin from stub to dataTables', () => {
-        expect(activePlugin.value().isStub()).toBe(false);
-        expect(activePlugin.value().outputType()).toEqual(OutputType.dataTables);
-        expect(outputPluginListeners[0].value().isStub()).toBe(false);
-        expect(outputPluginListeners[0].value().outputType()).toEqual(OutputType.dataTables);
+        const outputPlugin = paragraphOutputResponse.outputPlugin();
+        expect(outputPlugin.isStub()).toBe(false);
+        expect(outputPlugin.outputType()).toEqual(OutputType.dataTables);
       });
 
       it('Should update active plugin from dataTables to uPlot', () => {
         paragraphOutputResponseMessage.data.output.type = OutputType.uPlot;
         paragraphOutputResponse.response(paragraphOutputResponseMessage);
-        expect(activePlugin.value().outputType()).toEqual(OutputType.uPlot);
-        expect(outputPluginListeners[0].value().outputType()).toEqual(OutputType.uPlot);
+        const outputPlugin = paragraphOutputResponse.outputPlugin();
+        expect(outputPlugin.outputType()).toEqual(OutputType.uPlot);
       });
     });
 
     describe('Sequential responses to datatables', () =>{
       it('Should respond to datatables plugin', () => {
         paragraphOutputResponse.response(paragraphOutputResponseMessage);
-        const activePluginSpy = vi.spyOn(activePlugin.value(), 'response');
-        const listenerPluginSpy = vi.spyOn(outputPluginListeners[0].value(), 'response');
+        const outputPlugin = paragraphOutputResponse.outputPlugin();
+        const outputPluginSpy = vi.spyOn(outputPlugin, 'response');
         paragraphOutputResponse.response(paragraphOutputResponseMessage);
         paragraphOutputResponse.response(paragraphOutputResponseMessage);
-        expect(activePluginSpy).toHaveBeenCalledTimes(2);
-        expect(listenerPluginSpy).toHaveBeenCalledTimes(2);
+        expect(outputPluginSpy).toHaveBeenCalledTimes(2);
       });
     });
 

@@ -47,9 +47,6 @@ import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {Notebook} from './notebook';
 import {NotebookImpl} from './notebookImpl';
-import {PushValueImpl} from '../pushValue/pushValueImpl';
-import {Paragraph} from '../paragraph/paragraph';
-import {PushValue} from '../pushValue/pushValue';
 
 describe('Notebook unit test', () => {
   const notebookId = 'noteId';
@@ -92,14 +89,10 @@ describe('Notebook unit test', () => {
 
   describe('Response', () => {
     describe('Filters responses', () => {
-      let paragraphs: PushValue<Paragraph[]>;
-      let paragraphSpy;
-
+      let responseSpy;
       beforeEach(() => {
         notebook = new NotebookImpl(channel, notebookData);
-        paragraphs = new PushValueImpl<Paragraph[]>();
-        notebook.paragraphCollection().paragraphs(paragraphs);
-        paragraphSpy = vi.spyOn(paragraphs.value()[0], 'response');
+        responseSpy = vi.spyOn(notebook.paragraphCollection(), 'response');
       });
 
       it('Should respond with right id', () =>{
@@ -110,7 +103,7 @@ describe('Notebook unit test', () => {
           }
         };
         notebook.response(response);
-        expect(paragraphSpy).toHaveBeenCalledExactlyOnceWith(response);
+        expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
       });
 
       it('Should not respond with wrong id', () =>{
@@ -121,7 +114,7 @@ describe('Notebook unit test', () => {
           }
         };
         notebook.response(response);
-        expect(paragraphSpy).toHaveBeenCalledTimes(0);
+        expect(responseSpy).toHaveBeenCalledTimes(0);
       });
 
       it('Should not respond if noteId property missing', () =>{
@@ -130,7 +123,7 @@ describe('Notebook unit test', () => {
           data:{}
         };
         notebook.response(response);
-        expect(paragraphSpy).toHaveBeenCalledExactlyOnceWith(response);
+        expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
       });
     });
   });

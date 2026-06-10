@@ -119,7 +119,7 @@ describe('AngularPluginAjs', () => {
       angularObjects = new PushValueImpl();
       angularObjectCollection = new AngularObjectCollectionImpl(channel);
       angularPlugin  = new AngularPluginImpl(channel, template, angularObjectCollection);
-      angularObjectCollection.angularObjects(angularObjects);
+      angularObjectCollection.angularObjects();
       angularObjectCollection.response(angularObjectResponse1);
       angularObjectCollection.response(angularObjectResponse2);
       angularPluginAjs.outputPlugin = angularPlugin;
