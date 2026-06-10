@@ -78,9 +78,8 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     ];
   }
 
-  paragraphs(value:PushValue<Paragraph[]>):void {
-    value.update(this._paragraphs);
-    this._pushParagraphs.push(value);
+  paragraphs():Paragraph[] {
+    return this._paragraphs;
   }
 
   request(data: object): void {

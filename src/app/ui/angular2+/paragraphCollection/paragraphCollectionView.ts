@@ -43,12 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input, OnInit, signal} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {ParagraphCollection} from '../../../objects/paragraphCollection/paragraphCollection';
-import {Paragraph} from '../../../objects/paragraph/paragraph';
 import {ParagraphView} from '../paragraph/paragraphView';
-import {WritableSignalArrayAsPushValue} from '../writableSignalArrayAsPushValue/writableSignalArrayAsPushValue';
-import {PushValue} from '../../../objects/pushValue/pushValue';
+import {ParagraphCollectionAngularDraw} from './paragraphCollectionAngularDraw';
+import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
+import {ParagraphCollectionAngularDrawImpl} from './paragraphCollectionAngularDrawImpl';
 
 @Component({
   selector: 'paragraph-collection',
@@ -56,7 +56,7 @@ import {PushValue} from '../../../objects/pushValue/pushValue';
     ParagraphView
   ],
   template: `
-    @for (paragraph of this.paragraphs.value(); track paragraph) {
+    @for (paragraph of paragraphCollectionAngularDraw.paragraphs(); track paragraph) {
       <paragraph [paragraphId]="paragraphId" [paragraph]="paragraph"></paragraph>
     }
   `
@@ -64,11 +64,10 @@ import {PushValue} from '../../../objects/pushValue/pushValue';
 export class ParagraphCollectionView implements OnInit {
   @Input({required:true}) paragraphId: string;
   @Input({required:true}) paragraphCollection: ParagraphCollection;
-  protected paragraphSignal = signal<Paragraph[]>([]);
-  protected paragraphs: PushValue<Paragraph[]>;
+  protected paragraphCollectionAngularDraw:ParagraphCollectionAngularDraw;
 
   ngOnInit():void {
-    this.paragraphs = new WritableSignalArrayAsPushValue(this.paragraphSignal);
-    this.paragraphCollection.paragraphs(this.paragraphs);
+    this.paragraphCollectionAngularDraw = new ParagraphCollectionAngularDrawImpl(this.paragraphCollection);
+    webAppRoot.addAngularDraw(this.paragraphCollectionAngularDraw);
   }
 }

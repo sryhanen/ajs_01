@@ -45,9 +45,8 @@
  */
 import {Paragraph} from '../paragraph/paragraph';
 import {Channel} from '../channel/channel';
-import {PushValue} from '../pushValue/pushValue';
 import Stubable from '../../shared/interfaces/stubable';
 
 export interface ParagraphCollection extends Channel, Stubable {
-  paragraphs(value:PushValue<Paragraph[]>):void;
+  paragraphs():Paragraph[];
 }

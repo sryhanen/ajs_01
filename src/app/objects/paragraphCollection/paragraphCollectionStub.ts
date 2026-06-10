@@ -1,5 +1,4 @@
 import {ParagraphCollection} from './paragraphCollection';
-import {PushValue} from '../pushValue/pushValue';
 import {Paragraph} from '../paragraph/paragraph';
 
 export class ParagraphCollectionStub implements ParagraphCollection {
@@ -7,7 +6,7 @@ export class ParagraphCollectionStub implements ParagraphCollection {
     return true;
   }
 
-  paragraphs(value: PushValue<Paragraph[]>): void {
+  paragraphs(): Paragraph[] {
     throw new Error('ParagraphCollectionStub: method not implemented.');
   }
 
