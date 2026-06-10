@@ -46,12 +46,10 @@
 import {
   ComponentRef,
   Directive,
-  effect,
   inject,
   Input,
-  OnChanges, SimpleChanges,
+  OnChanges,
   ViewContainerRef,
-  WritableSignal
 } from '@angular/core';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 import {AngularView} from './angular/angularView';
@@ -65,7 +63,7 @@ export class OutputPluginDirective implements OnChanges{
   @Input({required:true}) outputPlugin: OutputPlugin;
   private viewContainer = inject(ViewContainerRef);
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     this.viewContainer.clear();
     if(!this.outputPlugin.isStub()){
       let newInstance: ComponentRef<AngularView | PluginView>;
