@@ -45,7 +45,6 @@
  */
 import {Response} from '../../../channel/response';
 import {Paragraph} from '../../../paragraph/paragraph';
-import {PushValue} from '../../../pushValue/pushValue';
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {Channel} from '../../../channel/channel';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
@@ -55,13 +54,11 @@ import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
 export class ParagraphAddedResponse implements Response{
   private readonly _channel: Channel;
   private readonly _paragraphs: Paragraph[];
-  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
   private readonly _angularObjectCollection: AngularObjectCollection;
 
-  constructor(channel: Channel, paragraphs: Paragraph[], pushParagraphs: PushValue<Paragraph[]>[], angularObjectCollection: AngularObjectCollection) {
+  constructor(channel: Channel, paragraphs: Paragraph[], angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._paragraphs = paragraphs;
-    this._pushParagraphs = pushParagraphs;
     this._angularObjectCollection = angularObjectCollection;
   }
 
@@ -73,7 +70,6 @@ export class ParagraphAddedResponse implements Response{
       const paragraphIndex:number = paragraphAddedData.getProperty('index', 'number');
       const newParagraph = new ParagraphImpl(this._channel, paragraphData, this._angularObjectCollection);
       this._paragraphs.splice(paragraphIndex, 0, newParagraph);
-      this._pushParagraphs.forEach(pushParagraph => pushParagraph.update(this._paragraphs));
     }
   }
 }

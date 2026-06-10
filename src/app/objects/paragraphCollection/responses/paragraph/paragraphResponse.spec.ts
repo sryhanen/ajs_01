@@ -45,31 +45,27 @@
  */
 import {Channel} from '../../../channel/channel';
 import {Paragraph} from '../../../paragraph/paragraph';
-import {PushValue} from '../../../pushValue/pushValue';
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
 import {ParagraphResponse} from './paragraphResponse';
 import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
-import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 
 describe('ParagraphResponder', () => {
   let channel:Channel;
   let paragraphs: Paragraph[];
-  let pushParagraphs: PushValue<Paragraph[]>[];
   let angularObjectCollection: AngularObjectCollection;
   let paragraphResponse: ParagraphResponse;
 
   beforeEach(() => {
     channel = new FakeChannel();
     paragraphs = [];
-    pushParagraphs = [new PushValueImpl()];
     angularObjectCollection = new AngularObjectCollectionImpl(channel);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      paragraphResponse = new ParagraphResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
+      paragraphResponse = new ParagraphResponse(channel, paragraphs, angularObjectCollection);
       expect(paragraphResponse).toBeInstanceOf(ParagraphResponse);
     });
   });
@@ -85,7 +81,7 @@ describe('ParagraphResponder', () => {
 
     it('Should update collection', () => {
       paragraphs = [new ParagraphImpl(channel, initialParagraph, angularObjectCollection)];
-      paragraphResponse = new ParagraphResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
+      paragraphResponse = new ParagraphResponse(channel, paragraphs, angularObjectCollection);
       const newName = 'new name for the paragraph';
       const responseWithNewName = {
         op:'PARAGRAPH',
@@ -95,18 +91,15 @@ describe('ParagraphResponder', () => {
           text:''
         }
       };
-      const pushValueSpy = vi.spyOn(pushParagraphs[0], 'update');
       const previousParagraph = paragraphs[0];
-      expect(pushValueSpy).toHaveBeenCalledTimes(0);
       paragraphResponse.response(responseWithNewName);
       const newParagraph = paragraphs[0];
-      expect(pushValueSpy).toHaveBeenCalledExactlyOnceWith(paragraphs);
       expect(newParagraph).not.toEqual(previousParagraph);
     });
 
     it('Should throw error if paragraph is not in the collection', () => {
       paragraphs = [new ParagraphImpl(channel, initialParagraph, angularObjectCollection)];
-      paragraphResponse = new ParagraphResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
+      paragraphResponse = new ParagraphResponse(channel, paragraphs, angularObjectCollection);
       const response = {
         op:'PARAGRAPH',
         data:{
@@ -120,7 +113,7 @@ describe('ParagraphResponder', () => {
 
     it('Paragraph message with empty collection is omitted', () => {
       paragraphs = [];
-      paragraphResponse = new ParagraphResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
+      paragraphResponse = new ParagraphResponse(channel, paragraphs, angularObjectCollection);
       const response = {
         op:'PARAGRAPH',
         data:{

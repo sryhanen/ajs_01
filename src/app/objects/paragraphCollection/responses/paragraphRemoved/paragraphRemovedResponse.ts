@@ -45,17 +45,14 @@
  */
 import {Response} from '../../../channel/response';
 import {Paragraph} from '../../../paragraph/paragraph';
-import {PushValue} from '../../../pushValue/pushValue';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../../message/messageImpl';
 
 export class ParagraphRemovedResponse implements Response {
   private readonly _paragraphs: Paragraph[];
-  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
 
-  constructor(paragraphs: Paragraph[], pushParagraphs: PushValue<Paragraph[]>[]) {
+  constructor(paragraphs: Paragraph[]) {
     this._paragraphs = paragraphs;
-    this._pushParagraphs = pushParagraphs;
   }
 
   response(data: object): void {
@@ -71,7 +68,6 @@ export class ParagraphRemovedResponse implements Response {
         throw new Error(`Paragraph delete failed: Paragraph "${removedParagraphId}" not found in current collection.`);
       }
       this._paragraphs.splice(removedParagraphIndex, 1);
-      this._pushParagraphs.forEach(pushValue => pushValue.update(this._paragraphs));
     }
   }
 }

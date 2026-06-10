@@ -60,19 +60,17 @@ import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObj
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _paragraphs: Paragraph[];
-  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
   private readonly _responses: Response[];
   private readonly _requests: Request[];
 
   constructor(channel: Channel, initialParagraphData: object[]) {
     const angularObjectCollection = new AngularObjectCollectionImpl(this);
     this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph, angularObjectCollection));
-    this._pushParagraphs = [];
     this._responses = [
       new DefaultResponse(this._paragraphs),
-      new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs, angularObjectCollection),
-      new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs, angularObjectCollection),
-      new ParagraphRemovedResponse(this._paragraphs, this._pushParagraphs),
+      new ParagraphResponse(channel, this._paragraphs, angularObjectCollection),
+      new ParagraphAddedResponse(channel, this._paragraphs, angularObjectCollection),
+      new ParagraphRemovedResponse(this._paragraphs),
     ];
     this._requests = [
       new DefaultRequest(channel),

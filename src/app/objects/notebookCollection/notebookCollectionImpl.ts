@@ -46,7 +46,6 @@
 import {NotebookCollection} from './notebookCollection';
 import {Notebook} from '../notebook/notebook';
 import {Channel} from '../channel/channel';
-import {PushValue} from '../pushValue/pushValue';
 import {NotesInfoResponse} from './responses/notesInfo/notesInfoResponse';
 import {Response} from '../channel/response';
 import {NoteResponse} from './responses/note/noteResponse';
@@ -54,16 +53,14 @@ import {NoteResponse} from './responses/note/noteResponse';
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;
   private readonly _collection: Notebook[];
-  private readonly _pushCollection:PushValue<Notebook[]>[];
   private readonly _responses: Response[];
 
   constructor(channel:Channel) {
     this._channel = channel;
     this._collection = [];
-    this._pushCollection = [];
     this._responses = [
-      new NotesInfoResponse(this._collection, this._pushCollection, this),
-      new NoteResponse(this, this._collection, this._pushCollection)
+      new NotesInfoResponse(this._collection, this),
+      new NoteResponse(this, this._collection)
     ];
   }
 

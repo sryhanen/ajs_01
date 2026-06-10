@@ -47,7 +47,6 @@ import {Channel} from '../../channel/channel';
 import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {OutputSwitcher} from './outputSwitcher';
 import {OutputSwitcherButtonStub} from './button/outputSwitcherButtonStub';
-import {PushValue} from '../../pushValue/pushValue';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../message/messageImpl';
 
@@ -55,7 +54,6 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   private readonly _channel: Channel;
   private _activeButton: OutputSwitcherButton;
   private readonly _status: {isSwitchable:boolean, isLoading:boolean};
-  private readonly _pushStatus: PushValue<{isSwitchable:boolean, isLoading:boolean}>[];
 
   constructor(channel: Channel) {
     this._channel = channel;
@@ -64,13 +62,11 @@ export class OutputSwitcherImpl implements OutputSwitcher {
       isSwitchable: false,
       isLoading: false,
     };
-    this._pushStatus = [];
   }
 
   requestFormatSwitch(outputSwitcherButton: OutputSwitcherButton): void {
     this._activeButton = outputSwitcherButton;
     this._status.isLoading = true;
-    this._pushStatus.forEach(value => value.update(this._status));
     this._channel.request(outputSwitcherButton.requestData());
   }
 
@@ -102,7 +98,6 @@ export class OutputSwitcherImpl implements OutputSwitcher {
         this._status.isSwitchable = false;
       }
       this._status.isLoading = false;
-      this._pushStatus.forEach(value => value.update(this._status));
     }
   }
 }
