@@ -83,9 +83,11 @@ describe('NotebookView integration', () => {
       expect(paragraphCollection).toBeTruthy();
     });
 
-    it('Should not rendered ParagraphCollection if notebook is partial', () => {
-      notebook = new NotebookImpl(channel, {id: noteId});
-      fixture.componentRef.setInput('notebook', notebook);
+    it('Should not render ParagraphCollection if notebook is partial', () => {
+      fixture.destroy();
+      fixture = TestBed.createComponent(NotebookView);
+      fixture.componentInstance.paragraphId = paragraphId;
+      fixture.componentInstance.notebook = new NotebookImpl(channel, {id: noteId});
       fixture.detectChanges();
       const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
       expect(paragraphCollection).not.toBeTruthy();

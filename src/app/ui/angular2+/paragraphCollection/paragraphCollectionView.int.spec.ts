@@ -107,7 +107,7 @@ describe('ParagraphCollectionView integration', () => {
         }
       };
       paragraphCollection.response(paragraphAddedResponse);
-      fixture.detectChanges();
+      fixture.changeDetectorRef.detectChanges();
       const paragraphs = fixture.debugElement.queryAll(By.directive(ParagraphView));
       expect(paragraphs).toHaveLength(4);
     });
