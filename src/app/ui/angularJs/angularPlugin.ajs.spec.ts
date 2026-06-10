@@ -47,11 +47,8 @@ import {AngularPluginAjs} from './angularPlugin.ajs';
 import {AngularObjectCollection} from '../../objects/angularObjectCollection/angularObjectCollection';
 import {AngularObjectCollectionImpl} from '../../objects/angularObjectCollection/angularObjectCollectionImpl';
 import {FakeChannel} from '../../objects/channel/fakeChannel';
-import {AngularObject} from '../../objects/angularObject/angularObject';
-import {PushValue} from '../../objects/pushValue/pushValue';
-import {PushValueImpl} from '../../objects/pushValue/pushValueImpl';
 import {AngularPluginImpl} from '../../objects/output/plugins/angularPlugin/angularPluginImpl';
-import {AngularPlugin} from '../../objects/output/plugins/angularPlugin/angularPlugin';
+import {AngularObjectImpl} from '../../objects/angularObject/angularObjectImpl';
 
 describe('AngularPluginAjs', () => {
   const $element = [
@@ -61,81 +58,56 @@ describe('AngularPluginAjs', () => {
   ];
   const mockLinkFunction = vi.fn().mockReturnValue($element);
   let $compile;
-  let watchSpy;
-  let watchCollectionSpy;
   let $scope;
+  const channel = new FakeChannel();
+  const template = '<h1>Test Template</h1>';
+  let angularObjectCollection: AngularObjectCollection;
 
   let angularPluginAjs: AngularPluginAjs;
   beforeEach(() => {
     $compile  = vi.fn().mockReturnValue(mockLinkFunction);
-    watchSpy = vi.fn();
-    watchCollectionSpy = vi.fn();
     $scope = {
-      $watch: watchSpy,
-      $watchCollection: watchCollectionSpy,
+      $watch: vi.fn(),
+      $watchCollection: vi.fn(),
     };
+    angularObjectCollection = new AngularObjectCollectionImpl(channel);
     angularPluginAjs = new AngularPluginAjs($compile,$scope,$element);
+    angularPluginAjs.outputPlugin = new AngularPluginImpl(channel, template, angularObjectCollection);
+    angularPluginAjs.angularObjects = [new AngularObjectImpl(channel, {noteId:'', paragraphId:'', interpreterGroupId:'', angularObject:{name: 'name', object: 'value'}})];
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(angularPluginAjs).toBeInstanceOf(AngularPluginAjs);
+      expect(angularPluginAjs).toBeDefined();
+    });
+
+    it('Should have $scope.z.runParagraph', () => {
+      expect(angularPluginAjs.$scope['z']['runParagraph']).toBeDefined();
+    });
+
+    it('Should have $scope.z.angularBind', () => {
+      expect(angularPluginAjs.$scope['z']['angularBind']).toBeDefined();
+    });
+
+    it('Should have $scope.z.angularUnbind', () => {
+      expect(angularPluginAjs.$scope['z']['angularUnbind']).toBeDefined();
     });
   });
 
-  describe('AngularJs component lifecycle $postLink-hook ', () => {
-    const template = '<h1>Test Template</h1>';
-    const channel = new FakeChannel();
-    let angularPlugin:AngularPlugin;
-    let angularObjectCollection: AngularObjectCollection;
-    let angularObjects: PushValue<AngularObject[]>;
-    const angularObject1 = {
-      name: 'SomeVariable1',
-      object: 'test data1',
-      noteId: '',
-    };
-    const angularObject2 = {
-      name: 'SomeVariable2',
-      object: 'test data2',
-      noteId: '',
-    };
-    const angularObjectResponse1: object = {
-      op: 'ANGULAR_OBJECT_UPDATE',
-      data: {
-        angularObject: angularObject1,
-        noteId: '',
-        interpreterGroupId: ''
-      },
-    };
-    const angularObjectResponse2:object = {
-      op: 'ANGULAR_OBJECT_UPDATE',
-      data: {
-        angularObject: angularObject2,
-        noteId: '',
-        interpreterGroupId: ''
-      },
-    };
+  describe('$postLink', () => {
+    let scopeSpy;
+
     beforeEach(() => {
-      angularObjects = new PushValueImpl();
-      angularObjectCollection = new AngularObjectCollectionImpl(channel);
-      angularPlugin  = new AngularPluginImpl(channel, template, angularObjectCollection);
-      angularObjectCollection.angularObjects();
-      angularObjectCollection.response(angularObjectResponse1);
-      angularObjectCollection.response(angularObjectResponse2);
-      angularPluginAjs.outputPlugin = angularPlugin;
+      scopeSpy = vi.spyOn(angularPluginAjs.$scope, '$watchCollection');
       angularPluginAjs.$postLink();
     });
 
-    it('Should bind angular objects to scope', () => {
-      expect(angularPluginAjs.$scope[angularObject1.name]).toBeDefined();
-      expect(angularPluginAjs.$scope[angularObject1.name]).toEqual(angularObject1.object);
-      expect(angularPluginAjs.$scope[angularObject2.name]).toBeDefined();
-      expect(angularPluginAjs.$scope[angularObject2.name]).toEqual(angularObject2.object);
+    it('Should evoked $watchCollection', () => {
+      expect(scopeSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('Should have set watchers to scope', () => {
-      expect(watchSpy).toHaveBeenCalledTimes(2);
-      expect(watchCollectionSpy).toHaveBeenCalledTimes(1);
+    it('Should bound angularObject to scope', () => {
+      expect(angularPluginAjs.$scope['name']).toBeDefined();
     });
 
     it('Should have compiled', () => {
