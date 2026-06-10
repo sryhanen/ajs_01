@@ -43,14 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {
-  Component,
-  Input, OnInit, signal,
-} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {OutputSwitcher} from '../../../../objects/output/switcher/outputSwitcher';
 import {OutputSwitcherButtonView} from './button/outputSwitcherButtonView';
 import {OutputSwitcherButton} from '../../../../objects/output/switcher/button/outputSwitcherButton';
-import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writableSignalAsPushValue';
+import {OutputSwitcherAngularDraw} from './outputSwitcherAngularDraw';
+import {OutputSwitcherAngularDrawImpl} from './outputSwitcherAngularDrawImpl';
+import {webAppRoot} from '../../../../objects/webAppRoot/webAppRootImpl';
 
 @Component({
   selector: 'output-switcher',
@@ -58,7 +57,7 @@ import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writabl
     OutputSwitcherButtonView
   ],
   template: `
-    @let status = this.switcherStatus();
+    @let status = this.outputSwitcherAngularDraw.status();
     @if (status.isSwitchable) {
       <div class="btn-group" role="group">
         @for (button of outputSwitcherButtons; track $index) {
@@ -75,9 +74,10 @@ import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writabl
 export class OutputSwitcherView implements OnInit{
   @Input({required:true}) outputSwitcher:OutputSwitcher;
   @Input({required:true}) outputSwitcherButtons: OutputSwitcherButton[];
-  protected switcherStatus = signal({isSwitchable:false, isLoading:false});
+  protected outputSwitcherAngularDraw:OutputSwitcherAngularDraw;
 
   ngOnInit(): void {
-    this.outputSwitcher.status(new WritableSignalAsPushValue(this.switcherStatus));
+    this.outputSwitcherAngularDraw = new OutputSwitcherAngularDrawImpl(this.outputSwitcher);
+    webAppRoot.addAngularDraw(this.outputSwitcherAngularDraw);
   }
 }
