@@ -45,8 +45,10 @@
  */
 import {Channel} from '../channel/channel';
 import {WebSocketService} from '../webSocket/service/webSocketService';
+import {AngularDraw} from '../../ui/angular2+/angularDraw/angularDraw';
 
 export interface WebAppRoot extends Channel {
   initialize(webSocketService:WebSocketService):void;
   rootObject(): Channel;
+  addAngularDraw(angularDraw:AngularDraw):void;
 }

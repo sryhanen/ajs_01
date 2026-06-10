@@ -67,9 +67,8 @@ export class NotebookCollectionImpl implements NotebookCollection{
     ];
   }
 
-  notebooks(value: PushValue<Notebook[]>):void {
-    value.update(this._collection);
-    this._pushCollection.push(value);
+  notebooks():Notebook[] {
+    return this._collection;
   }
 
   request(data: object): void {

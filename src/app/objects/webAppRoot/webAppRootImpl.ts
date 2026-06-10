@@ -49,6 +49,7 @@ import {NotebookCollection} from '../notebookCollection/notebookCollection';
 import {NotebookCollectionImpl} from '../notebookCollection/notebookCollectionImpl';
 import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
+import {AngularDraw} from '../../ui/angular2+/angularDraw/angularDraw';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;
@@ -89,6 +90,11 @@ class WebAppRootImpl implements WebAppRoot {
     return this.notebookCollection;
   }
 
+  private readonly _angularDraws:AngularDraw[] = [];
+  addAngularDraw(angularDraw:AngularDraw):void {
+    this._angularDraws.push(angularDraw);
+  }
+
   request(data: object): void {
     if(!this._hasInitialized){
       throw new Error('WebAppRoot not initialized');
@@ -101,6 +107,7 @@ class WebAppRootImpl implements WebAppRoot {
       throw new Error('WebAppRoot not initialized');
     }
     this.notebookCollection.response(data);
+    this._angularDraws.forEach(angularDraw => angularDraw.draw());
   }
 }
 
