@@ -46,7 +46,6 @@
 import {AngularObjectCollection} from './angularObjectCollection';
 import {Channel} from '../channel/channel';
 import {Response} from '../channel/response';
-import {PushValue} from '../pushValue/pushValue';
 import {AngularObject} from '../angularObject/angularObject';
 import {AngularObjectRemoveResponse} from './responses/angularObjectRemove/angularObjectRemoveResponse';
 import {AngularObjectUpdateResponse} from './responses/angularObjectUpdate/angularObjectUpdateResponse';
@@ -54,16 +53,14 @@ import {AngularObjectUpdateResponse} from './responses/angularObjectUpdate/angul
 export class AngularObjectCollectionImpl implements AngularObjectCollection {
   private readonly _channel: Channel;
   private readonly _angularObjects: AngularObject[];
-  private readonly _pushValues: PushValue<AngularObject[]>[];
   private readonly _responses: Response[];
 
   constructor(channel: Channel) {
     this._channel = channel;
     this._angularObjects = [];
-    this._pushValues = [];
     this._responses = [
-      new AngularObjectRemoveResponse(this._angularObjects, this._pushValues),
-      new AngularObjectUpdateResponse(this, this._angularObjects, this._pushValues)
+      new AngularObjectRemoveResponse(this._angularObjects),
+      new AngularObjectUpdateResponse(this, this._angularObjects)
     ];
   }
 
