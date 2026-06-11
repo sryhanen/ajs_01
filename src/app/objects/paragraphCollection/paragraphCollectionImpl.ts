@@ -56,6 +56,7 @@ import {DefaultResponse} from './responses/default/defaultResponse';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
+import {ParagraphRemovedMessageImpl} from './paragraphRemovedMessage/paragraphRemovedMessageImpl';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _paragraphs: Paragraph[];
@@ -86,6 +87,11 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   response(data: object): void {
+    const paragraphRemovedMessage = new ParagraphRemovedMessageImpl(data);
+    if(!paragraphRemovedMessage.paragraphId().isStub()){
+      const removeIndex = this._paragraphs.findIndex(paragraph => paragraph.id() === paragraphRemovedMessage.paragraphId().text());
+      this._paragraphs.splice(removeIndex, 1);
+    }
     this._responses.forEach(response => response.response(data));
   }
 

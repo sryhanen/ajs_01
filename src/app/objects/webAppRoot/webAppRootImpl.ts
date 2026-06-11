@@ -112,8 +112,37 @@ class WebAppRootImpl implements WebAppRoot {
       throw new Error('WebAppRoot not initialized');
     }
     this.notebookCollection.response(data);
-    this._angularDraws.forEach(angularDraw => angularDraw.draw());
+    //this._angularDraws.forEach(angularDraw => angularDraw.draw());
   }
 }
 
 export const webAppRoot = new WebAppRootImpl();
+
+
+export interface WebAppRootAngularDraw extends WebAppRoot {
+
+}
+
+export class WebAppRootAngularDrawImpl implements WebAppRootAngularDraw {
+  private readonly _webAppRoot: WebAppRoot;
+
+  constructor(webAppRoot: WebAppRoot) {
+    this._webAppRoot = webAppRoot;
+  }
+
+  initialize(webSocketService: WebSocketService): void {
+  }
+
+  request(data: object): void {
+  }
+
+  response(data: object): void {
+  }
+
+  rootObject(): Channel {
+    return this._webAppRoot.rootObject();
+  }
+
+  addAngularDraw(angularDraw: AngularDraw): void {
+  }
+}

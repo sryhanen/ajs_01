@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, effect, Input, OnInit} from '@angular/core';
 import {NotebookView} from '../notebook/notebookView';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 import {NotebookCollectionAngularDraw} from './notebookCollectionAngularDraw';
@@ -60,6 +60,8 @@ import {NotebookCollectionAngularDrawImpl} from './notebookCollectionAngularDraw
         <notebook [paragraphId]="paragraphId" [notebook]="notebook"></notebook>
       }
     }
+
+    <ng-content></ng-content>
   `
 })
 export class NotebookCollectionView implements OnInit {
@@ -67,6 +69,9 @@ export class NotebookCollectionView implements OnInit {
   @Input({required:true}) paragraphId: string;
   protected collection: NotebookCollectionAngularDraw;
 
+  private notebookRender = effect(() => {
+
+  });
 
   ngOnInit() {
     this.collection = new NotebookCollectionAngularDrawImpl(webAppRoot.rootObject());
