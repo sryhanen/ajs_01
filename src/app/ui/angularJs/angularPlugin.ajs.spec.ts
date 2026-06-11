@@ -73,7 +73,7 @@ describe('AngularPluginAjs', () => {
     angularObjectCollection = new AngularObjectCollectionImpl(channel);
     angularPluginAjs = new AngularPluginAjs($compile,$scope,$element);
     angularPluginAjs.outputPlugin = new AngularPluginImpl(channel, template, angularObjectCollection);
-    angularPluginAjs.angularObjects = [new AngularObjectImpl(channel, {noteId:'', paragraphId:'', interpreterGroupId:'', angularObject:{name: 'name', object: 'value'}})];
+    angularPluginAjs.angularObjects = [new AngularObjectImpl(channel, {name: 'name', object: 'value'}, '')];
   });
 
   describe('Birth', () => {

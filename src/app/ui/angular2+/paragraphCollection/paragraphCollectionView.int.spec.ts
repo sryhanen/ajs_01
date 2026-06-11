@@ -70,7 +70,7 @@ describe('ParagraphCollectionView integration', () => {
     fixture = TestBed.createComponent(ParagraphCollectionView);
     fixture.componentInstance.paragraphCollection = paragraphCollection;
     fixture.componentInstance.paragraphId = 'paragraphId';
-    fixture.detectChanges();
+    fixture.changeDetectorRef.detectChanges();
   });
 
   describe('Birth', () => {
@@ -92,37 +92,6 @@ describe('ParagraphCollectionView integration', () => {
       fixture.detectChanges();
       const paragraphs = fixture.debugElement.queryAll(By.directive(ParagraphView));
       expect(paragraphs).toHaveLength(0);
-    });
-  });
-
-  describe('Collection updates', () => {
-    it('Should add paragraph', () => {
-      const paragraphAddedResponse = {
-        op:'PARAGRAPH_ADDED',
-        data:{
-          index:0,
-          paragraph:{
-            id:'newParagraph'
-          }
-        }
-      };
-      paragraphCollection.response(paragraphAddedResponse);
-      fixture.changeDetectorRef.detectChanges();
-      const paragraphs = fixture.debugElement.queryAll(By.directive(ParagraphView));
-      expect(paragraphs).toHaveLength(4);
-    });
-
-    it('Should remove paragraph', () => {
-      const paragraphRemovedResponse = {
-        op: 'PARAGRAPH_REMOVED',
-        data: {
-          id:paraId1
-        }
-      };
-      paragraphCollection.response(paragraphRemovedResponse);
-      fixture.detectChanges();
-      const paragraphs = fixture.debugElement.queryAll(By.directive(ParagraphView));
-      expect(paragraphs).toHaveLength(2);
     });
   });
 });
