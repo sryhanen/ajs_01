@@ -49,7 +49,6 @@ import {NotebookCollection} from '../notebookCollection/notebookCollection';
 import {NotebookCollectionImpl} from '../notebookCollection/notebookCollectionImpl';
 import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
-import {AngularDraw} from '../../ui/angular2+/angularDraw/angularDraw';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean;
