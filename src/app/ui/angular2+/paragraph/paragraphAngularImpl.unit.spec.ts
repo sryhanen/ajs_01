@@ -44,53 +44,71 @@
  * a licensee so wish it.
  */
 import {Paragraph} from '../../../objects/paragraph/paragraph';
-import {ParagraphImpl} from '../../../objects/paragraph/paragraphImpl';
+import {OutputContainer} from '../../../objects/output/container/outputContainer';
+import {OutputContainerImpl} from '../../../objects/output/container/outputContainerImpl';
 import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {Channel} from '../../../objects/channel/channel';
-import {AngularObjectCollection} from '../../../objects/angularObjectCollection/angularObjectCollection';
 import {AngularObjectCollectionImpl} from '../../../objects/angularObjectCollection/angularObjectCollectionImpl';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {ParagraphView} from './paragraphView';
-import {By} from '@angular/platform-browser';
-import {OutputContainerView} from '../output/container/outputContainerView';
-import {ToasterService} from '../../../shared/components/Toaster/notifications.service';
-import {FakeToasterService} from '../../../shared/components/Toaster/fakeToasterService';
+import {OutputContainerAngularImpl} from '../output/container/outputContainerAngularImpl';
+import {ParagraphAngularImpl} from './paragraphAngularImpl';
 
-describe('ParagraphView integration', () => {
-  const paragraphId = 'paragraphId';
-  const channel:Channel = new FakeChannel();
-  const toaster = new FakeToasterService();
+describe('ParagraphAngular unit test', () => {
+  let channel: Channel;
   let paragraph:Paragraph;
-  let fixture: ComponentFixture<ParagraphView>;
-
-  beforeEach(async () => {
-    paragraph = new ParagraphImpl(channel, {id:paragraphId});
-    TestBed.configureTestingModule({
-      providers: [
-        {provide:ToasterService, useValue: toaster}
-      ]
-    });
-    fixture = TestBed.createComponent(ParagraphView);
-    fixture.componentInstance.paragraphId = 'paragraphId';
-    fixture.componentInstance.paragraph = paragraph;
-    fixture.detectChanges();
+  let paragraphAngular:Paragraph;
+  beforeEach(() => {
+    channel = new FakeChannel();
+    paragraph = {
+      id(): string {
+        return 'id';
+      },
+      outputContainer(): OutputContainer {
+        return new OutputContainerImpl(channel, new AngularObjectCollectionImpl(channel));
+      },
+      print(): object {
+        return {
+          id: 'id',
+        };
+      },
+      request(data: object): void {},
+      response(data: object): void {}
+    };
+    paragraphAngular = new ParagraphAngularImpl(paragraph);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(fixture.componentInstance).toBeDefined();
+      expect(paragraphAngular).toBeDefined();
     });
 
-    it('Should have output container', () => {
-      const outputContainer = fixture.debugElement.query(By.directive(OutputContainerView));
-      expect(outputContainer).toBeTruthy();
+    it('Should have id', () => {
+      expect(paragraphAngular.id()).toEqual('id');
     });
 
-    it('Should have no output container if paragraphId does not match', () => {
-      fixture.componentRef.setInput('paragraphId', 'wrongId');
-      fixture.detectChanges();
-      const outputContainer = fixture.debugElement.query(By.directive(OutputContainerView));
-      expect(outputContainer).not.toBeTruthy();
+    it('Should print name', () => {
+      expect(paragraphAngular.print()).toEqual({id:'id'});
+    });
+
+    it('Should have OutputContainerAngular implementation', () => {
+      expect(paragraphAngular.outputContainer()).toBeInstanceOf(OutputContainerAngularImpl);
+    });
+  });
+
+  describe('Request', () => {
+    it('Should request paragraph', () => {
+      const request = {op:'', data:{}};
+      const requestSpy = vi.spyOn(paragraph, 'request');
+      paragraphAngular.request(request);
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+  });
+
+  describe('Response', () => {
+    it('Should respond outputContainer', () => {
+      const response = {op:'', data:{}};
+      const responseSpy = vi.spyOn(paragraphAngular.outputContainer(), 'response');
+      paragraphAngular.response(response);
+      expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
     });
   });
 });

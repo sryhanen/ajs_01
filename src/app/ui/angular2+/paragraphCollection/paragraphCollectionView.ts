@@ -45,7 +45,7 @@
  */
 import {Component, Input} from '@angular/core';
 import {ParagraphView} from '../paragraph/paragraphView';
-import {ParagraphCollectionAngular} from './paragraphCollectionAngular';
+import {ParagraphCollection} from '../../../objects/paragraphCollection/paragraphCollection';
 
 @Component({
   selector: 'paragraph-collection',
@@ -60,5 +60,5 @@ import {ParagraphCollectionAngular} from './paragraphCollectionAngular';
 })
 export class ParagraphCollectionView {
   @Input({required:true}) paragraphId: string;
-  @Input({required:true}) paragraphCollection: ParagraphCollectionAngular;
+  @Input({required:true}) paragraphCollection: ParagraphCollection;
 }

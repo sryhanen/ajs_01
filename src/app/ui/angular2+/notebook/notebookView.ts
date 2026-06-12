@@ -45,7 +45,7 @@
  */
 import {Component, Input} from '@angular/core';
 import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
-import {NotebookAngular} from './notebookAngular';
+import {Notebook} from '../../../objects/notebook/notebook';
 
 @Component({
   selector: 'notebook',
@@ -61,5 +61,5 @@ import {NotebookAngular} from './notebookAngular';
 })
 export class NotebookView {
   @Input({required:true}) paragraphId: string;
-  @Input({required:true}) notebook: NotebookAngular;
+  @Input({required:true}) notebook: Notebook;
 }

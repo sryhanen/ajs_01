@@ -45,9 +45,9 @@
  */
 import {Component, Input, OnInit} from '@angular/core';
 import {NotebookView} from '../notebook/notebookView';
-import {NotebookCollectionAngular} from './notebookCollectionAngular';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 import {WebAppRootAngularImpl} from '../webAppRoot/webAppRootAngularImpl';
+import {NotebookCollection} from '../../../objects/notebookCollection/notebookCollection';
 
 @Component({
   selector: 'notebook-collection',
@@ -65,7 +65,7 @@ import {WebAppRootAngularImpl} from '../webAppRoot/webAppRootAngularImpl';
 export class NotebookCollectionView implements OnInit {
   @Input({required:true}) noteId: string;
   @Input({required:true}) paragraphId: string;
-  protected notebookCollection: NotebookCollectionAngular;
+  protected notebookCollection: NotebookCollection;
 
   ngOnInit() {
     const angularWebAppRoot = new WebAppRootAngularImpl(webAppRoot);

@@ -46,7 +46,7 @@
 import {Component, Input} from '@angular/core';
 import {OutputSwitcherButtonView} from './button/outputSwitcherButtonView';
 import {OutputSwitcherButton} from '../../../../objects/output/switcher/button/outputSwitcherButton';
-import {OutputSwitcherAngular} from './outputSwitcherAngular';
+import {OutputSwitcher} from '../../../../objects/output/switcher/outputSwitcher';
 
 @Component({
   selector: 'output-switcher',
@@ -69,6 +69,6 @@ import {OutputSwitcherAngular} from './outputSwitcherAngular';
   `
 })
 export class OutputSwitcherView {
-  @Input({required:true}) outputSwitcher:OutputSwitcherAngular;
+  @Input({required:true}) outputSwitcher:OutputSwitcher;
   @Input({required:true}) outputSwitcherButtons: OutputSwitcherButton[];
 }
