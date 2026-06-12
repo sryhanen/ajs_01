@@ -49,9 +49,6 @@ import {OutputSwitcherView} from '../switcher/outputSwitcherView';
 import {InterpreterErrorDirective} from '../../interpreterError/interpreterErrorDirective';
 import {OutputSwitcherButton} from '../../../../objects/output/switcher/button/outputSwitcherButton';
 import {OutputPluginDirective} from '../plugin/outputPluginDirective';
-import {webAppRoot} from '../../../../objects/webAppRoot/webAppRootImpl';
-import {OutputContainerAngularDrawImpl} from './outputContainerAngularDrawImpl';
-import {OutputContainerAngularDraw} from './outputContainerAngularDraw';
 
 @Component({
   selector: 'output-container',
@@ -64,17 +61,14 @@ import {OutputContainerAngularDraw} from './outputContainerAngularDraw';
     <output-switcher [interpreter-error-popup]="outputContainer.errorListener()"
                      [outputSwitcher]="outputContainer.outputSwitcher()"
                      [outputSwitcherButtons]="outputSwitcherButtons"></output-switcher>
-    <ng-container output-plugin [outputPlugin]="outputContainerAngularDraw.outputPlugin()"></ng-container>
+    <ng-container output-plugin [outputPlugin]="outputContainer.outputPlugin()"></ng-container>
   `
 })
 export class OutputContainerView implements OnInit {
   @Input({required:true}) outputContainer: OutputContainer;
   protected outputSwitcherButtons: OutputSwitcherButton[];
-  protected outputContainerAngularDraw:OutputContainerAngularDraw;
 
   ngOnInit(): void {
-    this.outputContainerAngularDraw = new OutputContainerAngularDrawImpl(this.outputContainer);
     this.outputSwitcherButtons = this.outputContainer.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
-    webAppRoot.addAngularDraw(this.outputContainerAngularDraw);
   }
 }

@@ -45,9 +45,9 @@
  */
 import {Component, Input, OnInit} from '@angular/core';
 import {NotebookView} from '../notebook/notebookView';
+import {NotebookCollectionAngular} from './notebookCollectionAngular';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
-import {NotebookCollectionAngularDraw} from './notebookCollectionAngularDraw';
-import {NotebookCollectionAngularDrawImpl} from './notebookCollectionAngularDrawImpl';
+import {WebAppRootAngularImpl} from '../webAppRoot/webAppRootAngularImpl';
 
 @Component({
   selector: 'notebook-collection',
@@ -55,7 +55,7 @@ import {NotebookCollectionAngularDrawImpl} from './notebookCollectionAngularDraw
     NotebookView
   ],
   template: `
-    @for (notebook of collection.notebooks(); track notebook) {
+    @for (notebook of notebookCollection.notebooks(); track notebook) {
       @if(notebook.id() === noteId){
         <notebook [paragraphId]="paragraphId" [notebook]="notebook"></notebook>
       }
@@ -65,11 +65,11 @@ import {NotebookCollectionAngularDrawImpl} from './notebookCollectionAngularDraw
 export class NotebookCollectionView implements OnInit {
   @Input({required:true}) noteId: string;
   @Input({required:true}) paragraphId: string;
-  protected collection: NotebookCollectionAngularDraw;
-
+  protected notebookCollection: NotebookCollectionAngular;
 
   ngOnInit() {
-    this.collection = new NotebookCollectionAngularDrawImpl(webAppRoot.rootObject());
-    webAppRoot.addAngularDraw(this.collection);
+    const angularWebAppRoot = new WebAppRootAngularImpl(webAppRoot);
+    this.notebookCollection = angularWebAppRoot.rootObject();
+    webAppRoot.addWebAppRoot(angularWebAppRoot);
   }
 }

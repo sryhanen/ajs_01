@@ -1,7 +1,6 @@
 import {ParagraphCollection} from '../../../objects/paragraphCollection/paragraphCollection';
-import {AngularDraw} from '../angularDraw/angularDraw';
 import {Paragraph} from '../../../objects/paragraph/paragraph';
 
-export interface ParagraphCollectionAngularDraw extends Partial<ParagraphCollection>, AngularDraw {
+export interface ParagraphCollectionAngular extends ParagraphCollection{
   paragraphs(): Map<string, Paragraph>;
 }

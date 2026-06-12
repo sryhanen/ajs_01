@@ -43,12 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {AngularViewUpgradeModule} from './angularViewUpgradeModule';
 import {AngularPlugin} from '../../../../../objects/output/plugins/angularPlugin/angularPlugin';
-import {AngularObjectsAngularDraw} from './angularObjectsAngularDraw';
-import {AngularObjectsAngularDrawImpl} from './angularObjectsAngularDrawImpl';
-import {webAppRoot} from '../../../../../objects/webAppRoot/webAppRootImpl';
 
 @Component({
   selector: 'angular-view',
@@ -56,15 +53,9 @@ import {webAppRoot} from '../../../../../objects/webAppRoot/webAppRootImpl';
     AngularViewUpgradeModule
   ],
   template: `
-    <ajs-angular-view [outputPlugin]="outputPlugin" [angularObjects]="angularObjectsAngularDraw.angularObjects()"></ajs-angular-view>
+    <ajs-angular-view [outputPlugin]="outputPlugin" [angularObjects]="outputPlugin.angularObjectCollection().angularObjects()"></ajs-angular-view>
   `
 })
-export class AngularView implements OnInit {
+export class AngularView {
   @Input({required:true}) outputPlugin: AngularPlugin;
-  protected angularObjectsAngularDraw: AngularObjectsAngularDraw;
-
-  ngOnInit() {
-    this.angularObjectsAngularDraw = new AngularObjectsAngularDrawImpl(this.outputPlugin.angularObjectCollection());
-    webAppRoot.addAngularDraw(this.angularObjectsAngularDraw);
-  }
 }

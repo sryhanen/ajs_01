@@ -43,13 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input, OnInit} from '@angular/core';
-import {OutputSwitcher} from '../../../../objects/output/switcher/outputSwitcher';
+import {Component, Input} from '@angular/core';
 import {OutputSwitcherButtonView} from './button/outputSwitcherButtonView';
 import {OutputSwitcherButton} from '../../../../objects/output/switcher/button/outputSwitcherButton';
-import {OutputSwitcherAngularDraw} from './outputSwitcherAngularDraw';
-import {OutputSwitcherAngularDrawImpl} from './outputSwitcherAngularDrawImpl';
-import {webAppRoot} from '../../../../objects/webAppRoot/webAppRootImpl';
+import {OutputSwitcherAngular} from './outputSwitcherAngular';
 
 @Component({
   selector: 'output-switcher',
@@ -57,7 +54,7 @@ import {webAppRoot} from '../../../../objects/webAppRoot/webAppRootImpl';
     OutputSwitcherButtonView
   ],
   template: `
-    @let status = this.outputSwitcherAngularDraw.status();
+    @let status = this.outputSwitcher.status();
     @if (status.isSwitchable) {
       <div class="btn-group" role="group">
         @for (button of outputSwitcherButtons; track $index) {
@@ -71,13 +68,7 @@ import {webAppRoot} from '../../../../objects/webAppRoot/webAppRootImpl';
     }
   `
 })
-export class OutputSwitcherView implements OnInit{
-  @Input({required:true}) outputSwitcher:OutputSwitcher;
+export class OutputSwitcherView {
+  @Input({required:true}) outputSwitcher:OutputSwitcherAngular;
   @Input({required:true}) outputSwitcherButtons: OutputSwitcherButton[];
-  protected outputSwitcherAngularDraw:OutputSwitcherAngularDraw;
-
-  ngOnInit(): void {
-    this.outputSwitcherAngularDraw = new OutputSwitcherAngularDrawImpl(this.outputSwitcher);
-    webAppRoot.addAngularDraw(this.outputSwitcherAngularDraw);
-  }
 }

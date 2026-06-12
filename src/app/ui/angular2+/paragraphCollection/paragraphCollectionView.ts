@@ -43,12 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input, OnInit} from '@angular/core';
-import {ParagraphCollection} from '../../../objects/paragraphCollection/paragraphCollection';
+import {Component, Input} from '@angular/core';
 import {ParagraphView} from '../paragraph/paragraphView';
-import {ParagraphCollectionAngularDraw} from './paragraphCollectionAngularDraw';
-import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
-import {ParagraphCollectionAngularDrawImpl} from './paragraphCollectionAngularDrawImpl';
+import {ParagraphCollectionAngular} from './paragraphCollectionAngular';
 
 @Component({
   selector: 'paragraph-collection',
@@ -56,18 +53,12 @@ import {ParagraphCollectionAngularDrawImpl} from './paragraphCollectionAngularDr
     ParagraphView
   ],
   template: `
-    @for (paragraph of paragraphCollectionAngularDraw.paragraphs(); track paragraph) {
+    @for (paragraph of paragraphCollection.paragraphs(); track paragraph) {
       <paragraph [paragraphId]="paragraphId" [paragraph]="paragraph[1]"></paragraph>
     }
   `
 })
-export class ParagraphCollectionView implements OnInit {
+export class ParagraphCollectionView {
   @Input({required:true}) paragraphId: string;
-  @Input({required:true}) paragraphCollection: ParagraphCollection;
-  protected paragraphCollectionAngularDraw:ParagraphCollectionAngularDraw;
-
-  ngOnInit():void {
-    this.paragraphCollectionAngularDraw = new ParagraphCollectionAngularDrawImpl(this.paragraphCollection);
-    webAppRoot.addAngularDraw(this.paragraphCollectionAngularDraw);
-  }
+  @Input({required:true}) paragraphCollection: ParagraphCollectionAngular;
 }
