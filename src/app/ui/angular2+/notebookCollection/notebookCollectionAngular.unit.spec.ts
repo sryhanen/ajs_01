@@ -43,31 +43,59 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookCollection} from '../../../objects/notebookCollection/notebookCollection';
-import {signal, WritableSignal} from '@angular/core';
-import {NotebookAngular} from '../notebook/notebookAngular';
-import {NotebookAngularImpl} from '../notebook/notebookAngularImpl';
 import {NotebookCollectionAngular} from './notebookCollectionAngular';
+import {NotebookCollectionAngularImpl} from './notebookCollectionAngularImpl';
+import {NotebookCollectionImpl} from '../../../objects/notebookCollection/notebookCollectionImpl';
+import {FakeChannel} from '../../../objects/channel/fakeChannel';
+import {Channel} from '../../../objects/channel/channel';
+import {NotebookCollection} from '../../../objects/notebookCollection/notebookCollection';
 
-export class NotebookCollectionAngularImpl implements NotebookCollectionAngular {
-  private readonly _notebookCollection: NotebookCollection;
-  private readonly _notebooks: WritableSignal<NotebookAngular[]>;
+describe('NotebookCollectionAngular unit test', () => {
+  let notebookCollection: NotebookCollection;
+  let notebookCollectionAngular: NotebookCollectionAngular;
+  let channel:Channel;
 
-  constructor(notebookCollection: NotebookCollection) {
-    this._notebookCollection = notebookCollection;
-    this._notebooks = signal(this._notebookCollection.notebooks().map(notebook => new NotebookAngularImpl(notebook)));
-  }
+  beforeEach(() => {
+    channel = new FakeChannel();
+    notebookCollection = new NotebookCollectionImpl(channel);
+    notebookCollectionAngular = new NotebookCollectionAngularImpl(notebookCollection);
+  });
 
-  request(json: object): void {
-    this._notebookCollection.request(json);
-  }
+  describe('Birth', () => {
+    it('Should have initialized', () => {
+      expect(notebookCollectionAngular).toBeDefined();
+    });
 
-  response(json: object): void {
-    this._notebooks.update(() => [...this._notebookCollection.notebooks().map(notebook => new NotebookAngularImpl(notebook))]);
-    this._notebooks().forEach(notebook => notebook.response(json));
-  }
+    it('Should have empty list of notebooks', () => {
+      expect(notebookCollectionAngular.notebooks()).toEqual([]);
+    });
+  });
 
-  notebooks(): NotebookAngular[] {
-    return this._notebooks();
-  }
-}
+  describe('Request', () => {
+    it('Should request notebook', () => {
+      const request = {op:'', data:{}};
+      const notebookRequestSpy = vi.spyOn(notebookCollection, 'request');
+      notebookCollectionAngular.request(request);
+      expect(notebookRequestSpy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+  });
+
+  describe('Response', () => {
+    const response = {
+      op:'NOTES_INFO',
+      data:{
+        notes:[
+          {id:'note1'},
+          {id:'note2'},
+          {id:'note3'},
+        ]
+      }
+    };
+
+    it('Should update notebooks on response', () => {
+      notebookCollection.response(response);
+      notebookCollectionAngular.response(response);
+      expect(notebookCollectionAngular.notebooks()).toHaveLength(3);
+    });
+  });
+});
