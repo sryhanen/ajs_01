@@ -51,6 +51,7 @@ import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {Channel} from '../../../objects/channel/channel';
 import {By} from '@angular/platform-browser';
 import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
+import {NotebookAngularImpl} from './notebookAngularImpl';
 
 describe('NotebookView integration', () => {
   let fixture: ComponentFixture<NotebookView>;
@@ -66,11 +67,11 @@ describe('NotebookView integration', () => {
   let notebook: Notebook;
 
   beforeEach(() => {
-    notebook = new NotebookImpl(channel, notebookData);
+    notebook = new NotebookAngularImpl(new NotebookImpl(channel, notebookData));
     fixture = TestBed.createComponent(NotebookView);
     fixture.componentInstance.paragraphId = paragraphId;
     fixture.componentInstance.notebook = notebook;
-    fixture.detectChanges();
+    fixture.componentRef.changeDetectorRef.detectChanges();
   });
 
   describe('Birth', () => {
@@ -87,8 +88,8 @@ describe('NotebookView integration', () => {
       fixture.destroy();
       fixture = TestBed.createComponent(NotebookView);
       fixture.componentInstance.paragraphId = paragraphId;
-      fixture.componentInstance.notebook = new NotebookImpl(channel, {id: noteId});
-      fixture.detectChanges();
+      fixture.componentInstance.notebook = new NotebookAngularImpl(new NotebookImpl(channel, {id: noteId}));
+      fixture.componentRef.changeDetectorRef.detectChanges();
       const paragraphCollection = fixture.debugElement.query(By.directive(ParagraphCollectionView));
       expect(paragraphCollection).not.toBeTruthy();
     });
