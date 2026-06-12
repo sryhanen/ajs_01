@@ -76,7 +76,7 @@ export class ParagraphCollectionAngularImpl implements ParagraphCollection {
   }
 
   isStub(): boolean {
-    return this._paragraphCollection.isStub();
+    return false;
   }
 
   paragraphs(): Map<string, Paragraph>{
