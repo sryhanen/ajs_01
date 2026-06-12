@@ -45,50 +45,71 @@
  */
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
-import {Response} from '../channel/response';
-import {Request} from '../channel/request';
-import {ParagraphResponse} from './responses/paragraph/paragraphResponse';
-import {ParagraphAddedResponse} from './responses/paragraphAdded/paragraphAddedResponse';
-import {ParagraphRemovedResponse} from './responses/paragraphRemoved/paragraphRemovedResponse';
-import {DefaultRequest} from './requests/default/defaultRequest';
-import {RunParagraphRequest} from './requests/runParagraph/runParagraphRequest';
-import {DefaultResponse} from './responses/default/defaultResponse';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
+import {ParagraphMessageImpl} from './messages/paragraphMessage/paragraphMessageImpl';
+import {ResponseChannel} from '../responseChannel/responseChannel';
+import {ResponseChannelImpl} from '../responseChannel/responseChannelImpl';
+import {ParagraphAddedMessageImpl} from './messages/paragraphAddedMessage/paragraphAddedMessageImpl';
+import {ParagraphRemovedMessageImpl} from './messages/paragraphRemovedMessage/paragraphRemovedMessageImpl';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
-  private readonly _paragraphs: Paragraph[];
-  private readonly _responses: Response[];
-  private readonly _requests: Request[];
+  private readonly _paragraphs: Map<string, Paragraph>;
+  private readonly _channel: Channel;
+  private readonly _responseChannel: ResponseChannel;
 
   constructor(channel: Channel, initialParagraphData: object[]) {
-    this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph));
-    this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph));
-    this._responses = [
-      new DefaultResponse(this._paragraphs),
-      new ParagraphResponse(channel, this._paragraphs),
-      new ParagraphAddedResponse(channel, this._paragraphs),
-      new ParagraphRemovedResponse(this._paragraphs),
-      new ParagraphResponse(channel, this._paragraphs),
-      new ParagraphAddedResponse(channel, this._paragraphs),
-      new ParagraphRemovedResponse(this._paragraphs),
-    ];
-    this._requests = [
-      new DefaultRequest(channel),
-      new RunParagraphRequest(channel, this._paragraphs)
-    ];
+    this._channel = channel;
+    this._paragraphs = new Map<string, Paragraph>();
+    initialParagraphData.forEach(paragraph => {
+      const paragraphObject = new ParagraphImpl(this, paragraph);
+      this._paragraphs.set(paragraphObject.id(), paragraphObject);
+    });
+    this._responseChannel = new ResponseChannelImpl();
+    this._responseChannel.subscribe('PARAGRAPH', (json:object)=> this.patchParagraph(json));
+    this._responseChannel.subscribe('PARAGRAPH_ADDED', (json:object)=> this.addParagraph(json));
+    this._responseChannel.subscribe('PARAGRAPH_REMOVED', (json:object)=> this.removeParagraph(json));
   }
 
-  paragraphs():Paragraph[] {
+  private removeParagraph(json:object):void {
+    const paragraphRemovedMessage = new ParagraphRemovedMessageImpl(json);
+    this._paragraphs.delete(paragraphRemovedMessage.removedParagraphId());
+  }
+
+  private addParagraph(json:object):void {
+    const paragraphAddedMessage = new ParagraphAddedMessageImpl(json);
+    const paragraphWithIndex = paragraphAddedMessage.paragraphWithIndex(this);
+    const paragraphMapCopy = new Map<string, Paragraph>(this._paragraphs);
+    this._paragraphs.clear();
+    let index = 0;
+    for(const [id, paragraph] of paragraphMapCopy) {
+      if(index === paragraphWithIndex.index){
+        this._paragraphs.set(paragraphWithIndex.paragraph.id(), paragraphWithIndex.paragraph);
+      }
+      else{
+        this._paragraphs.set(id, paragraph);
+      }
+      index +=1;
+    }
+  }
+
+  private patchParagraph(json:object):void{
+    const paragraphMessage = new ParagraphMessageImpl(json);
+    const paragraph = paragraphMessage.paragraph(this._channel);
+    this._paragraphs.set(paragraph.id(), paragraph);
+  }
+
+  paragraphs():Map<string, Paragraph> {
     return this._paragraphs;
   }
 
   request(data: object): void {
-    this._requests.forEach(request => request.request(data));
+    this._channel.request(data);
   }
 
   response(data: object): void {
-    this._responses.forEach(response => response.response(data));
+    this._responseChannel.response(data);
+    this._paragraphs.forEach(paragraph => paragraph.response(data));
   }
 
   isStub(): boolean {

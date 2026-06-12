@@ -6,7 +6,7 @@ export class ParagraphCollectionStub implements ParagraphCollection {
     return true;
   }
 
-  paragraphs(): Paragraph[] {
+  paragraphs(): Map<string, Paragraph> {
     throw new Error('ParagraphCollectionStub: method not implemented.');
   }
 

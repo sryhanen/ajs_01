@@ -57,7 +57,7 @@ import {ParagraphCollectionAngularDrawImpl} from './paragraphCollectionAngularDr
   ],
   template: `
     @for (paragraph of paragraphCollectionAngularDraw.paragraphs(); track paragraph) {
-      <paragraph [paragraphId]="paragraphId" [paragraph]="paragraph"></paragraph>
+      <paragraph [paragraphId]="paragraphId" [paragraph]="paragraph[1]"></paragraph>
     }
   `
 })

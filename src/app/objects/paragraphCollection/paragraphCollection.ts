@@ -48,5 +48,5 @@ import {Channel} from '../channel/channel';
 import Stubable from '../../shared/interfaces/stubable';
 
 export interface ParagraphCollection extends Channel, Stubable {
-  paragraphs():Paragraph[];
+  paragraphs():Map<string, Paragraph>;
 }
