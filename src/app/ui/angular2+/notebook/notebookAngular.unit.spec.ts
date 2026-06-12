@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import {Notebook} from '../../../objects/notebook/notebook';
-import {NotebookAngular} from './notebookAngular';
 import {Channel} from '../../../objects/channel/channel';
 import {FakeChannel} from '../../../objects/channel/fakeChannel';
 import {NotebookImpl} from '../../../objects/notebook/notebookImpl';
@@ -53,7 +52,7 @@ import {NotebookAngularImpl} from './notebookAngularImpl';
 describe('NotebookAngular unit test', () => {
   let channel:Channel;
   let notebook:Notebook;
-  let notebookAngular:NotebookAngular;
+  let notebookAngular:Notebook;
 
   beforeEach(() => {
     channel = new FakeChannel();

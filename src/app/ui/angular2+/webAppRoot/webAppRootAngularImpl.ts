@@ -1,11 +1,11 @@
 import {WebAppRoot} from '../../../objects/webAppRoot/webAppRoot';
 import {WebSocketService} from '../../../objects/webSocket/service/webSocketService';
-import {NotebookCollectionAngular} from '../notebookCollection/notebookCollectionAngular';
 import {NotebookCollectionAngularImpl} from '../notebookCollection/notebookCollectionAngularImpl';
+import {NotebookCollection} from '../../../objects/notebookCollection/notebookCollection';
 
 export class WebAppRootAngularImpl implements WebAppRoot {
   private readonly _webAppRoot:WebAppRoot;
-  private readonly _rootObject:NotebookCollectionAngular;
+  private readonly _rootObject:NotebookCollection;
 
   constructor(webAppRoot:WebAppRoot){
     this._webAppRoot = webAppRoot;
@@ -24,7 +24,7 @@ export class WebAppRootAngularImpl implements WebAppRoot {
     this._rootObject.response(data);
   }
 
-  rootObject(): NotebookCollectionAngular {
+  rootObject(): NotebookCollection {
     return this._rootObject;
   }
 

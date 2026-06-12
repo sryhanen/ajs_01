@@ -45,13 +45,12 @@
  */
 import {NotebookCollection} from '../../../objects/notebookCollection/notebookCollection';
 import {signal, WritableSignal} from '@angular/core';
-import {NotebookAngular} from '../notebook/notebookAngular';
 import {NotebookAngularImpl} from '../notebook/notebookAngularImpl';
-import {NotebookCollectionAngular} from './notebookCollectionAngular';
+import {Notebook} from '../../../objects/notebook/notebook';
 
-export class NotebookCollectionAngularImpl implements NotebookCollectionAngular {
+export class NotebookCollectionAngularImpl implements NotebookCollection {
   private readonly _notebookCollection: NotebookCollection;
-  private readonly _notebooks: WritableSignal<NotebookAngular[]>;
+  private readonly _notebooks: WritableSignal<Notebook[]>;
 
   constructor(notebookCollection: NotebookCollection) {
     this._notebookCollection = notebookCollection;
@@ -67,7 +66,7 @@ export class NotebookCollectionAngularImpl implements NotebookCollectionAngular 
     this._notebooks().forEach(notebook => notebook.response(json));
   }
 
-  notebooks(): NotebookAngular[] {
+  notebooks(): Notebook[] {
     return this._notebooks();
   }
 }

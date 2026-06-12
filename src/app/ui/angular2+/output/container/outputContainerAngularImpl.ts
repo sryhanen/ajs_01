@@ -4,13 +4,12 @@ import { InterpreterErrorListener } from '../../../../objects/interpreterErrorLi
 import { OutputFormat } from '../../../../objects/output/format/outputFormat';
 import { OutputSwitcher } from '../../../../objects/output/switcher/outputSwitcher';
 import {signal, WritableSignal} from '@angular/core';
-import {OutputSwitcherAngular} from '../switcher/outputSwitcherAngular';
 import {OutputSwitcherAngularImpl} from '../switcher/outputSwitcherAngularImpl';
 
 export class OutputContainerAngularImpl implements OutputContainer {
   private readonly _outputContainer: OutputContainer;
   private readonly _outputPlugin: WritableSignal<OutputPlugin>;
-  private readonly _outputSwitcher: OutputSwitcherAngular;
+  private readonly _outputSwitcher: OutputSwitcher;
 
   constructor(outputContainer: OutputContainer) {
     this._outputContainer = outputContainer;

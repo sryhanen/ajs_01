@@ -43,26 +43,25 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookAngular} from './notebookAngular';
 import {Notebook} from '../../../objects/notebook/notebook';
-import {ParagraphCollectionAngular} from '../paragraphCollection/paragraphCollectionAngular';
 import {ParagraphCollectionAngularImpl} from '../paragraphCollection/paragraphCollectionAngularImpl';
 import {signal, WritableSignal} from '@angular/core';
-import {ParagraphCollectionAngularStub} from '../paragraphCollection/paragraphCollectionAngularStub';
+import {ParagraphCollection} from '../../../objects/paragraphCollection/paragraphCollection';
+import {ParagraphCollectionStub} from '../../../objects/paragraphCollection/paragraphCollectionStub';
 
-export class NotebookAngularImpl implements NotebookAngular {
+export class NotebookAngularImpl implements Notebook {
   private readonly _notebook:Notebook;
-  private readonly _paragraphCollection:WritableSignal<ParagraphCollectionAngular>;
+  private readonly _paragraphCollection:WritableSignal<ParagraphCollection>;
 
   constructor(notebook:Notebook) {
     this._notebook = notebook;
     this._paragraphCollection = signal(this.paragraphCollectionAngular());
   }
 
-  private paragraphCollectionAngular(): ParagraphCollectionAngular {
-    let paragraphCollectionAngular:ParagraphCollectionAngular;
+  private paragraphCollectionAngular(): ParagraphCollection {
+    let paragraphCollectionAngular:ParagraphCollection;
     if(this._notebook.paragraphCollection().isStub()){
-      paragraphCollectionAngular = new ParagraphCollectionAngularStub();
+      paragraphCollectionAngular = new ParagraphCollectionStub();
     }
     else{
       paragraphCollectionAngular = new ParagraphCollectionAngularImpl(this._notebook.paragraphCollection());
@@ -84,7 +83,7 @@ export class NotebookAngularImpl implements NotebookAngular {
     return this._notebook.id();
   }
 
-  paragraphCollection(): ParagraphCollectionAngular {
+  paragraphCollection(): ParagraphCollection {
     return this._paragraphCollection();
   }
 }

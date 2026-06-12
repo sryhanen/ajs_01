@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookCollectionAngular} from './notebookCollectionAngular';
 import {NotebookCollectionAngularImpl} from './notebookCollectionAngularImpl';
 import {NotebookCollectionImpl} from '../../../objects/notebookCollection/notebookCollectionImpl';
 import {FakeChannel} from '../../../objects/channel/fakeChannel';
@@ -52,7 +51,7 @@ import {NotebookCollection} from '../../../objects/notebookCollection/notebookCo
 
 describe('NotebookCollectionAngular unit test', () => {
   let notebookCollection: NotebookCollection;
-  let notebookCollectionAngular: NotebookCollectionAngular;
+  let notebookCollectionAngular: NotebookCollection;
   let channel:Channel;
 
   beforeEach(() => {
