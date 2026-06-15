@@ -43,17 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Response} from '../../../channel/response';
-import {Paragraph} from '../../../paragraph/paragraph';
+import {IsAggregated} from './isAggregated/isAggregated';
 
-export class DefaultResponse implements Response {
-  private readonly _paragraphs: Paragraph[];
-
-  constructor(paragraphs: Paragraph[]) {
-    this._paragraphs = paragraphs;
-  }
-
-  response(data: object) {
-    this._paragraphs.forEach(paragraph => paragraph.response(data));
-  }
+export interface ParagraphOutputMessage {
+  isAggregated(): IsAggregated;
+  type(): string;
+  output():object;
 }

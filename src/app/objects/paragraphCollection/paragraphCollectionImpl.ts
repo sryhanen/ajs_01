@@ -47,7 +47,6 @@ import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
-import {ParagraphMessageImpl} from './messages/paragraphMessage/paragraphMessageImpl';
 import {ResponseChannel} from '../responseChannel/responseChannel';
 import {ResponseChannelImpl} from '../responseChannel/responseChannelImpl';
 import {ParagraphAddedMessageImpl} from './messages/paragraphAddedMessage/paragraphAddedMessageImpl';
@@ -66,7 +65,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       this._paragraphs.set(paragraphObject.id(), paragraphObject);
     });
     this._responseChannel = new ResponseChannelImpl();
-    this._responseChannel.subscribe('PARAGRAPH', (json:object)=> this.patchParagraph(json));
     this._responseChannel.subscribe('PARAGRAPH_ADDED', (json:object)=> this.addParagraph(json));
     this._responseChannel.subscribe('PARAGRAPH_REMOVED', (json:object)=> this.removeParagraph(json));
   }
@@ -91,12 +89,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       }
       index +=1;
     }
-  }
-
-  private patchParagraph(json:object):void{
-    const paragraphMessage = new ParagraphMessageImpl(json);
-    const paragraph = paragraphMessage.paragraph(this._channel);
-    this._paragraphs.set(paragraph.id(), paragraph);
   }
 
   paragraphs():Map<string, Paragraph> {

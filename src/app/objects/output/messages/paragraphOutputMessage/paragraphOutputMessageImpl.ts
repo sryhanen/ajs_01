@@ -43,34 +43,61 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
-import {Response} from '../../../channel/response';
-import {Paragraph} from '../../../paragraph/paragraph';
+import {ParagraphOutputMessage} from './paragraphOutputMessage';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
+import {Message} from '../../../message/message';
+import {SafeJson} from '../../../safeJson/safeJson';
+import {IsAggregated} from './isAggregated/isAggregated';
+import {IsAggregatedImpl} from './isAggregated/isAggregatedImpl';
+import {IsAggregatedStub} from './isAggregated/isAggregatedStub';
 
-export class ParagraphResponse implements Response {
-  private readonly _channel: Channel;
-  private readonly _paragraphs: Paragraph[];
+export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
+  private readonly _json:object;
 
-  constructor(channel: Channel, paragraphs: Paragraph[]) {
-    this._channel = channel;
-    this._paragraphs = paragraphs;
+  constructor(json:object) {
+    this._json = json;
   }
 
-  response(data: object): void {
-    if(this._paragraphs.length === 0){
-      return;
+  output():object {
+    const message = this.message();
+    this.validateMessage(message);
+    const safeData = this.safeData(message);
+    return safeData.getProperty('output', 'object');
+  }
+
+  isAggregated(): IsAggregated {
+    const message = this.message();
+    this.validateMessage(message);
+    const safeData = this.safeData(message);
+    let isAggregated:IsAggregated;
+    if(safeData.propertyExists('isAggregated')) {
+      isAggregated = new IsAggregatedImpl(new SafeJsonImpl(safeData.getProperty('output', 'object')).getProperty('isAggregated', 'boolean'));
     }
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    if(message.operation() === 'PARAGRAPH') {
-      const newParagraph = new ParagraphImpl(this._channel, message.data());
-      const paragraphIndex = this._paragraphs.findIndex(paragraph => paragraph.id() === newParagraph.id());
-      if(paragraphIndex === -1){
-        throw new Error(`Paragraph update failed: Paragraph "${newParagraph.id()}" not found in current collection.`);
-      }
-      this._paragraphs.splice(paragraphIndex, 1, newParagraph);
+    else{
+      isAggregated = new IsAggregatedStub();
     }
+    return isAggregated;
+  }
+
+  type(): string {
+    const message = this.message();
+    this.validateMessage(message);
+    const safeData = this.safeData(message);
+    return new SafeJsonImpl(safeData.getProperty('output', 'object')).getProperty('type', 'string');
+  }
+
+  private safeData(message:Message): SafeJson{
+    return new SafeJsonImpl(message.data());
+  }
+
+  private validateMessage(message:Message): void{
+    if(message.operation() !== 'PARAGRAPH_OUTPUT'){
+      throw new RangeError('Message operation is not "PARAGRAPH_OUTPUT".');
+    }
+  }
+
+  private message(): Message {
+    return new MessageImpl(new SafeJsonImpl(this._json));
   }
 }

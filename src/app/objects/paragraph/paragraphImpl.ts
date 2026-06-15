@@ -52,20 +52,26 @@ import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {MessageImpl} from '../message/messageImpl';
 import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
+import {ParagraphMessageImpl} from '../paragraphCollection/messages/paragraphMessage/paragraphMessageImpl';
+import {ResponseChannel} from '../responseChannel/responseChannel';
+import {ResponseChannelImpl} from '../responseChannel/responseChannelImpl';
 
 export class ParagraphImpl implements Paragraph{
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
   private readonly _angularObjectCollection: AngularObjectCollection;
-  private readonly _paragraph: SafeJson;
+  private readonly _responseChannel: ResponseChannel;
+  private _paragraph: SafeJson;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
     this._angularObjectCollection = new AngularObjectCollectionImpl(this);
-    this._outputContainer = new OutputContainerImpl(this, this._angularObjectCollection);
+    this._responseChannel = new ResponseChannelImpl();
+    this._responseChannel.subscribe('PARAGRAPH', (json:object)=> this.patchParagraph(json));
 
-    if(this._paragraph.propertyExists('output')){
+    this._outputContainer = new OutputContainerImpl(this, this._angularObjectCollection);
+    if(this._paragraph.propertyExists('output')){ //TODO refactor this to outputContainer
       const paragraphOutput = this._paragraph.getProperty<object>('output', 'object');
       if(paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined){
         console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
@@ -82,6 +88,11 @@ export class ParagraphImpl implements Paragraph{
         this._outputContainer.response(paragraphOutputMessage);
       }
     }
+  }
+
+  private patchParagraph(json:object):void{
+    const paragraphMessage = new ParagraphMessageImpl(json);
+    this._paragraph = new SafeJsonImpl(paragraphMessage.paragraphData());
   }
 
   id(): string {
@@ -125,6 +136,7 @@ export class ParagraphImpl implements Paragraph{
       if(paragraphId === this.id()){
         this._outputContainer.response(data);
         this._angularObjectCollection.response(data);
+        this._responseChannel.response(data);
       }
     }
     else{

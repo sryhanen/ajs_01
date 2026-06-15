@@ -56,16 +56,23 @@ import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/inter
 import {AngularFormat} from '../format/angular/angularFormat';
 import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 import {HTMLFormat} from '../format/html/htmlFormat';
-import {ParagraphOutputResponseImpl} from './responses/paragraphOutputResponse/paragraphOutputResponseImpl';
 import {OutputPlugin} from '../plugins/outputPlugin';
-import {ParagraphOutputResponse} from './responses/paragraphOutputResponse/paragraphOutputResponse';
+import {ResponseChannel} from '../../responseChannel/responseChannel';
+import {ResponseChannelImpl} from '../../responseChannel/responseChannelImpl';
+import {ParagraphOutputMessageImpl} from '../messages/paragraphOutputMessage/paragraphOutputMessageImpl';
+import {OutputPluginStub} from '../plugins/outputPluginStub';
+import {OutputType} from '../outputType';
+import {ParagraphMessageImpl} from '../../paragraphCollection/messages/paragraphMessage/paragraphMessageImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
   private readonly _outputFormats:OutputFormat[];
   private readonly _outputSwitcher:OutputSwitcher;
   private readonly _errorListener: InterpreterErrorListener;
-  private readonly _paragraphOutputResponse: ParagraphOutputResponse;
+  private readonly _responseChannel: ResponseChannel;
+  private readonly _outputPluginStub: OutputPlugin;
+  private _outputPlugin:OutputPlugin;
 
   constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
@@ -76,13 +83,44 @@ export class OutputContainerImpl implements OutputContainer{
       new AngularFormat(this, angularObjectCollection),
       new HTMLFormat()
     ];
+    this._outputPluginStub = new OutputPluginStub();
+    this._outputPlugin = this._outputPluginStub;
+    this._responseChannel = new ResponseChannelImpl();
+    this._responseChannel.subscribe('PARAGRAPH', (json:object) => this.updateOutputOnParagraphMessage(json));
+    this._responseChannel.subscribe('PARAGRAPH_OUTPUT', (json:object)=> this.updateOutputOnParagraphOutputMessage(json));
     this._outputSwitcher = new OutputSwitcherImpl(this);
     this._errorListener = new InterpreterErrorListenerImpl(this);
-    this._paragraphOutputResponse = new ParagraphOutputResponseImpl(this, this._outputFormats, this._outputSwitcher);
+  }
+
+  private updateOutputOnParagraphMessage(json:object):void {
+    const paragraphMessage = new ParagraphMessageImpl(json);
+    const safeParagraphData = new SafeJsonImpl(paragraphMessage.paragraphData());
+    if(!safeParagraphData.propertyExists('output')){
+      this._outputPlugin = this._outputPluginStub;
+    }
+  }
+
+  private updateOutputOnParagraphOutputMessage(json:object):void {
+    const paragraphOutputMessage = new ParagraphOutputMessageImpl(json);
+    if(!this._outputSwitcher.outputTypeIsValid(paragraphOutputMessage.type())){
+      this._outputSwitcher.requestFormatSwitch(this._outputSwitcher.activeButton());
+      return;
+    }
+    if(!this._outputPlugin.isStub() && paragraphOutputMessage.type() === OutputType.dataTables && this._outputPlugin.outputType() === OutputType.dataTables){
+      this._outputPlugin.response(paragraphOutputMessage.output());
+    }
+    else{
+      this._outputPlugin = this.pluginFromFormats(paragraphOutputMessage.type(), paragraphOutputMessage.output());
+    }
+    this._outputSwitcher.response(json);
+  }
+
+  private pluginFromFormats(type:string, outputData:object): OutputPlugin {
+    return this._outputFormats.find(outputFormat => outputFormat.outputType() === type).plugin(outputData);
   }
 
   outputPlugin(): OutputPlugin {
-    return this._paragraphOutputResponse.outputPlugin();
+    return this._outputPlugin;
   }
 
   errorListener(): InterpreterErrorListener {
@@ -101,8 +139,8 @@ export class OutputContainerImpl implements OutputContainer{
     this._channel.request(data);
   }
 
-  response(data: object): void {
-    this._paragraphOutputResponse.response(data);
-    this._errorListener.response(data);
+  response(json: object): void {
+    this._responseChannel.response(json);
+    this._errorListener.response(json);
   }
 }

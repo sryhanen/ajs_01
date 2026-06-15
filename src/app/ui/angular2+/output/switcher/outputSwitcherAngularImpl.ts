@@ -68,7 +68,7 @@ export class OutputSwitcherAngularImpl implements OutputSwitcher {
     this._outputSwitcher.requestFormatSwitch(outputSwitcherButton);
   }
 
-  response(data: object): void {
+  response(): void {
     this._status.set(this._outputSwitcher.status());
   }
 

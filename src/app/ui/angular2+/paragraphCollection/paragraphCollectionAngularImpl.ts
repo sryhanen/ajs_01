@@ -71,7 +71,9 @@ export class ParagraphCollectionAngularImpl implements ParagraphCollection {
   }
 
   response(data: object): void {
-    this._paragraphs.set(this.paragraphMapMappedToParagraphAngularMap());
+    if(this._paragraphs().size !== this._paragraphCollection.paragraphs().size) {
+      this._paragraphs.set(this.paragraphMapMappedToParagraphAngularMap());
+    }
     this._paragraphs().forEach(paragraph => paragraph.response(data));
   }
 
