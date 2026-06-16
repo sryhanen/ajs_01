@@ -9,8 +9,19 @@
     "sourceMap": true,
     "allowUmdGlobalAccess": true,
     "experimentalDecorators": true,
+    "skipLibCheck": true
   },
-  "include": [
-    "./devServer/**/*"
+  "files":[
+    "./src/main.ts"
   ],
+  "include": [
+    "./devServer/**/*",
+    "./**/*.ts"
+  ],
+  "exclude": [
+    "./webpack.config.ts",
+    "./webpack.config.dev.ts",
+    "./src/test/*",
+    "./**/*.spec.ts"
+  ]
 }
