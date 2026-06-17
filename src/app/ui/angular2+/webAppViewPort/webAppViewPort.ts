@@ -57,13 +57,14 @@ import {NotebookView} from '../notebook/notebookView';
     RecursiveComponentDraw
   ],
   template: `
-    @let notebookCollection = webAppRoot.rootObject();
-    <recursive-component-draw [render]="notebookCollection()" [noteId]="noteId()" [paragraphId]="paragraphId()"></recursive-component-draw>
+    <recursive-component-draw [renderNode]="notebookCollection().render()()" [noteId]="noteId()" [paragraphId]="paragraphId()"></recursive-component-draw>
   `
 })
 export class WebAppViewPort implements OnInit {
   noteId = input.required<string>();
   paragraphId= input.required<string>();
+
+  protected notebookCollection = webAppRoot.rootObject();
 
   private readonly _components = new Map<string, new () => unknown>([
     ['NOTEBOOK_COLLECTION_VIEW', NotebookCollectionView],
@@ -73,7 +74,6 @@ export class WebAppViewPort implements OnInit {
 
   ngOnInit() {
     this._components.forEach((component:new () => unknown, type:string) => this.componentRegistry.register(type, component));
+    webAppRoot.rootObject()().render();
   }
-
-  protected readonly webAppRoot = webAppRoot;
 }

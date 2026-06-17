@@ -44,14 +44,14 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
-import {Render} from '../render/render';
+import {Renderable} from '../render/renderable';
 import {Signal} from '@angular/core';
 
-export interface Notebook extends Channel, Render{
+export interface Notebook extends Channel, Renderable{
   id(): string;
   render(): Signal<{
     type: string;
     data: Signal<Record<string, unknown>>
-    children: Signal<Render[]>;
+    children: Signal<Renderable[]>;
   }>;
 }

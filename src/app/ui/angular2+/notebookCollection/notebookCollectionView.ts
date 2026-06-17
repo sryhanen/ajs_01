@@ -43,15 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {Notebook} from '../../../objects/notebook/notebook';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'notebook-collection',
   template: `
-    <div>notebook collection</div>
   `
 })
-export class NotebookCollectionView {
-  notebooks = input.required<Map<string, Notebook>>();
-}
+export class NotebookCollectionView {}

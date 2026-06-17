@@ -44,14 +44,6 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
-import {Notebook} from '../notebook/notebook';
-import {Render} from '../render/render';
-import {Signal} from '@angular/core';
+import {Renderable} from '../render/renderable';
 
-export interface NotebookCollection extends Channel, Render{
-  render(): Signal<{
-    type: string;
-    data: Signal<Record<string, Map<string, Notebook>>>;
-    children: Signal<Render[]>;
-  }>;
-}
+export interface NotebookCollection extends Channel, Renderable{}
