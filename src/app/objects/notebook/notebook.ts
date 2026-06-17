@@ -46,13 +46,12 @@
 import {Channel} from '../channel/channel';
 import {Render} from '../render/render';
 import {Signal} from '@angular/core';
-import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 
 export interface Notebook extends Channel, Render{
   id(): string;
   render(): Signal<{
     type: string;
-    data: Signal<object>
+    data: Signal<Record<string, unknown>>
     children: Signal<Render[]>;
   }>;
 }

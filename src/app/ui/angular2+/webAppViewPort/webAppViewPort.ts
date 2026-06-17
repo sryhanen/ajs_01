@@ -48,24 +48,17 @@ import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComp
 import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
 import {NotebookCollectionView} from '../notebookCollection/notebookCollectionView';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
-import {NgComponentOutlet} from '@angular/common';
+import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
+import {NotebookView} from '../notebook/notebookView';
 
 @Component({
   selector: 'web-app-view-port',
   imports: [
-    NgComponentOutlet
+    RecursiveComponentDraw
   ],
   template: `
     @let notebookCollection = webAppRoot.rootObject();
-    @let notebookCollectionRendered = notebookCollection.render();
-    <ng-container
-      *ngComponentOutlet="componentRegistry.resolve(notebookCollectionRendered().type);
-       inputs: {
-        notebooks: notebookCollectionRendered().data(),
-        noteId:noteId(),
-        paragraphId:paragraphId(),
-        }"
-    ></ng-container>
+    <recursive-component-draw [render]="notebookCollection()" [noteId]="noteId()" [paragraphId]="paragraphId()"></recursive-component-draw>
   `
 })
 export class WebAppViewPort implements OnInit {
@@ -73,7 +66,8 @@ export class WebAppViewPort implements OnInit {
   paragraphId= input.required<string>();
 
   private readonly _components = new Map<string, new () => unknown>([
-    ['NOTEBOOK_COLLECTION_VIEW', NotebookCollectionView]
+    ['NOTEBOOK_COLLECTION_VIEW', NotebookCollectionView],
+    ['NOTEBOOK', NotebookView]
   ]);
   protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
 

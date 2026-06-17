@@ -44,24 +44,14 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
-import {NotebookView} from '../notebook/notebookView';
 import {Notebook} from '../../../objects/notebook/notebook';
 
 @Component({
   selector: 'notebook-collection',
-  imports: [
-    NotebookView
-  ],
   template: `
-    @for (notebook of notebooks().values(); track notebook) {
-      @if(notebook.id() === noteId()){
-        <notebook [paragraphId]="paragraphId()" [notebook]="notebook"></notebook>
-      }
-    }
+    <div>notebook collection</div>
   `
 })
-export class NotebookCollectionView{
-  noteId = input.required<string>();
-  paragraphId= input.required<string>();
+export class NotebookCollectionView {
   notebooks = input.required<Map<string, Notebook>>();
 }

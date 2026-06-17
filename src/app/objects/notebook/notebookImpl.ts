@@ -75,11 +75,14 @@ export class NotebookImpl implements Notebook {
     }
     return paragraphCollection;
   }
-  render(): Signal<{type: string ,data: Signal<object>,children: Signal<Render[]>}> {
+
+  render(): Signal<{type: string ,data: Signal<Record<string, unknown>>,children: Signal<Render[]>}> {
     return computed(() => ({
-      type: undefined,
-      data: undefined,
-      children: undefined,
+      type: 'NOTEBOOK',
+      data: computed(()  => {
+        return {id: this.id()};
+      }),
+      children: computed(() => []),
     }));
   }
 

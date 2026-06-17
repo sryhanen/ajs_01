@@ -49,17 +49,18 @@ import {NotebookCollection} from '../notebookCollection/notebookCollection';
 import {NotebookCollectionImpl} from '../notebookCollection/notebookCollectionImpl';
 import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;
 
-  private _notebookCollection: NotebookCollection;
+  private _notebookCollection: WritableSignal<NotebookCollection>;
   private set notebookCollection(value: NotebookCollection){
     if(this._notebookCollection === undefined){
-      this._notebookCollection = value;
+      this._notebookCollection = signal(value);
     }
   }
-  private get notebookCollection(): NotebookCollection{
+  private get notebookCollection(): Signal<NotebookCollection>{
     return this._notebookCollection;
   }
 
@@ -82,11 +83,11 @@ class WebAppRootImpl implements WebAppRoot {
     this._hasInitialized = true;
   }
 
-  rootObject(): NotebookCollection {
+  rootObject(): Signal<NotebookCollection> {
     if(!this._hasInitialized){
       throw new Error('WebAppRoot not initialized');
     }
-    return this.notebookCollection;
+    return computed(() => this.notebookCollection());
   }
 
   request(data: object): void {
@@ -100,7 +101,7 @@ class WebAppRootImpl implements WebAppRoot {
     if(!this._hasInitialized){
       throw new Error('WebAppRoot not initialized');
     }
-    this.notebookCollection.response(data);
+    this.notebookCollection().response(data);
   }
 }
 

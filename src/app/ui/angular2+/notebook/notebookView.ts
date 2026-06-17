@@ -44,18 +44,20 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
-import {Notebook} from '../../../objects/notebook/notebook';
 
 @Component({
   selector: 'notebook',
   template: `
-    <div>
-      {{notebook().id()}}
-    </div>
+    @if(id() === noteId()){
+      <h2>
+        {{id()}}
+      </h2>
+    }
 
   `
 })
 export class NotebookView {
+  noteId = input.required<string>();
   paragraphId = input.required<string>();
-  notebook = input.required<Notebook>();
+  id = input.required<string>();
 }

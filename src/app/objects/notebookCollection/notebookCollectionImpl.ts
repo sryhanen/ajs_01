@@ -67,10 +67,10 @@ export class NotebookCollectionImpl implements NotebookCollection{
     this._componentType = 'NOTEBOOK_COLLECTION_VIEW';
   }
 
-  render(): Signal<{ type: string,  data: Signal<Map<string, Notebook>>, children: Signal<Notebook[]>}> {
+  render(): Signal<{ type: string,  data: Signal<Record<string, Map<string, Notebook>>>, children: Signal<Notebook[]>}> {
     return computed(() => ({
         type: this._componentType,
-        data: computed(() => this._notebooks()),
+        data: computed(() => { return {notebooks: this._notebooks()};}),
         children: computed(() => Array.from(this._notebooks().values())),
       })
     );

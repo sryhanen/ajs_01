@@ -48,7 +48,7 @@ import {Render} from './render';
 
 export interface RenderNode {
   type: string;
-  data: Signal<object>;
+  data: Signal<Record<string, unknown>>;
   children: Signal<Render[]>;
 }
 
