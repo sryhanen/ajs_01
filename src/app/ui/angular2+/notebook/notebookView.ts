@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {Notebook} from '../../../objects/notebook/notebook';
 import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
 
@@ -53,14 +53,14 @@ import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectio
     ParagraphCollectionView
   ],
   template: `
-    @let paragraphCollection = notebook.paragraphCollection();
+    @let paragraphCollection = notebook().paragraphCollection();
     @if(!paragraphCollection.isStub()) {
-      <paragraph-collection [paragraphCollection]="paragraphCollection" [paragraphId]="paragraphId"></paragraph-collection>
+      <paragraph-collection [paragraphCollection]="paragraphCollection" [paragraphId]="paragraphId()"></paragraph-collection>
     }
 
   `
 })
 export class NotebookView {
-  @Input({required:true}) paragraphId: string;
-  @Input({required:true}) notebook: Notebook;
+  paragraphId = input.required<string>();
+  notebook = input.required<Notebook>();
 }
