@@ -61,7 +61,7 @@ import {NgComponentOutlet} from '@angular/common';
     <ng-container
       *ngComponentOutlet="componentRegistry.resolve(notebookCollectionRendered().type);
        inputs: {
-        notebooks: notebookCollectionRendered().data,
+        notebooks: notebookCollectionRendered().data(),
         noteId:noteId(),
         paragraphId:paragraphId(),
         }"

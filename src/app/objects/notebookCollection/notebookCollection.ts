@@ -51,7 +51,7 @@ import {Signal} from '@angular/core';
 export interface NotebookCollection extends Channel, Render{
   render(): Signal<{
     type: string;
-    data: Map<string, Notebook>
+    data: Signal<Map<string, Notebook>>;
     children: Signal<Render[]>;
   }>;
 }

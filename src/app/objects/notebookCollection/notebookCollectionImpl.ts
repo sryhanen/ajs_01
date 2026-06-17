@@ -50,7 +50,6 @@ import {NotesInfoResponse} from './responses/notesInfo/notesInfoResponse';
 import {Response} from '../channel/response';
 import {NoteResponse} from './responses/note/noteResponse';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {NotebookCollectionView} from '../../ui/angular2+/notebookCollection/notebookCollectionView';
 
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;
@@ -68,10 +67,10 @@ export class NotebookCollectionImpl implements NotebookCollection{
     this._componentType = 'NOTEBOOK_COLLECTION_VIEW';
   }
 
-  render(): Signal<{ type: string,  data: Map<string, Notebook>, children: Signal<Notebook[]>}> {
+  render(): Signal<{ type: string,  data: Signal<Map<string, Notebook>>, children: Signal<Notebook[]>}> {
     return computed(() => ({
         type: this._componentType,
-        data: this._notebooks(),
+        data: computed(() => this._notebooks()),
         children: computed(() => Array.from(this._notebooks().values())),
       })
     );
