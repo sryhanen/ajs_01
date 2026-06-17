@@ -48,7 +48,6 @@ import {OutputSwitcher} from '../switcher/outputSwitcher';
 import {OutputFormat} from '../format/outputFormat';
 import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
 import {Render} from '../../render/render';
-import {RenderNode} from '../../render/renderNode';
 import {Signal, WritableSignal} from '@angular/core';
 import {OutputPlugin} from '../plugins/outputPlugin';
 
@@ -59,6 +58,6 @@ export interface OutputContainer extends Channel, Render{
   render(): {
     type: string
     data: WritableSignal<Map<string, Signal<OutputPlugin>>>
-    children: Signal<RenderNode[]>
+    children: Signal<Render[]>
   }
 }
