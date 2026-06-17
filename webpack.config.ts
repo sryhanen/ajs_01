@@ -45,6 +45,7 @@
  */
 'use strict';
 
+const { AngularWebpackPlugin } = require('@ngtools/webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -154,6 +155,9 @@ var config = {
   },
 
   plugins: [
+    new AngularWebpackPlugin({
+      tsconfig: './tsconfig.json',
+    }),
     new CopyPlugin({
       patterns: [
         { from: "node_modules/ace-builds/src-noconflict/mode-*.js", to: "[name][ext]" },
@@ -190,7 +194,10 @@ var config = {
   ],
   module: {
     rules: [
-      { test: /\.tsx?$/, loader: 'ts-loader' },
+      {
+        test: /\.[jt]sx?$/,
+        loader: '@ngtools/webpack',
+      },
       {
         test: require.resolve('headroom.js'),
         use: 'imports-loader?this=>window,define=>false,exports=>false'

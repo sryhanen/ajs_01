@@ -155,7 +155,6 @@ const config = {
   plugins: [
     new AngularWebpackPlugin({
       tsconfig: './tsconfig.json',
-      // ... other options as needed
     }),
     new CopyPlugin({
       patterns: [
