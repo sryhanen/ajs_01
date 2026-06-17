@@ -43,47 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookCollection} from './notebookCollection';
-import {Notebook} from '../notebook/notebook';
-import {Channel} from '../channel/channel';
-import {NotesInfoResponse} from './responses/notesInfo/notesInfoResponse';
-import {Response} from '../channel/response';
-import {NoteResponse} from './responses/note/noteResponse';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {NotebookCollectionView} from '../../ui/angular2+/notebookCollection/notebookCollectionView';
-
-export class NotebookCollectionImpl implements NotebookCollection{
-  private readonly _channel:Channel;
-  private readonly _notebooks: WritableSignal<Map<string, Notebook>>;
-  private readonly _responses: Response[];
-  private readonly _componentType:string;
-
-  constructor(channel:Channel) {
-    this._channel = channel;
-    this._notebooks = signal(new Map());
-    this._responses = [
-      new NotesInfoResponse(this._notebooks, this),
-      new NoteResponse(this, this._notebooks)
-    ];
-    this._componentType = 'NOTEBOOK_COLLECTION_VIEW';
-  }
-
-  render(): Signal<{ type: string,  data: Map<string, Notebook>, children: Signal<Notebook[]>}> {
-    return computed(() => ({
-        type: this._componentType,
-        data: this._notebooks(),
-        children: computed(() => Array.from(this._notebooks().values())),
-      })
-    );
-  }
-
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(json: object): void {
-    this._responses.forEach(responseEvent => responseEvent.response(json));
-    this._notebooks().forEach(notebook => notebook.response(json));
-  }
+export interface WebAppComponentRegistry {
+  register(type:string, component: new () => unknown):void;
+  resolve(type:string): new () => unknown;
 }
-

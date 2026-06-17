@@ -45,37 +45,28 @@
  */
 import {Response} from '../../../channel/response';
 import {Notebook} from '../../../notebook/notebook';
-import {PushValue} from '../../../pushValue/pushValue';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {Channel} from '../../../channel/channel';
 import {NotebookImpl} from '../../../notebook/notebookImpl';
+import {WritableSignal} from '@angular/core';
 
 export class NoteResponse implements Response {
   private readonly _channel:Channel;
-  private readonly _notebooks: Notebook[];
-  private readonly _pushCollection:PushValue<Notebook[]>[];
+  private readonly _notebooks: WritableSignal<Map<string, Notebook>>;
 
-  constructor(channel:Channel, notebooks:Notebook[], pushCollection:PushValue<Notebook[]>[]) {
+  constructor(channel:Channel, notebooks: WritableSignal<Map<string, Notebook>>) {
     this._channel = channel;
     this._notebooks = notebooks;
-    this._pushCollection = pushCollection;
   }
 
   response(data: object) {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'NOTE'){
-      const noteData = new SafeJsonImpl(message.data());
-      const noteId:string = noteData.getProperty('id', 'string');
-      const noteIndex = this._notebooks.findIndex(notebook => notebook.id() === noteId);
       const newNotebook = new NotebookImpl(this._channel, message.data());
-      if(noteIndex === -1){
-        this._notebooks.push(newNotebook);
-      }
-      else{
-        this._notebooks.splice(noteIndex, 1, newNotebook);
-      }
-      this._pushCollection.forEach(pushValue => pushValue.update(this._notebooks));
+      this._notebooks.update((notebooks) => {
+        return notebooks.set(newNotebook.id(), newNotebook);
+      });
     }
   }
 }

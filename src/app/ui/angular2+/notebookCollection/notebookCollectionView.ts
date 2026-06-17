@@ -43,13 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ChangeDetectorRef, Component, effect, inject, Input, OnInit, signal} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {NotebookView} from '../notebook/notebookView';
-import {NotebookCollection} from '../../../objects/notebookCollection/notebookCollection';
-import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 import {Notebook} from '../../../objects/notebook/notebook';
-import {WritableSignalArrayAsPushValue} from '../writableSignalArrayAsPushValue/writableSignalArrayAsPushValue';
-import {PushValue} from '../../../objects/pushValue/pushValue';
 
 @Component({
   selector: 'notebook-collection',
@@ -57,27 +53,15 @@ import {PushValue} from '../../../objects/pushValue/pushValue';
     NotebookView
   ],
   template: `
-    @for (notebook of notebooks.value(); track notebook) {
-      @if(notebook.id() === noteId){
-        <notebook [paragraphId]="paragraphId" [notebook]="notebook"></notebook>
+    @for (notebook of notebooks().values(); track notebook) {
+      @if(notebook.id() === noteId()){
+        <notebook [paragraphId]="paragraphId()" [notebook]="notebook"></notebook>
       }
     }
   `
 })
-export class NotebookCollectionView implements OnInit {
-  @Input({required:true}) noteId: string;
-  @Input({required:true}) paragraphId: string;
-  private collection: NotebookCollection;
-  protected notebooks:PushValue<Notebook[]>;
-  private cdr = inject(ChangeDetectorRef);
-  private change = effect(() => {
-    this.notebooks.value();
-    this.cdr.detectChanges();
-  });
-
-  ngOnInit() {
-    this.collection = webAppRoot.rootObject();
-    this.notebooks = new WritableSignalArrayAsPushValue(signal<Notebook[]>([]));
-    this.collection.notebooks(this.notebooks);
-  }
+export class NotebookCollectionView{
+  noteId = input.required<string>();
+  paragraphId= input.required<string>();
+  notebooks = input.required<Map<string, Notebook>>();
 }

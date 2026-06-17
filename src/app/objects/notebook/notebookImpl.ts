@@ -51,6 +51,8 @@ import {MessageImpl} from '../message/messageImpl';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 import {ParagraphCollectionStub} from '../paragraphCollection/paragraphCollectionStub';
+import {computed, Signal} from '@angular/core';
+import {Render} from '../render/render';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
@@ -73,10 +75,12 @@ export class NotebookImpl implements Notebook {
     }
     return paragraphCollection;
   }
-
-
-  paragraphCollection(): ParagraphCollection {
-    return this._paragraphCollection;
+  render(): Signal<{type: string ,data: Signal<object>,children: Signal<Render[]>}> {
+    return computed(() => ({
+      type: undefined,
+      data: undefined,
+      children: undefined,
+    }));
   }
 
   id(): string {

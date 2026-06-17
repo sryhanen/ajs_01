@@ -45,8 +45,13 @@
  */
 import {Channel} from '../channel/channel';
 import {Notebook} from '../notebook/notebook';
-import {PushValue} from '../pushValue/pushValue';
+import {Render} from '../render/render';
+import {Signal} from '@angular/core';
 
-export interface NotebookCollection extends Channel{
-  notebooks(value: PushValue<Notebook[]>):void;
+export interface NotebookCollection extends Channel, Render{
+  render(): Signal<{
+    type: string;
+    data: Map<string, Notebook>
+    children: Signal<Render[]>;
+  }>;
 }

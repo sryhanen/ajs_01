@@ -45,18 +45,13 @@
  */
 import {Component, input} from '@angular/core';
 import {Notebook} from '../../../objects/notebook/notebook';
-import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
 
 @Component({
   selector: 'notebook',
-  imports: [
-    ParagraphCollectionView
-  ],
   template: `
-    @let paragraphCollection = notebook().paragraphCollection();
-    @if(!paragraphCollection.isStub()) {
-      <paragraph-collection [paragraphCollection]="paragraphCollection" [paragraphId]="paragraphId()"></paragraph-collection>
-    }
+    <div>
+      {{notebook().id()}}
+    </div>
 
   `
 })

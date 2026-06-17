@@ -51,7 +51,7 @@ import {Render} from '../../render/render';
 import {Signal, WritableSignal} from '@angular/core';
 import {OutputPlugin} from '../plugins/outputPlugin';
 
-export interface OutputContainer extends Channel, Render{
+export interface OutputContainer extends Channel{
   outputSwitcher(): OutputSwitcher;
   outputFormats(): OutputFormat[];
   errorListener(): InterpreterErrorListener;

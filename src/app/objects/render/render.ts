@@ -44,7 +44,8 @@
  * a licensee so wish it.
  */
 import {RenderNode} from './renderNode';
+import {Signal} from '@angular/core';
 
 export interface Render {
-  render(): RenderNode;
+  render(): Signal<RenderNode>;
 }

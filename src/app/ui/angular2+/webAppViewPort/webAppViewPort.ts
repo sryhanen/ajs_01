@@ -43,47 +43,43 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookCollection} from './notebookCollection';
-import {Notebook} from '../notebook/notebook';
-import {Channel} from '../channel/channel';
-import {NotesInfoResponse} from './responses/notesInfo/notesInfoResponse';
-import {Response} from '../channel/response';
-import {NoteResponse} from './responses/note/noteResponse';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {NotebookCollectionView} from '../../ui/angular2+/notebookCollection/notebookCollectionView';
+import {Component, inject, input, OnInit} from '@angular/core';
+import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComponentRegistryImpl';
+import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
+import {NotebookCollectionView} from '../notebookCollection/notebookCollectionView';
+import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
+import {NgComponentOutlet} from '@angular/common';
 
-export class NotebookCollectionImpl implements NotebookCollection{
-  private readonly _channel:Channel;
-  private readonly _notebooks: WritableSignal<Map<string, Notebook>>;
-  private readonly _responses: Response[];
-  private readonly _componentType:string;
+@Component({
+  selector: 'web-app-view-port',
+  imports: [
+    NgComponentOutlet
+  ],
+  template: `
+    @let notebookCollection = webAppRoot.rootObject();
+    @let notebookCollectionRendered = notebookCollection.render();
+    <ng-container
+      *ngComponentOutlet="componentRegistry.resolve(notebookCollectionRendered().type);
+       inputs: {
+        notebooks: notebookCollectionRendered().data,
+        noteId:noteId(),
+        paragraphId:paragraphId(),
+        }"
+    ></ng-container>
+  `
+})
+export class WebAppViewPort implements OnInit {
+  noteId = input.required<string>();
+  paragraphId= input.required<string>();
 
-  constructor(channel:Channel) {
-    this._channel = channel;
-    this._notebooks = signal(new Map());
-    this._responses = [
-      new NotesInfoResponse(this._notebooks, this),
-      new NoteResponse(this, this._notebooks)
-    ];
-    this._componentType = 'NOTEBOOK_COLLECTION_VIEW';
+  private readonly _components = new Map<string, new () => unknown>([
+    ['NOTEBOOK_COLLECTION_VIEW', NotebookCollectionView]
+  ]);
+  protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
+
+  ngOnInit() {
+    this._components.forEach((component:new () => unknown, type:string) => this.componentRegistry.register(type, component));
   }
 
-  render(): Signal<{ type: string,  data: Map<string, Notebook>, children: Signal<Notebook[]>}> {
-    return computed(() => ({
-        type: this._componentType,
-        data: this._notebooks(),
-        children: computed(() => Array.from(this._notebooks().values())),
-      })
-    );
-  }
-
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(json: object): void {
-    this._responses.forEach(responseEvent => responseEvent.response(json));
-    this._notebooks().forEach(notebook => notebook.response(json));
-  }
+  protected readonly webAppRoot = webAppRoot;
 }
-

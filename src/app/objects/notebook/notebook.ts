@@ -44,9 +44,15 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
+import {Render} from '../render/render';
+import {Signal} from '@angular/core';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 
-export interface Notebook extends Channel{
+export interface Notebook extends Channel, Render{
   id(): string;
-  paragraphCollection():ParagraphCollection;
+  render(): Signal<{
+    type: string;
+    data: Signal<object>
+    children: Signal<Render[]>;
+  }>;
 }
