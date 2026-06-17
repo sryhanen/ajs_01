@@ -43,7 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
 import {OutputPlugin} from '../outputPlugin';
 
-export interface DataTablesPlugin extends Channel, OutputPlugin {}
+export interface DataTablesPlugin extends OutputPlugin {
+  response(json:object):void;
+  request(json:object):void;
+}
