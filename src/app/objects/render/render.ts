@@ -43,22 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
-import {OutputSwitcher} from '../switcher/outputSwitcher';
-import {OutputFormat} from '../format/outputFormat';
-import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
-import {Render} from '../../render/render';
-import {RenderNode} from '../../render/renderNode';
-import {Signal, WritableSignal} from '@angular/core';
-import {OutputPlugin} from '../plugins/outputPlugin';
+import {RenderNode} from './renderNode';
 
-export interface OutputContainer extends Channel, Render{
-  outputSwitcher(): OutputSwitcher;
-  outputFormats(): OutputFormat[];
-  errorListener(): InterpreterErrorListener;
-  render(): {
-    type: string
-    data: WritableSignal<Map<string, Signal<OutputPlugin>>>
-    children: Signal<RenderNode[]>
-  }
+export interface Render {
+  render(): RenderNode;
 }

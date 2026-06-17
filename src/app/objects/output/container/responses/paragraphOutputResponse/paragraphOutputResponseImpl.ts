@@ -49,22 +49,20 @@ import {OutputSwitcher} from '../../../switcher/outputSwitcher';
 import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../../../message/messageImpl';
 import {OutputType} from '../../../outputType';
-import {PushValue} from '../../../../pushValue/pushValue';
 import {OutputPlugin} from '../../../plugins/outputPlugin';
+import {WritableSignal} from '@angular/core';
 
 export class ParagraphOutputResponseImpl implements Channel {
   private readonly _channel:Channel;
   private readonly _outputFormats:OutputFormat[];
   private readonly _outputSwitcher:OutputSwitcher;
-  private readonly _activePlugin:PushValue<OutputPlugin>;
-  private readonly _outputPluginListeners:PushValue<OutputPlugin>[];
+  private readonly _outputPlugin:WritableSignal<OutputPlugin>;
 
-  constructor(channel:Channel, outputFormats:OutputFormat[], outputSwitcher:OutputSwitcher, activePlugin:PushValue<OutputPlugin>, outputPluginListeners:PushValue<OutputPlugin>[]) {
+  constructor(channel:Channel, outputFormats:OutputFormat[], outputSwitcher:OutputSwitcher, outputPlugin:WritableSignal<OutputPlugin>) {
     this._channel = channel;
     this._outputFormats = outputFormats;
     this._outputSwitcher = outputSwitcher;
-    this._activePlugin = activePlugin;
-    this._outputPluginListeners = outputPluginListeners;
+    this._outputPlugin = outputPlugin;
   }
 
   request(data: object) {
@@ -84,12 +82,11 @@ export class ParagraphOutputResponseImpl implements Channel {
       else {
         const outputFormatToRender = this._outputFormats.find(outputFormat => outputFormat.outputType() === outputType);
         const newPlugin = outputFormatToRender.plugin(outputData);
-        if(!this._activePlugin.value().isStub() && this._activePlugin.value().outputType() === OutputType.dataTables && outputFormatToRender.outputType() === OutputType.dataTables){
-          this._activePlugin.value().response(safeOutputData.getProperty('data', 'object'));
+        if(!this._outputPlugin().isStub() && this._outputPlugin().outputType() === OutputType.dataTables && outputFormatToRender.outputType() === OutputType.dataTables){
+          this._outputPlugin().response(safeOutputData.getProperty('data', 'object'));
         }
         else{
-          this._activePlugin.update(newPlugin);
-          this._outputPluginListeners.forEach(listener => listener.update(this._activePlugin.value()));
+          this._outputPlugin.set(newPlugin);
         }
         this._outputSwitcher.response(data);
       }

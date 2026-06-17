@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input, OnInit, signal} from '@angular/core';
+import {Component, input, Input, OnInit, signal} from '@angular/core';
 import {OutputContainer} from '../../../../objects/output/container/outputContainer';
 import {OutputSwitcherView} from '../switcher/outputSwitcherView';
 import {InterpreterErrorDirective} from '../../interpreterError/interpreterErrorDirective';
@@ -61,19 +61,18 @@ import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
     OutputPluginDirective,
   ],
   template: `
-    <output-switcher [interpreter-error-popup]="outputContainer.errorListener()"
-                     [outputSwitcher]="outputContainer.outputSwitcher()"
+    <output-switcher [interpreter-error-popup]="outputContainer().errorListener()"
+                     [outputSwitcher]="outputContainer().outputSwitcher()"
                      [outputSwitcherButtons]="outputSwitcherButtons"></output-switcher>
-    <ng-container output-plugin [outputPlugin]="outputPlugin"></ng-container>
+    @let renderNode = outputContainer().render();
+    <ng-container output-plugin [outputPlugin]="renderNode.data().get('plugin')()"></ng-container>
   `
 })
 export class OutputContainerView implements OnInit {
-  @Input({required:true}) outputContainer: OutputContainer;
+  outputContainer = input.required<OutputContainer>();
   protected outputSwitcherButtons: OutputSwitcherButton[];
-  outputPlugin = signal<OutputPlugin>(new OutputPluginStub());
 
   ngOnInit(): void {
-    this.outputSwitcherButtons = this.outputContainer.outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
-    this.outputContainer.outputPlugin(new WritableSignalAsPushValue(this.outputPlugin));
+    this.outputSwitcherButtons = this.outputContainer().outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
   }
 }
