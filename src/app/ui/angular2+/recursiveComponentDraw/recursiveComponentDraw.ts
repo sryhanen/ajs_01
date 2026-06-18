@@ -30,11 +30,7 @@ export class RecursiveComponentDraw implements OnInit {
   ngOnInit() {
     this.component = this.componentRegistry.resolve(this.renderNode().type);
     this.inputs = this.renderNode().data();
-    if(this.paragraphId()){
-      this.inputs['paragraphId'] = this.paragraphId();
-    }
-    if(this.noteId()){
-      this.inputs['noteId'] = this.noteId();
-    }
+    this.inputs['paragraphId'] = this.paragraphId();
+    this.inputs['noteId'] = this.noteId();
   }
 }

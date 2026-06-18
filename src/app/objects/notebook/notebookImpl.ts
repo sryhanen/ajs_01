@@ -52,7 +52,6 @@ import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectio
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 import {ParagraphCollectionStub} from '../paragraphCollection/paragraphCollectionStub';
 import {computed, Signal} from '@angular/core';
-import {Printable} from '../render/printable';
 import {RenderNode} from '../render/renderNode';
 
 export class NotebookImpl implements Notebook {
@@ -80,9 +79,7 @@ export class NotebookImpl implements Notebook {
   print(): Signal<RenderNode> {
     return computed(() => ({
       type: 'NOTEBOOK',
-      data: computed(()  => {
-        return {id: this.id()};
-      }),
+      data: computed(()  => ({})),
       children: computed(() => []),
     }));
   }
