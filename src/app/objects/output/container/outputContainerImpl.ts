@@ -90,8 +90,7 @@ export class OutputContainerImpl implements OutputContainer{
       new ParagraphOutputResponseImpl(this, this._outputFormats, this._outputSwitcher, this._outputPlugin)
     ];
     const componentInputs = computed(() => ({
-      outputPlugin:this._outputPlugin(),
-      paragraphId:this._paragraphId
+      outputPlugin:this._outputPlugin()
     }));
     this._componentView = new ComponentViewImpl('OUTPUT_CONTAINER', componentInputs);
   }
@@ -107,6 +106,7 @@ export class OutputContainerImpl implements OutputContainer{
   print(): Signal<RenderNode> {
     return computed(() =>
       ({
+        paragraphId:this._paragraphId,
         componentView: this._componentView,
         children:computed(() => [])
       })

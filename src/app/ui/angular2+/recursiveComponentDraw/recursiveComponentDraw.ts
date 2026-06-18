@@ -63,7 +63,9 @@ import {ComponentView} from '../../../objects/rendering/componentView/componentV
       </ng-container>
     }
     @for (child of renderNode().children(); track $index) {
-      <recursive-component-draw [renderNode]="child" [containerId]="containerId()"></recursive-component-draw>
+      @if(child.paragraphId === undefined || child.paragraphId === this.containerId()){
+        <recursive-component-draw [renderNode]="child" [containerId]="containerId()"></recursive-component-draw>
+      }
     }
   `
 })
@@ -79,11 +81,7 @@ export class RecursiveComponentDraw implements OnInit {
     this.componentView = this.renderNode().componentView;
     if(!this.componentView.isStub()){
       this.component = this.componentRegistry.resolve(this.componentView.type());
-      this.inputs = computed(() => {
-        const inputs = this.componentView.inputs()();
-        inputs['containerId'] = this.containerId();
-        return inputs;
-      });
+      this.inputs = this.componentView.inputs();
     }
   }
 }

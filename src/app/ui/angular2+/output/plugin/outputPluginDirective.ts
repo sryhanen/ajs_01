@@ -55,6 +55,7 @@ import {OutputType} from '../../../../objects/output/outputType';
 export class OutputPluginDirective {
   outputPlugin = input.required<OutputPlugin>();
   private viewContainer = inject(ViewContainerRef);
+
   private pluginChanged = effect(() => {
     this.viewContainer.clear();
     if(!this.outputPlugin().isStub()){

@@ -43,27 +43,19 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, OnInit} from '@angular/core';
-import {OutputPluginDirective} from '../plugin/outputPluginDirective';
+import {Component, input} from '@angular/core';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
+import {OutputPluginDirective} from '../plugin/outputPluginDirective';
 
 @Component({
   selector: 'output-container',
   imports: [
-    OutputPluginDirective,
+    OutputPluginDirective
   ],
   template: `
-    @if(paragraphId() === containerId()){
-      <ng-container output-plugin [outputPlugin]="outputPlugin()"></ng-container>
-    }
+    <ng-container output-plugin [outputPlugin]="outputPlugin()"></ng-container>
   `
 })
-export class OutputContainerView implements OnInit {
-  containerId = input.required<string>();
-  paragraphId = input.required<string>();
+export class OutputContainerView {
   outputPlugin = input.required<OutputPlugin>();
-
-  ngOnInit() {
-    console.debug('OutputContainerView ngOnInit');
-  }
 }

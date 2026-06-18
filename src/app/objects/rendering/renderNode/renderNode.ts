@@ -47,6 +47,7 @@ import {Signal} from '@angular/core';
 import {ComponentView} from '../componentView/componentView';
 
 export interface RenderNode {
+  paragraphId?:string;
   componentView: ComponentView;
   children: Signal<RenderNode[]>;
 }
