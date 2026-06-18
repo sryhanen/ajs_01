@@ -63,19 +63,16 @@ import {ComponentView} from '../../../objects/rendering/componentView/componentV
       </ng-container>
     }
     @for (child of renderNode().children(); track $index) {
-      <recursive-component-draw [renderNode]="child" [noteId]="noteId()"
-                                [paragraphId]="paragraphId()"></recursive-component-draw>
+      <recursive-component-draw [renderNode]="child" [containerId]="containerId()"></recursive-component-draw>
     }
   `
 })
 export class RecursiveComponentDraw implements OnInit {
   renderNode = input.required<RenderNode>();
-  paragraphId = input.required<string>();
-  noteId = input.required<string>();
+  containerId = input.required<string>();
   protected componentView: ComponentView;
   protected component: {new(): unknown};
   protected inputs: Signal<Record<string, unknown>>;
-
   private componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
 
   ngOnInit() {
@@ -84,8 +81,7 @@ export class RecursiveComponentDraw implements OnInit {
       this.component = this.componentRegistry.resolve(this.componentView.type());
       this.inputs = computed(() => {
         const inputs = this.componentView.inputs()();
-        inputs['paragraphId'] = this.paragraphId();
-        inputs['noteId'] = this.noteId();
+        inputs['containerId'] = this.containerId();
         return inputs;
       });
     }

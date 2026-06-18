@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ComponentRef, Directive, effect, inject, input, Input, ViewContainerRef, WritableSignal} from '@angular/core';
+import {ComponentRef, Directive, effect, inject, input, ViewContainerRef} from '@angular/core';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 import {AngularView} from './angular/angularView';
 import {PluginView} from './pluginView';

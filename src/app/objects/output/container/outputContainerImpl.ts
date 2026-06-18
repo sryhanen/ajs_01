@@ -60,20 +60,21 @@ import {HTMLFormat} from '../format/html/htmlFormat';
 import {ParagraphOutputResponseImpl} from './responses/paragraphOutputResponse/paragraphOutputResponseImpl';
 import {OutputPlugin} from '../plugins/outputPlugin';
 import {OutputPluginStub} from '../plugins/outputPluginStub';
-import {Signal, signal, WritableSignal} from '@angular/core';
-import {Printable} from '../../rendering/printable/printable';
+import {computed, Signal, signal, WritableSignal} from '@angular/core';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {ComponentView} from '../../rendering/componentView/componentView';
+import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
   private readonly _outputFormats:OutputFormat[];
   private readonly _outputSwitcher:OutputSwitcher;
-  private readonly _errorListener: InterpreterErrorListener;
   private readonly _responses: Response[];
   private readonly _outputPlugin:WritableSignal<OutputPlugin>;
-  private readonly _data: WritableSignal<Map<string, Signal<OutputPlugin>>>;
-  private readonly _children: WritableSignal<Printable[]>;
+  private readonly _componentView:ComponentView;
+  private readonly _paragraphId:string;
 
-  constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
+  constructor(channel:Channel, angularObjectCollection: AngularObjectCollection, paragraphId:string) {
     this._channel = channel;
     this._outputFormats = [
       new DataTablesFormat(this),
@@ -82,27 +83,17 @@ export class OutputContainerImpl implements OutputContainer{
       new AngularFormat(this, angularObjectCollection),
       new HTMLFormat()
     ];
-    this._outputSwitcher = new OutputSwitcherImpl(this);
-    this._errorListener = new InterpreterErrorListenerImpl(this);
+    this._paragraphId = paragraphId;
     this._outputPlugin = signal(new OutputPluginStub());
-    this._data = signal(new Map());
-    this._data().set('plugin', this._outputPlugin);
-    this._children = signal([]);
+    this._outputSwitcher = new OutputSwitcherImpl(this);
     this._responses = [
       new ParagraphOutputResponseImpl(this, this._outputFormats, this._outputSwitcher, this._outputPlugin)
     ];
-  }
-
-  errorListener(): InterpreterErrorListener {
-    return this._errorListener;
-  }
-
-  outputSwitcher(): OutputSwitcher {
-    return this._outputSwitcher;
-  }
-
-  outputFormats(): OutputFormat[] {
-    return this._outputFormats;
+    const componentInputs = computed(() => ({
+      outputPlugin:this._outputPlugin(),
+      paragraphId:this._paragraphId
+    }));
+    this._componentView = new ComponentViewImpl('OUTPUT_CONTAINER', componentInputs);
   }
 
   request(data: object): void {
@@ -111,18 +102,14 @@ export class OutputContainerImpl implements OutputContainer{
 
   response(data: object): void {
     this._responses.forEach(response => response.response(data));
-    this._errorListener.response(data);
   }
 
-  render(): {
-    type: string
-    data: WritableSignal<Map<string, Signal<OutputPlugin>>>
-    children: Signal<Printable[]>
-  } {
-    return {
-      type: 'CONTAINER',
-      children: this._children,
-      data: this._data,
-    };
+  print(): Signal<RenderNode> {
+    return computed(() =>
+      ({
+        componentView: this._componentView,
+        children:computed(() => [])
+      })
+    );
   }
 }

@@ -44,20 +44,6 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../channel/channel';
-import {OutputSwitcher} from '../switcher/outputSwitcher';
-import {OutputFormat} from '../format/outputFormat';
-import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
 import {Printable} from '../../rendering/printable/printable';
-import {Signal, WritableSignal} from '@angular/core';
-import {OutputPlugin} from '../plugins/outputPlugin';
 
-export interface OutputContainer extends Channel{
-  outputSwitcher(): OutputSwitcher;
-  outputFormats(): OutputFormat[];
-  errorListener(): InterpreterErrorListener;
-  render(): {
-    type: string
-    data: WritableSignal<Map<string, Signal<OutputPlugin>>>
-    children: Signal<Printable[]>
-  }
-}
+export interface OutputContainer extends Channel, Printable{}

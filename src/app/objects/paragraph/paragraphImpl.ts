@@ -68,7 +68,7 @@ export class ParagraphImpl implements Paragraph {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
     this._angularObjectCollection = new AngularObjectCollectionImpl(this);
-    this._outputContainer = new OutputContainerImpl(this, this._angularObjectCollection);
+    this._outputContainer = new OutputContainerImpl(this, this._angularObjectCollection, this.id());
 
     if (this._paragraph.propertyExists('output')) {
       const paragraphOutput = this._paragraph.getProperty<object>('output', 'object');
@@ -91,7 +91,7 @@ export class ParagraphImpl implements Paragraph {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      children:computed(() => []),
+      children:computed(() => [this._outputContainer.print()()]),
       componentView: this._componentView
     }));
   }
@@ -99,11 +99,6 @@ export class ParagraphImpl implements Paragraph {
   id(): string {
     return this._paragraph.getProperty('id', 'string');
   }
-
-  outputContainer(): OutputContainer {
-    return this._outputContainer;
-  }
-
 
   request(data: object): void {
     const message = new MessageImpl(new SafeJsonImpl(data));

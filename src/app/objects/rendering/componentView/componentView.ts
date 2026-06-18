@@ -43,8 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Signal} from '@angular/core';
 import Stubable from '../../../shared/interfaces/stubable';
+import {Signal} from '@angular/core';
 
 export interface ComponentView extends Stubable{
   type():string;

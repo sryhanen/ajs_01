@@ -43,36 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, Input, OnInit, signal} from '@angular/core';
-import {OutputContainer} from '../../../../objects/output/container/outputContainer';
-import {OutputSwitcherView} from '../switcher/outputSwitcherView';
-import {InterpreterErrorDirective} from '../../interpreterError/interpreterErrorDirective';
-import {OutputSwitcherButton} from '../../../../objects/output/switcher/button/outputSwitcherButton';
-import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writableSignalAsPushValue';
-import {OutputPluginStub} from '../../../../objects/output/plugins/outputPluginStub';
+import {Component, input, OnInit} from '@angular/core';
 import {OutputPluginDirective} from '../plugin/outputPluginDirective';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
 @Component({
   selector: 'output-container',
   imports: [
-    OutputSwitcherView,
-    InterpreterErrorDirective,
     OutputPluginDirective,
   ],
   template: `
-    <output-switcher [interpreter-error-popup]="outputContainer().errorListener()"
-                     [outputSwitcher]="outputContainer().outputSwitcher()"
-                     [outputSwitcherButtons]="outputSwitcherButtons"></output-switcher>
-    @let renderNode = outputContainer().render();
-    <ng-container output-plugin [outputPlugin]="renderNode.data().get('plugin')()"></ng-container>
+    @if(paragraphId() === containerId()){
+      <ng-container output-plugin [outputPlugin]="outputPlugin()"></ng-container>
+    }
   `
 })
 export class OutputContainerView implements OnInit {
-  outputContainer = input.required<OutputContainer>();
-  protected outputSwitcherButtons: OutputSwitcherButton[];
+  containerId = input.required<string>();
+  paragraphId = input.required<string>();
+  outputPlugin = input.required<OutputPlugin>();
 
-  ngOnInit(): void {
-    this.outputSwitcherButtons = this.outputContainer().outputFormats().map(format => format.switcherButtons().filter(button => !button.isStub())).flat();
+  ngOnInit() {
+    console.debug('OutputContainerView ngOnInit');
   }
 }

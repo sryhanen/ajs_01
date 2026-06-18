@@ -49,6 +49,7 @@ import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponen
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {OutputContainerView} from '../output/container/outputContainerView';
 
 
 @Component({
@@ -57,15 +58,16 @@ import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
     RecursiveComponentDraw
   ],
   template: `
-    <recursive-component-draw [renderNode]="renderNode()" [noteId]="noteId()"
-                              [paragraphId]="paragraphId()"></recursive-component-draw>
+    <recursive-component-draw [renderNode]="renderNode()"
+                              [containerId]="containerId()"></recursive-component-draw>
   `
 })
 export class WebAppViewPort implements OnInit {
-  noteId = input.required<string>();
-  paragraphId= input.required<string>();
+  containerId= input.required<string>();
 
-  private readonly _components = new Map<string, new () => unknown>([]);
+  private readonly _components = new Map<string, new () => unknown>([
+    ['OUTPUT_CONTAINER', OutputContainerView]
+  ]);
   protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
   protected renderNode: Signal<RenderNode>;
 

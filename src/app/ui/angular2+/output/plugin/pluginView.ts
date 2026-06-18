@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/core';
 import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
 
 @Component({
@@ -53,12 +53,12 @@ import {OutputPlugin} from '../../../../objects/output/plugins/outputPlugin';
   `,
 })
 export class PluginView implements AfterViewInit {
-  @Input({required:true}) outputPlugin: OutputPlugin;
+  outputPlugin = input.required<OutputPlugin>();
   @ViewChild('anchor') anchor: ElementRef;
 
   ngAfterViewInit(): void {
-    if(!this.outputPlugin.isStub()){
-      this.outputPlugin.render(this.anchor.nativeElement);
+    if(!this.outputPlugin().isStub()){
+      this.outputPlugin().render(this.anchor.nativeElement);
     }
   }
 }
