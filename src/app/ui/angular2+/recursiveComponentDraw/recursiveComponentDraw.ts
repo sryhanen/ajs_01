@@ -1,8 +1,55 @@
-import {Component, inject, input, OnInit} from '@angular/core';
+/*
+ * Teragrep User Interface (ajs_01)
+ * Copyright (C) 2019-2026 Suomen Kanuuna Oy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
+ * Additional permission under GNU Affero General Public License version 3
+ * section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with other code, such other code is not for that reason alone subject to any
+ * of the requirements of the GNU Affero GPL version 3 as long as this Program
+ * is the same Program as licensed from Suomen Kanuuna Oy without any additional
+ * modifications.
+ *
+ * Supplemented terms under GNU Affero General Public License version 3
+ * section 7
+ *
+ * Origin of the software must be attributed to Suomen Kanuuna Oy. Any modified
+ * versions must be marked as "Modified version of" The Program.
+ *
+ * Names of the licensors and authors may not be used for publicity purposes.
+ *
+ * No rights are granted for use of trade names, trademarks, or service marks
+ * which are in The Program if any.
+ *
+ * Licensee must indemnify licensors and authors for any liability that these
+ * contractual assumptions impose on licensors and authors.
+ *
+ * To the extent this program is licensed as part of the Commercial versions of
+ * Teragrep, the applicable Commercial License may apply to this file if you as
+ * a licensee so wish it.
+ */
+import {Component, computed, inject, input, OnInit, Signal} from '@angular/core';
 import {NgComponentOutlet} from '@angular/common';
 import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
 import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComponentRegistryImpl';
-import {RenderNode} from '../../../objects/render/renderNode';
+import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+
 
 @Component({
   selector: 'recursive-component-draw',
@@ -10,9 +57,11 @@ import {RenderNode} from '../../../objects/render/renderNode';
     NgComponentOutlet
   ],
   template: `
-    <ng-container
-      *ngComponentOutlet="component; inputs: inputs">
-    </ng-container>
+    @if(!componentView.isStub()){
+      <ng-container
+        *ngComponentOutlet="component; inputs: inputs()">
+      </ng-container>
+    }
     @for (child of renderNode().children(); track $index) {
       <recursive-component-draw [renderNode]="child" [noteId]="noteId()"
                                 [paragraphId]="paragraphId()"></recursive-component-draw>
@@ -23,14 +72,22 @@ export class RecursiveComponentDraw implements OnInit {
   renderNode = input.required<RenderNode>();
   paragraphId = input.required<string>();
   noteId = input.required<string>();
-  protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
+  protected componentView: ComponentView;
   protected component: {new(): unknown};
-  protected inputs: Record<string, unknown>;
+  protected inputs: Signal<Record<string, unknown>>;
+
+  private componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
 
   ngOnInit() {
-    this.component = this.componentRegistry.resolve(this.renderNode().type);
-    this.inputs = this.renderNode().data();
-    this.inputs['paragraphId'] = this.paragraphId();
-    this.inputs['noteId'] = this.noteId();
+    this.componentView = this.renderNode().componentView;
+    if(!this.componentView.isStub()){
+      this.component = this.componentRegistry.resolve(this.componentView.type());
+      this.inputs = computed(() => {
+        const inputs = this.componentView.inputs()();
+        inputs['paragraphId'] = this.paragraphId();
+        inputs['noteId'] = this.noteId();
+        return inputs;
+      });
+    }
   }
 }

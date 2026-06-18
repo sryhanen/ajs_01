@@ -43,34 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, inject, input, OnInit, Signal} from '@angular/core';
-import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComponentRegistryImpl';
-import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
-import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
-import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
-import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {ComponentView} from './componentView';
+import {Signal} from '@angular/core';
 
+export class ComponentViewImpl implements ComponentView {
+  private readonly _type:string;
+  private readonly _inputs: Signal<Record<string, unknown>>;
 
-@Component({
-  selector: 'web-app-view-port',
-  imports: [
-    RecursiveComponentDraw
-  ],
-  template: `
-    <recursive-component-draw [renderNode]="renderNode()" [noteId]="noteId()"
-                              [paragraphId]="paragraphId()"></recursive-component-draw>
-  `
-})
-export class WebAppViewPort implements OnInit {
-  noteId = input.required<string>();
-  paragraphId= input.required<string>();
+  constructor(type:string, inputs: Signal<Record<string, unknown>>) {
+    this._type = type;
+    this._inputs = inputs;
+  }
 
-  private readonly _components = new Map<string, new () => unknown>([]);
-  protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
-  protected renderNode: Signal<RenderNode>;
+  type():string{
+    return this._type;
+  }
 
-  ngOnInit() {
-    this._components.forEach((component:new () => unknown, type:string) => this.componentRegistry.register(type, component));
-    this.renderNode = webAppRoot.rootObject()().print();
+  inputs(): Signal<Record<string, unknown>> {
+   return this._inputs;
+  }
+
+  isStub(): boolean {
+    return false;
   }
 }

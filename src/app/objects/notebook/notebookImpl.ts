@@ -53,16 +53,20 @@ import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 import {ParagraphCollectionStub} from '../paragraphCollection/paragraphCollectionStub';
 import {computed, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
+import {ComponentView} from '../rendering/componentView/componentView';
+import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
   private readonly _notebook: SafeJson;
   private readonly _paragraphCollection: ParagraphCollection;
+  private readonly _componentView:ComponentView;
 
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
     this._paragraphCollection = this.initializedParagraphCollection();
+    this._componentView = new ComponentViewStub();
   }
 
   private initializedParagraphCollection(): ParagraphCollection {
@@ -78,8 +82,7 @@ export class NotebookImpl implements Notebook {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      type: 'NOTEBOOK',
-      data: computed(()  => ({})),
+      componentView: this._componentView,
       children: computed(() => []),
     }));
   }

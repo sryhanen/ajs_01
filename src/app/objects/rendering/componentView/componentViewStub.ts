@@ -43,34 +43,19 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, inject, input, OnInit, Signal} from '@angular/core';
-import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComponentRegistryImpl';
-import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
-import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
-import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
-import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {ComponentView} from './componentView';
+import {Signal} from '@angular/core';
 
+export class ComponentViewStub implements ComponentView {
+  isStub(): boolean {
+    return true;
+  }
 
-@Component({
-  selector: 'web-app-view-port',
-  imports: [
-    RecursiveComponentDraw
-  ],
-  template: `
-    <recursive-component-draw [renderNode]="renderNode()" [noteId]="noteId()"
-                              [paragraphId]="paragraphId()"></recursive-component-draw>
-  `
-})
-export class WebAppViewPort implements OnInit {
-  noteId = input.required<string>();
-  paragraphId= input.required<string>();
+  inputs(): Signal<Record<string, unknown>> {
+    throw new Error('ComponentViewStub: method not implemented.');
+  }
 
-  private readonly _components = new Map<string, new () => unknown>([]);
-  protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
-  protected renderNode: Signal<RenderNode>;
-
-  ngOnInit() {
-    this._components.forEach((component:new () => unknown, type:string) => this.componentRegistry.register(type, component));
-    this.renderNode = webAppRoot.rootObject()().print();
+  type(): string {
+    throw new Error('ComponentViewStub: method not implemented.');
   }
 }

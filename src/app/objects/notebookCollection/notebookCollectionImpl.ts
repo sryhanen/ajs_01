@@ -51,12 +51,14 @@ import {Response} from '../channel/response';
 import {NoteResponse} from './responses/note/noteResponse';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
+import {ComponentView} from '../rendering/componentView/componentView';
+import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;
   private readonly _notebooks: WritableSignal<Map<string, Notebook>>;
   private readonly _responses: Response[];
-  private readonly _componentType:string;
+  private readonly _componentView:ComponentView;
 
   constructor(channel:Channel) {
     this._channel = channel;
@@ -65,13 +67,12 @@ export class NotebookCollectionImpl implements NotebookCollection{
       new NotesInfoResponse(this._notebooks, this),
       new NoteResponse(this, this._notebooks)
     ];
-    this._componentType = 'NOTEBOOK_COLLECTION_VIEW';
+    this._componentView = new ComponentViewStub();
   }
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-        type: this._componentType,
-        data: computed(() => ({})),
+        componentView: this._componentView,
         children: computed(() => {
           const renderableList: RenderNode[] = [];
           this._notebooks().forEach(notebook => {
