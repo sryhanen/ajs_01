@@ -45,10 +45,10 @@
  */
 import {Channel} from '../channel/channel';
 import {WebSocketService} from '../webSocket/service/webSocketService';
-import {Renderable} from '../render/renderable';
+import {Printable} from '../render/printable';
 import {Signal} from '@angular/core';
 
 export interface WebAppRoot extends Channel {
   initialize(webSocketService:WebSocketService):void;
-  rootObject(): Signal<Renderable>;
+  rootObject(): Signal<Printable>;
 }

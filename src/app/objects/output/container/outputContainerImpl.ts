@@ -61,7 +61,7 @@ import {ParagraphOutputResponseImpl} from './responses/paragraphOutputResponse/p
 import {OutputPlugin} from '../plugins/outputPlugin';
 import {OutputPluginStub} from '../plugins/outputPluginStub';
 import {Signal, signal, WritableSignal} from '@angular/core';
-import {Renderable} from '../../render/renderable';
+import {Printable} from '../../render/printable';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
@@ -71,7 +71,7 @@ export class OutputContainerImpl implements OutputContainer{
   private readonly _responses: Response[];
   private readonly _outputPlugin:WritableSignal<OutputPlugin>;
   private readonly _data: WritableSignal<Map<string, Signal<OutputPlugin>>>;
-  private readonly _children: WritableSignal<Renderable[]>;
+  private readonly _children: WritableSignal<Printable[]>;
 
   constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
@@ -117,7 +117,7 @@ export class OutputContainerImpl implements OutputContainer{
   render(): {
     type: string
     data: WritableSignal<Map<string, Signal<OutputPlugin>>>
-    children: Signal<Renderable[]>
+    children: Signal<Printable[]>
   } {
     return {
       type: 'CONTAINER',

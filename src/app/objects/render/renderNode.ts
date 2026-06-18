@@ -44,11 +44,10 @@
  * a licensee so wish it.
  */
 import {Signal} from '@angular/core';
-import {Renderable} from './renderable';
 
 export interface RenderNode {
   type: string;
   data: Signal<Record<string, unknown>>;
-  children: Signal<Renderable[]>;
+  children: Signal<RenderNode[]>;
 }
 

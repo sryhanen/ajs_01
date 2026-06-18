@@ -43,11 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
   selector: 'notebook-collection',
   template: `
   `
 })
-export class NotebookCollectionView {}
+export class NotebookCollectionView {
+  noteId = input.required<string>();
+  paragraphId = input.required<string>();
+}

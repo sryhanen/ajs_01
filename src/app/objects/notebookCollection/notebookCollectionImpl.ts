@@ -50,7 +50,6 @@ import {NotesInfoResponse} from './responses/notesInfo/notesInfoResponse';
 import {Response} from '../channel/response';
 import {NoteResponse} from './responses/note/noteResponse';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {Renderable} from '../render/renderable';
 import {RenderNode} from '../render/renderNode';
 
 export class NotebookCollectionImpl implements NotebookCollection{
@@ -69,14 +68,14 @@ export class NotebookCollectionImpl implements NotebookCollection{
     this._componentType = 'NOTEBOOK_COLLECTION_VIEW';
   }
 
-  render(): Signal<RenderNode> {
+  print(): Signal<RenderNode> {
     return computed(() => ({
         type: this._componentType,
-        data: undefined,
+        data: computed(() => ({})),
         children: computed(() => {
-          const renderableList = [];
+          const renderableList: RenderNode[] = [];
           this._notebooks().forEach(notebook => {
-            renderableList.push(notebook.render());
+            renderableList.push(notebook.print()());
           });
           return renderableList;
         }),

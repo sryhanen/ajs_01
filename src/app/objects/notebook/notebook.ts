@@ -44,14 +44,8 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
-import {Renderable} from '../render/renderable';
-import {Signal} from '@angular/core';
+import {Printable} from '../render/printable';
 
-export interface Notebook extends Channel, Renderable{
+export interface Notebook extends Channel, Printable{
   id(): string;
-  render(): Signal<{
-    type: string;
-    data: Signal<Record<string, unknown>>
-    children: Signal<Renderable[]>;
-  }>;
 }

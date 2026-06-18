@@ -13,8 +13,9 @@ import {RenderNode} from '../../../objects/render/renderNode';
     <ng-container
       *ngComponentOutlet="component; inputs: inputs">
     </ng-container>
-    @for(child of renderNode().children(); track $index){
-      <recursive-component-draw [renderNode]="child.render()()" [noteId]="noteId()" [paragraphId]="paragraphId()"></recursive-component-draw>
+    @for (child of renderNode().children(); track $index) {
+      <recursive-component-draw [renderNode]="child" [noteId]="noteId()"
+                                [paragraphId]="paragraphId()"></recursive-component-draw>
     }
   `
 })
@@ -28,6 +29,12 @@ export class RecursiveComponentDraw implements OnInit {
 
   ngOnInit() {
     this.component = this.componentRegistry.resolve(this.renderNode().type);
-    this.inputs = {...{noteId:this.noteId(), paragraphId: this.paragraphId()}, ...this.renderNode().data};
+    this.inputs = this.renderNode().data();
+    if(this.paragraphId()){
+      this.inputs['paragraphId'] = this.paragraphId();
+    }
+    if(this.noteId()){
+      this.inputs['noteId'] = this.noteId();
+    }
   }
 }

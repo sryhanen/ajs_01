@@ -43,13 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, inject, input, OnInit} from '@angular/core';
+import {Component, inject, input, OnInit, Signal} from '@angular/core';
 import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComponentRegistryImpl';
 import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
 import {NotebookCollectionView} from '../notebookCollection/notebookCollectionView';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
 import {NotebookView} from '../notebook/notebookView';
+import {RenderNode} from '../../../objects/render/renderNode';
 
 @Component({
   selector: 'web-app-view-port',
@@ -57,23 +58,23 @@ import {NotebookView} from '../notebook/notebookView';
     RecursiveComponentDraw
   ],
   template: `
-    <recursive-component-draw [renderNode]="notebookCollection().render()()" [noteId]="noteId()" [paragraphId]="paragraphId()"></recursive-component-draw>
+    <recursive-component-draw [renderNode]="renderNode()" [noteId]="noteId()"
+                              [paragraphId]="paragraphId()"></recursive-component-draw>
   `
 })
 export class WebAppViewPort implements OnInit {
   noteId = input.required<string>();
   paragraphId= input.required<string>();
 
-  protected notebookCollection = webAppRoot.rootObject();
-
   private readonly _components = new Map<string, new () => unknown>([
     ['NOTEBOOK_COLLECTION_VIEW', NotebookCollectionView],
     ['NOTEBOOK', NotebookView]
   ]);
   protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
+  protected renderNode: Signal<RenderNode>;
 
   ngOnInit() {
     this._components.forEach((component:new () => unknown, type:string) => this.componentRegistry.register(type, component));
-    webAppRoot.rootObject()().render();
+    this.renderNode = webAppRoot.rootObject()().print();
   }
 }

@@ -44,6 +44,6 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
-import {Renderable} from '../render/renderable';
+import {Printable} from '../render/printable';
 
-export interface NotebookCollection extends Channel, Renderable{}
+export interface NotebookCollection extends Channel, Printable{}

@@ -46,6 +46,6 @@
 import {RenderNode} from './renderNode';
 import {Signal} from '@angular/core';
 
-export interface Renderable {
-  render(): Signal<RenderNode>;
+export interface Printable {
+  print(): Signal<RenderNode>;
 }
