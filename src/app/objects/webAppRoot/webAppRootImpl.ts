@@ -51,7 +51,7 @@ import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../render/renderNode';
-import {Printable} from '../render/printable';
+import {Printable} from '../rendering/printable/printable';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;

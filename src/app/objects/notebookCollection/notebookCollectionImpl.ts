@@ -50,7 +50,7 @@ import {NotesInfoResponse} from './responses/notesInfo/notesInfoResponse';
 import {Response} from '../channel/response';
 import {NoteResponse} from './responses/note/noteResponse';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../render/renderNode';
+import {RenderNode} from '../rendering/renderNode/renderNode';
 
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;

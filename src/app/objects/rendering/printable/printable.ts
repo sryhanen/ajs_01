@@ -43,8 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {RenderNode} from './renderNode';
+
 import {Signal} from '@angular/core';
+import {RenderNode} from '../renderNode/renderNode';
 
 export interface Printable {
   print(): Signal<RenderNode>;

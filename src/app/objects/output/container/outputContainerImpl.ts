@@ -61,7 +61,7 @@ import {ParagraphOutputResponseImpl} from './responses/paragraphOutputResponse/p
 import {OutputPlugin} from '../plugins/outputPlugin';
 import {OutputPluginStub} from '../plugins/outputPluginStub';
 import {Signal, signal, WritableSignal} from '@angular/core';
-import {Printable} from '../../render/printable';
+import {Printable} from '../../rendering/printable/printable';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;

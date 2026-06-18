@@ -47,7 +47,7 @@ import {Channel} from '../../channel/channel';
 import {OutputSwitcher} from '../switcher/outputSwitcher';
 import {OutputFormat} from '../format/outputFormat';
 import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
-import {Printable} from '../../render/printable';
+import {Printable} from '../../rendering/printable/printable';
 import {Signal, WritableSignal} from '@angular/core';
 import {OutputPlugin} from '../plugins/outputPlugin';
 
