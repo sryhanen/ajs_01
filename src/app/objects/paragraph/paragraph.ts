@@ -45,9 +45,9 @@
  */
 import {Channel} from '../channel/channel';
 import {OutputContainer} from '../output/container/outputContainer';
+import {Printable} from '../rendering/printable/printable';
 
-export interface Paragraph extends Channel {
+export interface Paragraph extends Channel, Printable {
   outputContainer(): OutputContainer;
   id(): string;
-  print(): object;
 }

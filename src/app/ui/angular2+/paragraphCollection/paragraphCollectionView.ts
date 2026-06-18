@@ -69,6 +69,5 @@ export class ParagraphCollectionView implements OnInit {
 
   ngOnInit():void {
     this.paragraphs = new WritableSignalArrayAsPushValue(this.paragraphSignal);
-    this.paragraphCollection.paragraphs(this.paragraphs);
   }
 }

@@ -45,7 +45,6 @@
  */
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
-import {PushValue} from '../pushValue/pushValue';
 import {Response} from '../channel/response';
 import {Request} from '../channel/request';
 import {ParagraphResponse} from './responses/paragraph/paragraphResponse';
@@ -56,31 +55,52 @@ import {RunParagraphRequest} from './requests/runParagraph/runParagraphRequest';
 import {DefaultResponse} from './responses/default/defaultResponse';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import { RenderNode } from '../rendering/renderNode/renderNode';
+import {ComponentView} from '../rendering/componentView/componentView';
+import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
-  private readonly _paragraphs: Paragraph[];
-  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
+  private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
   private readonly _responses: Response[];
   private readonly _requests: Request[];
+  private readonly _componentView: ComponentView;
 
   constructor(channel: Channel, initialParagraphData: object[]) {
-    this._paragraphs = initialParagraphData.map(paragraph => new ParagraphImpl(this, paragraph));
-    this._pushParagraphs = [];
+    this._paragraphs = this.initializedParagraphs(initialParagraphData);
     this._responses = [
       new DefaultResponse(this._paragraphs),
-      new ParagraphResponse(channel, this._paragraphs, this._pushParagraphs),
-      new ParagraphAddedResponse(channel, this._paragraphs, this._pushParagraphs),
-      new ParagraphRemovedResponse(this._paragraphs, this._pushParagraphs),
+      new ParagraphResponse(channel, this._paragraphs),
+      new ParagraphAddedResponse(channel, this._paragraphs),
+      new ParagraphRemovedResponse(this._paragraphs),
     ];
     this._requests = [
       new DefaultRequest(channel),
       new RunParagraphRequest(channel, this._paragraphs)
     ];
+    this._componentView = new ComponentViewStub();
   }
 
-  paragraphs(value:PushValue<Paragraph[]>):void {
-    value.update(this._paragraphs);
-    this._pushParagraphs.push(value);
+  private initializedParagraphs(initialParagraphData: object[]): WritableSignal<Map<string,  Paragraph>> {
+    const paragraphMap = new Map<string, Paragraph>();
+    initialParagraphData.forEach(paragraphData => {
+      const paragraph = new ParagraphImpl(this, paragraphData);
+      paragraphMap.set(paragraph.id(), paragraph);
+    });
+    return signal(paragraphMap);
+  }
+
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      componentView: this._componentView,
+      children: computed(() => {
+        const children:RenderNode[] = [];
+        this._paragraphs().forEach(paragraph => {
+          children.push(paragraph.print()());
+        });
+        return children;
+      }),
+    }));
   }
 
   request(data: object): void {

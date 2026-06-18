@@ -49,12 +49,13 @@ import {Channel} from '../../../channel/channel';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {Message} from '../../../message/message';
+import {Signal} from '@angular/core';
 
 export class RunParagraphRequest implements Request {
   private readonly _channel: Channel;
-  private readonly _paragraphs: Paragraph[];
+  private readonly _paragraphs: Signal<Map<string,  Paragraph>>;
 
-  constructor(channel: Channel, paragraphs: Paragraph[]){
+  constructor(channel: Channel, paragraphs: Signal<Map<string,  Paragraph>>){
     this._channel = channel;
     this._paragraphs = paragraphs;
   }
@@ -64,7 +65,7 @@ export class RunParagraphRequest implements Request {
     if(message.operation() === 'RUN_PARAGRAPH'){
       const runParagraphData = new SafeJsonImpl(message.data());
       const paragraphId:string = runParagraphData.getProperty('id', 'string');
-      const decoratorParagraph = this._paragraphs.find(paragraph => paragraph.id() === paragraphId);
+      const decoratorParagraph = this._paragraphs().get(paragraphId);
       if(decoratorParagraph === undefined){
         throw new Error(`Failed to decorate run paragraph request: paragraph "${paragraphId}" not found in collection`);
       }

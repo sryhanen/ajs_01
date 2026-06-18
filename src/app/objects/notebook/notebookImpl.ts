@@ -83,7 +83,13 @@ export class NotebookImpl implements Notebook {
   print(): Signal<RenderNode> {
     return computed(() => ({
       componentView: this._componentView,
-      children: computed(() => []),
+      children: computed(() => {
+        const children:RenderNode[] = [];
+        if(!this._paragraphCollection.isStub()){
+          children.push(this._paragraphCollection.print()());
+        }
+        return children;
+      }),
     }));
   }
 

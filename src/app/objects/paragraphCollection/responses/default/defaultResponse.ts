@@ -45,15 +45,16 @@
  */
 import {Response} from '../../../channel/response';
 import {Paragraph} from '../../../paragraph/paragraph';
+import {Signal} from '@angular/core';
 
 export class DefaultResponse implements Response {
-  private readonly _paragraphs: Paragraph[];
+  private readonly _paragraphs:Signal<Map<string,  Paragraph>>;
 
-  constructor(paragraphs: Paragraph[]) {
+  constructor(paragraphs:Signal<Map<string,  Paragraph>>) {
     this._paragraphs = paragraphs;
   }
 
   response(data: object) {
-    this._paragraphs.forEach(paragraph => paragraph.response(data));
+    this._paragraphs().forEach(paragraph => paragraph.response(data));
   }
 }

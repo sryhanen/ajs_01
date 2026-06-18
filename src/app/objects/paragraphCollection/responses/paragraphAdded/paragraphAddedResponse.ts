@@ -45,21 +45,19 @@
  */
 import {Response} from '../../../channel/response';
 import {Paragraph} from '../../../paragraph/paragraph';
-import {PushValue} from '../../../pushValue/pushValue';
 import {Channel} from '../../../channel/channel';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
+import {WritableSignal} from '@angular/core';
 
 export class ParagraphAddedResponse implements Response{
   private readonly _channel: Channel;
-  private readonly _paragraphs: Paragraph[];
-  private readonly _pushParagraphs: PushValue<Paragraph[]>[];
+  private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
 
-  constructor(channel: Channel, paragraphs: Paragraph[], pushParagraphs: PushValue<Paragraph[]>[]) {
+  constructor(channel: Channel, paragraphs: WritableSignal<Map<string,  Paragraph>>) {
     this._channel = channel;
     this._paragraphs = paragraphs;
-    this._pushParagraphs = pushParagraphs;
   }
 
   response(data:object):void{
@@ -69,8 +67,19 @@ export class ParagraphAddedResponse implements Response{
       const paragraphData:object = paragraphAddedData.getProperty('paragraph', 'object');
       const paragraphIndex:number = paragraphAddedData.getProperty('index', 'number');
       const newParagraph = new ParagraphImpl(this._channel, paragraphData);
-      this._paragraphs.splice(paragraphIndex, 0, newParagraph);
-      this._pushParagraphs.forEach(pushParagraph => pushParagraph.update(this._paragraphs));
+      const previousParagraphMap = this._paragraphs();
+      const newParagraphMap = new Map<string, Paragraph>;
+      let index = 0;
+      for(const paragraph of previousParagraphMap.values()) {
+        if(index === paragraphIndex){
+          newParagraphMap.set(newParagraph.id(), newParagraph);
+        }
+        else{
+          newParagraphMap.set(paragraph.id(), paragraph);
+        }
+        index += 1;
+      }
+      this._paragraphs.set(newParagraphMap);
     }
   }
 }

@@ -52,12 +52,17 @@ import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {MessageImpl} from '../message/messageImpl';
 import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
+import {computed, Signal} from '@angular/core';
+import { RenderNode } from '../rendering/renderNode/renderNode';
+import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
+import {ComponentView} from '../rendering/componentView/componentView';
 
-export class ParagraphImpl implements Paragraph{
+export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
   private readonly _angularObjectCollection: AngularObjectCollection;
   private readonly _paragraph: SafeJson;
+  private readonly _componentView: ComponentView;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
@@ -65,23 +70,30 @@ export class ParagraphImpl implements Paragraph{
     this._angularObjectCollection = new AngularObjectCollectionImpl(this);
     this._outputContainer = new OutputContainerImpl(this, this._angularObjectCollection);
 
-    if(this._paragraph.propertyExists('output')){
+    if (this._paragraph.propertyExists('output')) {
       const paragraphOutput = this._paragraph.getProperty<object>('output', 'object');
-      if(paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined){
+      if (paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined) {
         console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
-      }
-      else{
+      } else {
         const paragraphOutputMessage = {
-          op:'PARAGRAPH_OUTPUT',
+          op: 'PARAGRAPH_OUTPUT',
           data: {
-            noteId:'',
-            paragraphId:'',
+            noteId: '',
+            paragraphId: '',
             output: paragraphOutput,
           }
         };
         this._outputContainer.response(paragraphOutputMessage);
       }
     }
+    this._componentView = new ComponentViewStub();
+  }
+
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      children:computed(() => []),
+      componentView: this._componentView
+    }));
   }
 
   id(): string {
@@ -92,13 +104,6 @@ export class ParagraphImpl implements Paragraph{
     return this._outputContainer;
   }
 
-  print():object {
-    return {
-      text:this._paragraph.getProperty<string>('text', 'string'),
-      config:this._paragraph.getProperty<object>('config', 'object'),
-      settings: this._paragraph.getProperty<object>('settings', 'object'),
-    };
-  }
 
   request(data: object): void {
     const message = new MessageImpl(new SafeJsonImpl(data));
