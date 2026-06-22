@@ -76,7 +76,7 @@ export class HTMLFormat implements OutputFormat{
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
       if(paragraphOutputMessage.outputType() === OutputType.html){
-        const htmlTemplate = new SafeJsonImpl(paragraphOutputMessage.outputData()).getProperty('data', 'string');
+        const htmlTemplate = new SafeJsonImpl(paragraphOutputMessage.output()).getProperty('data', 'string');
         const componentView = new ComponentViewImpl('HTML_OUTPUT_VIEW', signal({htmlTemplate: htmlTemplate}));
         this._componentView.set(componentView);
       }

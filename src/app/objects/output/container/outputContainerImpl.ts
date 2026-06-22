@@ -58,7 +58,6 @@ import {ComponentViewStub} from '../../rendering/componentView/componentViewStub
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
   private readonly _outputFormats:OutputFormat[];
-  private readonly _responses: Response[];
   private readonly _componentView:ComponentView;
   private readonly _paragraphId:string;
 

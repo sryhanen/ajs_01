@@ -79,7 +79,7 @@ export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
     return this._message.operation();
   }
 
-  outputData(): object {
+  output(): object {
     return this.safeData().getProperty('output', 'object');
   }
 

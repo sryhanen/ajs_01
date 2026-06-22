@@ -49,8 +49,6 @@ import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
 import {GraphType} from './graphType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {OutputType} from '../../outputType';
-import uPlot from 'uplot';
-import {OutputPlugin} from '../../plugins/outputPlugin';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {Channel} from '../../../channel/channel';
@@ -59,7 +57,6 @@ import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraph
 import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {UPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
-import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 
 export class uPlotFormat implements OutputFormat {
@@ -92,7 +89,7 @@ export class uPlotFormat implements OutputFormat {
         this._componentView.set(this._componentViewStub);
         return;
       }
-      const uPlotData = paragraphOutputMessage.outputData()['data'];
+      const uPlotData = paragraphOutputMessage.output()['data'];
       const uPlotOptions = paragraphOutputMessage.outputOptions();
       const plugin = new UPlotPluginImpl(uPlotData, uPlotOptions);
       this._componentView.set(new ComponentViewImpl('UPLOT_OUTPUT_VIEW', signal({uPlotPlugin: plugin})));

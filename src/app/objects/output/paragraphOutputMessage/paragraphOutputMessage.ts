@@ -48,6 +48,6 @@ import {Message} from '../../message/message';
 export interface ParagraphOutputMessage extends Message {
   isAggregated(): boolean;
   outputType(): string;
-  outputData(): object;
+  output(): object;
   outputOptions(): object;
 }
