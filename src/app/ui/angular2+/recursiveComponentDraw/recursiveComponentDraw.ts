@@ -57,9 +57,9 @@ import {ComponentView} from '../../../objects/rendering/componentView/componentV
     NgComponentOutlet
   ],
   template: `
-    @if(!componentView.isStub()){
+    @if(!componentView().isStub()){
       <ng-container
-        *ngComponentOutlet="component; inputs: inputs()">
+        *ngComponentOutlet="component(); inputs: inputs()">
       </ng-container>
     }
     @for (child of renderNode().children(); track $index) {
@@ -69,19 +69,19 @@ import {ComponentView} from '../../../objects/rendering/componentView/componentV
     }
   `
 })
-export class RecursiveComponentDraw implements OnInit {
+export class RecursiveComponentDraw {
   renderNode = input.required<RenderNode>();
   containerId = input.required<string>();
-  protected componentView: ComponentView;
-  protected component: {new(): unknown};
-  protected inputs: Signal<Record<string, unknown>>;
-  private componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
-
-  ngOnInit() {
-    this.componentView = this.renderNode().componentView;
-    if(!this.componentView.isStub()){
-      this.component = this.componentRegistry.resolve(this.componentView.type());
-      this.inputs = this.componentView.inputs();
+  protected componentView = computed(() => this.renderNode().componentView);
+  protected component = computed(() => {
+    if(!this.componentView().isStub()){
+      return this.componentRegistry.resolve(this.componentView().type());
     }
-  }
+  });
+  protected inputs = computed(() => {
+    if(!this.componentView().isStub()){
+      return this.componentView().inputs()();
+    }
+  });
+  private componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
 }
