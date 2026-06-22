@@ -47,29 +47,53 @@ import {OutputFormat} from '../outputFormat';
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {HtmlPluginImpl} from '../../plugins/htmlPlugin/htmlPluginImpl';
-import {OutputPlugin} from '../../plugins/outputPlugin';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {RenderNode} from '../../../rendering/renderNode/renderNode';
+import {Channel} from '../../../channel/channel';
+import {MessageImpl} from '../../../message/messageImpl';
+import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraphOutputMessageImpl';
+import {ComponentView} from '../../../rendering/componentView/componentView';
+import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
+import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 
 export class HTMLFormat implements OutputFormat{
-  private readonly _switcherButtons: OutputSwitcherButton[];
-  private readonly _outputType: string;
+  private readonly _channel: Channel;
+  private readonly _componentViewStub: ComponentView;
+  private readonly _componentView: WritableSignal<ComponentView>;
 
-  constructor() {
-    this._outputType = OutputType.html;
-    this._switcherButtons = [];
+  constructor(channel: Channel) {
+    this._channel = channel;
+    this._componentViewStub = new ComponentViewStub();
+    this._componentView = signal(this._componentViewStub);
   }
 
-  plugin(paragraphOutputData: object): OutputPlugin {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData:string = safeParagraphOutputData.getProperty('data', 'string');
-    return new HtmlPluginImpl(outputData);
+  request(json: object): void {
+    this._channel.request(json);
   }
 
-  outputType(): string {
-    return this._outputType;
+  response(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    if(message.operation() === 'PARAGRAPH_OUTPUT'){
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
+      if(paragraphOutputMessage.outputType() === OutputType.html){
+        const htmlTemplate = new SafeJsonImpl(paragraphOutputMessage.outputData()).getProperty('data', 'string');
+        const componentView = new ComponentViewImpl('HTML_OUTPUT_VIEW', signal({htmlTemplate: htmlTemplate}));
+        this._componentView.set(componentView);
+      }
+      else{
+        this._componentView.set(this._componentViewStub);
+      }
+    }
+  }
+
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      componentView: this._componentView(),
+      children: computed(() => []),
+    }));
   }
 
   switcherButtons(): OutputSwitcherButton[] {
-    return this._switcherButtons;
+    return [];
   }
 }

@@ -43,9 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputPlugin} from '../outputPlugin';
+import {Channel} from '../../../channel/channel';
+import Stubable from '../../../../shared/interfaces/stubable';
 
-export interface DataTablesPlugin extends OutputPlugin {
-  response(json:object):void;
-  request(json:object):void;
+export interface DataTablesPlugin extends Channel, Stubable {
+  initializeTable(anchorElement: HTMLElement): void;
 }

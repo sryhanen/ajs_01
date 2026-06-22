@@ -51,18 +51,31 @@ import {AngularPluginImpl} from '../../plugins/angularPlugin/angularPluginImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {OutputType} from '../../outputType';
 import {OutputPlugin} from '../../plugins/outputPlugin';
+import { Signal } from '@angular/core';
+import { RenderNode } from '../../../rendering/renderNode/renderNode';
 
 export class AngularFormat implements OutputFormat {
   private readonly _channel: Channel;
-  private readonly _angularObjectCollection:AngularObjectCollection;
+  private readonly _angularObjectCollection: AngularObjectCollection;
   private readonly _switcherButtons: OutputSwitcherButton[];
-  private readonly _outputType:string;
+  private readonly _outputType: string;
 
-  constructor(channel: Channel, angularObjectCollection:AngularObjectCollection) {
+  constructor(channel: Channel, angularObjectCollection: AngularObjectCollection) {
     this._channel = channel;
     this._angularObjectCollection = angularObjectCollection;
     this._switcherButtons = [];
     this._outputType = OutputType.angular;
+  }
+
+  request(data: object): void {
+        throw new Error('Method not implemented.');
+    }
+    response(data: object): void {
+        throw new Error('Method not implemented.');
+    }
+
+  print(): Signal<RenderNode> {
+      throw new Error('Method not implemented.');
   }
 
   outputType(): string {

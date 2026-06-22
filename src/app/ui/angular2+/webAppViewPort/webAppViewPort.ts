@@ -43,14 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, effect, inject, input, OnInit, signal, Signal} from '@angular/core';
+import {Component, computed, inject, input, OnInit} from '@angular/core';
 import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComponentRegistryImpl';
 import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
-import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
-import {OutputContainerView} from '../output/container/outputContainerView';
-
+import {DataTablesFormatView} from '../output/outputFormats/dataTablesFormatView/dataTablesFormatView';
+import {HtmlFormatView} from '../output/outputFormats/htmlFormatView/htmlFormatView';
 
 @Component({
   selector: 'web-app-view-port',
@@ -66,7 +65,8 @@ export class WebAppViewPort implements OnInit {
   containerId= input.required<string>();
 
   private readonly _components = new Map<string, new () => unknown>([
-    ['OUTPUT_CONTAINER', OutputContainerView]
+    ['HTML_OUTPUT_VIEW', HtmlFormatView],
+    ['DATATABLES_OUTPUT_VIEW', DataTablesFormatView]
   ]);
   protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
   protected renderNode = computed(() => webAppRoot.print()());

@@ -78,6 +78,5 @@ export class OutputSwitcherView implements OnInit{
   protected switcherStatus = signal({isSwitchable:false, isLoading:false});
 
   ngOnInit(): void {
-    this.outputSwitcher.status(new WritableSignalAsPushValue(this.switcherStatus));
   }
 }

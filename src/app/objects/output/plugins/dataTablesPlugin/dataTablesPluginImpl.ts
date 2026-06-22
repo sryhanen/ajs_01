@@ -49,26 +49,19 @@ import {Channel} from '../../../channel/channel';
 import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
 import {DataTablesAjax} from './ajax/dataTablesAjax';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {OutputPlugin} from '../outputPlugin';
-import {OutputType} from '../../outputType';
+import {DataTablesPlugin} from './dataTablesPlugin';
 
-export class DataTablesPluginImpl implements OutputPlugin, Channel {
+export class DataTablesPluginImpl implements DataTablesPlugin {
   private readonly _channel: Channel;
   private readonly _dataTablesAjax: DataTablesAjax;
   private readonly _outputData:object;
   private readonly _outputOptions:object;
-  private readonly _outputType:string;
 
   constructor(channel:Channel, outputData:object, outputOptions:object) {
     this._channel = channel;
     this._outputData = outputData;
     this._outputOptions = outputOptions;
     this._dataTablesAjax = new DataTablesAjaxImpl(this);
-    this._outputType = OutputType.dataTables;
-  }
-
-  outputType(): string {
-    return this._outputType;
   }
 
   request(data: object): void {
@@ -79,7 +72,7 @@ export class DataTablesPluginImpl implements OutputPlugin, Channel {
     this._dataTablesAjax.response(data);
   }
 
-  render(anchorElement: HTMLElement): void {
+  initializeTable(anchorElement: HTMLElement): void {
     const safeOptions = new SafeJsonImpl(this._outputOptions);
     const headers:Array<string> = safeOptions.getProperty('headers', 'object');
     const config: Config = {

@@ -49,6 +49,8 @@ import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {TextPluginImpl} from '../../plugins/textPlugin/textPluginImpl';
 import {OutputPlugin} from '../../plugins/outputPlugin';
+import {Signal} from '@angular/core';
+import {RenderNode} from '../../../rendering/renderNode/renderNode';
 
 export class TextFormat implements OutputFormat {
   private readonly _switcherButtons: OutputSwitcherButton[];
@@ -57,6 +59,17 @@ export class TextFormat implements OutputFormat {
   constructor() {
     this._outputType = OutputType.text;
     this._switcherButtons = [];
+  }
+
+  request(data: object): void {
+        throw new Error('Method not implemented.');
+    }
+    response(data: object): void {
+        throw new Error('Method not implemented.');
+    }
+
+  print(): Signal<RenderNode> {
+    throw new Error('Method not implemented.');
   }
 
   plugin(paragraphOutputData: object): OutputPlugin {

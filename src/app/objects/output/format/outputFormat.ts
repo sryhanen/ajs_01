@@ -44,11 +44,9 @@
  * a licensee so wish it.
  */
 import {OutputSwitcherButton} from '../switcher/button/outputSwitcherButton';
-import {OutputPlugin} from '../plugins/outputPlugin';
+import {Printable} from '../../rendering/printable/printable';
+import {Channel} from '../../channel/channel';
 
-export interface OutputFormat {
+export interface OutputFormat extends Channel, Printable {
   switcherButtons(): OutputSwitcherButton[];
-  outputType(): string;
-  plugin(paragraphOutputData:object): OutputPlugin;
 }
-

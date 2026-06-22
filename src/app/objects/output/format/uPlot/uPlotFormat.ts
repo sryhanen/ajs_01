@@ -52,6 +52,8 @@ import {uPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
 import {OutputType} from '../../outputType';
 import uPlot from 'uplot';
 import {OutputPlugin} from '../../plugins/outputPlugin';
+import {Signal} from '@angular/core';
+import {RenderNode} from '../../../rendering/renderNode/renderNode';
 
 export class uPlotFormat implements OutputFormat {
   private readonly _switcherButtons:OutputSwitcherButton[];
@@ -65,6 +67,17 @@ export class uPlotFormat implements OutputFormat {
       new uPlotSwitcherButton('Bar Chart', 'fas fa-chart-bar', GraphType.bar),
       new uPlotSwitcherButton('Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
+  }
+
+  request(data: object): void {
+        throw new Error('Method not implemented.');
+    }
+    response(data: object): void {
+        throw new Error('Method not implemented.');
+    }
+
+  print(): Signal<RenderNode> {
+    throw new Error('Method not implemented.');
   }
 
   plugin(paragraphOutputData: object): OutputPlugin {

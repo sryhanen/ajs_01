@@ -45,36 +45,66 @@
  */
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {Channel} from '../../../channel/channel';
-import {Request} from '../../../channel/request';
 import {DataTableSwitcherButton} from './switcherButton/dataTablesSwitcherButton';
 import {OutputFormat} from '../outputFormat';
 import {OutputType} from '../../outputType';
 import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import { OutputPlugin } from '../../plugins/outputPlugin';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import { RenderNode } from '../../../rendering/renderNode/renderNode';
+import {MessageImpl} from '../../../message/messageImpl';
+import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraphOutputMessageImpl';
+import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import {ComponentView} from '../../../rendering/componentView/componentView';
+import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
+import {DataTablesPlugin} from '../../plugins/dataTablesPlugin/dataTablesPlugin';
+import {DataTablesPluginStub} from '../../plugins/dataTablesPlugin/dataTablesPluginStub';
 
-export class DataTablesFormat implements OutputFormat, Request {
+export class DataTablesFormat implements OutputFormat {
   private readonly _channel: Channel;
-  private readonly _outputType: string;
   private readonly _switcherButtons: OutputSwitcherButton[];
+  private readonly _componentViewStub: ComponentView;
+  private readonly _componentView: WritableSignal<ComponentView>;
+  private readonly _pluginStub: DataTablesPlugin;
+  private readonly _plugin: WritableSignal<DataTablesPlugin>;
 
   constructor(channel: Channel) {
     this._channel = channel;
-    this._outputType = OutputType.dataTables;
     this._switcherButtons = [
       new DataTableSwitcherButton()
     ];
+    this._componentViewStub = new ComponentViewStub();
+    this._componentView = signal(this._componentViewStub);
+    this._pluginStub = new DataTablesPluginStub();
+    this._plugin = signal(this._pluginStub);
   }
 
-  plugin(paragraphOutputData: object): OutputPlugin {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
-    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
-    return new DataTablesPluginImpl(this._channel, outputData, outputOptions);
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      componentView: this._componentView(),
+      children: computed(() => [])
+    }));
   }
 
-  outputType(): string {
-    return this._outputType;
+  response(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    if(message.operation() === 'PARAGRAPH_OUTPUT'){
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
+      if(paragraphOutputMessage.outputType() !== OutputType.dataTables){
+        this._componentView.set(this._componentViewStub);
+        this._plugin.set(this._pluginStub);
+        return;
+      }
+      const dataTablesData = paragraphOutputMessage.outputData()['data'];
+      if(!this._plugin().isStub()){
+        this._plugin().response(dataTablesData);
+      }
+      else{
+        const dataTablesOptions = paragraphOutputMessage.outputOptions();
+        this._plugin.set(new DataTablesPluginImpl(this, dataTablesData, dataTablesOptions));
+        this._componentView.set(new ComponentViewImpl('DATATABLES_OUTPUT_VIEW', signal({dataTablesPlugin: this._plugin()})));
+      }
+    }
   }
 
   request(data: object): void {

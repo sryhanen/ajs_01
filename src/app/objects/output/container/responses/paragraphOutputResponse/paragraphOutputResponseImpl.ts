@@ -70,26 +70,6 @@ export class ParagraphOutputResponseImpl implements Channel {
   }
 
   response(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputData = new SafeJsonImpl(message.data());
-      const outputData:object = paragraphOutputData.getProperty('output', 'object');
-      const safeOutputData = new SafeJsonImpl(outputData);
-      const outputType:string = safeOutputData.getProperty('type', 'string');
-      if(!this._outputSwitcher.outputTypeIsValid(outputType)){
-        this._outputSwitcher.requestFormatSwitch(this._outputSwitcher.activeButton());
-      }
-      else {
-        const outputFormatToRender = this._outputFormats.find(outputFormat => outputFormat.outputType() === outputType);
-        const newPlugin = outputFormatToRender.plugin(outputData);
-        if(!this._outputPlugin().isStub() && this._outputPlugin().outputType() === OutputType.dataTables && outputFormatToRender.outputType() === OutputType.dataTables){
-          this._outputPlugin().response(safeOutputData.getProperty('data', 'object'));
-        }
-        else{
-          this._outputPlugin.set(newPlugin);
-        }
-        this._outputSwitcher.response(data);
-      }
-    }
+
   }
 }

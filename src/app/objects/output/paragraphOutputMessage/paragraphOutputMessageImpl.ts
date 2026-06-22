@@ -43,56 +43,51 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputContainer} from './outputContainer';
-import {Channel} from '../../channel/channel';
-import {Response} from '../../channel/response';
-import {OutputFormat} from '../format/outputFormat';
-import {DataTablesFormat} from '../format/dataTables/dataTablesFormat';
-import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
-import {HTMLFormat} from '../format/html/htmlFormat';
-import {computed, Signal} from '@angular/core';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {ComponentView} from '../../rendering/componentView/componentView';
-import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
+import {ParagraphOutputMessage} from './paragraphOutputMessage';
+import {Message} from '../../message/message';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {SafeJson} from '../../safeJson/safeJson';
 
-export class OutputContainerImpl implements OutputContainer{
-  private readonly _channel:Channel;
-  private readonly _outputFormats:OutputFormat[];
-  private readonly _responses: Response[];
-  private readonly _componentView:ComponentView;
-  private readonly _paragraphId:string;
+export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
+  private readonly _message:Message;
 
-  constructor(channel:Channel, angularObjectCollection: AngularObjectCollection, paragraphId:string) {
-    this._channel = channel;
-    this._outputFormats = [
-      new DataTablesFormat(this),
-      new HTMLFormat(this)
-    ];
-    this._paragraphId = paragraphId;
-    this._componentView = new ComponentViewStub();
+  constructor(message:Message) {
+    this._message = message;
   }
 
-  request(data: object): void {
-    this._channel.request(data);
+  data(): object {
+    if(this._message.operation() !== 'PARAGRAPH_OUTPUT'){
+      throw new RangeError('Message operation is not "PARAGRAPH_OUTPUT"');
+    }
+    return this._message.data();
   }
 
-  response(data: object): void {
-    this._outputFormats.forEach(format => format.response(data));
+  private safeData(): SafeJson {
+    return new SafeJsonImpl(this.data());
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() =>
-      ({
-        paragraphId:this._paragraphId,
-        componentView: this._componentView,
-        children: computed(() => {
-          const renderableList: RenderNode[] = [];
-          this._outputFormats.forEach(outputFormat => {
-            renderableList.push(outputFormat.print()());
-          });
-          return renderableList;
-        }),
-      })
-    );
+  private safeOutputData():SafeJson {
+    return new SafeJsonImpl(this.safeData().getProperty('output', 'object'));
+  }
+
+  isAggregated(): boolean {
+    const safeData = this.safeData();
+    return safeData.propertyExists('isAggregated') && safeData.getProperty('isAggregated', 'boolean');
+  }
+
+  operation(): string {
+    return this._message.operation();
+  }
+
+  outputData(): object {
+    return this.safeData().getProperty('output', 'object');
+  }
+
+  outputOptions(): object {
+    return this.safeOutputData().getProperty('options', 'object');
+  }
+
+  outputType(): string {
+    return this.safeOutputData().getProperty('type', 'string');
   }
 }

@@ -86,11 +86,6 @@ export class OutputSwitcherImpl implements OutputSwitcher {
     return this._activeButton;
   }
 
-  status(value: PushValue<{isSwitchable:boolean, isLoading:boolean}>):void {
-    value.update(this._status);
-    this._pushStatus.push(value);
-  }
-
   response(data: object): void {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){

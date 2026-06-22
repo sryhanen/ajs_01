@@ -43,56 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputContainer} from './outputContainer';
-import {Channel} from '../../channel/channel';
-import {Response} from '../../channel/response';
-import {OutputFormat} from '../format/outputFormat';
-import {DataTablesFormat} from '../format/dataTables/dataTablesFormat';
-import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
-import {HTMLFormat} from '../format/html/htmlFormat';
-import {computed, Signal} from '@angular/core';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {ComponentView} from '../../rendering/componentView/componentView';
-import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
+import {DataTablesPlugin} from './dataTablesPlugin';
 
-export class OutputContainerImpl implements OutputContainer{
-  private readonly _channel:Channel;
-  private readonly _outputFormats:OutputFormat[];
-  private readonly _responses: Response[];
-  private readonly _componentView:ComponentView;
-  private readonly _paragraphId:string;
+export class DataTablesPluginStub implements DataTablesPlugin {
+  isStub(): boolean {
+    return true;
+  }
 
-  constructor(channel:Channel, angularObjectCollection: AngularObjectCollection, paragraphId:string) {
-    this._channel = channel;
-    this._outputFormats = [
-      new DataTablesFormat(this),
-      new HTMLFormat(this)
-    ];
-    this._paragraphId = paragraphId;
-    this._componentView = new ComponentViewStub();
+  initializeTable(anchorElement: HTMLElement): void {
+    throw new Error('DataTablesPluginStub: Method not implemented.');
   }
 
   request(data: object): void {
-    this._channel.request(data);
+    throw new Error('DataTablesPluginStub: Method not implemented.');
   }
 
   response(data: object): void {
-    this._outputFormats.forEach(format => format.response(data));
-  }
-
-  print(): Signal<RenderNode> {
-    return computed(() =>
-      ({
-        paragraphId:this._paragraphId,
-        componentView: this._componentView,
-        children: computed(() => {
-          const renderableList: RenderNode[] = [];
-          this._outputFormats.forEach(outputFormat => {
-            renderableList.push(outputFormat.print()());
-          });
-          return renderableList;
-        }),
-      })
-    );
+    throw new Error('DataTablesPluginStub: Method not implemented.');
   }
 }
