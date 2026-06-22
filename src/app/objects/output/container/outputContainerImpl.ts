@@ -52,8 +52,6 @@ import {OutputSwitcher} from '../switcher/outputSwitcher';
 import {TextFormat} from '../format/text/textFormat';
 import {DataTablesFormat} from '../format/dataTables/dataTablesFormat';
 import {uPlotFormat} from '../format/uPlot/uPlotFormat';
-import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
-import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/interpreterErrorListenerImpl';
 import {AngularFormat} from '../format/angular/angularFormat';
 import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 import {HTMLFormat} from '../format/html/htmlFormat';
@@ -64,8 +62,6 @@ import {computed, Signal, signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
 import {ComponentView} from '../../rendering/componentView/componentView';
 import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
-import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {MessageImpl} from '../../message/messageImpl';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
@@ -103,12 +99,6 @@ export class OutputContainerImpl implements OutputContainer{
 
   response(data: object): void {
     this._responses.forEach(response => response.response(data));
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    if(message.operation()=== 'PARAGRAPH'){
-      if(message.data()['output'] === undefined ){
-        this._outputPlugin.set(new OutputPluginStub());
-      }
-    }
   }
 
   print(): Signal<RenderNode> {
