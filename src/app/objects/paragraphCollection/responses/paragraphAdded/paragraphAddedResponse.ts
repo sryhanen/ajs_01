@@ -67,19 +67,11 @@ export class ParagraphAddedResponse implements Response{
       const paragraphData:object = paragraphAddedData.getProperty('paragraph', 'object');
       const paragraphIndex:number = paragraphAddedData.getProperty('index', 'number');
       const newParagraph = new ParagraphImpl(this._channel, paragraphData);
-      const previousParagraphMap = this._paragraphs();
-      const newParagraphMap = new Map<string, Paragraph>;
-      let index = 0;
-      for(const paragraph of previousParagraphMap.values()) {
-        if(index === paragraphIndex){
-          newParagraphMap.set(newParagraph.id(), newParagraph);
-        }
-        else{
-          newParagraphMap.set(paragraph.id(), paragraph);
-        }
-        index += 1;
-      }
-      this._paragraphs.set(newParagraphMap);
+      this._paragraphs.update(paragraphs => {
+        const paragraphsArray = Array.from(paragraphs);
+        paragraphsArray.splice(paragraphIndex, 0, [newParagraph.id(), newParagraph]);
+        return new Map(paragraphsArray);
+      });
     }
   }
 }
