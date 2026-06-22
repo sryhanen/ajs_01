@@ -44,59 +44,66 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../../../channel/channel';
+import {FakeChannel} from '../../../../channel/fakeChannel';
+import {DataTablesPluginImpl} from './dataTablesPluginImpl';
+import {DataTablesPlugin} from './dataTablesPlugin';
 import {OutputType} from '../../../outputType';
-import {DataTablesAjax} from './dataTablesAjax';
-import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';
 
-export class DataTablesAjaxImpl implements DataTablesAjax {
-  private readonly _channel: Channel;
-  private _callback: (data: object) => void;
+describe('DataTablesOutput', () => {
+  let channel:Channel;
+  let outputData;
+  let outputOptions;
+  let dataTablesPlugin:DataTablesPlugin;
+  const initialData = [
+    {test:'test1'},
+    {test:'test2'},
+    {test:'test3'}
+  ];
 
-  constructor(channel:Channel) {
-    this._channel = channel;
-  }
-
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(data: object): void {
-    if(this._callback) {
-      this._callback(this.validatedData(data));
-    }
-  }
-
-  private validatedData(data: object): {draw:number, recordsTotal:number, recordsFiltered:number, data:object} {
-    const safeJson = new SafeJsonImpl(data);
-    const draw:number = safeJson.getProperty('draw', 'number');
-    const recordsTotal:number = safeJson.getProperty('recordsTotal', 'number');
-    const recordsFiltered:number = safeJson.getProperty('recordsFiltered', 'number');
-    const tableData:object = safeJson.getProperty('data', 'object');
-    return {
-      draw:draw,
-      recordsTotal:recordsTotal,
-      recordsFiltered:recordsFiltered,
-      data:tableData
+  beforeEach(() => {
+    channel = new FakeChannel();
+    outputData = {
+      data:initialData,
+      draw:1,
+      recordsTotal: 3,
+      recordsFiltered: 3,
     };
-  }
-
-  configFunction(initialData: object): (data: {draw:number, start:number, length:number}, callback: (data:object) => void) => void {
-    const validatedData = this.validatedData(initialData);
-    return (data: {draw:number, start:number, length:number}, callback: (data:object) => void) => {
-      this._callback = callback;
-      this._callback(validatedData);
-      if(data.draw > validatedData.draw) {
-        const request = {
-          op:'PARAGRAPH_OUTPUT_REQUEST',
-          data: {
-            paragraphId: '',
-            noteId: '',
-            type: OutputType.dataTables,
-            requestOptions: data
-          }
-        };
-        this.request(request);
-      }
+    outputOptions = {
+      headers:['test']
     };
-  }
-}
+    dataTablesPlugin = new DataTablesPluginImpl(channel, outputData, outputOptions);
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(dataTablesPlugin).toBeInstanceOf(DataTablesPluginImpl);
+    });
+
+    it('Should have output type', () => {
+      expect(dataTablesPlugin.outputType()).toEqual(OutputType.dataTables);
+    });
+
+    it('Should not be a stub', () => {
+      expect(dataTablesPlugin.isStub()).toBe(false);
+    });
+  });
+
+  describe('Request', () => {
+    it('Should send request to channel', () => {
+      const channelSpy = vi.spyOn(channel, 'request');
+      const request = {test: 'test'};
+      expect(channelSpy).toHaveBeenCalledTimes(0);
+      dataTablesPlugin.request(request);
+      expect(channelSpy).toHaveBeenCalledTimes(1);
+      expect(channelSpy).toHaveBeenCalledWith(request);
+    });
+  });
+
+  describe('Render', () => {
+    it('Should bind table to the html element', () => {
+      const htmlElement = document.createElement('div');
+      dataTablesPlugin.render(htmlElement);
+      expect(htmlElement.innerHTML).toContain('<table class="table table-bordered table-striped');
+    });
+  });
+});

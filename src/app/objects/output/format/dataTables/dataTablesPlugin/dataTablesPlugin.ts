@@ -43,10 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import Stubable from '../../../shared/interfaces/stubable';
+import {Channel} from '../../../../channel/channel';
+import Stubable from '../../../../../shared/interfaces/stubable';
 
-export interface OutputPlugin extends Stubable{
-  render(anchorElement: HTMLElement): void;
-  outputType():string;
-  response?(data:object):void;
+export interface DataTablesPlugin extends Channel, Stubable {
+  initializeTable(tableElement: HTMLTableElement): void;
 }

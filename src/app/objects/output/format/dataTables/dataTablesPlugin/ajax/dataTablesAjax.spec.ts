@@ -43,9 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../../channel/channel';
+import {Channel} from '../../../../../channel/channel';
 import {DataTablesAjaxImpl} from './dataTablesAjaxImpl';
-import {FakeChannel} from '../../../../channel/fakeChannel';
+import {FakeChannel} from '../../../../../channel/fakeChannel';
 import {DataTablesAjax} from './dataTablesAjax';
 
 describe('Ajax', () => {

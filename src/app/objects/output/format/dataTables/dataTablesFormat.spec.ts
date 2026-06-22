@@ -47,7 +47,7 @@ import {DataTablesFormat} from './dataTablesFormat';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {OutputType} from '../../outputType';
-import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
+import {DataTablesPluginImpl} from './dataTablesPlugin/dataTablesPluginImpl';
 
 describe('dataTablesFormat', () => {
   let channel:Channel;

@@ -46,19 +46,20 @@
 import {GraphSeries} from './graphSeries';
 import uPlot from 'uplot';
 import {RgbColor} from '../color/rgbColor';
-import {GraphType} from '../../../../format/uPlot/graphType';
+import {GraphType} from '../../../graphType';
 
-export class AreaSeries implements GraphSeries {
+export class ScatterSeries implements GraphSeries  {
   type(): string {
-    return GraphType.area;
+    return GraphType.scatter;
   }
 
   series(label:string, rgbColor: RgbColor): uPlot.Series{
     return {
       label: label,
+      paths: uPlot.paths.bars(),
       stroke: rgbColor.toString(),
-      width: 2,
-      fill: rgbColor.toString(0.3),
+      width:0,
+      points: {show: true, size: 10, fill: rgbColor.toString(0.3)}
     };
   }
 }

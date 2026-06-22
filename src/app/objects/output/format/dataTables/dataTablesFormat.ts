@@ -48,7 +48,7 @@ import {Channel} from '../../../channel/channel';
 import {DataTableSwitcherButton} from './switcherButton/dataTablesSwitcherButton';
 import {OutputFormat} from '../outputFormat';
 import {OutputType} from '../../outputType';
-import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
+import {DataTablesPluginImpl} from './dataTablesPlugin/dataTablesPluginImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../../../rendering/renderNode/renderNode';
@@ -57,8 +57,8 @@ import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraph
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
-import {DataTablesPlugin} from '../../plugins/dataTablesPlugin/dataTablesPlugin';
-import {DataTablesPluginStub} from '../../plugins/dataTablesPlugin/dataTablesPluginStub';
+import {DataTablesPlugin} from './dataTablesPlugin/dataTablesPlugin';
+import {DataTablesPluginStub} from './dataTablesPlugin/dataTablesPluginStub';
 import {
   DataTablesOutputView
 } from '../../../../ui/angular2+/output/outputViews/dataTablesOutputView/dataTablesOutputView';

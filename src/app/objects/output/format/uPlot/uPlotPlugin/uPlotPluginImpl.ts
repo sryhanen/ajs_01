@@ -43,36 +43,44 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {HtmlPluginImpl} from './htmlPluginImpl';
-import {OutputPlugin} from '../outputPlugin';
-import {OutputType} from '../../outputType';
+import uPlot from 'uplot';
+import {ResizeListener} from './configuration/resizeListener/resizeListener';
+import {ResizeListenerImpl} from './configuration/resizeListener/resizeListenerImpl';
+import {GraphType} from '../graphType';
+import {BarChartOptionsImpl} from './configuration/options/barChartOptionsImpl';
+import {BasicOptionsImpl} from './configuration/options/basicOptionsImpl';
+import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';
+import {UPlotPlugin} from './uPlotPlugin';
 
-describe('HtmlPlugin', () => {
-  const inputData = '<h1>some input data</h1>';
-  let htmlPlugin: OutputPlugin;
-  beforeEach(() => {
-    htmlPlugin = new HtmlPluginImpl(inputData);
-  });
+export class UPlotPluginImpl implements UPlotPlugin {
+  private readonly _outputData: uPlot.AlignedData;
+  private readonly _outputOptions:object;
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(htmlPlugin).toBeInstanceOf(HtmlPluginImpl);
-    });
+  constructor(outputData: uPlot.AlignedData, outputOptions:object) {
+    this._outputData = outputData;
+    this._outputOptions = outputOptions;
+  }
 
-    it('Should have output type', () => {
-      expect(htmlPlugin.outputType()).toEqual(OutputType.html);
-    });
-
-    it('Should not be stub', () => {
-      expect(htmlPlugin.isStub()).toBe(false);
-    });
-  });
-
-  describe('Render', () => {
-    it('Should bind table to the html element', () => {
-      const htmlElement = document.createElement('div');
-      htmlPlugin.render(htmlElement);
-      expect(htmlElement.innerHTML).toContain(inputData);
-    });
-  });
-});
+  initializeUPlot(htmlElement:HTMLElement):void {
+    const safeOutputOptions = new SafeJsonImpl(this._outputOptions);
+    const uPlotOutputOptions = {
+      labels:safeOutputOptions.getProperty<string[]>('labels', 'object'),
+      series:safeOutputOptions.getProperty<string[]>('series', 'object'),
+      xAxisLabel:safeOutputOptions.getProperty<string>('xAxisLabel', 'string'),
+      graphType: safeOutputOptions.getProperty<string>('graphType', 'string'),
+    };
+    let uPlotOptions:uPlot.Options;
+    const basicOptions = new BasicOptionsImpl(uPlotOutputOptions);
+    if(uPlotOutputOptions.graphType === GraphType.bar){
+      const barChartOptions = new BarChartOptionsImpl(basicOptions);
+      uPlotOptions = barChartOptions.options();
+    }
+    else{
+      uPlotOptions = basicOptions.options();
+    }
+    const size:ResizeListener = new ResizeListenerImpl();
+    const graph = new uPlot(uPlotOptions, this._outputData, htmlElement);
+    size.registerToWindow(graph);
+    size.registerToElement(graph, htmlElement);
+  }
+}

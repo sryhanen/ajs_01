@@ -43,22 +43,64 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputPlugin} from './outputPlugin';
+import {GraphSeries} from './graphSeries';
+import uPlot from 'uplot';
+import {SpaceCalculatorImpl} from './spaceCalculator/spaceCalculatorImpl';
+import {SpaceCalculator} from './spaceCalculator/spaceCalculator';
+import {RgbColor} from '../color/rgbColor';
+import {GraphType} from '../../../graphType';
 
-export class OutputPluginStub implements OutputPlugin {
-  isStub(): boolean {
-    return true;
+
+export class BarSeries implements GraphSeries {
+  type(): string {
+    return GraphType.bar;
   }
 
-  response(data: object): void {
-    throw new Error('OutputPluginStub: method not implemented');
+  series(label:string, rgbColor: RgbColor, seriesCount:number): uPlot.Series{
+    return {
+      label: label,
+      paths: uPlot.paths.bars({
+        disp:{
+          x0: {
+            unit:2,
+            values: (u, seriesIdx, idx0, idx1) => this.x0Values(seriesCount, seriesIdx-1, idx1)
+          },
+          size: {
+            unit:2,
+            values: (u, seriesIdx, idx0, idx1) =>  this.sizeValues(seriesCount, idx1+1)
+          },
+        }
+      }),
+      stroke: rgbColor.toString(),
+      fill: rgbColor.toString(),
+      points:{
+        show:false
+      }
+    };
   }
 
-  outputType(): string {
-    throw new Error('OutputPluginStub: method not implemented');
+  private x0Values(seriesCount:number, seriesIdx:number, seriesLength:number):uPlot.Series.BarsPathBuilderFacetValue[]{
+    const x0Values = [];
+    const calc = this.calculator(seriesLength, seriesCount);
+    for(let i = 0; i < seriesLength+1; i++){
+      const x0 = calc.barPosition(i, seriesIdx);
+      x0Values.push(x0);
+    }
+    return x0Values;
   }
 
-  render(anchorElement: HTMLElement): void {
-    throw new Error('OutputPluginStub: method not implemented');
+  private sizeValues(seriesCount:number, seriesLength:number):uPlot.Series.BarsPathBuilderFacetValue[]{
+    const sizeValues = [];
+    const calc = this.calculator(seriesLength, seriesCount);
+    const width = calc.barWidth();
+    for(let i= 0; i< seriesLength; i++){
+      sizeValues.push(width);
+    }
+    return sizeValues;
+  }
+
+  private calculator(seriesLength:number, seriesCount:number): SpaceCalculator {
+    return new SpaceCalculatorImpl(0.30,0.35, seriesLength, seriesCount);
   }
 }
+

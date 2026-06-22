@@ -45,10 +45,10 @@
  */
 import DataTable, {Config, ConfigColumnDefs, ConfigColumns} from 'datatables.net-bs5';
 import 'datatables.net-buttons-bs5';
-import {Channel} from '../../../channel/channel';
+import {Channel} from '../../../../channel/channel';
 import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
 import {DataTablesAjax} from './ajax/dataTablesAjax';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';
 import {DataTablesPlugin} from './dataTablesPlugin';
 
 export class DataTablesPluginImpl implements DataTablesPlugin {

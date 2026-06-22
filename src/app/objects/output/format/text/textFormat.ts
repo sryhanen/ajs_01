@@ -47,8 +47,6 @@ import {OutputFormat} from '../outputFormat';
 import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {TextPluginImpl} from '../../plugins/textPlugin/textPluginImpl';
-import {OutputPlugin} from '../../plugins/outputPlugin';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';

@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../../channel/channel';
+import {Channel} from '../../../../../channel/channel';
 
 export interface DataTablesAjax extends Channel {
   response(dataTablesData:object): void;

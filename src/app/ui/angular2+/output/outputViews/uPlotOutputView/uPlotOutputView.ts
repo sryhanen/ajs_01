@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/core';
-import {UPlotPlugin} from '../../../../../objects/output/plugins/uPlotPlugin/uPlotPlugin';
+import {UPlotPlugin} from '../../../../../objects/output/format/uPlot/uPlotPlugin/uPlotPlugin';
 
 @Component({
   selector: 'uPlotOutputView',

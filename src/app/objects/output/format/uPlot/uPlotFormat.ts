@@ -56,7 +56,7 @@ import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
-import {UPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
+import {UPlotPluginImpl} from './uPlotPlugin/uPlotPluginImpl';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 import {UPlotOutputView} from '../../../../ui/angular2+/output/outputViews/uPlotOutputView/uPlotOutputView';
 

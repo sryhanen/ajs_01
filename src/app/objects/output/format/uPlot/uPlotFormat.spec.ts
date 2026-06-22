@@ -45,7 +45,7 @@
  */
 import {uPlotFormat} from './uPlotFormat';
 import {OutputType} from '../../outputType';
-import {UPlotPluginImpl} from '../../plugins/uPlotPlugin/UPlotPluginImpl';
+import {UPlotPluginImpl} from './uPlotPlugin/UPlotPluginImpl';
 
 describe('uPlotFormat', () => {
   let microPlotFormat: uPlotFormat;

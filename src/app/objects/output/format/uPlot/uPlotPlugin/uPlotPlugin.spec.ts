@@ -43,27 +43,38 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputPlugin} from '../outputPlugin';
-import {OutputType} from '../../outputType';
+import uPlot from 'uplot';
+import {GraphType} from '../graphType';
+import {UPlotPluginImpl} from './UPlotPluginImpl';
+import {OutputType} from '../../../outputType';
 
-export class HtmlPluginImpl implements OutputPlugin {
-  private readonly _data:string;
-  private readonly _outputType:string;
+describe('uPlotOutput', () => {
+  const data:uPlot.AlignedData = [
+    [1,2,3],
+    [1,2,3]
+  ];
+  const options = {
+    labels: ['moment1', 'moment2', 'moment3'],
+    series: ['series1'],
+    xAxisLabel: 'value',
+    graphType: GraphType.line
+  };
+  let microPlotPlugin: UPlotPluginImpl;
+  beforeEach(() => {
+    microPlotPlugin = new UPlotPluginImpl(data, options);
+  });
 
-  constructor(data:string) {
-    this._data = data;
-    this._outputType = OutputType.html;
-  }
+  describe('Birth', () =>{
+    it('Should be initialized', () => {
+      expect(microPlotPlugin).toBeInstanceOf(UPlotPluginImpl);
+    });
 
-  outputType(): string {
-    return this._outputType;
-  }
+    it('Should have output type', () => {
+      expect(microPlotPlugin.outputType()).toBe(OutputType.uPlot);
+    });
 
-  render(anchorElement: HTMLElement):void {
-    anchorElement.innerHTML = this._data;
-  }
-
-  isStub(): boolean {
-    return false;
-  }
-}
+    it('Should not be stub', () => {
+      expect(microPlotPlugin.isStub()).toBe(false);
+    });
+  });
+});

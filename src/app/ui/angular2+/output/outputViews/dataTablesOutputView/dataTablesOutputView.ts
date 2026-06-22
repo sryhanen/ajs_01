@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/core';
-import {DataTablesPlugin} from '../../../../../objects/output/plugins/dataTablesPlugin/dataTablesPlugin';
+import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
 
 @Component({
   selector: 'dataTablesView',

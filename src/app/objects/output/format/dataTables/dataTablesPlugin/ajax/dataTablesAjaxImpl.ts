@@ -43,23 +43,60 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {GraphSeries} from './graphSeries';
-import uPlot from 'uplot';
-import {RgbColor} from '../color/rgbColor';
-import {GraphType} from '../../../../format/uPlot/graphType';
+import {Channel} from '../../../../../channel/channel';
+import {OutputType} from '../../../../outputType';
+import {DataTablesAjax} from './dataTablesAjax';
+import {SafeJsonImpl} from '../../../../../safeJson/safeJsonImpl';
 
-export class ScatterSeries implements GraphSeries  {
-  type(): string {
-    return GraphType.scatter;
+export class DataTablesAjaxImpl implements DataTablesAjax {
+  private readonly _channel: Channel;
+  private _callback: (data: object) => void;
+
+  constructor(channel:Channel) {
+    this._channel = channel;
   }
 
-  series(label:string, rgbColor: RgbColor): uPlot.Series{
+  request(data: object): void {
+    this._channel.request(data);
+  }
+
+  response(data: object): void {
+    if(this._callback) {
+      this._callback(this.validatedData(data));
+    }
+  }
+
+  private validatedData(data: object): {draw:number, recordsTotal:number, recordsFiltered:number, data:object} {
+    const safeJson = new SafeJsonImpl(data);
+    const draw:number = safeJson.getProperty('draw', 'number');
+    const recordsTotal:number = safeJson.getProperty('recordsTotal', 'number');
+    const recordsFiltered:number = safeJson.getProperty('recordsFiltered', 'number');
+    const tableData:object = safeJson.getProperty('data', 'object');
     return {
-      label: label,
-      paths: uPlot.paths.bars(),
-      stroke: rgbColor.toString(),
-      width:0,
-      points: {show: true, size: 10, fill: rgbColor.toString(0.3)}
+      draw:draw,
+      recordsTotal:recordsTotal,
+      recordsFiltered:recordsFiltered,
+      data:tableData
+    };
+  }
+
+  configFunction(initialData: object): (data: {draw:number, start:number, length:number}, callback: (data:object) => void) => void {
+    const validatedData = this.validatedData(initialData);
+    return (data: {draw:number, start:number, length:number}, callback: (data:object) => void) => {
+      this._callback = callback;
+      this._callback(validatedData);
+      if(data.draw > validatedData.draw) {
+        const request = {
+          op:'PARAGRAPH_OUTPUT_REQUEST',
+          data: {
+            paragraphId: '',
+            noteId: '',
+            type: OutputType.dataTables,
+            requestOptions: data
+          }
+        };
+        this.request(request);
+      }
     };
   }
 }

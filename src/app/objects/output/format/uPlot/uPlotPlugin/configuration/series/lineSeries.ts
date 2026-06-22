@@ -43,31 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AnsiUp} from 'ansi_up';
-import {OutputPlugin} from '../outputPlugin';
-import {OutputType} from '../../outputType';
+import {GraphSeries} from './graphSeries';
+import uPlot from 'uplot';
+import {RgbColor} from '../color/rgbColor';
+import {GraphType} from '../../../graphType';
 
-export class TextPluginImpl implements OutputPlugin {
-  private readonly _ansiUp: AnsiUp;
-  private readonly _outputData: string;
-  private readonly _outputType:string;
-
-  constructor(outputData: string) {
-    this._outputData = outputData;
-    this._ansiUp = new AnsiUp();
-    this._outputType = OutputType.text;
+export class LineSeries implements GraphSeries {
+  type(): string {
+    return GraphType.line;
   }
 
-  outputType(): string {
-    return this._outputType;
-  }
-
-  render(anchorElement: HTMLElement): void {
-    anchorElement.classList.add('plain-text');
-    anchorElement.innerHTML = this._ansiUp.ansi_to_html(this._outputData);
-  }
-
-  isStub(): boolean {
-    return false;
+  series(label:string, rgbColor: RgbColor): uPlot.Series{
+    return {
+      label: label,
+      stroke: rgbColor.toString(),
+      width: 2,
+    };
   }
 }

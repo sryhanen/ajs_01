@@ -43,9 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
-import Stubable from '../../../../shared/interfaces/stubable';
+import {GraphSeries} from './graphSeries';
+import uPlot from 'uplot';
+import {RgbColor} from '../color/rgbColor';
+import {GraphType} from '../../../graphType';
 
-export interface DataTablesPlugin extends Channel, Stubable {
-  initializeTable(tableElement: HTMLTableElement): void;
+export class AreaSeries implements GraphSeries {
+  type(): string {
+    return GraphType.area;
+  }
+
+  series(label:string, rgbColor: RgbColor): uPlot.Series{
+    return {
+      label: label,
+      stroke: rgbColor.toString(),
+      width: 2,
+      fill: rgbColor.toString(0.3),
+    };
+  }
 }
