@@ -58,7 +58,7 @@ import {OutputContainerView} from '../output/container/outputContainerView';
     RecursiveComponentDraw
   ],
   template: `
-    <recursive-component-draw [renderNode]="renderNode"
+    <recursive-component-draw [renderNode]="renderNode()"
                               [containerId]="containerId()"></recursive-component-draw>
   `
 })
@@ -69,13 +69,9 @@ export class WebAppViewPort implements OnInit {
     ['OUTPUT_CONTAINER', OutputContainerView]
   ]);
   protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
-  protected renderNode: RenderNode;
-  changed = effect(() => {
-    this.renderNode = webAppRoot.print()();
-  });
+  protected renderNode = computed(() => webAppRoot.print()());
 
   ngOnInit() {
     this._components.forEach((component:new () => unknown, type:string) => this.componentRegistry.register(type, component));
-    this.renderNode = webAppRoot.print()();
   }
 }
