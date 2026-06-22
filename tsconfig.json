@@ -23,7 +23,6 @@
     "./src/app/objects/webSocket/service/fakeWebSocket.ts",
     "./src/app/objects/output/switcher/button/fakeOutputSwitcherButton.ts",
     "./src/app/objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin.ts",
-    "./src/app/objects/output/fakeOutputPlugin.ts",
     "./src/app/objects/channel/fakeChannel.ts",
     "./karma.conf.ts",
     "./vite.config.ts",

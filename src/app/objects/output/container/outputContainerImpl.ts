@@ -47,7 +47,6 @@ import {OutputContainer} from './outputContainer';
 import {Channel} from '../../channel/channel';
 import {OutputFormat} from '../format/outputFormat';
 import {DataTablesFormat} from '../format/dataTables/dataTablesFormat';
-import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 import {HTMLFormat} from '../format/html/htmlFormat';
 import {computed, Signal} from '@angular/core';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
