@@ -45,7 +45,6 @@
  */
 import {OutputContainer} from './outputContainer';
 import {Channel} from '../../channel/channel';
-import {Response} from '../../channel/response';
 import {OutputFormat} from '../format/outputFormat';
 import {DataTablesFormat} from '../format/dataTables/dataTablesFormat';
 import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
@@ -56,6 +55,7 @@ import {ComponentView} from '../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
 import {TextFormat} from '../format/text/textFormat';
 import {uPlotFormat} from '../format/uPlot/uPlotFormat';
+import {AngularFormat} from '../format/angular/angularFormat';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
@@ -63,13 +63,14 @@ export class OutputContainerImpl implements OutputContainer{
   private readonly _componentView:ComponentView;
   private readonly _paragraphId:string;
 
-  constructor(channel:Channel, angularObjectCollection: AngularObjectCollection, paragraphId:string) {
+  constructor(channel:Channel, paragraphId:string) {
     this._channel = channel;
     this._outputFormats = [
       new DataTablesFormat(this),
       new HTMLFormat(this),
       new uPlotFormat(this),
       new TextFormat(this),
+      new AngularFormat(this),
     ];
     this._paragraphId = paragraphId;
     this._componentView = new ComponentViewStub();

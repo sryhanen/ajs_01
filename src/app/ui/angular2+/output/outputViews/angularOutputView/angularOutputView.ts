@@ -43,9 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {AngularViewUpgradeModule} from './angularViewUpgradeModule';
-import {AngularPlugin} from '../../../../../objects/output/plugins/angularPlugin/angularPlugin';
+import {AngularObject} from '../../../../../objects/angularObject/angularObject';
+import {Request} from '../../../../../objects/channel/request';
 
 @Component({
   selector: 'angular-view',
@@ -53,9 +54,11 @@ import {AngularPlugin} from '../../../../../objects/output/plugins/angularPlugin
     AngularViewUpgradeModule
   ],
   template: `
-    <ajs-angular-view [outputPlugin]="outputPlugin"></ajs-angular-view>
+    <ajs-angular-view [template]="template()" [angularObjects]="angularObjects()" [requestable]="requestable()"></ajs-angular-view>
   `
 })
-export class AngularView {
-  @Input({required:true}) outputPlugin: AngularPlugin;
+export class AngularOutputView {
+  template = input.required<string>();
+  angularObjects= input.required<AngularObject[]>();
+  requestable = input.required<Request>();
 }

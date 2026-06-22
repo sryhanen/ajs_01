@@ -43,10 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-
 import {Response} from '../../../channel/response';
 import {AngularObject} from '../../../angularObject/angularObject';
-import {PushValue} from '../../../pushValue/pushValue';
 import {Channel} from '../../../channel/channel';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
@@ -55,12 +53,10 @@ import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
 export class AngularObjectUpdateResponse implements Response {
   private readonly _channel: Channel;
   private readonly _angularObjects: AngularObject[];
-  private readonly _pushValues: PushValue<AngularObject[]>[];
 
-  constructor(channel: Channel, angularObjects: AngularObject[], pushValues: PushValue<AngularObject[]>[]) {
+  constructor(channel: Channel, angularObjects: AngularObject[]) {
     this._channel = channel;
     this._angularObjects = angularObjects;
-    this._pushValues = pushValues;
   }
 
   response(data: object) {
@@ -77,7 +73,6 @@ export class AngularObjectUpdateResponse implements Response {
       else{
         this._angularObjects.splice(existingAngularObjectIndex, 1, angularObject);
       }
-      this._pushValues.forEach(value => value.update(this._angularObjects));
     }
   }
 }

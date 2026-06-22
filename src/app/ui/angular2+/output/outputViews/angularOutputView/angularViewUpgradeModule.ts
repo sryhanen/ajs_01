@@ -43,11 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Request} from '../../../channel/request';
-import {OutputPlugin} from '../outputPlugin';
-import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
+import {Directive, ElementRef, Inject, Injector, input} from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+import {AngularObject} from '../../../../../objects/angularObject/angularObject';
+import {Request} from '../../../../../objects/channel/request';
 
-export interface AngularPlugin extends Request, OutputPlugin {
-  template():string;
-  angularObjectCollection(): AngularObjectCollection;
+@Directive({
+  selector: 'ajs-angular-view'
+})
+export class AngularViewUpgradeModule extends UpgradeComponent {
+  template = input.required<string>();
+  angularObjects= input.required<AngularObject[]>();
+  requestable = input.required<Request>();
+
+  constructor(
+    @Inject(ElementRef) elementRef: ElementRef,
+    @Inject(Injector) injector: Injector
+  ) {
+    super('angularPluginAjs', elementRef, injector);
+  }
 }
