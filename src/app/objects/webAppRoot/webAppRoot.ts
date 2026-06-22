@@ -48,7 +48,7 @@ import {WebSocketService} from '../webSocket/service/webSocketService';
 import {Printable} from '../rendering/printable/printable';
 import {Signal} from '@angular/core';
 
-export interface WebAppRoot extends Channel {
+export interface WebAppRoot extends Channel, Printable {
   initialize(webSocketService:WebSocketService):void;
   rootObject(): Signal<Printable>;
 }

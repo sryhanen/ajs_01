@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, inject, input, OnInit, Signal} from '@angular/core';
+import {Component, computed, effect, inject, input, OnInit, signal, Signal} from '@angular/core';
 import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComponentRegistryImpl';
 import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
@@ -58,7 +58,7 @@ import {OutputContainerView} from '../output/container/outputContainerView';
     RecursiveComponentDraw
   ],
   template: `
-    <recursive-component-draw [renderNode]="renderNode()"
+    <recursive-component-draw [renderNode]="renderNode"
                               [containerId]="containerId()"></recursive-component-draw>
   `
 })
@@ -69,10 +69,13 @@ export class WebAppViewPort implements OnInit {
     ['OUTPUT_CONTAINER', OutputContainerView]
   ]);
   protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
-  protected renderNode: Signal<RenderNode>;
+  protected renderNode: RenderNode;
+  changed = effect(() => {
+    this.renderNode = webAppRoot.print()();
+  });
 
   ngOnInit() {
     this._components.forEach((component:new () => unknown, type:string) => this.componentRegistry.register(type, component));
-    this.renderNode = webAppRoot.rootObject()().print();
+    this.renderNode = webAppRoot.print()();
   }
 }
