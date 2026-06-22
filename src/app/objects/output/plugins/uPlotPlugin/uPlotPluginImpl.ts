@@ -50,25 +50,18 @@ import {GraphType} from '../../format/uPlot/graphType';
 import {BarChartOptionsImpl} from './configuration/options/barChartOptionsImpl';
 import {BasicOptionsImpl} from './configuration/options/basicOptionsImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {OutputPlugin} from '../outputPlugin';
-import {OutputType} from '../../outputType';
+import {UPlotPlugin} from './uPlotPlugin';
 
-export class uPlotPluginImpl implements OutputPlugin {
+export class UPlotPluginImpl implements UPlotPlugin {
   private readonly _outputData: uPlot.AlignedData;
   private readonly _outputOptions:object;
-  private readonly _outputType:string;
 
   constructor(outputData: uPlot.AlignedData, outputOptions:object) {
-    this._outputType = OutputType.uPlot;
     this._outputData = outputData;
     this._outputOptions = outputOptions;
   }
 
-  outputType(): string {
-    return this._outputType;
-  }
-
-  render(anchorElement: HTMLElement): void {
+  initializeUPlot(htmlElement:HTMLElement):void {
     const safeOutputOptions = new SafeJsonImpl(this._outputOptions);
     const uPlotOutputOptions = {
       labels:safeOutputOptions.getProperty<string[]>('labels', 'object'),
@@ -86,12 +79,8 @@ export class uPlotPluginImpl implements OutputPlugin {
       uPlotOptions = basicOptions.options();
     }
     const size:ResizeListener = new ResizeListenerImpl();
-    const graph = new uPlot(uPlotOptions, this._outputData, anchorElement);
+    const graph = new uPlot(uPlotOptions, this._outputData, htmlElement);
     size.registerToWindow(graph);
-    size.registerToElement(graph, anchorElement);
-  }
-
-  isStub(): boolean {
-    return false;
+    size.registerToElement(graph, htmlElement);
   }
 }

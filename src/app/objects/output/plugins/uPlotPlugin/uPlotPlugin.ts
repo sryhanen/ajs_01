@@ -43,20 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/core';
-import {DataTablesPlugin} from '../../../../../objects/output/plugins/dataTablesPlugin/dataTablesPlugin';
-
-@Component({
-  selector: 'dataTablesView',
-  template: `
-    <table #table class="table table-bordered table-striped"></table>
-  `
-})
-export class DataTablesFormatView implements AfterViewInit {
-  dataTablesPlugin = input.required<DataTablesPlugin>();
-  @ViewChild('table') table: ElementRef;
-
-  ngAfterViewInit() {
-    this.dataTablesPlugin().initializeTable(this.table.nativeElement);
-  }
+export interface UPlotPlugin {
+  initializeUPlot(htmlElement:HTMLElement):void;
 }

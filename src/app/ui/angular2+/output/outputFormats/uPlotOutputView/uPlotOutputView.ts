@@ -43,33 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputFormat} from '../../../format/outputFormat';
-import {Channel} from '../../../../channel/channel';
-import {OutputSwitcher} from '../../../switcher/outputSwitcher';
-import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';
-import {MessageImpl} from '../../../../message/messageImpl';
-import {OutputType} from '../../../outputType';
-import {OutputPlugin} from '../../../plugins/outputPlugin';
-import {WritableSignal} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/core';
+import {UPlotPlugin} from '../../../../../objects/output/plugins/uPlotPlugin/uPlotPlugin';
 
-export class ParagraphOutputResponseImpl implements Channel {
-  private readonly _channel:Channel;
-  private readonly _outputFormats:OutputFormat[];
-  private readonly _outputSwitcher:OutputSwitcher;
-  private readonly _outputPlugin:WritableSignal<OutputPlugin>;
+@Component({
+  selector: 'uPlotOutputView',
+  template: `
+    <div #anchor></div>
+  `
+})
+export class UPlotOutputView implements AfterViewInit {
+  uPlotPlugin = input.required<UPlotPlugin>();
+  @ViewChild('anchor') anchor: ElementRef;
 
-  constructor(channel:Channel, outputFormats:OutputFormat[], outputSwitcher:OutputSwitcher, outputPlugin:WritableSignal<OutputPlugin>) {
-    this._channel = channel;
-    this._outputFormats = outputFormats;
-    this._outputSwitcher = outputSwitcher;
-    this._outputPlugin = outputPlugin;
-  }
-
-  request(data: object) {
-    this._channel.request(data);
-  }
-
-  response(data: object): void {
-
+  ngAfterViewInit() {
+    this.uPlotPlugin().initializeUPlot(this.anchor.nativeElement);
   }
 }

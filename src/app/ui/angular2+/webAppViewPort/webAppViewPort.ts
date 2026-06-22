@@ -48,8 +48,9 @@ import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComp
 import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
-import {DataTablesFormatView} from '../output/outputFormats/dataTablesFormatView/dataTablesFormatView';
-import {HtmlFormatView} from '../output/outputFormats/htmlFormatView/htmlFormatView';
+import {UPlotOutputView} from '../output/outputFormats/uPlotOutputView/uPlotOutputView';
+import {HtmlOutputView} from '../output/outputFormats/htmlOutputView/htmlOutputView';
+import {DataTablesOutputView} from '../output/outputFormats/dataTablesOutputView/dataTablesOutputView';
 
 @Component({
   selector: 'web-app-view-port',
@@ -65,8 +66,9 @@ export class WebAppViewPort implements OnInit {
   containerId= input.required<string>();
 
   private readonly _components = new Map<string, new () => unknown>([
-    ['HTML_OUTPUT_VIEW', HtmlFormatView],
-    ['DATATABLES_OUTPUT_VIEW', DataTablesFormatView]
+    ['HTML_OUTPUT_VIEW', HtmlOutputView],
+    ['DATATABLES_OUTPUT_VIEW', DataTablesOutputView],
+    ['UPLOT_OUTPUT_VIEW', UPlotOutputView]
   ]);
   protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
   protected renderNode = computed(() => webAppRoot.print()());

@@ -43,21 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, effect, ElementRef, input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/core';
+import {DataTablesPlugin} from '../../../../../objects/output/plugins/dataTablesPlugin/dataTablesPlugin';
 
 @Component({
-  selector: 'htmlView',
+  selector: 'dataTablesView',
   template: `
-    <div #anchor></div>
+    <table #table class="table table-bordered table-striped"></table>
   `
 })
-export class HtmlFormatView implements OnInit {
-  htmlTemplate = input.required<string>();
-  @ViewChild('anchor') anchor: ElementRef;
+export class DataTablesOutputView implements AfterViewInit {
+  dataTablesPlugin = input.required<DataTablesPlugin>();
+  @ViewChild('table') table: ElementRef;
 
-  ngOnInit(): void {
-    effect(() => {
-      this.anchor.nativeElement.innerHtml = this.htmlTemplate();
-    });
+  ngAfterViewInit() {
+    this.dataTablesPlugin().initializeTable(this.table.nativeElement);
   }
 }

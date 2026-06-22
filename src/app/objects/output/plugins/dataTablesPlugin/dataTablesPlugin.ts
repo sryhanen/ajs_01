@@ -47,5 +47,5 @@ import {Channel} from '../../../channel/channel';
 import Stubable from '../../../../shared/interfaces/stubable';
 
 export interface DataTablesPlugin extends Channel, Stubable {
-  initializeTable(anchorElement: HTMLElement): void;
+  initializeTable(tableElement: HTMLTableElement): void;
 }

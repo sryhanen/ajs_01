@@ -48,47 +48,62 @@ import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
 import {GraphType} from './graphType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {uPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
 import {OutputType} from '../../outputType';
 import uPlot from 'uplot';
 import {OutputPlugin} from '../../plugins/outputPlugin';
-import {Signal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
+import {Channel} from '../../../channel/channel';
+import {MessageImpl} from '../../../message/messageImpl';
+import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraphOutputMessageImpl';
+import {ComponentView} from '../../../rendering/componentView/componentView';
+import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
+import {UPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
+import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
+import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 
 export class uPlotFormat implements OutputFormat {
+  private readonly _channel: Channel;
   private readonly _switcherButtons:OutputSwitcherButton[];
-  private readonly _outputType: string;
+  private readonly _componentViewStub: ComponentView;
+  private readonly _componentView: WritableSignal<ComponentView>;
 
-  constructor() {
-    this._outputType = OutputType.uPlot;
+  constructor(channel: Channel) {
+    this._channel = channel;
     this._switcherButtons = [
       new uPlotSwitcherButton('Line Chart', 'fas fa-chart-line', GraphType.line),
       new uPlotSwitcherButton('Area Chart', 'fas fa-chart-area', GraphType.area),
       new uPlotSwitcherButton('Bar Chart', 'fas fa-chart-bar', GraphType.bar),
       new uPlotSwitcherButton('Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
+    this._componentViewStub = new ComponentViewStub();
+    this._componentView = signal(this._componentViewStub);
   }
 
-  request(data: object): void {
-        throw new Error('Method not implemented.');
+  request(json: object): void {
+    this._channel.request(json);
+  }
+
+  response(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    if(message.operation() === 'PARAGRAPH_OUTPUT') {
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
+      if(paragraphOutputMessage.outputType() !== OutputType.uPlot){
+        this._componentView.set(this._componentViewStub);
+        return;
+      }
+      const uPlotData = paragraphOutputMessage.outputData()['data'];
+      const uPlotOptions = paragraphOutputMessage.outputOptions();
+      const plugin = new UPlotPluginImpl(uPlotData, uPlotOptions);
+      this._componentView.set(new ComponentViewImpl('UPLOT_OUTPUT_VIEW', signal({uPlotPlugin: plugin})));
     }
-    response(data: object): void {
-        throw new Error('Method not implemented.');
-    }
+  }
 
   print(): Signal<RenderNode> {
-    throw new Error('Method not implemented.');
-  }
-
-  plugin(paragraphOutputData: object): OutputPlugin {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData: uPlot.AlignedData = safeParagraphOutputData.getProperty('data', 'object');
-    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
-    return new uPlotPluginImpl(outputData, outputOptions);
-  }
-
-  outputType(): string {
-    return this._outputType;
+    return computed(() => ({
+      componentView: this._componentView(),
+      children: computed(() => [])
+    }));
   }
 
   switcherButtons(): OutputSwitcherButton[] {

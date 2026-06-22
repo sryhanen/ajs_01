@@ -43,43 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {uPlotFormat} from './uPlotFormat';
-import {OutputType} from '../../outputType';
-import {UPlotPluginImpl} from '../../plugins/uPlotPlugin/UPlotPluginImpl';
+import {Component, effect, ElementRef, input, OnInit, ViewChild} from '@angular/core';
 
-describe('uPlotFormat', () => {
-  let microPlotFormat: uPlotFormat;
-  beforeEach(() => {
-    microPlotFormat = new uPlotFormat();
-  });
+@Component({
+  selector: 'htmlView',
+  template: `
+    <div #anchor></div>
+  `
+})
+export class HtmlOutputView implements OnInit {
+  htmlTemplate = input.required<string>();
+  @ViewChild('anchor') anchor: ElementRef;
 
-  describe('Birth', ()=> {
-    it('Should be initialized', () => {
-      expect(microPlotFormat).toBeDefined();
+  ngOnInit(): void {
+    effect(() => {
+      this.anchor.nativeElement.innerHtml = this.htmlTemplate();
     });
-
-    it('Should have switcher buttons', () => {
-      const switcherButtons = microPlotFormat.switcherButtons();
-      expect(switcherButtons).toHaveLength(4);
-    });
-
-    it('Should have outputType', () => {
-      expect(microPlotFormat.outputType()).toEqual(OutputType.uPlot);
-    });
-  });
-
-  describe('Plugin formatting', ()=> {
-    const pluginData = {
-      data:{},
-      options:{}
-    };
-
-    it('Should return plugin', () => {
-      expect(microPlotFormat.plugin(pluginData)).toBeInstanceOf(UPlotPluginImpl);
-    });
-
-    it('Should validate plugin data', () => {
-      expect(() => microPlotFormat.plugin({})).toThrow();
-    });
-  });
-});
+  }
+}

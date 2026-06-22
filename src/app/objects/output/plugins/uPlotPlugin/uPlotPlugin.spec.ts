@@ -45,7 +45,7 @@
  */
 import uPlot from 'uplot';
 import {GraphType} from '../../format/uPlot/graphType';
-import {uPlotPluginImpl} from './uPlotPluginImpl';
+import {UPlotPluginImpl} from './UPlotPluginImpl';
 import {OutputType} from '../../outputType';
 
 describe('uPlotOutput', () => {
@@ -59,14 +59,14 @@ describe('uPlotOutput', () => {
     xAxisLabel: 'value',
     graphType: GraphType.line
   };
-  let microPlotPlugin: uPlotPluginImpl;
+  let microPlotPlugin: UPlotPluginImpl;
   beforeEach(() => {
-    microPlotPlugin = new uPlotPluginImpl(data, options);
+    microPlotPlugin = new UPlotPluginImpl(data, options);
   });
 
   describe('Birth', () =>{
     it('Should be initialized', () => {
-      expect(microPlotPlugin).toBeInstanceOf(uPlotPluginImpl);
+      expect(microPlotPlugin).toBeInstanceOf(UPlotPluginImpl);
     });
 
     it('Should have output type', () => {

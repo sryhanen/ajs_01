@@ -72,7 +72,7 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
     this._dataTablesAjax.response(data);
   }
 
-  initializeTable(anchorElement: HTMLElement): void {
+  initializeTable(tableElement: HTMLTableElement): void {
     const safeOptions = new SafeJsonImpl(this._outputOptions);
     const headers:Array<string> = safeOptions.getProperty('headers', 'object');
     const config: Config = {
@@ -104,12 +104,7 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
       ordering: false,
       processing: true,
     };
-    const anchor = document.createElement('table');
-    anchor.classList.add('table');
-    anchor.classList.add('table-bordered');
-    anchor.classList.add('table-striped');
-    anchorElement.appendChild(anchor);
-    new DataTable(anchor, config);
+    new DataTable(tableElement, config);
   }
 
   isStub(): boolean {
