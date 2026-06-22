@@ -54,6 +54,8 @@ import {computed, Signal} from '@angular/core';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
 import {ComponentView} from '../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
+import {TextFormat} from '../format/text/textFormat';
+import {uPlotFormat} from '../format/uPlot/uPlotFormat';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
@@ -65,7 +67,9 @@ export class OutputContainerImpl implements OutputContainer{
     this._channel = channel;
     this._outputFormats = [
       new DataTablesFormat(this),
-      new HTMLFormat(this)
+      new HTMLFormat(this),
+      new uPlotFormat(this),
+      new TextFormat(this),
     ];
     this._paragraphId = paragraphId;
     this._componentView = new ComponentViewStub();

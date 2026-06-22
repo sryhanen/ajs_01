@@ -49,40 +49,52 @@ import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {TextPluginImpl} from '../../plugins/textPlugin/textPluginImpl';
 import {OutputPlugin} from '../../plugins/outputPlugin';
-import {Signal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
+import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
+import {ComponentView} from '../../../rendering/componentView/componentView';
+import {Channel} from '../../../channel/channel';
+import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import {MessageImpl} from '../../../message/messageImpl';
+import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraphOutputMessageImpl';
 
 export class TextFormat implements OutputFormat {
-  private readonly _switcherButtons: OutputSwitcherButton[];
-  private readonly _outputType: string;
+  private readonly _channel: Channel;
+  private readonly _componentViewStub: ComponentView;
+  private readonly _componentView: WritableSignal<ComponentView>;
 
-  constructor() {
-    this._outputType = OutputType.text;
-    this._switcherButtons = [];
+  constructor(channel: Channel) {
+    this._channel = channel;
+    this._componentViewStub = new ComponentViewStub();
+    this._componentView = signal(this._componentViewStub);
   }
 
-  request(data: object): void {
-        throw new Error('Method not implemented.');
+  request(json: object): void {
+    this._channel.request(json);
+  }
+
+  response(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    if(message.operation() === 'PARAGRAPH_OUTPUT'){
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
+      if(paragraphOutputMessage.outputType() !== OutputType.text) {
+        this._componentView.set(this._componentViewStub);
+        return;
+      }
+      const textOutput = new SafeJsonImpl(paragraphOutputMessage.output()).getProperty('data', 'string');
+      const componentView = new ComponentViewImpl('TEXT_OUTPUT_VIEW', signal({textOutput: textOutput}));
+      this._componentView.set(componentView);
     }
-    response(data: object): void {
-        throw new Error('Method not implemented.');
-    }
+  }
 
   print(): Signal<RenderNode> {
-    throw new Error('Method not implemented.');
-  }
-
-  plugin(paragraphOutputData: object): OutputPlugin {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData:string = safeParagraphOutputData.getProperty('data', 'string');
-    return new TextPluginImpl(outputData);
+    return computed(() => ({
+      componentView: this._componentView(),
+      children: computed(() => []),
+    }));
   }
 
   switcherButtons(): OutputSwitcherButton[] {
-    return this._switcherButtons;
-  }
-
-  outputType(): string {
-    return this._outputType;
+    return [];
   }
 }

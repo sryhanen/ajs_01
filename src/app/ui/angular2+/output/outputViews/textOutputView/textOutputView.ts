@@ -43,21 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, effect, ElementRef, input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/core';
+import {AnsiUp} from 'ansi_up';
 
 @Component({
-  selector: 'htmlView',
+  selector: 'textOutputView',
   template: `
-    <div #anchor></div>
+    <div  #anchor class="plain-text" [innerHTML]="textContent"></div>
   `
 })
-export class HtmlOutputView implements OnInit {
-  htmlTemplate = input.required<string>();
+export class TextOutputView implements AfterViewInit{
+  textOutput = input.required<string>();
   @ViewChild('anchor') anchor: ElementRef;
+  private _ansiUp: AnsiUp;
+  protected textContent:string;
 
-  ngOnInit(): void {
-    effect(() => {
-      this.anchor.nativeElement.innerHtml = this.htmlTemplate();
-    });
+  ngAfterViewInit() {
+    this._ansiUp = new AnsiUp();
+    this.textContent = this._ansiUp.ansi_to_html(this.textOutput());
   }
 }

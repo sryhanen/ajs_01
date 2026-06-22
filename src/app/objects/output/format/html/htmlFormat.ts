@@ -75,14 +75,13 @@ export class HTMLFormat implements OutputFormat{
     const message = new MessageImpl(new SafeJsonImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.outputType() === OutputType.html){
-        const htmlTemplate = new SafeJsonImpl(paragraphOutputMessage.output()).getProperty('data', 'string');
-        const componentView = new ComponentViewImpl('HTML_OUTPUT_VIEW', signal({htmlTemplate: htmlTemplate}));
-        this._componentView.set(componentView);
-      }
-      else{
+      if(paragraphOutputMessage.outputType() !== OutputType.html) {
         this._componentView.set(this._componentViewStub);
+        return;
       }
+      const htmlTemplate = new SafeJsonImpl(paragraphOutputMessage.output()).getProperty('data', 'string');
+      const componentView = new ComponentViewImpl('HTML_OUTPUT_VIEW', signal({htmlTemplate: htmlTemplate}));
+      this._componentView.set(componentView);
     }
   }
 
