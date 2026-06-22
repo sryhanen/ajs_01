@@ -43,15 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, inject, input, OnInit} from '@angular/core';
-import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComponentRegistryImpl';
-import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
+import {Component, computed, input} from '@angular/core';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
-import {UPlotOutputView} from '../output/outputViews/uPlotOutputView/uPlotOutputView';
-import {HtmlOutputView} from '../output/outputViews/htmlOutputView/htmlOutputView';
-import {DataTablesOutputView} from '../output/outputViews/dataTablesOutputView/dataTablesOutputView';
-import {TextOutputView} from '../output/outputViews/textOutputView/textOutputView';
 
 @Component({
   selector: 'web-app-view-port',
@@ -63,18 +57,7 @@ import {TextOutputView} from '../output/outputViews/textOutputView/textOutputVie
                               [containerId]="containerId()"></recursive-component-draw>
   `
 })
-export class WebAppViewPort implements OnInit {
+export class WebAppViewPort {
   containerId= input.required<string>();
-  private readonly _components = new Map<string, new () => unknown>([
-    ['HTML_OUTPUT_VIEW', HtmlOutputView],
-    ['DATATABLES_OUTPUT_VIEW', DataTablesOutputView],
-    ['UPLOT_OUTPUT_VIEW', UPlotOutputView],
-    ['TEXT_OUTPUT_VIEW', TextOutputView],
-  ]);
-  protected componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
   protected renderNode = computed(() => webAppRoot.print()());
-
-  ngOnInit() {
-    this._components.forEach((component:new () => unknown, type:string) => this.componentRegistry.register(type, component));
-  }
 }

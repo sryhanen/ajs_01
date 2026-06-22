@@ -48,7 +48,6 @@ import {downgradeComponent, downgradeInjectable} from '@angular/upgrade/static';
 import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
 import {EditorComponent} from './editor/editor.component';
 import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {NotebookCollectionView} from './ui/angular2+/notebookCollection/notebookCollectionView';
 import {WebAppViewPort} from './ui/angular2+/webAppViewPort/webAppViewPort';
 
 angular.module('zeppelinWebApp').factory('authenticationServiceImpl', downgradeInjectable(AuthenticationServiceImpl));
@@ -59,12 +58,6 @@ angular.module('zeppelinWebApp')
   );
 
 angular.module('zeppelinWebApp').factory('webSocketService', downgradeInjectable(WebSocketServiceImpl));
-
-angular.module('zeppelinWebApp')
-  .directive(
-    'notebookCollection',
-    downgradeComponent({ component: NotebookCollectionView }) as angular.IDirectiveFactory
-  );
 
 angular.module('zeppelinWebApp')
   .directive(

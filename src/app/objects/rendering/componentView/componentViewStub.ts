@@ -55,7 +55,7 @@ export class ComponentViewStub implements ComponentView {
     throw new Error('ComponentViewStub: method not implemented.');
   }
 
-  type(): string {
+  component(): new () => unknown {
     throw new Error('ComponentViewStub: method not implemented.');
   }
 }

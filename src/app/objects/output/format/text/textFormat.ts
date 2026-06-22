@@ -57,6 +57,7 @@ import {Channel} from '../../../channel/channel';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraphOutputMessageImpl';
+import {TextOutputView} from '../../../../ui/angular2+/output/outputViews/textOutputView/textOutputView';
 
 export class TextFormat implements OutputFormat {
   private readonly _channel: Channel;
@@ -82,7 +83,7 @@ export class TextFormat implements OutputFormat {
         return;
       }
       const textOutput = new SafeJsonImpl(paragraphOutputMessage.output()).getProperty('data', 'string');
-      const componentView = new ComponentViewImpl('TEXT_OUTPUT_VIEW', signal({textOutput: textOutput}));
+      const componentView = new ComponentViewImpl(TextOutputView, signal({textOutput: textOutput}));
       this._componentView.set(componentView);
     }
   }

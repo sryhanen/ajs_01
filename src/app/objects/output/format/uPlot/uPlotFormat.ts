@@ -58,6 +58,7 @@ import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {UPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import {UPlotOutputView} from '../../../../ui/angular2+/output/outputViews/uPlotOutputView/uPlotOutputView';
 
 export class uPlotFormat implements OutputFormat {
   private readonly _channel: Channel;
@@ -92,7 +93,7 @@ export class uPlotFormat implements OutputFormat {
       const uPlotData = paragraphOutputMessage.output()['data'];
       const uPlotOptions = paragraphOutputMessage.outputOptions();
       const plugin = new UPlotPluginImpl(uPlotData, uPlotOptions);
-      this._componentView.set(new ComponentViewImpl('UPLOT_OUTPUT_VIEW', signal({uPlotPlugin: plugin})));
+      this._componentView.set(new ComponentViewImpl(UPlotOutputView, signal({uPlotPlugin: plugin})));
     }
   }
 

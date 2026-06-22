@@ -47,16 +47,16 @@ import {ComponentView} from './componentView';
 import {Signal} from '@angular/core';
 
 export class ComponentViewImpl implements ComponentView {
-  private readonly _type:string;
+  private readonly _component:new () => unknown;
   private readonly _inputs: Signal<Record<string, unknown>>;
 
-  constructor(type:string, inputs: Signal<Record<string, unknown>>) {
-    this._type = type;
+  constructor(component: new () => unknown, inputs: Signal<Record<string, unknown>>) {
+    this._component = component;
     this._inputs = inputs;
   }
 
-  type():string{
-    return this._type;
+  component(): new () => unknown{
+    return this._component;
   }
 
   inputs(): Signal<Record<string, unknown>> {

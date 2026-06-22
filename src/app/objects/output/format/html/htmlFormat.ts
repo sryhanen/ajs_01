@@ -55,6 +55,7 @@ import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraph
 import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import {HtmlOutputView} from '../../../../ui/angular2+/output/outputViews/htmlOutputView/htmlOutputView';
 
 export class HTMLFormat implements OutputFormat{
   private readonly _channel: Channel;
@@ -80,7 +81,7 @@ export class HTMLFormat implements OutputFormat{
         return;
       }
       const htmlTemplate = new SafeJsonImpl(paragraphOutputMessage.output()).getProperty('data', 'string');
-      const componentView = new ComponentViewImpl('HTML_OUTPUT_VIEW', signal({htmlTemplate: htmlTemplate}));
+      const componentView = new ComponentViewImpl(HtmlOutputView, signal({htmlTemplate: htmlTemplate}));
       this._componentView.set(componentView);
     }
   }

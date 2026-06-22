@@ -57,6 +57,7 @@ import {OutputType} from '../../outputType';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import {AngularOutputView} from '../../../../ui/angular2+/output/outputViews/angularOutputView/angularOutputView';
 
 export class AngularFormat implements OutputFormat {
   private readonly _channel: Channel;
@@ -84,7 +85,7 @@ export class AngularFormat implements OutputFormat {
         return;
       }
       const template = paragraphOutputMessage.output()['data'];
-      this._componentView.set(new ComponentViewImpl('ANGULAR_OUTPUT_VIEW', signal({template:template, angularObjects: this._angularObjectCollection.angularObjects(), requestable:this})));
+      this._componentView.set(new ComponentViewImpl(AngularOutputView, signal({template:template, angularObjects: this._angularObjectCollection.angularObjects(), requestable:this})));
     }
   }
 

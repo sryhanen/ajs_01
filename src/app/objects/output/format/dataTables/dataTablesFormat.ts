@@ -59,6 +59,9 @@ import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {DataTablesPlugin} from '../../plugins/dataTablesPlugin/dataTablesPlugin';
 import {DataTablesPluginStub} from '../../plugins/dataTablesPlugin/dataTablesPluginStub';
+import {
+  DataTablesOutputView
+} from '../../../../ui/angular2+/output/outputViews/dataTablesOutputView/dataTablesOutputView';
 
 export class DataTablesFormat implements OutputFormat {
   private readonly _channel: Channel;
@@ -102,7 +105,7 @@ export class DataTablesFormat implements OutputFormat {
       else{
         const dataTablesOptions = paragraphOutputMessage.outputOptions();
         this._plugin.set(new DataTablesPluginImpl(this, dataTablesData, dataTablesOptions));
-        this._componentView.set(new ComponentViewImpl('DATATABLES_OUTPUT_VIEW', signal({dataTablesPlugin: this._plugin()})));
+        this._componentView.set(new ComponentViewImpl(DataTablesOutputView, signal({dataTablesPlugin: this._plugin()})));
       }
     }
   }

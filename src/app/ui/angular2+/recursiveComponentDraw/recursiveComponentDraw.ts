@@ -43,12 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, inject, input, OnInit, Signal} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {NgComponentOutlet} from '@angular/common';
-import {WebAppComponentRegistry} from '../webAppComponentRegistry/webAppComponentRegistry';
-import {WebAppComponentRegistryImpl} from '../webAppComponentRegistry/webAppComponentRegistryImpl';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
 
 
 @Component({
@@ -75,7 +72,7 @@ export class RecursiveComponentDraw {
   protected componentView = computed(() => this.renderNode().componentView);
   protected component = computed(() => {
     if(!this.componentView().isStub()){
-      return this.componentRegistry.resolve(this.componentView().type());
+      return this.componentView().component();
     }
   });
   protected inputs = computed(() => {
@@ -83,5 +80,4 @@ export class RecursiveComponentDraw {
       return this.componentView().inputs()();
     }
   });
-  private componentRegistry:WebAppComponentRegistry = inject(WebAppComponentRegistryImpl);
 }

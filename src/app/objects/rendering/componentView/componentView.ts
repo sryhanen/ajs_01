@@ -47,6 +47,6 @@ import Stubable from '../../../shared/interfaces/stubable';
 import {Signal} from '@angular/core';
 
 export interface ComponentView extends Stubable{
-  type():string;
+  component(): new () => unknown;
   inputs():Signal<Record<string, unknown>>;
 }
