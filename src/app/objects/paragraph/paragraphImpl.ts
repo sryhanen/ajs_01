@@ -47,7 +47,6 @@ import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
 import {OutputContainer} from '../output/container/outputContainer';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
-import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {MessageImpl} from '../message/messageImpl';

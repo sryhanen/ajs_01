@@ -43,8 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/core';
-import {UPlotPlugin} from '../../../../../objects/output/format/uPlot/uPlotPlugin/uPlotPlugin';
+import {AfterViewInit, Component, ElementRef, input, OnChanges, ViewChild} from '@angular/core';
+import uPlot from 'uplot';
+import {UPlotPluginImpl} from '../../../../../objects/output/format/uPlot/uPlotPlugin/uPlotPluginImpl';
 
 @Component({
   selector: 'uPlotOutputView',
@@ -52,11 +53,27 @@ import {UPlotPlugin} from '../../../../../objects/output/format/uPlot/uPlotPlugi
     <div #anchor></div>
   `
 })
-export class UPlotOutputView implements AfterViewInit {
-  uPlotPlugin = input.required<UPlotPlugin>();
+export class UPlotOutputView implements AfterViewInit, OnChanges {
+  uPlotOptions = input.required<{
+    graphType:string;
+    labels:string[];
+    series:string[];
+    xAxisLabel:string;
+  }>();
+  uPlotData = input.required<uPlot.AlignedData>();
   @ViewChild('anchor') anchor: ElementRef;
 
+  ngOnChanges() {
+    if(!this.anchor) {
+      return;
+    }
+    this.anchor.nativeElement.replaceChildren();
+    const plugin = new UPlotPluginImpl(this.uPlotData(), this.uPlotOptions());
+    plugin.initializeUPlot(this.anchor.nativeElement);
+  }
+
   ngAfterViewInit() {
-    this.uPlotPlugin().initializeUPlot(this.anchor.nativeElement);
+    const plugin = new UPlotPluginImpl(this.uPlotData(), this.uPlotOptions());
+    plugin.initializeUPlot(this.anchor.nativeElement);
   }
 }

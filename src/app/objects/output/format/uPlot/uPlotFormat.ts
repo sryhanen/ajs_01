@@ -92,8 +92,7 @@ export class uPlotFormat implements OutputFormat {
       }
       const uPlotData = paragraphOutputMessage.output()['data'];
       const uPlotOptions = paragraphOutputMessage.outputOptions();
-      const plugin = new UPlotPluginImpl(uPlotData, uPlotOptions);
-      this._componentView.set(new ComponentViewImpl(UPlotOutputView, signal({uPlotPlugin: plugin})));
+      this._componentView.set(new ComponentViewImpl(UPlotOutputView, signal({uPlotOptions: uPlotOptions, uPlotData: uPlotData})));
     }
   }
 
