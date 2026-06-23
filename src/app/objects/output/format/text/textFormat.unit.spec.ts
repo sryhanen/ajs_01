@@ -45,14 +45,12 @@
  */
 import {TextFormat} from './textFormat';
 import {OutputType} from '../../outputType';
-import {FakeChannel} from '../../../channel/fakeChannel';
 
 describe('Text Format', () => {
-  const channel = new FakeChannel();
   let textFormat: TextFormat;
 
   beforeEach(() => {
-    textFormat = new TextFormat(channel);
+    textFormat = new TextFormat();
   });
 
   describe('Birth', () => {

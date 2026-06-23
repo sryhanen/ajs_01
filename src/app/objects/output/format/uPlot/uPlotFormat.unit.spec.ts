@@ -46,6 +46,7 @@
 import {UPlotFormatImpl} from './uPlotFormatImpl';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
+import {OutputType} from '../../outputType';
 
 describe('uPlotFormat', () => {
   let channel:Channel;
@@ -66,5 +67,34 @@ describe('uPlotFormat', () => {
     });
   });
 
+  describe('Request', () => {
+    it('Should request channel', () =>{
+      const requestData= {test:'test'};
+      const channelSpy = vi.spyOn(channel, 'request');
+      uPlotFormat.request(requestData);
+      expect(channelSpy).toHaveBeenCalledTimes(1);
+      expect(channelSpy).toHaveBeenCalledWith(requestData);
+    });
+  });
 
+  describe('ComponentView updates', () => {
+    it('Should have component view stub', () => {
+      expect(uPlotFormat.print()().componentView.isStub()).toBe(true);
+    });
+
+    it('Should not have stub after output response', () => {
+      const outputResponse = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{
+            type:OutputType.uPlot,
+            data:{},
+            options:{}
+          }
+        }
+      };
+      uPlotFormat.response(outputResponse);
+      expect(uPlotFormat.print()().componentView.isStub()).toBe(false);
+    });
+  });
 });

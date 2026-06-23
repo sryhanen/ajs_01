@@ -45,15 +45,12 @@
  */
 import {HTMLFormat} from './htmlFormat';
 import {OutputType} from '../../outputType';
-import {FakeChannel} from '../../../channel/fakeChannel';
-import {AngularFormatImpl} from '../angular/angularFormatImpl';
 
 describe('HTMLFormat', () => {
-  const channel = new FakeChannel();
   let htmlFormat: HTMLFormat;
 
   beforeEach(() => {
-    htmlFormat = new HTMLFormat(channel);
+    htmlFormat = new HTMLFormat();
   });
 
   describe('Birth', () => {
