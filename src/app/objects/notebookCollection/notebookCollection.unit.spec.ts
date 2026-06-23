@@ -61,6 +61,11 @@ describe('NotebookCollection', () => {
     it('Should have been initialized', () =>{
       expect(notebookCollection).toBeInstanceOf(NotebookCollectionImpl);
     });
+
+    it('Should print', () => {
+      const notebookCollectionPrinted =notebookCollection.print()();
+        expect(notebookCollectionPrinted).toBeDefined();
+    });
   });
 
   describe('Request', () => {

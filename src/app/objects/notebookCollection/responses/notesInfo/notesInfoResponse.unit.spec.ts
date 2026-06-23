@@ -43,67 +43,44 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Notebook} from '../../../notebook/notebook';
-import {PushValue} from '../../../pushValue/pushValue';
-import {Channel} from '../../../channel/channel';
-import {NoteResponse} from './noteResponse';
+import {NotesInfoResponse} from './notesInfoResponse';
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {PushValueImpl} from '../../../pushValue/pushValueImpl';
-import {NotebookImpl} from '../../../notebook/notebookImpl';
+import {Channel} from '../../../channel/channel';
+import {Notebook} from '../../../notebook/notebook';
+import {signal, WritableSignal} from '@angular/core';
 
-describe('NoteResponse', () => {
-  let channel:Channel;
-  let notebooks: Notebook[];
-  let pushCollection:PushValue<Notebook[]>[];
-  let noteResponse: NoteResponse;
-  let initialNotebook: Notebook;
-  const initialNotebookId = 'initialNotebookId';
-  const initialNotebookName = 'Notebook 1';
-
-  beforeEach(() => {
-    channel = new FakeChannel();
-    initialNotebook = new NotebookImpl(channel, {id:initialNotebookId, name:initialNotebookName});
-    notebooks = [initialNotebook];
-    pushCollection = [new PushValueImpl()];
-    noteResponse = new NoteResponse(channel, notebooks, pushCollection);
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(noteResponse).toBeInstanceOf(NoteResponse);
+describe('NotesInfoResponse', () => {
+    let channel:Channel;
+    let notebookCollection: WritableSignal<Map<string, Notebook>>;
+    let notebookCollectionUpdate: NotesInfoResponse;
+    beforeEach(() => {
+      channel  = new FakeChannel();
+      notebookCollection = signal(new Map([]));
+      notebookCollectionUpdate = new NotesInfoResponse(notebookCollection, channel);
     });
-  });
 
-  describe('Response', () => {
-    const newNotebookName = 'Notebook 2';
-    it('Should add new notebook', () => {
-      const response = {
-        op:'NOTE',
-        data:{
-          id:'newNotebookId',
-          name:newNotebookName,
+    describe('Birth', () => {
+      it('Should be initialized', () => {
+        expect(notebookCollectionUpdate).toBeInstanceOf(NotesInfoResponse);
+      });
+    });
+
+    describe('Collection updates', () => {
+      const notebook1 = {id:'note1', name:'note1'};
+      const notebook2 = {id:'note2', name:'note2'};
+      const updateResponse = {
+        op: 'NOTES_INFO',
+        data: {
+          notes: [
+            notebook1,
+            notebook2
+          ]
         }
       };
-      expect(notebooks).toHaveLength(1);
-      noteResponse.response(response);
-      expect(notebooks).toHaveLength(2);
-      expect(pushCollection[0].value()).toEqual(notebooks);
+      it('Updates notebookCollection and pushCollection', () => {
+        expect(notebookCollection()).toHaveLength(0);
+        notebookCollectionUpdate.response(updateResponse);
+        expect(notebookCollection()).toHaveLength(2);
+      });
     });
-
-    it('Should replace existing notebook', () => {
-      const response = {
-        op:'NOTE',
-        data:{
-          id: initialNotebookId,
-          name: newNotebookName
-        }
-      };
-      const previousNotebook = notebooks[0];
-      expect(notebooks).toHaveLength(1);
-      noteResponse.response(response);
-      expect(notebooks).toHaveLength(1);
-      expect(notebooks[0]).not.toEqual(previousNotebook);
-      expect(pushCollection[0].value()).toEqual(notebooks);
-    });
-  });
 });
