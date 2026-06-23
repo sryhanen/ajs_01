@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import DataTable, {Config, ConfigColumnDefs, ConfigColumns} from 'datatables.net-bs5';
+import DataTable, {Api, Config, ConfigColumnDefs, ConfigColumns} from 'datatables.net-bs5';
 import 'datatables.net-buttons-bs5';
 import {Channel} from '../../../../channel/channel';
 import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
@@ -72,7 +72,7 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
     this._dataTablesAjax.response(data);
   }
 
-  initializeTable(tableElement: HTMLTableElement): void {
+  initializedTable(tableElement: HTMLTableElement): Api<unknown>{
     const safeOptions = new SafeJsonImpl(this._outputOptions);
     const headers:Array<string> = safeOptions.getProperty('headers', 'object');
     const config: Config = {
@@ -104,7 +104,7 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
       ordering: false,
       processing: true,
     };
-    new DataTable(tableElement, config);
+    return new DataTable(tableElement, config);
   }
 
   isStub(): boolean {

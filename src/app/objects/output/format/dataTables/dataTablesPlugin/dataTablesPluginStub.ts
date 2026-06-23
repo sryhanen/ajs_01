@@ -44,13 +44,14 @@
  * a licensee so wish it.
  */
 import {DataTablesPlugin} from './dataTablesPlugin';
+import {Api} from 'datatables.net-bs5';
 
 export class DataTablesPluginStub implements DataTablesPlugin {
   isStub(): boolean {
     return true;
   }
 
-  initializeTable(anchorElement: HTMLElement): void {
+  initializedTable(anchorElement: HTMLElement): Api<unknown> {
     throw new Error('DataTablesPluginStub: Method not implemented.');
   }
 

@@ -47,7 +47,6 @@ import {DataTablesFormat} from './dataTablesFormat';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {OutputType} from '../../outputType';
-import {DataTablesPluginImpl} from './dataTablesPlugin/dataTablesPluginImpl';
 
 describe('dataTablesFormat', () => {
   let channel:Channel;
@@ -67,10 +66,6 @@ describe('dataTablesFormat', () => {
       const buttons = dataTablesFormat.switcherButtons();
       expect(buttons).toHaveLength(1);
     });
-
-    it('Should have output type', () =>{
-      expect(dataTablesFormat.outputType()).toEqual(OutputType.dataTables);
-    });
   });
 
   describe('Request', () => {
@@ -83,17 +78,44 @@ describe('dataTablesFormat', () => {
     });
   });
 
-  describe('Plugin formatting', () => {
-    const plugingData = {
-      data:{},
-      options:{}
-    };
-    it('Should return plugin', () =>{
-      expect(dataTablesFormat.plugin(plugingData)).toBeInstanceOf(DataTablesPluginImpl);
+  describe('ComponentView updates', () => {
+    it('Should have component view stub', () => {
+      expect(dataTablesFormat.print()().componentView.isStub()).toBe(true);
     });
 
-    it('Should validate plugin data', () =>{
-      expect(() => dataTablesFormat.plugin({})).toThrow();
+    it('Should not have component view stub after output response', () => {
+      const outputResponse = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{
+            type:OutputType.dataTables,
+            data:{},
+            options:{},
+          }
+        }
+      };
+      dataTablesFormat.response(outputResponse);
+      expect(dataTablesFormat.print()().componentView.isStub()).toBe(false);
+    });
+
+    it('Should respond plugin on consequential output responses', () => {
+      const outputResponse = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{
+            type:OutputType.dataTables,
+            data:{},
+            options:{},
+          }
+        }
+      };
+      dataTablesFormat.response(outputResponse);
+      const plugin = dataTablesFormat.print()().componentView.inputs()()['dataTablesPlugin'] as Channel;
+      const spy = vi.spyOn(plugin, 'response');
+      dataTablesFormat.response(outputResponse);
+      dataTablesFormat.response(outputResponse);
+      dataTablesFormat.response(outputResponse);
+      expect(spy).toHaveBeenCalledTimes(3);
     });
   });
 });

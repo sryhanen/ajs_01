@@ -57,6 +57,6 @@ export class DataTablesOutputView implements AfterViewInit {
   @ViewChild('table') table: ElementRef;
 
   ngAfterViewInit() {
-    this.dataTablesPlugin().initializeTable(this.table.nativeElement);
+    this.dataTablesPlugin().initializedTable(this.table.nativeElement);
   }
 }
