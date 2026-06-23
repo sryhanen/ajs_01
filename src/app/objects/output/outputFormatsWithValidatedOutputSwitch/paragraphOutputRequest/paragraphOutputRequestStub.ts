@@ -43,47 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputContainer} from './outputContainer';
-import {Channel} from '../../channel/channel';
-import {computed, Signal} from '@angular/core';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {ComponentView} from '../../rendering/componentView/componentView';
-import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
-import {
-  OutputFormatsWithValidatedOutputSwitchImpl
-} from '../outputFormatsWithValidatedOutputSwitch/outputFormatsWithValidatedOutputSwitchImpl';
-import {
-  OutputFormatsWithValidatedOutputSwitch
-} from '../outputFormatsWithValidatedOutputSwitch/outputFormatsWithValidatedOutputSwitch';
+import {ParagraphOutputRequest} from './paragraphOutputRequest';
 
-export class OutputContainerImpl implements OutputContainer{
-  private readonly _channel:Channel;
-  private readonly _outputFormatsWithValidatedOutputSwitch: OutputFormatsWithValidatedOutputSwitch;
-  private readonly _componentView:ComponentView;
-  private readonly _paragraphId:string;
-
-  constructor(channel:Channel, paragraphId:string) {
-    this._channel = channel;
-    this._outputFormatsWithValidatedOutputSwitch = new OutputFormatsWithValidatedOutputSwitchImpl(this);
-    this._paragraphId = paragraphId;
-    this._componentView = new ComponentViewStub();
+export class ParagraphOutputRequestStub implements ParagraphOutputRequest {
+  isStub(): boolean {
+    return true;
   }
 
-  request(json: object): void {
-    this._channel.request(json);
+  data(): object {
+    throw new Error('ParagraphOutputRequestStub: Method not implemented.');
   }
 
-  response(json: object): void {
-    this._outputFormatsWithValidatedOutputSwitch.response(json);
+  operation(): string {
+    throw new Error('ParagraphOutputRequestStub: Method not implemented.');
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() =>
-      ({
-        paragraphId:this._paragraphId,
-        componentView: this._componentView,
-        children: computed(() => this._outputFormatsWithValidatedOutputSwitch.print()().children()),
-      })
-    );
+  request(): object {
+    throw new Error('ParagraphOutputRequestStub: Method not implemented.');
+  }
+
+  type(): string {
+    throw new Error('ParagraphOutputRequestStub: Method not implemented.');
   }
 }

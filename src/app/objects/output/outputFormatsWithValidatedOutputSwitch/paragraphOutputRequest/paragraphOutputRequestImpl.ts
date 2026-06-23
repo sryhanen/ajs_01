@@ -43,47 +43,46 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputContainer} from './outputContainer';
-import {Channel} from '../../channel/channel';
-import {computed, Signal} from '@angular/core';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {ComponentView} from '../../rendering/componentView/componentView';
-import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
-import {
-  OutputFormatsWithValidatedOutputSwitchImpl
-} from '../outputFormatsWithValidatedOutputSwitch/outputFormatsWithValidatedOutputSwitchImpl';
-import {
-  OutputFormatsWithValidatedOutputSwitch
-} from '../outputFormatsWithValidatedOutputSwitch/outputFormatsWithValidatedOutputSwitch';
+import {ParagraphOutputRequest} from './paragraphOutputRequest';
+import {Message} from '../../../message/message';
 
-export class OutputContainerImpl implements OutputContainer{
-  private readonly _channel:Channel;
-  private readonly _outputFormatsWithValidatedOutputSwitch: OutputFormatsWithValidatedOutputSwitch;
-  private readonly _componentView:ComponentView;
-  private readonly _paragraphId:string;
+export class ParagraphOutputRequestImpl implements ParagraphOutputRequest {
+  private readonly _message:Message;
 
-  constructor(channel:Channel, paragraphId:string) {
-    this._channel = channel;
-    this._outputFormatsWithValidatedOutputSwitch = new OutputFormatsWithValidatedOutputSwitchImpl(this);
-    this._paragraphId = paragraphId;
-    this._componentView = new ComponentViewStub();
+  constructor(message:Message) {
+    this._message = message;
   }
 
-  request(json: object): void {
-    this._channel.request(json);
+  request(): object {
+    this.validateOperation();
+    return {
+      op:this.operation(),
+      data:this.data(),
+    };
   }
 
-  response(json: object): void {
-    this._outputFormatsWithValidatedOutputSwitch.response(json);
+  type(): string {
+    this.validateOperation();
+    return this._message.data()['type'];
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() =>
-      ({
-        paragraphId:this._paragraphId,
-        componentView: this._componentView,
-        children: computed(() => this._outputFormatsWithValidatedOutputSwitch.print()().children()),
-      })
-    );
+  operation(): string {
+    this.validateOperation();
+    return this._message.operation();
+  }
+
+  data(): object {
+    this.validateOperation();
+    return this._message.data();
+  }
+
+  isStub(): boolean {
+    return false;
+  }
+
+  private validateOperation():void{
+    if(this._message.operation() !== 'PARAGRAPH_OUTPUT_REQUEST'){
+      throw new RangeError('Message operation is not "PARAGRAPH_OUTPUT_REQUEST".')
+    }
   }
 }
