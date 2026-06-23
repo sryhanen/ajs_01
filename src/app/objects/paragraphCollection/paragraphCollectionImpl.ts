@@ -52,7 +52,6 @@ import {ParagraphAddedResponse} from './responses/paragraphAdded/paragraphAddedR
 import {ParagraphRemovedResponse} from './responses/paragraphRemoved/paragraphRemovedResponse';
 import {DefaultRequest} from './requests/default/defaultRequest';
 import {RunParagraphRequest} from './requests/runParagraph/runParagraphRequest';
-import {DefaultResponse} from './responses/default/defaultResponse';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
@@ -62,6 +61,7 @@ import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
+  private readonly _decoratorParagraphs:WritableSignal<Map<string,  object>>;
   private readonly _responses: Response[];
   private readonly _requests: Request[];
   private readonly _componentView: ComponentView;
@@ -69,14 +69,13 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   constructor(channel: Channel, initialParagraphData: object[]) {
     this._paragraphs = this.initializedParagraphs(initialParagraphData);
     this._responses = [
-      new DefaultResponse(this._paragraphs),
-      new ParagraphResponse(channel, this._paragraphs),
-      new ParagraphAddedResponse(channel, this._paragraphs),
-      new ParagraphRemovedResponse(this._paragraphs),
+      new ParagraphResponse(channel, this._paragraphs, this._decoratorParagraphs),
+      new ParagraphAddedResponse(channel, this._paragraphs, this._decoratorParagraphs),
+      new ParagraphRemovedResponse(this._paragraphs, this._decoratorParagraphs),
     ];
     this._requests = [
       new DefaultRequest(channel),
-      new RunParagraphRequest(channel, this._paragraphs)
+      new RunParagraphRequest(channel, this._decoratorParagraphs)
     ];
     this._componentView = new ComponentViewStub();
   }
@@ -109,6 +108,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
 
   response(data: object): void {
     this._responses.forEach(response => response.response(data));
+    this._paragraphs().forEach(paragraph => paragraph.response(data));
   }
 
   isStub(): boolean {

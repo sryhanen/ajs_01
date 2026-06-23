@@ -44,20 +44,19 @@
  * a licensee so wish it.
  */
 import {Request} from '../../../channel/request';
-import {Paragraph} from '../../../paragraph/paragraph';
 import {Channel} from '../../../channel/channel';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {Message} from '../../../message/message';
-import {Signal} from '@angular/core';
+import {WritableSignal} from '@angular/core';
 
 export class RunParagraphRequest implements Request {
   private readonly _channel: Channel;
-  private readonly _paragraphs: Signal<Map<string,  Paragraph>>;
+  private readonly _decoratorParagraphs:WritableSignal<Map<string,  object>>;
 
-  constructor(channel: Channel, paragraphs: Signal<Map<string,  Paragraph>>){
+  constructor(channel: Channel, decoratorParagraphs:WritableSignal<Map<string,  object>>){
     this._channel = channel;
-    this._paragraphs = paragraphs;
+    this._decoratorParagraphs = decoratorParagraphs;
   }
 
   request(data: object) {
@@ -65,17 +64,17 @@ export class RunParagraphRequest implements Request {
     if(message.operation() === 'RUN_PARAGRAPH'){
       const runParagraphData = new SafeJsonImpl(message.data());
       const paragraphId:string = runParagraphData.getProperty('id', 'string');
-      const decoratorParagraph = this._paragraphs().get(paragraphId);
-      if(decoratorParagraph === undefined){
+      const paragraphData = this._decoratorParagraphs().get(paragraphId);
+      if(paragraphData === undefined){
         throw new Error(`Failed to decorate run paragraph request: paragraph "${paragraphId}" not found in collection`);
       }
-      this._channel.request(this.decoratedMessage(message, decoratorParagraph));
+      this._channel.request(this.decoratedMessage(message, paragraphData));
     }
   }
 
-  private decoratedMessage(message:Message, decoratorParagraph:Paragraph):object {
+  private decoratedMessage(message:Message, paragraphData:object):object {
     const data = message.data();
-    const decoratorData = new SafeJsonImpl(decoratorParagraph.print());
+    const decoratorData = new SafeJsonImpl(paragraphData);
     data['paragraph'] = decoratorData.getProperty<string>('text', 'string');
     data['config'] = decoratorData.getProperty<object>('config', 'object');
     const settings = decoratorData.getProperty<object>('settings', 'object');

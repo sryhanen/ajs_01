@@ -44,29 +44,28 @@
   * a licensee so wish it.
 */
 import {Paragraph} from '../../../paragraph/paragraph';
-import {PushValue} from '../../../pushValue/pushValue';
-import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
 import {Channel} from '../../../channel/channel';
 import {ParagraphRemovedResponse} from './paragraphRemovedResponse';
+import {signal, WritableSignal} from '@angular/core';
 
 describe('ParagraphRemovedResponse', () => {
-  let paragraphs: Paragraph[];
-  let pushParagraphs: PushValue<Paragraph[]>[];
+  let paragraphs: WritableSignal<Map<string, Paragraph>>;
+  let decoratorParagraphs: WritableSignal<Map<string, object>>;
   const defaultParagraphId = 'paragraphId';
   let paragraphRemovedResponse: ParagraphRemovedResponse;
 
   beforeEach(() => {
     const channel: Channel = new FakeChannel();
-    paragraphs = [new ParagraphImpl(channel, {id:defaultParagraphId}, new AngularObjectCollectionImpl(channel))];
-    pushParagraphs = [new PushValueImpl()];
+    const initialParagraph = new ParagraphImpl(channel, {id:defaultParagraphId});
+    paragraphs = signal(new Map([[initialParagraph.id(), initialParagraph]]));
+    decoratorParagraphs = signal(new Map([[initialParagraph.id(), {id:defaultParagraphId}]]));
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      paragraphRemovedResponse = new ParagraphRemovedResponse(paragraphs, pushParagraphs);
+      paragraphRemovedResponse = new ParagraphRemovedResponse(paragraphs, decoratorParagraphs);
       expect(paragraphRemovedResponse).toBeInstanceOf(ParagraphRemovedResponse);
     });
   });
@@ -80,24 +79,10 @@ describe('ParagraphRemovedResponse', () => {
     };
 
     it('Should remove paragraph', () => {
-      paragraphRemovedResponse = new ParagraphRemovedResponse(paragraphs, pushParagraphs);
-      const pushParagraphSpy = vi.spyOn(pushParagraphs[0], 'update');
+      paragraphRemovedResponse = new ParagraphRemovedResponse(paragraphs, decoratorParagraphs);
       paragraphRemovedResponse.response(response);
-      expect(paragraphs).toEqual([]);
-      expect(pushParagraphSpy).toHaveBeenCalledExactlyOnceWith([]);
-    });
-
-    it('Should throw error if paragraph is not in the collection', () => {
-      paragraphRemovedResponse = new ParagraphRemovedResponse(paragraphs, pushParagraphs);
-      response.data.id = 'notInCollection';
-      expect(() => paragraphRemovedResponse.response(response)).toThrow();
-    });
-
-    it('Should omit remove if collection is empty', () => {
-      paragraphs = [];
-      paragraphRemovedResponse = new ParagraphRemovedResponse(paragraphs, pushParagraphs);
-      paragraphRemovedResponse.response(response);
-      expect(paragraphs).toEqual([]);
+      expect(paragraphs().size).toEqual(0);
+      expect(decoratorParagraphs().size).toEqual(0);
     });
   });
 });

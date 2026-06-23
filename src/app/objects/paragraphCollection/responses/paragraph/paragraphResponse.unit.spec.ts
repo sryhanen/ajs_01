@@ -43,18 +43,46 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Response} from '../../../channel/response';
+import {Channel} from '../../../channel/channel';
 import {Paragraph} from '../../../paragraph/paragraph';
-import {Signal} from '@angular/core';
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {ParagraphResponse} from './paragraphResponse';
+import {signal, WritableSignal} from '@angular/core';
 
-export class DefaultResponse implements Response {
-  private readonly _paragraphs:Signal<Map<string,  Paragraph>>;
+describe('ParagraphResponder', () => {
+  let channel:Channel;
+  let paragraphs: WritableSignal<Map<string, Paragraph>>;
+  let decoratorParagraphs: WritableSignal<Map<string, Paragraph>>;
+  let paragraphResponse: ParagraphResponse;
 
-  constructor(paragraphs:Signal<Map<string,  Paragraph>>) {
-    this._paragraphs = paragraphs;
-  }
+  beforeEach(() => {
+    channel = new FakeChannel();
+    paragraphs = signal(new Map([]));
+  });
 
-  response(data: object) {
-    this._paragraphs().forEach(paragraph => paragraph.response(data));
-  }
-}
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      paragraphResponse = new ParagraphResponse(channel, paragraphs, decoratorParagraphs);
+      expect(paragraphResponse).toBeInstanceOf(ParagraphResponse);
+    });
+  });
+
+  describe('Paragraph update', () => {
+    const paragraphId = 'paragraphId';
+
+    it('Should update collection', () => {
+      paragraphResponse = new ParagraphResponse(channel, paragraphs,decoratorParagraphs);
+      const response = {
+        op:'PARAGRAPH',
+        data: {
+          id:paragraphId,
+        }
+      };
+      expect(paragraphs()).toHaveLength(0);
+      expect(decoratorParagraphs()).toHaveLength(0);
+      paragraphResponse.response(response);
+      expect(paragraphs()).toHaveLength(1);
+      expect(decoratorParagraphs()).toHaveLength(1);
+    });
+  });
+});

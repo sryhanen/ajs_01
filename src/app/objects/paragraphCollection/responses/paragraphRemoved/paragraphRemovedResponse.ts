@@ -51,9 +51,11 @@ import {WritableSignal} from '@angular/core';
 
 export class ParagraphRemovedResponse implements Response {
   private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
+  private readonly _decoratorParagraphs:WritableSignal<Map<string,  object>>;
 
-  constructor(paragraphs: WritableSignal<Map<string,  Paragraph>>) {
+  constructor(paragraphs: WritableSignal<Map<string,  Paragraph>>, decoratorParagraphs:WritableSignal<Map<string,  object>>) {
     this._paragraphs = paragraphs;
+    this._decoratorParagraphs = decoratorParagraphs;
   }
 
   response(data: object): void {
@@ -62,6 +64,10 @@ export class ParagraphRemovedResponse implements Response {
       const paragraphRemovedData = new SafeJsonImpl(message.data());
       const removedParagraphId:string = paragraphRemovedData.getProperty('id', 'string');
       this._paragraphs.update(paragraphMap => {
+        paragraphMap.delete(removedParagraphId);
+        return paragraphMap;
+      });
+      this._decoratorParagraphs.update(paragraphMap => {
         paragraphMap.delete(removedParagraphId);
         return paragraphMap;
       });

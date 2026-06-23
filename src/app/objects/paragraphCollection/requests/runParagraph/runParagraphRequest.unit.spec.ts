@@ -43,41 +43,68 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Paragraph} from '../../../paragraph/paragraph';
-import {DefaultResponse} from './defaultResponse';
-import {ParagraphImpl} from '../../../paragraph/paragraphImpl';
+import {RunParagraphRequest} from './runParagraphRequest';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {Channel} from '../../../channel/channel';
+import {signal, WritableSignal} from '@angular/core';
 
-describe('DefaultResponse', () => {
-  let paragraphs:Paragraph[];
-  let defaultResponse:DefaultResponse;
+describe('RunParagraphRequest', () => {
+  let channel: Channel;
+  let paragraphs: WritableSignal<Map<string, object>>;
+  const paragraphId = 'paragraphId';
+  const paragraphText = 'some text';
+  const paragraphConfig = {
+    prop:'config prop'
+  };
+  const paragraphSettings = {
+    params:{
+      prop:'config prop'
+    }
+  };
+  const defaultParagraphData = {
+    id: paragraphId,
+    text:paragraphText,
+    config: paragraphConfig,
+    settings: paragraphSettings
+  };
+  let runParagraphRequest: RunParagraphRequest;
 
   beforeEach(() => {
-    const channel: Channel = new FakeChannel();
-    paragraphs = [new ParagraphImpl(channel, {})];
-    defaultResponse = new DefaultResponse(paragraphs);
+    channel = new FakeChannel();
+    paragraphs = signal(new Map([[defaultParagraphData.id, defaultParagraphData]]));
+    runParagraphRequest = new RunParagraphRequest(channel, paragraphs);
   });
 
   describe('Birth', () => {
-    it('Should be initialized', ()=> {
-      expect(defaultResponse).toBeInstanceOf(DefaultResponse);
+    it('Should be initialized', () => {
+      expect(runParagraphRequest).toBeInstanceOf(RunParagraphRequest);
     });
   });
 
-  describe('Response', () => {
-    const response = {
-      op:'',
-      data:{}
+  describe('Request', () => {
+    const initialRequest = {
+      op:'RUN_PARAGRAPH',
+      data:{
+        id:paragraphId,
+        paragraph:'',
+        config:{},
+        params:{}
+      }
     };
-    let paragraphSpy;
-    beforeEach(() => {
-      paragraphSpy = vi.spyOn(paragraphs[0], 'response');
-      defaultResponse.response(response);
-    });
 
-    it('Should have responded paragraphs', ()=> {
-      expect(paragraphSpy).toHaveBeenCalledExactlyOnceWith(response);
+    it('Should decorate request', () => {
+      const expectedRequest = {
+        op:'RUN_PARAGRAPH',
+        data:{
+          id:paragraphId,
+          paragraph:paragraphText,
+          config:paragraphConfig,
+          params:paragraphSettings.params
+        }
+      };
+      const channelSpy = vi.spyOn(channel, 'request');
+      runParagraphRequest.request(initialRequest);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
     });
   });
 });

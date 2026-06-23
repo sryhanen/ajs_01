@@ -54,10 +54,12 @@ import {WritableSignal} from '@angular/core';
 export class ParagraphResponse implements Response {
   private readonly _channel: Channel;
   private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
+  private readonly _decoratorParagraphs:WritableSignal<Map<string,  object>>;
 
-  constructor(channel: Channel, paragraphs: WritableSignal<Map<string,  Paragraph>>) {
+  constructor(channel: Channel, paragraphs: WritableSignal<Map<string,  Paragraph>>, decoratorParagraphs:WritableSignal<Map<string,  object>>) {
     this._channel = channel;
     this._paragraphs = paragraphs;
+    this._decoratorParagraphs = decoratorParagraphs;
   }
 
   response(data: object): void {
@@ -66,6 +68,10 @@ export class ParagraphResponse implements Response {
       const newParagraph = new ParagraphImpl(this._channel, message.data());
       this._paragraphs.update(paragraphMap => {
         paragraphMap.set(newParagraph.id(), newParagraph);
+        return paragraphMap;
+      });
+      this._decoratorParagraphs.update(paragraphMap => {
+        paragraphMap.set(newParagraph.id(), message.data());
         return paragraphMap;
       });
     }

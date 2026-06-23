@@ -44,31 +44,26 @@
   * a licensee so wish it.
 */
 import {Paragraph} from '../../../paragraph/paragraph';
-import {PushValue} from '../../../pushValue/pushValue';
-import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {Channel} from '../../../channel/channel';
 import {ParagraphAddedResponse} from './paragraphAddedResponse';
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
-import {PushValueImpl} from '../../../pushValue/pushValueImpl';
+import {signal, WritableSignal} from '@angular/core';
 
 describe('ParagraphAddedResponse', () => {
   let channel:Channel;
-  let paragraphs:Paragraph[];
-  let pushParagraphs: PushValue<Paragraph[]>[];
-  let angularObjectCollection: AngularObjectCollection;
+  let paragraphs: WritableSignal<Map<string, Paragraph>>;
+  let decoratorParagraphs: WritableSignal<Map<string, Paragraph>>;
   let paragraphAddedResponse: ParagraphAddedResponse;
 
   beforeEach(() => {
     channel = new FakeChannel();
-    paragraphs = [];
-    pushParagraphs = [new PushValueImpl()];
-    angularObjectCollection = new AngularObjectCollectionImpl(channel);
+    paragraphs = signal(new Map([]));
+    decoratorParagraphs = signal(new Map([]));
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      paragraphAddedResponse = new ParagraphAddedResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
+      paragraphAddedResponse = new ParagraphAddedResponse(channel, paragraphs, decoratorParagraphs);
       expect(paragraphAddedResponse).toBeInstanceOf(ParagraphAddedResponse);
     });
   });
@@ -86,11 +81,12 @@ describe('ParagraphAddedResponse', () => {
     };
 
     it('Should add paragraph', () => {
-      paragraphAddedResponse = new ParagraphAddedResponse(channel, paragraphs, pushParagraphs, angularObjectCollection);
-      const pushParagraphSpy = vi.spyOn(pushParagraphs[0], 'update');
+      paragraphAddedResponse = new ParagraphAddedResponse(channel, paragraphs, decoratorParagraphs);
+      expect(paragraphs().size).toEqual(0);
+      expect(decoratorParagraphs().size).toEqual(0);
       paragraphAddedResponse.response(response);
-      expect(paragraphs).toHaveLength(1);
-      expect(pushParagraphSpy).toHaveBeenCalledExactlyOnceWith(paragraphs);
+      expect(paragraphs().size).toEqual(1);
+      expect(decoratorParagraphs().size).toEqual(1);
     });
   });
 });
