@@ -44,20 +44,20 @@
  * a licensee so wish it.
  */
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {AngularFormat} from './angularFormat';
+import {AngularFormatImpl} from './angularFormatImpl';
 import {OutputType} from '../../outputType';
 
 describe('AngularFormat', () => {
   const channel = new FakeChannel();
-  let angularFormat: AngularFormat;
+  let angularFormat: AngularFormatImpl;
 
   beforeEach(() => {
-    angularFormat = new AngularFormat(channel);
+    angularFormat = new AngularFormatImpl(channel);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(angularFormat).toBeInstanceOf(AngularFormat);
+      expect(angularFormat).toBeInstanceOf(AngularFormatImpl);
     });
 
     it('Should not have switcherButtons', () => {

@@ -44,8 +44,8 @@
  * a licensee so wish it.
  */
 import {Printable} from '../../rendering/printable/printable';
-import {Channel} from '../../channel/channel';
+import {Response} from '../../channel/response';
 
-export interface OutputFormat extends Channel, Printable {
+export interface OutputFormat extends Response, Printable {
   switcherButtons(): Printable[];
 }

@@ -43,23 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {DataTablesFormat} from './dataTablesFormat';
+import {DataTablesFormatImpl} from './dataTablesFormatImpl';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {OutputType} from '../../outputType';
 
 describe('dataTablesFormat', () => {
   let channel:Channel;
-  let dataTablesFormat:DataTablesFormat;
+  let dataTablesFormat:DataTablesFormatImpl;
 
   beforeEach(() => {
     channel = new FakeChannel();
-    dataTablesFormat = new DataTablesFormat(channel);
+    dataTablesFormat = new DataTablesFormatImpl(channel);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () =>{
-      expect(dataTablesFormat).toBeInstanceOf(DataTablesFormat);
+      expect(dataTablesFormat).toBeInstanceOf(DataTablesFormatImpl);
     });
 
     it('Should have a switcher button', () =>{

@@ -43,43 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {uPlotFormat} from './uPlotFormat';
-import {OutputType} from '../../outputType';
-import {UPlotPluginImpl} from './uPlotPlugin/UPlotPluginImpl';
+import {UPlotFormatImpl} from './uPlotFormatImpl';
+import {Channel} from '../../../channel/channel';
+import {FakeChannel} from '../../../channel/fakeChannel';
 
 describe('uPlotFormat', () => {
-  let microPlotFormat: uPlotFormat;
+  let channel:Channel;
+  let uPlotFormat: UPlotFormatImpl;
   beforeEach(() => {
-    microPlotFormat = new uPlotFormat();
+    channel = new FakeChannel();
+    uPlotFormat = new UPlotFormatImpl(channel);
   });
 
   describe('Birth', ()=> {
     it('Should be initialized', () => {
-      expect(microPlotFormat).toBeDefined();
+      expect(uPlotFormat).toBeDefined();
     });
 
     it('Should have switcher buttons', () => {
-      const switcherButtons = microPlotFormat.switcherButtons();
+      const switcherButtons = uPlotFormat.switcherButtons();
       expect(switcherButtons).toHaveLength(4);
     });
-
-    it('Should have outputType', () => {
-      expect(microPlotFormat.outputType()).toEqual(OutputType.uPlot);
-    });
   });
 
-  describe('Plugin formatting', ()=> {
-    const pluginData = {
-      data:{},
-      options:{}
-    };
 
-    it('Should return plugin', () => {
-      expect(microPlotFormat.plugin(pluginData)).toBeInstanceOf(UPlotPluginImpl);
-    });
-
-    it('Should validate plugin data', () => {
-      expect(() => microPlotFormat.plugin({})).toThrow();
-    });
-  });
 });

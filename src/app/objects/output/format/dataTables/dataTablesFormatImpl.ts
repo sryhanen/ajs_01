@@ -43,51 +43,79 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {Channel} from '../../../channel/channel';
+import {DataTableSwitcherButton} from './switcherButton/dataTablesSwitcherButton';
 import {OutputFormat} from '../outputFormat';
 import {OutputType} from '../../outputType';
+import {DataTablesPluginImpl} from './dataTablesPlugin/dataTablesPluginImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
-import {ComponentView} from '../../../rendering/componentView/componentView';
-import {Channel} from '../../../channel/channel';
-import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import { RenderNode } from '../../../rendering/renderNode/renderNode';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraphOutputMessageImpl';
-import {TextOutputView} from '../../../../ui/angular2+/output/outputViews/textOutputView/textOutputView';
+import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import {ComponentView} from '../../../rendering/componentView/componentView';
+import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
+import {DataTablesPlugin} from './dataTablesPlugin/dataTablesPlugin';
+import {DataTablesPluginStub} from './dataTablesPlugin/dataTablesPluginStub';
+import {
+  DataTablesOutputView
+} from '../../../../ui/angular2+/output/outputViews/dataTablesOutputView/dataTablesOutputView';
 import {Printable} from '../../../rendering/printable/printable';
+import {DataTablesFormat} from './dataTablesFormat';
 
-export class TextFormat implements OutputFormat {
+export class DataTablesFormatImpl implements DataTablesFormat {
+  private readonly _channel: Channel;
+  private readonly _switcherButtons: Printable[];
   private readonly _componentViewStub: ComponentView;
   private readonly _componentView: WritableSignal<ComponentView>;
+  private readonly _pluginStub: DataTablesPlugin;
+  private readonly _plugin: WritableSignal<DataTablesPlugin>;
 
-  constructor() {
+  constructor(channel: Channel) {
+    this._channel = channel;
+    this._switcherButtons = [
+      new DataTableSwitcherButton(this)
+    ];
     this._componentViewStub = new ComponentViewStub();
     this._componentView = signal(this._componentViewStub);
+    this._pluginStub = new DataTablesPluginStub();
+    this._plugin = signal(this._pluginStub);
+  }
+
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      componentView: this._componentView(),
+      children: computed(() => [])
+    }));
   }
 
   response(json: object): void {
     const message = new MessageImpl(new SafeJsonImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.outputType() !== OutputType.text) {
+      if(paragraphOutputMessage.outputType() !== OutputType.dataTables){
         this._componentView.set(this._componentViewStub);
+        this._plugin.set(this._pluginStub);
         return;
       }
-      const textOutput = new SafeJsonImpl(paragraphOutputMessage.output()).getProperty('data', 'string');
-      const componentView = new ComponentViewImpl(TextOutputView, signal({textOutput: textOutput}));
-      this._componentView.set(componentView);
+      const dataTablesData = paragraphOutputMessage.output()['data'];
+      if(!this._plugin().isStub()){
+        this._plugin().response(dataTablesData);
+      }
+      else{
+        const dataTablesOptions = paragraphOutputMessage.outputOptions();
+        this._plugin.set(new DataTablesPluginImpl(this, dataTablesData, dataTablesOptions));
+        this._componentView.set(new ComponentViewImpl(DataTablesOutputView, signal({dataTablesPlugin: this._plugin()})));
+      }
     }
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView(),
-      children: computed(() => []),
-    }));
+  request(data: object): void {
+    this._channel.request(data);
   }
 
   switcherButtons(): Printable[] {
-    return [];
+    return this._switcherButtons;
   }
 }

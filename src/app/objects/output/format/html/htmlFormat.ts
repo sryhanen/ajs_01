@@ -58,18 +58,12 @@ import {HtmlOutputView} from '../../../../ui/angular2+/output/outputViews/htmlOu
 import {Printable} from '../../../rendering/printable/printable';
 
 export class HTMLFormat implements OutputFormat{
-  private readonly _channel: Channel;
   private readonly _componentViewStub: ComponentView;
   private readonly _componentView: WritableSignal<ComponentView>;
 
-  constructor(channel: Channel) {
-    this._channel = channel;
+  constructor() {
     this._componentViewStub = new ComponentViewStub();
     this._componentView = signal(this._componentViewStub);
-  }
-
-  request(json: object): void {
-    this._channel.request(json);
   }
 
   response(json: object): void {

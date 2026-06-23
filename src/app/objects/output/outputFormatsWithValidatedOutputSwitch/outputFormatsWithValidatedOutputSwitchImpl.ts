@@ -47,11 +47,11 @@ import {Channel} from '../../channel/channel';
 import {OutputFormat} from '../format/outputFormat';
 import {computed, Signal} from '@angular/core';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {DataTablesFormat} from '../format/dataTables/dataTablesFormat';
+import {DataTablesFormatImpl} from '../format/dataTables/dataTablesFormatImpl';
 import {HTMLFormat} from '../format/html/htmlFormat';
-import {uPlotFormat} from '../format/uPlot/uPlotFormat';
+import {UPlotFormatImpl} from '../format/uPlot/uPlotFormatImpl';
 import {TextFormat} from '../format/text/textFormat';
-import {AngularFormat} from '../format/angular/angularFormat';
+import {AngularFormatImpl} from '../format/angular/angularFormatImpl';
 import {OutputSwitcherImpl} from '../switcher/outputSwitcherImpl';
 import {OutputSwitcher} from '../switcher/outputSwitcher';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
@@ -74,11 +74,11 @@ export class OutputFormatsWithValidatedOutputSwitchImpl implements OutputFormats
   constructor(channel: Channel, ) {
     this._channel = channel;
     this._outputFormats = [
-      new DataTablesFormat(this),
-      new HTMLFormat(this),
-      new uPlotFormat(this),
-      new TextFormat(this),
-      new AngularFormat(this),
+      new DataTablesFormatImpl(this),
+      new HTMLFormat(),
+      new UPlotFormatImpl(this),
+      new TextFormat(),
+      new AngularFormatImpl(this),
     ];
     const buttons = this._outputFormats.map(format => format.switcherButtons());
     this._outputSwitcher = new OutputSwitcherImpl(buttons.flat());

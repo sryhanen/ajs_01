@@ -45,58 +45,5 @@
  */
 import {OutputFormat} from '../outputFormat';
 import {Channel} from '../../../channel/channel';
-import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import { RenderNode } from '../../../rendering/renderNode/renderNode';
-import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
-import {MessageImpl} from '../../../message/messageImpl';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraphOutputMessageImpl';
-import {OutputType} from '../../outputType';
-import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
-import {ComponentView} from '../../../rendering/componentView/componentView';
-import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
-import {AngularOutputView} from '../../../../ui/angular2+/output/outputViews/angularOutputView/angularOutputView';
-import {Printable} from '../../../rendering/printable/printable';
 
-export class AngularFormat implements OutputFormat {
-  private readonly _channel: Channel;
-  private readonly _angularObjectCollection: AngularObjectCollection;
-  private readonly _componentViewStub: ComponentView;
-  private readonly _componentView: WritableSignal<ComponentView>;
-
-  constructor(channel: Channel) {
-    this._channel = channel;
-    this._angularObjectCollection = new AngularObjectCollectionImpl(this);
-    this._componentViewStub = new ComponentViewStub();
-    this._componentView = signal(this._componentViewStub);
-  }
-
-  request(json: object): void {
-    this._channel.request(json);
-  }
-
-  response(json: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.outputType() !== OutputType.angular){
-        this._componentView.set(this._componentViewStub);
-        return;
-      }
-      const template = paragraphOutputMessage.output()['data'];
-      this._componentView.set(new ComponentViewImpl(AngularOutputView, signal({template:template, angularObjects: this._angularObjectCollection.angularObjects(), requestable:this})));
-    }
-  }
-
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView(),
-      children: computed(() => [])
-    }));
-  }
-
-  switcherButtons(): Printable[] {
-    return [];
-  }
-}
+export interface AngularFormat extends OutputFormat, Channel {}

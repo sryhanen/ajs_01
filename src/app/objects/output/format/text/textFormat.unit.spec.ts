@@ -65,18 +65,6 @@ describe('Text Format', () => {
     });
   });
 
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const spy = vi.spyOn(channel, 'request');
-      const request = {
-        op:'',
-        data:{}
-      };
-      textFormat.request(request);
-      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
-    });
-  });
-
   describe('ComponentView updates', () => {
     it('Should have component view stub', () => {
       expect(textFormat.print()().componentView.isStub()).toBe(true);

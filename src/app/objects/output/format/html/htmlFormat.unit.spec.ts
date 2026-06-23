@@ -46,7 +46,7 @@
 import {HTMLFormat} from './htmlFormat';
 import {OutputType} from '../../outputType';
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {AngularFormat} from '../angular/angularFormat';
+import {AngularFormatImpl} from '../angular/angularFormatImpl';
 
 describe('HTMLFormat', () => {
   const channel = new FakeChannel();
@@ -63,18 +63,6 @@ describe('HTMLFormat', () => {
 
     it('Should not have switcherButtons', () => {
       expect(htmlFormat.switcherButtons()).toEqual([]);
-    });
-  });
-
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const spy = vi.spyOn(channel, 'request');
-      const request = {
-        op:'',
-        data:{}
-      };
-      htmlFormat.request(request);
-      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
     });
   });
 
