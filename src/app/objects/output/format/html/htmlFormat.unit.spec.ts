@@ -43,42 +43,58 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {TextFormat} from './textFormat';
+import {HTMLFormat} from './htmlFormat';
 import {OutputType} from '../../outputType';
-import {TextPluginImpl} from "../../plugins/textPlugin/textPluginImpl";
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {AngularFormat} from '../angular/angularFormat';
 
-describe('Text Format', () => {
-  let textFormat: TextFormat;
+describe('HTMLFormat', () => {
+  const channel = new FakeChannel();
+  let htmlFormat: HTMLFormat;
 
   beforeEach(() => {
-    textFormat = new TextFormat();
+    htmlFormat = new HTMLFormat(channel);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(textFormat).toBeInstanceOf(TextFormat);
+      expect(htmlFormat).toBeInstanceOf(HTMLFormat);
     });
 
-    it('Should have switcherButton stub', () => {
-      expect(textFormat.switcherButtons()).toEqual([]);
-    });
-
-    it('Should have output type', () => {
-      expect(textFormat.outputType()).toBe(OutputType.text);
+    it('Should not have switcherButtons', () => {
+      expect(htmlFormat.switcherButtons()).toEqual([]);
     });
   });
 
-  describe('Plugin formatting', () => {
-    const pluginData = {
-      data:'',
-    };
+  describe('Request', () => {
+    it('Should request channel', () => {
+      const spy = vi.spyOn(channel, 'request');
+      const request = {
+        op:'',
+        data:{}
+      };
+      htmlFormat.request(request);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+  });
 
-    it('Should return plugin', () => {
-      expect(textFormat.plugin(pluginData)).toBeInstanceOf(TextPluginImpl);
+  describe('ComponentView updates', () => {
+    it('Should have component view stub', () => {
+      expect(htmlFormat.print()().componentView.isStub()).toBe(true);
     });
 
-    it('Should validate plugin data', () => {
-      expect(() => textFormat.plugin({})).toThrow();
+    it('Should not have stub after output response', () => {
+      const outputResponse = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{
+            type:OutputType.html,
+            data:'',
+          }
+        }
+      };
+      htmlFormat.response(outputResponse);
+      expect(htmlFormat.print()().componentView.isStub()).toBe(false);
     });
   });
 });

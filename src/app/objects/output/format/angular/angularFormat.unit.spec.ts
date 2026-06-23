@@ -45,6 +45,7 @@
  */
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {AngularFormat} from './angularFormat';
+import {OutputType} from '../../outputType';
 
 describe('AngularFormat', () => {
   const channel = new FakeChannel();
@@ -86,7 +87,7 @@ describe('AngularFormat', () => {
         op:'PARAGRAPH_OUTPUT',
         data:{
           output:{
-            type:'angular',
+            type:OutputType.angular,
             data:'',
           }
         }

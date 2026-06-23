@@ -43,42 +43,57 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {HTMLFormat} from './htmlFormat';
+import {TextFormat} from './textFormat';
 import {OutputType} from '../../outputType';
-import {HtmlPluginImpl} from '../../plugins/htmlPlugin/htmlPluginImpl';
+import {FakeChannel} from '../../../channel/fakeChannel';
 
-describe('HTMLFormat', () => {
-  let htmlFormat: HTMLFormat;
+describe('Text Format', () => {
+  const channel = new FakeChannel();
+  let textFormat: TextFormat;
 
   beforeEach(() => {
-    htmlFormat = new HTMLFormat();
+    textFormat = new TextFormat(channel);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(htmlFormat).toBeInstanceOf(HTMLFormat);
+      expect(textFormat).toBeInstanceOf(TextFormat);
     });
 
-    it('Should not have switcher buttons', () => {
-      expect(htmlFormat.switcherButtons()).toEqual([]);
-    });
-
-    it('Should have output type', () => {
-      expect(htmlFormat.outputType()).toEqual(OutputType.html);
+    it('Should not have switcherButtons', () => {
+      expect(textFormat.switcherButtons()).toEqual([]);
     });
   });
 
-  describe('Plugin formatting', () => {
-    const pluginData = {
-      data:''
-    };
+  describe('Request', () => {
+    it('Should request channel', () => {
+      const spy = vi.spyOn(channel, 'request');
+      const request = {
+        op:'',
+        data:{}
+      };
+      textFormat.request(request);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+  });
 
-    it('Should return plugin', () => {
-      expect(htmlFormat.plugin(pluginData)).toBeInstanceOf(HtmlPluginImpl);
+  describe('ComponentView updates', () => {
+    it('Should have component view stub', () => {
+      expect(textFormat.print()().componentView.isStub()).toBe(true);
     });
 
-    it('Should validate plugin data', () => {
-      expect(() => htmlFormat.plugin({})).toThrow();
+    it('Should not have stub after output response', () => {
+      const outputResponse = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{
+            type:OutputType.text,
+            data:'',
+          }
+        }
+      };
+      textFormat.response(outputResponse);
+      expect(textFormat.print()().componentView.isStub()).toBe(false);
     });
   });
 });
