@@ -75,8 +75,15 @@ export class OutputSwitcherImpl implements OutputSwitcher {
     }));
   }
 
-  response(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
+  request(json: object) {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    if(message.operation() === 'PARAGRAPH_OUTPUT_REQUEST'){
+      this._switchIsPending.set(true);
+    }
+  }
+
+  response(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
       this._outputIsSwitchable.set(paragraphOutputMessage.isAggregated());

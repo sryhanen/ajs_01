@@ -105,6 +105,7 @@ export class OutputFormatsWithValidatedOutputSwitchImpl implements OutputFormats
     const message = new MessageImpl(new SafeJsonImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT_REQUEST'){
       this._previousParagraphOutputRequest = new ParagraphOutputRequestImpl(message);
+      this._outputSwitcher.request(json);
     }
     this._channel.request(json);
   }

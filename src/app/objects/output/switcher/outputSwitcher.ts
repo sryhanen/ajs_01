@@ -44,6 +44,6 @@
  * a licensee so wish it.
  */
 import {Printable} from '../../rendering/printable/printable';
-import {Response} from '../../channel/response';
+import {Channel} from '../../channel/channel';
 
-export interface OutputSwitcher extends Response, Printable{}
+export interface OutputSwitcher extends Channel, Printable{}
