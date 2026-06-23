@@ -43,19 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import Stubable from '../../../../shared/interfaces/stubable';
+import {Component, input} from '@angular/core';
 
-export interface OutputSwitcherButton extends Stubable {
-  icon(): string;
-  title(): string;
-  outputType(): string;
-  requestData(): {
-    op: 'PARAGRAPH_OUTPUT_REQUEST',
-    data:{
-      paragraphId: string
-      noteId: string
-      type: string
-      requestOptions: object
-    }
-  };
+@Component({
+  selector: 'output-switcher-button',
+  template: `
+    <button class="btn btn-secondary"
+            type="button"
+            title="{{title()}}"
+            (click)="requestFormatSwitch()()">
+      <i class="{{icon()}}"></i>
+    </button>
+  `
+})
+export class OutputSwitcherButtonView {
+  requestFormatSwitch = input.required<() => void>();
+  title = input.required<string>();
+  icon = input.required<string>();
 }

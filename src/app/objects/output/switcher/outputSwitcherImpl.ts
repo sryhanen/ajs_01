@@ -43,47 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
-import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {OutputSwitcher} from './outputSwitcher';
-import {OutputSwitcherButtonStub} from './button/outputSwitcherButtonStub';
-import {PushValue} from '../../pushValue/pushValue';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../message/messageImpl';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import { RenderNode } from '../../rendering/renderNode/renderNode';
+import {Printable} from '../../rendering/printable/printable';
+import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
+import {OutputSwitcherView} from '../../../ui/angular2+/output/switcher/outputSwitcherView';
 
 export class OutputSwitcherImpl implements OutputSwitcher {
-  private readonly _channel: Channel;
-  private _activeButton: OutputSwitcherButton;
-  private readonly _status: {isSwitchable:boolean, isLoading:boolean};
-  private readonly _pushStatus: PushValue<{isSwitchable:boolean, isLoading:boolean}>[];
+  private readonly _isSwitchable:WritableSignal<boolean>;
+  private readonly _isLoading:WritableSignal<boolean>;
+  private readonly _switcherButtons: Printable[];
 
-  constructor(channel: Channel) {
-    this._channel = channel;
-    this._activeButton = new OutputSwitcherButtonStub();
-    this._status = {
-      isSwitchable: false,
-      isLoading: false,
-    };
-    this._pushStatus = [];
+  constructor(switcherButtons: Printable[]) {
+    this._switcherButtons = switcherButtons;
+    this._isSwitchable = signal(true);
+    this._isLoading = signal(false);
   }
 
-  requestFormatSwitch(outputSwitcherButton: OutputSwitcherButton): void {
-    this._activeButton = outputSwitcherButton;
-    this._status.isLoading = true;
-    this._pushStatus.forEach(value => value.update(this._status));
-    this._channel.request(outputSwitcherButton.requestData());
-  }
-
-  outputTypeIsValid(outputType:string): boolean {
-    let isValid:boolean = true;
-    if(!this._activeButton.isStub()){
-      isValid = outputType === this._activeButton.outputType();
-    }
-    return isValid;
-  }
-
-  activeButton(): OutputSwitcherButton {
-    return this._activeButton;
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      children:computed(() => []),
+      componentView: new ComponentViewImpl(OutputSwitcherView, computed(() => ({
+        switcherButtons: this._switcherButtons,
+        switchIsPending: this._isLoading(),
+        outputIsSwitchable: this._isSwitchable(),
+      })))
+    }));
   }
 
   response(data: object): void {
@@ -92,13 +80,12 @@ export class OutputSwitcherImpl implements OutputSwitcher {
       const paragraphOutputData = new SafeJsonImpl(message.data());
       const safeOutput = new SafeJsonImpl(paragraphOutputData.getProperty('output', 'object'));
       if(safeOutput.propertyExists('isAggregated')){
-        this._status.isSwitchable = safeOutput.getProperty('isAggregated', 'boolean');
+        this._isSwitchable.set(safeOutput.getProperty('isAggregated', 'boolean'));
       }
       else{
-        this._status.isSwitchable = false;
+        this._isSwitchable.set(false);
       }
-      this._status.isLoading = false;
-      this._pushStatus.forEach(value => value.update(this._status));
+      this._isLoading.set(false);
     }
   }
 }

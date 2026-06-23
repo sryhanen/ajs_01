@@ -43,10 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputSwitcherButton} from '../switcher/button/outputSwitcherButton';
 import {Printable} from '../../rendering/printable/printable';
 import {Channel} from '../../channel/channel';
 
 export interface OutputFormat extends Channel, Printable {
-  switcherButtons(): OutputSwitcherButton[];
+  switcherButtons(): Printable[];
 }

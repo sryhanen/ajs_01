@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {Channel} from '../../../channel/channel';
 import {DataTableSwitcherButton} from './switcherButton/dataTablesSwitcherButton';
 import {OutputFormat} from '../outputFormat';
@@ -62,10 +61,11 @@ import {DataTablesPluginStub} from './dataTablesPlugin/dataTablesPluginStub';
 import {
   DataTablesOutputView
 } from '../../../../ui/angular2+/output/outputViews/dataTablesOutputView/dataTablesOutputView';
+import {Printable} from '../../../rendering/printable/printable';
 
 export class DataTablesFormat implements OutputFormat {
   private readonly _channel: Channel;
-  private readonly _switcherButtons: OutputSwitcherButton[];
+  private readonly _switcherButtons: Printable[];
   private readonly _componentViewStub: ComponentView;
   private readonly _componentView: WritableSignal<ComponentView>;
   private readonly _pluginStub: DataTablesPlugin;
@@ -74,7 +74,7 @@ export class DataTablesFormat implements OutputFormat {
   constructor(channel: Channel) {
     this._channel = channel;
     this._switcherButtons = [
-      new DataTableSwitcherButton()
+      new DataTableSwitcherButton(this)
     ];
     this._componentViewStub = new ComponentViewStub();
     this._componentView = signal(this._componentViewStub);
@@ -114,7 +114,7 @@ export class DataTablesFormat implements OutputFormat {
     this._channel.request(data);
   }
 
-  switcherButtons(): OutputSwitcherButton[] {
+  switcherButtons(): Printable[] {
     return this._switcherButtons;
   }
 }

@@ -44,38 +44,37 @@
  * a licensee so wish it.
  */
 import {
-  Component,
-  Input, OnInit, signal,
+  Component, input,
+  OnInit,
 } from '@angular/core';
-import {OutputSwitcher} from '../../../../objects/output/switcher/outputSwitcher';
-import {OutputSwitcherButtonView} from './button/outputSwitcherButtonView';
-import {OutputSwitcherButton} from '../../../../objects/output/switcher/button/outputSwitcherButton';
-import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writableSignalAsPushValue';
+import {Printable} from '../../../../objects/rendering/printable/printable';
+import {NgComponentOutlet} from '@angular/common';
 
 @Component({
   selector: 'output-switcher',
   imports: [
-    OutputSwitcherButtonView
+    NgComponentOutlet
   ],
   template: `
-    @let status = this.switcherStatus();
-    @if (status.isSwitchable) {
+    @if (outputIsSwitchable()) {
       <div class="btn-group" role="group">
-        @for (button of outputSwitcherButtons; track $index) {
-          <output-switcher-button class="btn-group" [outputSwitcherButton]="button"
-                                  [outputSwitcher]="outputSwitcher"></output-switcher-button>
+        @for (button of switcherButtons(); track $index) {
+          @let componentView = button.print()().componentView;
+          <ng-container
+            *ngComponentOutlet="componentView.component(); inputs: componentView.inputs()()">
+          </ng-container>
         }
       </div>
-      @if (status.isLoading) {
+      @if (switchIsPending()) {
         <div class="spinner-border mx-2 text-primary" role="status"></div>
       }
     }
   `
 })
 export class OutputSwitcherView implements OnInit{
-  @Input({required:true}) outputSwitcher:OutputSwitcher;
-  @Input({required:true}) outputSwitcherButtons: OutputSwitcherButton[];
-  protected switcherStatus = signal({isSwitchable:false, isLoading:false});
+  switcherButtons = input.required<Printable[]>();
+  switchIsPending= input.required<boolean>();
+  outputIsSwitchable= input.required<boolean>();
 
   ngOnInit(): void {
   }

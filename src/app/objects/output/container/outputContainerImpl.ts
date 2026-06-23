@@ -55,10 +55,13 @@ import {ComponentViewStub} from '../../rendering/componentView/componentViewStub
 import {TextFormat} from '../format/text/textFormat';
 import {uPlotFormat} from '../format/uPlot/uPlotFormat';
 import {AngularFormat} from '../format/angular/angularFormat';
+import {OutputSwitcher} from '../switcher/outputSwitcher';
+import {OutputSwitcherImpl} from '../switcher/outputSwitcherImpl';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
   private readonly _outputFormats:OutputFormat[];
+  private readonly _outputSwitcher:OutputSwitcher;
   private readonly _componentView:ComponentView;
   private readonly _paragraphId:string;
 
@@ -71,6 +74,8 @@ export class OutputContainerImpl implements OutputContainer{
       new TextFormat(this),
       new AngularFormat(this),
     ];
+    const buttons = this._outputFormats.map(format => format.switcherButtons());
+    this._outputSwitcher = new OutputSwitcherImpl(buttons.flat());
     this._paragraphId = paragraphId;
     this._componentView = new ComponentViewStub();
   }
@@ -89,7 +94,9 @@ export class OutputContainerImpl implements OutputContainer{
         paragraphId:this._paragraphId,
         componentView: this._componentView,
         children: computed(() => {
-          const renderableList: RenderNode[] = [];
+          const renderableList: RenderNode[] = [
+            this._outputSwitcher.print()()
+          ];
           this._outputFormats.forEach(outputFormat => {
             renderableList.push(outputFormat.print()());
           });

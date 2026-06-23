@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import {OutputFormat} from '../outputFormat';
-import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
 import {GraphType} from './graphType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
@@ -59,20 +58,21 @@ import {ComponentViewStub} from '../../../rendering/componentView/componentViewS
 import {UPlotPluginImpl} from './uPlotPlugin/uPlotPluginImpl';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 import {UPlotOutputView} from '../../../../ui/angular2+/output/outputViews/uPlotOutputView/uPlotOutputView';
+import {Printable} from '../../../rendering/printable/printable';
 
 export class uPlotFormat implements OutputFormat {
   private readonly _channel: Channel;
-  private readonly _switcherButtons:OutputSwitcherButton[];
+  private readonly _switcherButtons: Printable[];
   private readonly _componentViewStub: ComponentView;
   private readonly _componentView: WritableSignal<ComponentView>;
 
   constructor(channel: Channel) {
     this._channel = channel;
     this._switcherButtons = [
-      new uPlotSwitcherButton('Line Chart', 'fas fa-chart-line', GraphType.line),
-      new uPlotSwitcherButton('Area Chart', 'fas fa-chart-area', GraphType.area),
-      new uPlotSwitcherButton('Bar Chart', 'fas fa-chart-bar', GraphType.bar),
-      new uPlotSwitcherButton('Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
+      new uPlotSwitcherButton(this,'Line Chart', 'fas fa-chart-line', GraphType.line),
+      new uPlotSwitcherButton(this,'Area Chart', 'fas fa-chart-area', GraphType.area),
+      new uPlotSwitcherButton(this,'Bar Chart', 'fas fa-chart-bar', GraphType.bar),
+      new uPlotSwitcherButton(this,'Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
     this._componentViewStub = new ComponentViewStub();
     this._componentView = signal(this._componentViewStub);
@@ -104,7 +104,7 @@ export class uPlotFormat implements OutputFormat {
     }));
   }
 
-  switcherButtons(): OutputSwitcherButton[] {
+  switcherButtons(): Printable[] {
     return this._switcherButtons;
   }
 }

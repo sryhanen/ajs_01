@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import {OutputFormat} from '../outputFormat';
-import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {Channel} from '../../../channel/channel';
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
@@ -58,6 +57,7 @@ import {ComponentViewStub} from '../../../rendering/componentView/componentViewS
 import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 import {AngularOutputView} from '../../../../ui/angular2+/output/outputViews/angularOutputView/angularOutputView';
+import {Printable} from '../../../rendering/printable/printable';
 
 export class AngularFormat implements OutputFormat {
   private readonly _channel: Channel;
@@ -96,7 +96,7 @@ export class AngularFormat implements OutputFormat {
     }));
   }
 
-  switcherButtons(): OutputSwitcherButton[] {
+  switcherButtons(): Printable[] {
     return [];
   }
 }
