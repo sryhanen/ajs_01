@@ -47,20 +47,14 @@ import {OutputContainer} from './outputContainer';
 import {Channel} from '../../channel/channel';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {OutputContainerImpl} from './outputContainerImpl';
-import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
-import {PushValue} from '../../pushValue/pushValue';
-import {OutputPlugin} from '../plugins/outputPlugin';
-import {PushValueImpl} from '../../pushValue/pushValueImpl';
 
 describe('OutputContainer', () => {
   let channel:Channel;
   let outputContainer:OutputContainer;
-  let outputPlugin: PushValue<OutputPlugin>;
 
   beforeEach(() => {
     channel = new FakeChannel();
-    outputContainer = new OutputContainerImpl(channel, {} as AngularObjectCollection);
-    outputPlugin = new PushValueImpl();
+    outputContainer = new OutputContainerImpl(channel, 'paragraphId');
   });
 
   describe('Birth', () => {
@@ -68,21 +62,8 @@ describe('OutputContainer', () => {
       expect(outputContainer).toBeInstanceOf(OutputContainerImpl);
     });
 
-    it('Should have outputSwitcher', () =>{
-      expect(outputContainer.outputSwitcher()).toBeDefined();
-    });
-
-    it('Should have outputFormats', () =>{
-      expect(outputContainer.outputFormats()).toHaveLength(5);
-    });
-
-    it('Should have error listener', () =>{
-      expect(outputContainer.errorListener()).toBeDefined();
-    });
-
-    it('Should have outputPlugin stub', () => {
-      outputContainer.outputPlugin(outputPlugin);
-      expect(outputPlugin.value().isStub()).toBe(true);
+    it('Should print', () => {
+      expect(outputContainer.print()).toBeDefined();
     });
   });
 
