@@ -69,11 +69,11 @@ export class UPlotOutputView implements AfterViewInit, OnChanges {
     }
     this.anchor.nativeElement.replaceChildren();
     const plugin = new UPlotPluginImpl(this.uPlotData(), this.uPlotOptions());
-    plugin.initializeUPlot(this.anchor.nativeElement);
+    plugin.initializedUPlot(this.anchor.nativeElement);
   }
 
   ngAfterViewInit() {
     const plugin = new UPlotPluginImpl(this.uPlotData(), this.uPlotOptions());
-    plugin.initializeUPlot(this.anchor.nativeElement);
+    plugin.initializedUPlot(this.anchor.nativeElement);
   }
 }

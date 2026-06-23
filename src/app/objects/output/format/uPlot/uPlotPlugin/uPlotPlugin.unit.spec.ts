@@ -45,8 +45,7 @@
  */
 import uPlot from 'uplot';
 import {GraphType} from '../graphType';
-import {UPlotPluginImpl} from './UPlotPluginImpl';
-import {OutputType} from '../../../outputType';
+import {UPlotPluginImpl} from './uPlotPluginImpl';
 
 describe('uPlotOutput', () => {
   const data:uPlot.AlignedData = [
@@ -68,13 +67,11 @@ describe('uPlotOutput', () => {
     it('Should be initialized', () => {
       expect(microPlotPlugin).toBeInstanceOf(UPlotPluginImpl);
     });
+  });
 
-    it('Should have output type', () => {
-      expect(microPlotPlugin.outputType()).toBe(OutputType.uPlot);
-    });
-
-    it('Should not be stub', () => {
-      expect(microPlotPlugin.isStub()).toBe(false);
+  describe('Initialized uPlot', () => {
+    it('Should return', () => {
+      expect(microPlotPlugin.initializedUPlot(document.createElement('div'))).toBeDefined();
     });
   });
 });

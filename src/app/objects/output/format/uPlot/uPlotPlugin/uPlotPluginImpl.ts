@@ -61,7 +61,7 @@ export class UPlotPluginImpl implements UPlotPlugin {
     this._outputOptions = outputOptions;
   }
 
-  initializeUPlot(htmlElement:HTMLElement):void {
+  initializedUPlot(htmlElement:HTMLElement):uPlot {
     const safeOutputOptions = new SafeJsonImpl(this._outputOptions);
     const uPlotOutputOptions = {
       labels:safeOutputOptions.getProperty<string[]>('labels', 'object'),
@@ -82,5 +82,6 @@ export class UPlotPluginImpl implements UPlotPlugin {
     const graph = new uPlot(uPlotOptions, this._outputData, htmlElement);
     size.registerToWindow(graph);
     size.registerToElement(graph, htmlElement);
+    return graph;
   }
 }

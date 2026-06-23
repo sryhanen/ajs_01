@@ -43,6 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import uPlot from 'uplot';
 export interface UPlotPlugin {
-  initializeUPlot(htmlElement:HTMLElement):void;
+  initializedUPlot(htmlElement:HTMLElement): uPlot;
 }
