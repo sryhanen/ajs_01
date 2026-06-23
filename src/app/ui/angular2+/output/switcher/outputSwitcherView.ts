@@ -71,11 +71,8 @@ import {NgComponentOutlet} from '@angular/common';
     }
   `
 })
-export class OutputSwitcherView implements OnInit{
+export class OutputSwitcherView {
   switcherButtons = input.required<Printable[]>();
   switchIsPending= input.required<boolean>();
   outputIsSwitchable= input.required<boolean>();
-
-  ngOnInit(): void {
-  }
 }

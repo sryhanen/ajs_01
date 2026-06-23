@@ -71,8 +71,8 @@ export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
   }
 
   isAggregated(): boolean {
-    const safeData = this.safeData();
-    return safeData.propertyExists('isAggregated') && safeData.getProperty('isAggregated', 'boolean');
+    const safeOutputData = this.safeOutputData();
+    return safeOutputData.propertyExists('isAggregated') && safeOutputData.getProperty('isAggregated', 'boolean');
   }
 
   operation(): string {

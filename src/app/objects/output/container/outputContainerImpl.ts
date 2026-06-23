@@ -80,12 +80,13 @@ export class OutputContainerImpl implements OutputContainer{
     this._componentView = new ComponentViewStub();
   }
 
-  request(data: object): void {
-    this._channel.request(data);
+  request(json: object): void {
+    this._channel.request(json);
   }
 
-  response(data: object): void {
-    this._outputFormats.forEach(format => format.response(data));
+  response(json: object): void {
+    this._outputSwitcher.response(json);
+    this._outputFormats.forEach(format => format.response(json));
   }
 
   print(): Signal<RenderNode> {

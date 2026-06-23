@@ -51,16 +51,17 @@ import { RenderNode } from '../../rendering/renderNode/renderNode';
 import {Printable} from '../../rendering/printable/printable';
 import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
 import {OutputSwitcherView} from '../../../ui/angular2+/output/switcher/outputSwitcherView';
+import {ParagraphOutputMessageImpl} from '../paragraphOutputMessage/paragraphOutputMessageImpl';
 
 export class OutputSwitcherImpl implements OutputSwitcher {
-  private readonly _isSwitchable:WritableSignal<boolean>;
-  private readonly _isLoading:WritableSignal<boolean>;
+  private readonly _outputIsSwitchable:WritableSignal<boolean>;
+  private readonly _switchIsPending:WritableSignal<boolean>;
   private readonly _switcherButtons: Printable[];
 
   constructor(switcherButtons: Printable[]) {
     this._switcherButtons = switcherButtons;
-    this._isSwitchable = signal(true);
-    this._isLoading = signal(false);
+    this._outputIsSwitchable = signal(false);
+    this._switchIsPending = signal(false);
   }
 
   print(): Signal<RenderNode> {
@@ -68,8 +69,8 @@ export class OutputSwitcherImpl implements OutputSwitcher {
       children:computed(() => []),
       componentView: new ComponentViewImpl(OutputSwitcherView, computed(() => ({
         switcherButtons: this._switcherButtons,
-        switchIsPending: this._isLoading(),
-        outputIsSwitchable: this._isSwitchable(),
+        switchIsPending: this._switchIsPending(),
+        outputIsSwitchable: this._outputIsSwitchable(),
       })))
     }));
   }
@@ -77,15 +78,9 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   response(data: object): void {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputData = new SafeJsonImpl(message.data());
-      const safeOutput = new SafeJsonImpl(paragraphOutputData.getProperty('output', 'object'));
-      if(safeOutput.propertyExists('isAggregated')){
-        this._isSwitchable.set(safeOutput.getProperty('isAggregated', 'boolean'));
-      }
-      else{
-        this._isSwitchable.set(false);
-      }
-      this._isLoading.set(false);
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
+      this._outputIsSwitchable.set(paragraphOutputMessage.isAggregated());
+      this._switchIsPending.set(false);
     }
   }
 }
