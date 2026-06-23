@@ -47,9 +47,6 @@ import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {ParagraphImpl} from './paragraphImpl';
 import {Paragraph} from './paragraph';
-import {OutputContainerImpl} from '../output/container/outputContainerImpl';
-import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
-import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
 
 describe('Paragraph', () => {
   const paragraphId = 'paragraphId';
@@ -78,8 +75,7 @@ describe('Paragraph', () => {
       id:paragraphId
     };
     channel = new FakeChannel();
-    const angularObjectCollection: AngularObjectCollection = new AngularObjectCollectionImpl(channel);
-    paragraph = new ParagraphImpl(channel, paragraphData, angularObjectCollection);
+    paragraph = new ParagraphImpl(channel, paragraphData);
   });
 
   describe('Birth', () => {
@@ -91,50 +87,29 @@ describe('Paragraph', () => {
       expect(paragraph.id()).toEqual(paragraphId);
     });
 
-    it('Should have OutputContainer', () => {
-      expect(paragraph.outputContainer()).toBeInstanceOf(OutputContainerImpl);
+    it('Should print', () => {
+      const paragraphPrinted = paragraph.print()();
+      expect(paragraphPrinted).toBeDefined();
     });
   });
 
-  describe('Response', () => {
-    describe('Filters responses', () => {
-      let containerSpy;
-      beforeEach(() => {
-        containerSpy = vi.spyOn(paragraph.outputContainer(), 'response');
-      });
-
-      it('Should respond container if data has matching id', () => {
-        const response = {
-          op:'',
-          data:{
-            paragraphId: paragraphId,
-          }
-        };
-        paragraph.response(response);
-        expect(containerSpy).toHaveBeenCalledExactlyOnceWith(response);
-      });
-
-      it('Should not respond container if data has wrong id', () => {
-        const response = {
-          op:'',
-          data:{
-            paragraphId: 'wrongId',
-          }
-        };
-        paragraph.response(response);
-        expect(containerSpy).toHaveBeenCalledTimes(0);
-      });
-
-      it('Should respond container if paragraphId is missing', () => {
-        const response = {
-          op:'response',
-          data:{
-            test:'test',
-          }
-        };
-        paragraph.response(response);
-        expect(containerSpy).toHaveBeenCalledExactlyOnceWith(response);
-      });
+  describe('Request', () => {
+    it('Should decorate request with paragraphId', () => {
+      const request = {
+        op:'',
+        data:{
+          paragraphId:''
+        }
+      };
+      const expectedRequest = {
+        op:'',
+        data:{
+          paragraphId:paragraphId
+        }
+      };
+      const spy = vi.spyOn(channel, 'request');
+      paragraph.request(request);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
     });
   });
 });
