@@ -44,20 +44,14 @@
  * a licensee so wish it.
  */
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {AngularFormat} from './angularFormat';
-import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
-import {OutputType} from '../../outputType';
-import {AngularPluginImpl} from '../../plugins/angularPlugin/angularPluginImpl';
 
 describe('AngularFormat', () => {
   const channel = new FakeChannel();
-  let angularObjectCollection: AngularObjectCollection;
   let angularFormat: AngularFormat;
 
   beforeEach(() => {
-    angularObjectCollection = new AngularObjectCollectionImpl(channel);
-    angularFormat = new AngularFormat(channel, angularObjectCollection);
+    angularFormat = new AngularFormat(channel);
   });
 
   describe('Birth', () => {
@@ -65,26 +59,40 @@ describe('AngularFormat', () => {
       expect(angularFormat).toBeInstanceOf(AngularFormat);
     });
 
-    it('Should have output type', () => {
-      expect(angularFormat.outputType()).toEqual(OutputType.angular);
-    });
-
     it('Should not have switcherButtons', () => {
       expect(angularFormat.switcherButtons()).toEqual([]);
     });
   });
 
-  describe('Plugin formatting', () => {
-    const pluginData = {
-      data:'<h1>{{test}}</h1>'
-    };
+  describe('Request', () => {
+    it('Should request channel', () => {
+      const spy = vi.spyOn(channel, 'request');
+      const request = {
+        op:'',
+        data:{}
+      };
+      angularFormat.request(request);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+  });
 
-    it('Should return plugin', () => {
-      expect(angularFormat.plugin(pluginData)).toBeInstanceOf(AngularPluginImpl);
+  describe('ComponentView updates', () => {
+    it('Should have component view stub', () => {
+      expect(angularFormat.print()().componentView.isStub()).toBe(true);
     });
 
-    it('Should validate plugin data', () => {
-      expect(() => angularFormat.plugin({})).toThrow();
+    it('Should not have stub after output response', () => {
+      const outputResponse = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{
+            type:'angular',
+            data:'',
+          }
+        }
+      };
+      angularFormat.response(outputResponse);
+      expect(angularFormat.print()().componentView.isStub()).toBe(false);
     });
   });
 });
