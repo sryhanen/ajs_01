@@ -88,7 +88,8 @@ describe('AngularPluginAjs', () => {
         request(data: object) {}
       };
       angularPluginAjs.angularObjects = [
-
+        angularObject1,
+        angularObject2,
       ];
       angularPluginAjs.$postLink();
     });

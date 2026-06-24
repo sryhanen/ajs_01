@@ -59,7 +59,7 @@ describe('NoteResponse', () => {
 
   beforeEach(() => {
     channel = new FakeChannel();
-    notebook = new NotebookImpl(channel, {id:notebookId});
+    notebook = new NotebookImpl(channel, {id:notebookId, paragraphs:[]});
     notebookSignal = signal(notebook);
     noteResponse = new NoteResponse(channel, notebookSignal);
   });
@@ -77,6 +77,7 @@ describe('NoteResponse', () => {
         op:'NOTE',
         data:{
           id:newNotebookId,
+          paragraphs:[]
         }
       };
       noteResponse.response(response);

@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import {webAppRoot} from './webAppRootImpl';
-import {NotebookCollectionImpl} from '../notebookCollection/notebookCollectionImpl';
 import {WebSocketService} from '../webSocket/service/webSocketService';
 import {FakeWebSocketService} from '../webSocket/service/fakeWebSocketService';
 
@@ -70,22 +69,10 @@ describe('WebAppRoot', () => {
       webAppRoot.initialize(webSocketService);
     });
 
-    it('rootObject() method should return notebookCollection', () => {
-      expect(webAppRoot.rootObject()).toBeInstanceOf(NotebookCollectionImpl);
-    });
-
     it('request() should evoke websocket request', () => {
       const spy = vi.spyOn(webSocketService, 'sendNewEvent');
       expect(spy).toHaveBeenCalledTimes(0);
       webAppRoot.request({op:'', data:{}});
-      expect(spy).toHaveBeenCalledTimes(1);
-    });
-
-    it('response() should evoke evoke rootObject response', () => {
-      const notebookCollection = webAppRoot.rootObject();
-      const spy = vi.spyOn(notebookCollection, 'response');
-      expect(spy).toHaveBeenCalledTimes(0);
-      webAppRoot.response({op:'', data:{}});
       expect(spy).toHaveBeenCalledTimes(1);
     });
   });

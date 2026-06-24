@@ -57,7 +57,8 @@ describe('ParagraphResponder', () => {
 
   beforeEach(() => {
     channel = new FakeChannel();
-    paragraphs = signal(new Map([]));
+    paragraphs = signal(new Map());
+    decoratorParagraphs = signal(new Map());
   });
 
   describe('Birth', () => {
