@@ -68,9 +68,10 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
 
   constructor(channel: Channel, initialParagraphData: object[]) {
     this._paragraphs = this.initializedParagraphs(initialParagraphData);
+    this._decoratorParagraphs = this.initializedDecoratorParagraphs(initialParagraphData);
     this._responses = [
-      new ParagraphResponse(channel, this._paragraphs, this._decoratorParagraphs),
-      new ParagraphAddedResponse(channel, this._paragraphs, this._decoratorParagraphs),
+      new ParagraphResponse(this, this._paragraphs, this._decoratorParagraphs),
+      new ParagraphAddedResponse(this, this._paragraphs, this._decoratorParagraphs),
       new ParagraphRemovedResponse(this._paragraphs, this._decoratorParagraphs),
     ];
     this._requests = [
@@ -78,6 +79,15 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       new RunParagraphRequest(channel, this._decoratorParagraphs)
     ];
     this._componentView = new ComponentViewStub();
+  }
+
+  private initializedDecoratorParagraphs(initialParagraphData: object[]): WritableSignal<Map<string,  object>>{
+    const paragraphMap = new Map<string, object>();
+    initialParagraphData.forEach(paragraphData => {
+      const paragraph = new ParagraphImpl(this, paragraphData);
+      paragraphMap.set(paragraph.id(), paragraphData);
+    });
+    return signal(paragraphMap);
   }
 
   private initializedParagraphs(initialParagraphData: object[]): WritableSignal<Map<string,  Paragraph>> {
