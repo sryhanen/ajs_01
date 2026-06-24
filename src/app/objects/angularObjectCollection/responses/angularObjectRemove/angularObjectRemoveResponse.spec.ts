@@ -44,12 +44,10 @@
  * a licensee so wish it.
  */
 import {AngularObject} from '../../../angularObject/angularObject';
-import {PushValue} from '../../../pushValue/pushValue';
 import {AngularObjectRemoveResponse} from './angularObjectRemoveResponse';
 import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 
 describe('AngularObjectRemoveResponse', () => {
   const defaultAngularObjectData =  {
@@ -62,15 +60,13 @@ describe('AngularObjectRemoveResponse', () => {
   let channel:Channel;
   let defaultAngularObject: AngularObject;
   let angularObjects: AngularObject[];
-  let pushValues:PushValue<AngularObject[]>[];
   let angularObjectRemoveResponse:AngularObjectRemoveResponse;
 
   beforeEach(() => {
     channel = new FakeChannel();
     defaultAngularObject = new AngularObjectImpl(channel, defaultAngularObjectData, interpreterGroupId);
     angularObjects = [defaultAngularObject];
-    pushValues = [new PushValueImpl()];
-    angularObjectRemoveResponse = new AngularObjectRemoveResponse(angularObjects, pushValues);
+    angularObjectRemoveResponse = new AngularObjectRemoveResponse(angularObjects);
   });
 
   describe('Birth', () => {
@@ -93,7 +89,6 @@ describe('AngularObjectRemoveResponse', () => {
     it('Should remove object', () => {
       angularObjectRemoveResponse.response(response);
       expect(angularObjects).toEqual([]);
-      expect(pushValues[0].value()).toEqual(angularObjects);
     });
 
     it('Should throw if object is not in the collection remove object', () => {

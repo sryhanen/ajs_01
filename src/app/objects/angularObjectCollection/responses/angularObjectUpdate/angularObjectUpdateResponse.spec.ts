@@ -45,10 +45,8 @@
  */
 import {Channel} from '../../../channel/channel';
 import {AngularObject} from '../../../angularObject/angularObject';
-import {PushValue} from '../../../pushValue/pushValue';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
-import {PushValueImpl} from '../../../pushValue/pushValueImpl';
 import {AngularObjectUpdateResponse} from './angularObjectUpdateResponse';
 
 describe('AngularObjectUpdateResponse', () => {
@@ -63,15 +61,13 @@ describe('AngularObjectUpdateResponse', () => {
   let channel:Channel;
   let defaultAngularObject: AngularObject;
   let angularObjects: AngularObject[];
-  let pushValues:PushValue<AngularObject[]>[];
   let angularObjectUpdateResponse:AngularObjectUpdateResponse;
 
   beforeEach(() => {
     channel = new FakeChannel();
     defaultAngularObject = new AngularObjectImpl(channel, defaultAngularObjectData, interpreterGroupId);
     angularObjects = [defaultAngularObject];
-    pushValues = [new PushValueImpl()];
-    angularObjectUpdateResponse = new AngularObjectUpdateResponse(channel, angularObjects, pushValues);
+    angularObjectUpdateResponse = new AngularObjectUpdateResponse(channel, angularObjects);
   });
 
   describe('Birth', () => {
@@ -103,7 +99,6 @@ describe('AngularObjectUpdateResponse', () => {
       expect(angularObjects).toHaveLength(1);
       expect(angularObjects[0].name()).toEqual(defaultAngularObjectData.name);
       expect(angularObjects[0].value()).toEqual(newValue);
-      expect(pushValues[0].value()).toEqual(angularObjects);
     });
 
     it('Should add new object to the collection', () => {
@@ -113,7 +108,6 @@ describe('AngularObjectUpdateResponse', () => {
       expect(angularObjects).toHaveLength(2);
       expect(angularObjects[1].name()).toEqual(newName);
       expect(angularObjects[1].value()).toEqual(newValue);
-      expect(pushValues[0].value()).toEqual(angularObjects);
     });
   });
 });
