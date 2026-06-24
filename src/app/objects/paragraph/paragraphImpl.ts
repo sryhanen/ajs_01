@@ -56,6 +56,7 @@ import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {Response} from '../channel/response';
 import {MessagePropertyFilterImpl} from '../messagePropertyFilter/messagePropertyFilterImpl';
+import {ParagraphDataAsOutputMessageImpl} from './paragraphDataAsOutputMessage/paragraphDataAsOutputMessageImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
@@ -69,21 +70,14 @@ export class ParagraphImpl implements Paragraph {
     this._paragraph = new SafeJsonImpl(paragraph);
     this._outputContainer = new OutputContainerImpl(this, this.id());
 
-    if (this._paragraph.propertyExists('output')) {
-      const paragraphOutput = this._paragraph.getProperty<object>('output', 'object');
-      if (paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined) {
-        console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
-      } else {
-        const paragraphOutputMessage = {
-          op: 'PARAGRAPH_OUTPUT',
-          data: {
-            noteId: '',
-            paragraphId: '',
-            output: paragraphOutput,
-          }
-        };
-        this._outputContainer.response(paragraphOutputMessage);
-      }
+    const paragraphDataAsOutputMessage = new ParagraphDataAsOutputMessageImpl(paragraph);
+    const paragraphOutputMessage = paragraphDataAsOutputMessage.paragraphOutputMessage();
+    if(!paragraphOutputMessage.isStub()){
+      const paragraphOutputMessageData = {
+        op:paragraphOutputMessage.operation(),
+        data:paragraphOutputMessage.data(),
+      };
+      this._outputContainer.response(paragraphOutputMessageData);
     }
     this._componentView = new ComponentViewStub();
     this._respondable = [
