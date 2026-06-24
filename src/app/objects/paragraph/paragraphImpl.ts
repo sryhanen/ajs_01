@@ -49,7 +49,6 @@ import {OutputContainer} from '../output/container/outputContainer';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {MessageImpl} from '../message/messageImpl';
 import {computed, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
@@ -63,6 +62,11 @@ import {
   ResponseRegisterWithDefaultResponseList
 } from '../register/responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
 import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
+import {RequestRegister} from '../register/requestRegister/requestRegister';
+import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterImpl';
+import {
+  RequestRegisterWithPropertyDecorator
+} from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
@@ -70,6 +74,7 @@ export class ParagraphImpl implements Paragraph {
   private readonly _paragraph: SafeJson;
   private readonly _componentView: ComponentView;
   private readonly _responseRegister:ResponseRegister;
+  private readonly _requestRegister:RequestRegister;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
@@ -87,6 +92,7 @@ export class ParagraphImpl implements Paragraph {
     }
     this._componentView = new ComponentViewStub();
     this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer]), {name:'paragraphId', type:'string'}, this.id());
+    this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
   }
 
   print(): Signal<RenderNode> {
@@ -100,21 +106,8 @@ export class ParagraphImpl implements Paragraph {
     return this._paragraph.getProperty('id', 'string');
   }
 
-  request(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    const messageData = new SafeJsonImpl(message.data());
-    if(messageData.propertyExists('paragraphId')){
-      const decoratedData = message.data();
-      decoratedData['paragraphId'] = this.id();
-      const decoratedRequest = {
-        op:message.operation(),
-        data:decoratedData,
-      };
-      this._channel.request(decoratedRequest);
-    }
-    else {
-      this._channel.request(data);
-    }
+  request(json: object): void {
+    this._requestRegister.request(json);
   }
 
   response(json: object): void {

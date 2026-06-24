@@ -162,10 +162,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   request(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    if(message.operation() !== 'RUN_PARAGRAPH'){
-      this._channel.request(data);
-    }
     this._requestRegister.request(data);
   }
 

@@ -45,10 +45,8 @@
  */
 import {Notebook} from './notebook';
 import {Channel} from '../channel/channel';
-import {Response} from '../channel/response';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {SafeJson} from '../safeJson/safeJson';
-import {MessageImpl} from '../message/messageImpl';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 import {computed, Signal} from '@angular/core';
@@ -63,6 +61,11 @@ import {
 import {
   ResponseRegisterWithPropertyFilter
 } from '../register/responseRegister/responseRegisterWithPropertyFilter/responseRegisterWithPropertyFilter';
+import {RequestRegister} from '../register/requestRegister/requestRegister';
+import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterImpl';
+import {
+  RequestRegisterWithPropertyDecorator
+} from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
@@ -70,6 +73,7 @@ export class NotebookImpl implements Notebook {
   private readonly _paragraphCollection: ParagraphCollection;
   private readonly _componentView:ComponentView;
   private readonly _responseRegister:ResponseRegister;
+  private readonly _requestRegister:RequestRegister;
 
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
@@ -77,6 +81,7 @@ export class NotebookImpl implements Notebook {
     this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
     this._componentView = new ComponentViewStub();
     this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._paragraphCollection]),{name:'noteId', type:'string'}, this.id());
+    this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'noteId', value:this.id()});
   }
 
   print(): Signal<RenderNode> {
@@ -94,21 +99,8 @@ export class NotebookImpl implements Notebook {
     return this._notebook.getProperty('id', 'string');
   }
 
-  request(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    const messageData = new SafeJsonImpl(message.data());
-    if(messageData.propertyExists('noteId')){
-      const decoratedData = message.data();
-      decoratedData['noteId'] = this.id();
-      const decoratedRequest = {
-        op:message.operation(),
-        data:decoratedData,
-      };
-      this._channel.request(decoratedRequest);
-    }
-    else{
-      this._channel.request(data);
-    }
+  request(json: object): void {
+    this._requestRegister.request(json);
   }
 
   response(json: object): void {
