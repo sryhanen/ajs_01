@@ -43,30 +43,65 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Response} from '../../channel/response';
-import {MessageImpl} from '../../message/messageImpl';
-import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
+import {Response} from '../channel/response';
+import {MessagePropertyFilterImpl} from './messagePropertyFilterImpl';
 
-export class NotebookIdFilterImpl implements Response{
-  private readonly _paragraphCollection: ParagraphCollection;
-  private readonly _id:string;
+describe('MessagePropertyFilter unit test', () => {
+  const value = 'someValue';
+  const property = {name: 'keyForSomeValue', type: 'string'};
+  let respondable: Response & { responseMessage():object; };
+  let responseMessage:object;
+  let messagePropertyFilter: Response;
 
-  constructor(paragraphCollection: ParagraphCollection, id:string){
-    this._paragraphCollection = paragraphCollection;
-    this._id = id;
-  }
-
-  response(json: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(json));
-    const messageData = new SafeJsonImpl(message.data());
-    if(messageData.propertyExists('noteId')){
-      if(messageData.getProperty('noteId', 'string') === this._id){
-        this._paragraphCollection.response(json);
+  beforeEach(() => {
+    responseMessage = {};
+    respondable = {
+      response(data: object): void {
+        responseMessage = data;
+      },
+      responseMessage(): object{
+        return responseMessage;
       }
-    }
-    else{
-      this._paragraphCollection.response(json);
-    }
-  }
-}
+    };
+    messagePropertyFilter = new MessagePropertyFilterImpl([respondable], property, value);
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(messagePropertyFilter).toBeDefined();
+    });
+  });
+
+  describe('Filtering', () => {
+    it('Should respond respondables if property exists and value matches', () => {
+      const response = {
+        op:'',
+        data:{
+          keyForSomeValue:'someValue'
+        }
+      };
+      messagePropertyFilter.response(response);
+      expect(respondable.responseMessage()).toEqual(response);
+    });
+
+    it('Should respond respondables if property does not exist', () => {
+      const response = {
+        op:'',
+        data:{}
+      };
+      messagePropertyFilter.response(response);
+      expect(respondable.responseMessage()).toEqual(response);
+    });
+
+    it('Should not respond respondables if property exists and value does not match', () => {
+      const response = {
+        op:'',
+        data:{
+          keyForSomeValue:'wrongValue'
+        }
+      };
+      messagePropertyFilter.response(response);
+      expect(respondable.responseMessage()).toEqual({});
+    });
+  });
+});

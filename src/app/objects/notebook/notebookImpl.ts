@@ -55,22 +55,22 @@ import {computed, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
-import {NotebookIdFilterImpl} from './notebookIdFilter/notebookIdFilterImpl';
+import {MessagePropertyFilterImpl} from '../messagePropertyFilter/messagePropertyFilterImpl';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
   private readonly _notebook: SafeJson;
   private readonly _paragraphCollection: ParagraphCollection;
   private readonly _componentView:ComponentView;
-  private readonly _responses:Response[];
+  private readonly _respondables:Response[];
 
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
     this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
     this._componentView = new ComponentViewStub();
-    this._responses = [
-      new NotebookIdFilterImpl(this._paragraphCollection, this.id())
+    this._respondables = [
+      new MessagePropertyFilterImpl([this._paragraphCollection], {name:'noteId', type:'string'}, this.id())
     ];
   }
 
@@ -107,7 +107,7 @@ export class NotebookImpl implements Notebook {
   }
 
   response(json: object): void {
-    this._responses.forEach(response => response.response(json));
+    this._respondables.forEach(respondable => respondable.response(json));
   }
 
   isStub(): boolean {

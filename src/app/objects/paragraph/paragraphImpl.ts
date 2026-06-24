@@ -54,12 +54,15 @@ import {computed, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {ComponentView} from '../rendering/componentView/componentView';
+import {Response} from '../channel/response';
+import {MessagePropertyFilterImpl} from '../messagePropertyFilter/messagePropertyFilterImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
   private readonly _paragraph: SafeJson;
   private readonly _componentView: ComponentView;
+  private readonly _respondables:Response[];
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
@@ -83,6 +86,9 @@ export class ParagraphImpl implements Paragraph {
       }
     }
     this._componentView = new ComponentViewStub();
+    this._respondables = [
+      new MessagePropertyFilterImpl([this._outputContainer], {name:'paragraphId', type:'string'}, this.id())
+    ];
   }
 
   print(): Signal<RenderNode> {
@@ -113,17 +119,7 @@ export class ParagraphImpl implements Paragraph {
     }
   }
 
-  response(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    const messageData = new SafeJsonImpl(message.data());
-    if(messageData.propertyExists('paragraphId')){
-      const paragraphId:string = messageData.getProperty('paragraphId', 'string');
-      if(paragraphId === this.id()){
-        this._outputContainer.response(data);
-      }
-    }
-    else{
-      this._outputContainer.response(data);
-    }
+  response(json: object): void {
+    this._respondables.forEach(respondable => respondable.response(json));
   }
 }
