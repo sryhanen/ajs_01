@@ -45,11 +45,7 @@
  */
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
-import {Response} from '../channel/response';
 import {Request} from '../channel/request';
-import {ParagraphResponse} from './responses/paragraph/paragraphResponse';
-import {ParagraphAddedResponse} from './responses/paragraphAdded/paragraphAddedResponse';
-import {ParagraphRemovedResponse} from './responses/paragraphRemoved/paragraphRemovedResponse';
 import {DefaultRequest} from './requests/default/defaultRequest';
 import {RunParagraphRequest} from './requests/runParagraph/runParagraphRequest';
 import {ParagraphCollection} from './paragraphCollection';
@@ -58,27 +54,75 @@ import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
+import {ResponseRegister} from '../responseRegister/responseRegister';
+import {ResponseRegisterImpl} from '../responseRegister/responseRegisterImpl';
+import {ParagraphMessageImpl} from '../message/paragraphMessage/paragraphMessageImpl';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
+import {MessageImpl} from '../message/messageImpl';
+import {ParagraphAddedMessageImpl} from '../message/paragraphAddedMessage/paragraphAddedMessageImpl';
+import {ParagraphRemovedMessageImpl} from '../message/paragraphRemovedMessage/paragraphRemovedMessageImpl';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
   private readonly _decoratorParagraphs:WritableSignal<Map<string,  object>>;
-  private readonly _responses: Response[];
   private readonly _requests: Request[];
   private readonly _componentView: ComponentView;
+  private readonly _responseRegister:ResponseRegister;
 
   constructor(channel: Channel, initialParagraphData: object[]) {
     this._paragraphs = this.initializedParagraphs(initialParagraphData);
     this._decoratorParagraphs = this.initializedDecoratorParagraphs(initialParagraphData);
-    this._responses = [
-      new ParagraphResponse(this, this._paragraphs, this._decoratorParagraphs),
-      new ParagraphAddedResponse(this, this._paragraphs, this._decoratorParagraphs),
-      new ParagraphRemovedResponse(this._paragraphs, this._decoratorParagraphs),
-    ];
+    this._responseRegister = new ResponseRegisterImpl();
+    this._responseRegister.register('PARAGRAPH', (json) => this.paragraphResponse(json));
+    this._responseRegister.register('PARAGRAPH_ADDED', (json) => this.paragraphAddedResponse(json));
+    this._responseRegister.register('PARAGRAPH_REMOVED', (json) => this.paragraphRemovedResponse(json));
     this._requests = [
       new DefaultRequest(channel),
       new RunParagraphRequest(channel, this._decoratorParagraphs)
     ];
     this._componentView = new ComponentViewStub();
+  }
+
+  private paragraphResponse(json:object):void{
+    const paragraphMessage = new ParagraphMessageImpl(new MessageImpl(new SafeJsonImpl(json)));
+    const paragraph = paragraphMessage.paragraph(this);
+    this._paragraphs.update(paragraphs => {
+      paragraphs.set(paragraph.id(), paragraph);
+      return paragraphs;
+    });
+    this._decoratorParagraphs.update(decoratorParagraphs => {
+      decoratorParagraphs.set(paragraph.id(), paragraphMessage.data());
+      return decoratorParagraphs;
+    });
+  }
+
+  private paragraphAddedResponse(json:object):void{
+    const paragraphAddedMessage = new ParagraphAddedMessageImpl(new MessageImpl(new SafeJsonImpl(json)));
+    const index = paragraphAddedMessage.index();
+    const paragraph = paragraphAddedMessage.paragraph(this);
+    this._paragraphs.update(paragraphs => {
+      const paragraphsAsArray = Array.from(paragraphs);
+      paragraphsAsArray.splice(index, 0, [paragraph.id(), paragraph]);
+      return new Map(paragraphsAsArray);
+    });
+    this._decoratorParagraphs.update(decoratorParagraphs => {
+      const decoratorParagraphsAsArray = Array.from(decoratorParagraphs);
+      decoratorParagraphsAsArray.splice(index, 0, [paragraph.id(), paragraphAddedMessage.data()]);
+      return new Map(decoratorParagraphsAsArray);
+    });
+  }
+
+  private paragraphRemovedResponse(json:object):void{
+    const paragraphRemovedMessage = new ParagraphRemovedMessageImpl(new MessageImpl(new SafeJsonImpl(json)));
+    const paragraphId = paragraphRemovedMessage.paragraphId();
+    this._paragraphs.update(paragraphs => {
+      paragraphs.delete(paragraphId);
+      return paragraphs;
+    });
+    this._decoratorParagraphs.update(decoratorParagraphs => {
+      decoratorParagraphs.delete(paragraphId);
+      return decoratorParagraphs;
+    });
   }
 
   private initializedDecoratorParagraphs(initialParagraphData: object[]): WritableSignal<Map<string,  object>>{
@@ -116,8 +160,8 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     this._requests.forEach(request => request.request(data));
   }
 
-  response(data: object): void {
-    this._responses.forEach(response => response.response(data));
-    this._paragraphs().forEach(paragraph => paragraph.response(data));
+  response(json: object): void {
+    this._responseRegister.response(json);
+    this._paragraphs().forEach(paragraph => paragraph.response(json));
   }
 }
