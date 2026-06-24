@@ -55,14 +55,14 @@ import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ParagraphDataAsOutputMessageImpl} from './paragraphDataAsOutputMessage/paragraphDataAsOutputMessageImpl';
-import {ResponseRegister} from '../responseRegister/responseRegister';
+import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {
   ResponseRegisterWithPropertyFilter
-} from '../responseRegister/responseRegisterWithPropertyFilter/responseRegisterWithPropertyFilter';
+} from '../register/responseRegister/responseRegisterWithPropertyFilter/responseRegisterWithPropertyFilter';
 import {
   ResponseRegisterWithDefaultResponseList
-} from '../responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
-import {ResponseRegisterImpl} from '../responseRegister/responseRegisterImpl';
+} from '../register/responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
+import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;

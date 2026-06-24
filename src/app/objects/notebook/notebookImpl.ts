@@ -55,14 +55,14 @@ import {computed, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
-import {ResponseRegister} from '../responseRegister/responseRegister';
-import {ResponseRegisterImpl} from '../responseRegister/responseRegisterImpl';
+import {ResponseRegister} from '../register/responseRegister/responseRegister';
+import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
 import {
   ResponseRegisterWithDefaultResponseList
-} from '../responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
+} from '../register/responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
 import {
   ResponseRegisterWithPropertyFilter
-} from '../responseRegister/responseRegisterWithPropertyFilter/responseRegisterWithPropertyFilter';
+} from '../register/responseRegister/responseRegisterWithPropertyFilter/responseRegisterWithPropertyFilter';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;

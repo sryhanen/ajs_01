@@ -43,42 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ResponseRegister} from '../responseRegister';
-import {ResponseRegisterImpl} from '../responseRegisterImpl';
-import {ResponseRegisterWithDefaultResponseList} from './responseRegisterWithDefaultResponseList';
 import {Response} from '../../channel/response';
-import {Mock} from 'vitest';
+import {Register} from '../register';
 
-describe('ResponseRegisterWithDefaultResponseList unit test', () => {
-  let responseRegister: ResponseRegister;
-  let responseRegisterWithDefaultResponseList: ResponseRegister;
-  let defaultResponseList: Response[];
-  let responseSpy: Mock;
-
-  beforeEach(() => {
-    responseRegister = new ResponseRegisterImpl();
-    const response ={
-      response(data: object) {}
-    };
-    defaultResponseList = [response];
-    responseSpy = vi.spyOn(response, 'response');
-    responseRegisterWithDefaultResponseList = new ResponseRegisterWithDefaultResponseList(responseRegister, defaultResponseList);
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(responseRegisterWithDefaultResponseList).toBeDefined();
-    });
-  });
-
-  describe('Default response', () => {
-    it('Should response defaultResponses by default', () => {
-      const response = {
-        op:'',
-        data:{}
-      };
-      responseRegisterWithDefaultResponseList.response(response);
-      expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
-    });
-  });
-});
+export interface ResponseRegister extends Response, Register {}

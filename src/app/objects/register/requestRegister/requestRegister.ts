@@ -43,26 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ResponseRegister} from './responseRegister';
-import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {MessageImpl} from '../message/messageImpl';
+import {Register} from '../register';
+import {Request} from '../../channel/request';
 
-export class ResponseRegisterImpl implements ResponseRegister {
-  private readonly _subscribers: Map<string, (json:object) => void>;
-
-  constructor(){
-    this._subscribers = new Map();
-  }
-
-  register(operation:string, callback: (json:object) => void): void {
-    this._subscribers.set(operation, callback);
-  }
-
-  response(json: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(json));
-    const subscription = this._subscribers.get(message.operation());
-    if(subscription){
-      subscription(json);
-    }
-  }
-}
+export interface RequestRegister extends Request, Register {}

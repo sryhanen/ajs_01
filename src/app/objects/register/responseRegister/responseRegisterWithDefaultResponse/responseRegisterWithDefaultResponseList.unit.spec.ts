@@ -43,47 +43,42 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
-import {DefaultRequest} from './defaultRequest';
-import {FakeChannel} from '../../../channel/fakeChannel';
+import {ResponseRegister} from '../responseRegister';
+import {ResponseRegisterImpl} from '../responseRegisterImpl';
+import {ResponseRegisterWithDefaultResponseList} from './responseRegisterWithDefaultResponseList';
+import {Response} from '../../../channel/response';
+import {Mock} from 'vitest';
 
-describe('DefaultRequest', () => {
-  let channel:Channel;
-  let defaultRequest:DefaultRequest;
+describe('ResponseRegisterWithDefaultResponseList unit test', () => {
+  let responseRegister: ResponseRegister;
+  let responseRegisterWithDefaultResponseList: ResponseRegister;
+  let defaultResponseList: Response[];
+  let responseSpy: Mock;
 
   beforeEach(() => {
-    channel = new FakeChannel();
-    defaultRequest = new DefaultRequest(channel);
+    responseRegister = new ResponseRegisterImpl();
+    const response ={
+      response(data: object) {}
+    };
+    defaultResponseList = [response];
+    responseSpy = vi.spyOn(response, 'response');
+    responseRegisterWithDefaultResponseList = new ResponseRegisterWithDefaultResponseList(responseRegister, defaultResponseList);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(defaultRequest).toBeInstanceOf(DefaultRequest);
+      expect(responseRegisterWithDefaultResponseList).toBeDefined();
     });
   });
 
-  describe('Request', () => {
-    let channelSpy;
-    beforeEach(() => {
-      channelSpy = vi.spyOn(channel, 'request');
-    });
-
-    it('Should request channel', () => {
-      const request = {
+  describe('Default response', () => {
+    it('Should response defaultResponses by default', () => {
+      const response = {
         op:'',
         data:{}
       };
-      defaultRequest.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
-
-    it('Should not request channel', () => {
-      const request = {
-        op:'RUN_PARAGRAPH',
-        data:{}
-      };
-      defaultRequest.request(request);
-      expect(channelSpy).toHaveBeenCalledTimes(0);
+      responseRegisterWithDefaultResponseList.response(response);
+      expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
     });
   });
 });

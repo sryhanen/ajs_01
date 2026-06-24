@@ -43,8 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Response} from '../channel/response';
+import {ResponseRegister} from '../responseRegister';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
-export interface ResponseRegister extends Response {
-  register(operation:string, callback:(json:object) => void):void;
+export class ResponseRegisterWithPropertyFilter implements ResponseRegister{
+  private readonly _responseRegister: ResponseRegister;
+  private readonly _property: { name:string, type:string };
+  private readonly _value: unknown;
+
+  constructor(responseRegister: ResponseRegister, property: { name:string, type:string }, value: unknown) {
+    this._responseRegister = responseRegister;
+    this._property = property;
+    this._value = value;
+  }
+
+  register(operation: string, callback: (json: object) => void): void {
+    this._responseRegister.register(operation, callback);
+  }
+
+  response(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    const messageData = new SafeJsonImpl(message.data());
+    if(messageData.propertyExists(this._property.name)){
+      if(messageData.getProperty(this._property.name, this._property.type) === this._value){
+        this._responseRegister.response(json);
+      }
+    }
+    else{
+      this._responseRegister.response(json);
+    }
+  }
 }

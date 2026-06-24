@@ -43,22 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Request} from '../../../channel/request';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {MessageImpl} from '../../../message/messageImpl';
-import {Channel} from '../../../channel/channel';
+import {ResponseRegister} from '../responseRegister';
+import {Response} from '../../../channel/response';
 
-export class DefaultRequest implements Request {
-  private readonly _channel: Channel;
+export class ResponseRegisterWithDefaultResponseList implements ResponseRegister{
+  private readonly _responseRegister: ResponseRegister;
+  private readonly _responseList:Response[];
 
-  constructor(channel: Channel) {
-    this._channel = channel;
+  constructor(responseRegister: ResponseRegister, responseList:Response[]) {
+    this._responseRegister = responseRegister;
+    this._responseList = responseList;
   }
 
-  request(data: object) {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    if(message.operation() !== 'RUN_PARAGRAPH'){
-      this._channel.request(data);
-    }
+  register(operation: string, callback: (json: object) => void): void {
+    this._responseRegister.register(operation, callback);
+  }
+
+  response(json: object): void {
+    this._responseRegister.response(json);
+    this._responseList.forEach(response => response.response(json));
   }
 }

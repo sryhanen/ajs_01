@@ -56,8 +56,8 @@ import {NoteMessageImpl} from '../message/noteMessage/noteMessageImpl';
 import {MessageImpl} from '../message/messageImpl';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {NotesInfoMessageImpl} from '../message/notesInfoMessage/notesInfoMessageImpl';
-import {ResponseRegister} from '../responseRegister/responseRegister';
-import {ResponseRegisterImpl} from '../responseRegister/responseRegisterImpl';
+import {ResponseRegister} from '../register/responseRegister/responseRegister';
+import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
 
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;
