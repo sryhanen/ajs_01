@@ -54,16 +54,22 @@ import {computed, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {ComponentView} from '../rendering/componentView/componentView';
-import {Response} from '../channel/response';
-import {MessagePropertyFilterImpl} from '../messagePropertyFilter/messagePropertyFilterImpl';
 import {ParagraphDataAsOutputMessageImpl} from './paragraphDataAsOutputMessage/paragraphDataAsOutputMessageImpl';
+import {ResponseRegister} from '../responseRegister/responseRegister';
+import {
+  ResponseRegisterWithPropertyFilter
+} from '../responseRegister/responseRegisterWithPropertyFilter/responseRegisterWithPropertyFilter';
+import {
+  ResponseRegisterWithDefaultResponseList
+} from '../responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
+import {ResponseRegisterImpl} from '../responseRegister/responseRegisterImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
   private readonly _paragraph: SafeJson;
   private readonly _componentView: ComponentView;
-  private readonly _respondable:Response[];
+  private readonly _responseRegister:ResponseRegister;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
@@ -80,9 +86,7 @@ export class ParagraphImpl implements Paragraph {
       this._outputContainer.response(paragraphOutputMessageData);
     }
     this._componentView = new ComponentViewStub();
-    this._respondable = [
-      new MessagePropertyFilterImpl([this._outputContainer], {name:'paragraphId', type:'string'}, this.id())
-    ];
+    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer]), {name:'paragraphId', type:'string'}, this.id());
   }
 
   print(): Signal<RenderNode> {
@@ -114,6 +118,6 @@ export class ParagraphImpl implements Paragraph {
   }
 
   response(json: object): void {
-    this._respondable.forEach(respondable => respondable.response(json));
+    this._responseRegister.response(json);
   }
 }

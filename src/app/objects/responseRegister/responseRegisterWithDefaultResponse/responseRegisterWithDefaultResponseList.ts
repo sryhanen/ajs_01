@@ -59,8 +59,8 @@ export class ResponseRegisterWithDefaultResponseList implements ResponseRegister
     this._responseRegister.register(operation, callback);
   }
 
-  response(data: object): void {
-    this._responseRegister.response(data);
-    this._responseList.forEach(response => response.response(data));
+  response(json: object): void {
+    this._responseRegister.response(json);
+    this._responseList.forEach(response => response.response(json));
   }
 }

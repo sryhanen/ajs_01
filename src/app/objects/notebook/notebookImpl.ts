@@ -55,23 +55,28 @@ import {computed, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
-import {MessagePropertyFilterImpl} from '../messagePropertyFilter/messagePropertyFilterImpl';
+import {ResponseRegister} from '../responseRegister/responseRegister';
+import {ResponseRegisterImpl} from '../responseRegister/responseRegisterImpl';
+import {
+  ResponseRegisterWithDefaultResponseList
+} from '../responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
+import {
+  ResponseRegisterWithPropertyFilter
+} from '../responseRegister/responseRegisterWithPropertyFilter/responseRegisterWithPropertyFilter';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
   private readonly _notebook: SafeJson;
   private readonly _paragraphCollection: ParagraphCollection;
   private readonly _componentView:ComponentView;
-  private readonly _respondables:Response[];
+  private readonly _responseRegister:ResponseRegister;
 
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
     this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
     this._componentView = new ComponentViewStub();
-    this._respondables = [
-      new MessagePropertyFilterImpl([this._paragraphCollection], {name:'noteId', type:'string'}, this.id())
-    ];
+    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._paragraphCollection]),{name:'noteId', type:'string'}, this.id());
   }
 
   print(): Signal<RenderNode> {
@@ -107,7 +112,7 @@ export class NotebookImpl implements Notebook {
   }
 
   response(json: object): void {
-    this._respondables.forEach(respondable => respondable.response(json));
+    this._responseRegister.response(json);
   }
 
   isStub(): boolean {
