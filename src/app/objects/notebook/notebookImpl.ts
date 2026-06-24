@@ -50,7 +50,6 @@ import {SafeJson} from '../safeJson/safeJson';
 import {MessageImpl} from '../message/messageImpl';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
-import {ParagraphCollectionStub} from '../paragraphCollection/paragraphCollectionStub';
 import {computed, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
@@ -65,19 +64,8 @@ export class NotebookImpl implements Notebook {
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
-    this._paragraphCollection = this.initializedParagraphCollection();
+    this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
     this._componentView = new ComponentViewStub();
-  }
-
-  private initializedParagraphCollection(): ParagraphCollection {
-    let paragraphCollection: ParagraphCollection;
-    if(this._notebook.propertyExists('paragraphs')) {
-      paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
-    }
-    else{
-      paragraphCollection = new ParagraphCollectionStub();
-    }
-    return paragraphCollection;
   }
 
   print(): Signal<RenderNode> {
@@ -85,9 +73,7 @@ export class NotebookImpl implements Notebook {
       componentView: this._componentView,
       children: computed(() => {
         const children:RenderNode[] = [];
-        if(!this._paragraphCollection.isStub()){
-          children.push(this._paragraphCollection.print()());
-        }
+        children.push(this._paragraphCollection.print()());
         return children;
       }),
     }));
@@ -119,21 +105,15 @@ export class NotebookImpl implements Notebook {
     const messageData = new SafeJsonImpl(message.data());
     if(messageData.propertyExists('noteId')){
       if(messageData.getProperty('noteId', 'string') === this.id()){
-        this.respondParagraphCollection(data);
+        this._paragraphCollection.response(data);
       }
     }
     else{
-      this.respondParagraphCollection(data);
+      this._paragraphCollection.response(data);
     }
   }
 
   isStub(): boolean {
     return false;
-  }
-
-  private respondParagraphCollection(data:object): void {
-    if(!this._paragraphCollection.isStub()){
-      this._paragraphCollection.response(data);
-    }
   }
 }

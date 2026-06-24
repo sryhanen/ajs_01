@@ -64,10 +64,6 @@ describe('ParagraphCollection unit test', () => {
       expect(paragraphCollection).toBeInstanceOf(ParagraphCollectionImpl);
     });
 
-    it('Should not be a stub', ()=>{
-      expect(paragraphCollection.isStub()).toBe(false);
-    });
-
     it('Should print', () => {
       const paragraphCollectionPrinted = paragraphCollection.print()();
       expect(paragraphCollectionPrinted).toBeDefined();

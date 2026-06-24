@@ -110,8 +110,4 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     this._responses.forEach(response => response.response(data));
     this._paragraphs().forEach(paragraph => paragraph.response(data));
   }
-
-  isStub(): boolean {
-    return false;
-  }
 }
