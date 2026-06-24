@@ -43,65 +43,33 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Mock} from 'vitest';
-import {RequestRegister} from './requestRegister';
-import {RequestRegisterImpl} from './requestRegisterImpl';
-import {Channel} from '../../channel/channel';
-import {FakeChannel} from '../../channel/fakeChannel';
+import {RequestRegister} from '../requestRegister';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
-describe('RequestRegister unit test', () => {
-  let channel: Channel;
-  let requestRegister: RequestRegister;
+export class RequestRegisterWithPropertyDecorator implements RequestRegister {
+  private readonly _requestRegister:RequestRegister;
+  private readonly _property: { name:string, value:unknown };
 
-  beforeEach(() => {
-    channel = new FakeChannel();
-    requestRegister = new RequestRegisterImpl(channel);
-  });
+  constructor(requestRegister:RequestRegister, property: { name:string, value:unknown }) {
+    this._requestRegister = requestRegister;
+    this._property = property;
+  }
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(requestRegister).toBeDefined();
-    });
-  });
+  register(operation: string, callback: (json: object) => void): void {
+    this._requestRegister.register(operation, callback);
+  }
 
-  describe('Request behaviour', () => {
-    let callback: Mock;
-    const operation = 'op';
-
-    beforeEach(() => {
-      callback  = vi.fn();
-      requestRegister.register(operation, (data) => callback(data));
-    });
-
-    it('Should execute callback on registered request', ()=> {
-      const request = {
-        op:'op',
-        data:{}
-      };
-      requestRegister.request(request);
-      expect(callback).toHaveBeenCalledExactlyOnceWith(request);
-    });
-
-    describe('Unregistered request', () => {
-      let channelSpy:Mock;
-      let request;
-
-      beforeEach(() => {
-        channelSpy = vi.spyOn(channel, 'request');
-        request = {
-          op:'Unregistered',
-          data:{}
-        };
-        requestRegister.request(request);
-      });
-
-      it('Should not execute callback', ()=> {
-        expect(callback).toHaveBeenCalledTimes(0);
-      });
-
-      it('Should request request', () => {
-        expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-      });
-    });
-  });
-});
+  request(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    const messageData = new SafeJsonImpl(message.data());
+    const requestMessage = {
+      op:message.operation(),
+      data:message.data()
+    };
+    if(messageData.propertyExists(this._property.name)){
+      requestMessage.data[this._property.name] = this._property.value;
+    }
+    this._requestRegister.request(requestMessage);
+  }
+}

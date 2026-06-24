@@ -43,64 +43,44 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Mock} from 'vitest';
-import {RequestRegister} from './requestRegister';
-import {RequestRegisterImpl} from './requestRegisterImpl';
-import {Channel} from '../../channel/channel';
-import {FakeChannel} from '../../channel/fakeChannel';
+import {RequestRegisterWithPropertyDecorator} from './requestRegisterWithPropertyDecorator';
+import {RequestRegister} from '../requestRegister';
+import {Channel} from '../../../channel/channel';
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {RequestRegisterImpl} from '../requestRegisterImpl';
 
-describe('RequestRegister unit test', () => {
+describe('RequestRegisterWithPropertyDecorator unit test', () => {
   let channel: Channel;
   let requestRegister: RequestRegister;
+  let requestRegisterWithPropertyDecorator: RequestRegister;
 
   beforeEach(() => {
     channel = new FakeChannel();
     requestRegister = new RequestRegisterImpl(channel);
+    requestRegisterWithPropertyDecorator = new RequestRegisterWithPropertyDecorator(requestRegister, {name:'propertyName', value: 'propertyValue'});
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(requestRegister).toBeDefined();
+      expect(requestRegisterWithPropertyDecorator).toBeDefined();
     });
   });
 
-  describe('Request behaviour', () => {
-    let callback: Mock;
-    const operation = 'op';
-
-    beforeEach(() => {
-      callback  = vi.fn();
-      requestRegister.register(operation, (data) => callback(data));
-    });
-
-    it('Should execute callback on registered request', ()=> {
+  describe('Request decoration', () => {
+    it('Should decorate property', () => {
       const request = {
-        op:'op',
-        data:{}
+        op:'',
+        data:{
+          propertyName:''
+        }
       };
-      requestRegister.request(request);
-      expect(callback).toHaveBeenCalledExactlyOnceWith(request);
-    });
-
-    describe('Unregistered request', () => {
-      let channelSpy:Mock;
-      let request;
-
-      beforeEach(() => {
-        channelSpy = vi.spyOn(channel, 'request');
-        request = {
-          op:'Unregistered',
-          data:{}
-        };
-        requestRegister.request(request);
-      });
-
-      it('Should not execute callback', ()=> {
-        expect(callback).toHaveBeenCalledTimes(0);
-      });
-
-      it('Should request request', () => {
-        expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
+      const spy = vi.spyOn(channel, 'request');
+      requestRegisterWithPropertyDecorator.request(request);
+      expect(spy).toHaveBeenCalledExactlyOnceWith({
+        op:'',
+        data:{
+          propertyName:'propertyValue'
+        }
       });
     });
   });
