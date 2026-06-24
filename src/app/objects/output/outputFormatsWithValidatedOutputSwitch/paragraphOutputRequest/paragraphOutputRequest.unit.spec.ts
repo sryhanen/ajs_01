@@ -44,45 +44,54 @@
  * a licensee so wish it.
  */
 import {ParagraphOutputRequest} from './paragraphOutputRequest';
-import {Message} from '../../../message/message';
+import {ParagraphOutputRequestImpl} from './paragraphOutputRequestImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../../../message/messageImpl';
 
-export class ParagraphOutputRequestImpl implements ParagraphOutputRequest {
-  private readonly _message:Message;
-
-  constructor(message:Message) {
-    this._message = message;
-  }
-
-  request(): object {
-    this.validateOperation();
-    return {
-      op:this.operation(),
-      data:this.data(),
-    };
-  }
-
-  type(): string {
-    this.validateOperation();
-    return this._message.data()['type'];
-  }
-
-  operation(): string {
-    this.validateOperation();
-    return this._message.operation();
-  }
-
-  data(): object {
-    this.validateOperation();
-    return this._message.data();
-  }
-
-  isStub(): boolean {
-    return false;
-  }
-
-  private validateOperation():void{
-    if(this._message.operation() !== 'PARAGRAPH_OUTPUT_REQUEST'){
-      throw new RangeError('Message operation is not "PARAGRAPH_OUTPUT_REQUEST".');
+describe('Paragraph Output Request unit test', () => {
+  const paragraphOutputRequestData = {
+    op:'PARAGRAPH_OUTPUT_REQUEST',
+    data:{
+      type:'type'
     }
-  }
-}
+  };
+  let paragraphOutputRequest: ParagraphOutputRequest;
+  beforeEach(() => {
+    paragraphOutputRequest = new ParagraphOutputRequestImpl(new MessageImpl(new SafeJsonImpl(paragraphOutputRequestData)));
+  });
+
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(paragraphOutputRequest).toBeDefined();
+    });
+
+    it('Should have operation', () => {
+      expect(paragraphOutputRequest.operation()).toEqual('PARAGRAPH_OUTPUT_REQUEST');
+    });
+
+    it('Should have data', () => {
+      expect(paragraphOutputRequest.data()).toEqual(paragraphOutputRequestData.data);
+    });
+
+    it('Should not be stub', () => {
+      expect(paragraphOutputRequest.isStub()).toBe(false);
+    });
+
+    it('Should have type', () => {
+      expect(paragraphOutputRequest.type()).toEqual(paragraphOutputRequestData.data.type);
+    });
+
+    it('Should have request', () => {
+      expect(paragraphOutputRequest.request()).toEqual(paragraphOutputRequestData);
+    });
+  });
+
+  describe('Validation', () => {
+    it('Should throw if operation is not "PARAGRAPH_OUTPUT_REQUEST"', () => {
+      paragraphOutputRequestData.op = '';
+      paragraphOutputRequest = new ParagraphOutputRequestImpl(new MessageImpl(new SafeJsonImpl(paragraphOutputRequestData)));
+      expect(() => paragraphOutputRequest.type()).toThrow();
+    });
+  });
+});
