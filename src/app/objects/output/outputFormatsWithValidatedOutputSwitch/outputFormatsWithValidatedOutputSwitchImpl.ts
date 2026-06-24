@@ -71,7 +71,7 @@ export class OutputFormatsWithValidatedOutputSwitchImpl implements OutputFormats
   private _previousParagraphOutputRequest: ParagraphOutputRequest;
   private readonly _componentView:ComponentView;
 
-  constructor(channel: Channel, ) {
+  constructor(channel: Channel) {
     this._channel = channel;
     this._outputFormats = [
       new DataTablesFormatImpl(this),

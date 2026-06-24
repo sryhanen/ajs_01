@@ -127,6 +127,10 @@ export class NotebookImpl implements Notebook {
     }
   }
 
+  isStub(): boolean {
+    return false;
+  }
+
   private respondParagraphCollection(data:object): void {
     if(!this._paragraphCollection.isStub()){
       this._paragraphCollection.response(data);

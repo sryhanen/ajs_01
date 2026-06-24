@@ -43,35 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Response} from '../../../channel/response';
-import {MessageImpl} from '../../../message/messageImpl';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {WritableSignal} from '@angular/core';
-import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
-import {NotebookIndex} from '../../notebookIndex/notebookIndex';
+import {computed, Signal} from '@angular/core';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {SafeJson} from '../../safeJson/safeJson';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {ComponentView} from '../../rendering/componentView/componentView';
+import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
+import {NotebookIndex} from './notebookIndex';
 
-export class NotesInfoResponse implements Response{
-  private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
+export class NotebookIndexImpl implements NotebookIndex {
+  private readonly _notebookIndexData:SafeJson;
+  private readonly _componentView:ComponentView;
 
-  constructor(notebookIndices: WritableSignal<Map<string, NotebookIndex>>) {
-    this._notebookIndices = notebookIndices;
+  constructor(notebookIndexData:object) {
+      this._notebookIndexData = new SafeJsonImpl(notebookIndexData);
+      this._componentView = new ComponentViewStub();
   }
 
-  response(data: object) {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    const operation = message.operation();
-    if(operation === 'NOTES_INFO'){
-      const messageData = new SafeJsonImpl(message.data());
-      this._notebookIndices.update(notebookIndices => {
-        notebookIndices.clear();
-        const notebookIndicesData = messageData.getProperty<Array<object>>('notes', 'object');
-        notebookIndicesData.forEach(notebookIndexData => {
-          const notebookIndex = new NotebookIndexImpl(notebookIndexData);
-          notebookIndices.set(notebookIndex.id(), notebookIndex);
-        });
-        return notebookIndices;
-      });
-    }
+  id():string {
+    return this._notebookIndexData.getProperty('id', 'string');
+  }
+
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      componentView: this._componentView,
+      children: computed(() =>[])
+    }));
   }
 }
-

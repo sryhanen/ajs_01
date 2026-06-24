@@ -45,7 +45,8 @@
  */
 import {Channel} from '../channel/channel';
 import {Printable} from '../rendering/printable/printable';
+import Stubable from '../../shared/interfaces/stubable';
 
-export interface Notebook extends Channel, Printable{
+export interface Notebook extends Channel, Printable, Stubable{
   id(): string;
 }

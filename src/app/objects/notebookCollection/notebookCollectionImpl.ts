@@ -53,19 +53,23 @@ import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
+import {NotebookIndex} from './notebookIndex/notebookIndex';
+import {NotebookStub} from '../notebook/notebookStub';
 
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;
-  private readonly _notebooks: WritableSignal<Map<string, Notebook>>;
+  private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
+  private readonly _currentNotebook: WritableSignal<Notebook>;
   private readonly _responses: Response[];
   private readonly _componentView:ComponentView;
 
   constructor(channel:Channel) {
     this._channel = channel;
-    this._notebooks = signal(new Map());
+    this._notebookIndices = signal(new Map());
+    this._currentNotebook = signal(new NotebookStub());
     this._responses = [
-      new NotesInfoResponse(this._notebooks, this),
-      new NoteResponse(this, this._notebooks)
+      new NotesInfoResponse(this._notebookIndices),
+      new NoteResponse(this, this._currentNotebook)
     ];
     this._componentView = new ComponentViewStub();
   }
@@ -75,9 +79,9 @@ export class NotebookCollectionImpl implements NotebookCollection{
         componentView: this._componentView,
         children: computed(() => {
           const renderableList: RenderNode[] = [];
-          this._notebooks().forEach(notebook => {
-            renderableList.push(notebook.print()());
-          });
+          if(!this._currentNotebook().isStub()) {
+            renderableList.push(this._currentNotebook().print()());
+          }
           return renderableList;
         }),
       })
@@ -90,7 +94,8 @@ export class NotebookCollectionImpl implements NotebookCollection{
 
   response(json: object): void {
     this._responses.forEach(responseEvent => responseEvent.response(json));
-    this._notebooks().forEach(notebook => notebook.response(json));
+    if(!this._currentNotebook().isStub()) {
+      this._currentNotebook().response(json);
+    }
   }
 }
-

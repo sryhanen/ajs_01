@@ -53,20 +53,18 @@ import {WritableSignal} from '@angular/core';
 
 export class NoteResponse implements Response {
   private readonly _channel:Channel;
-  private readonly _notebooks: WritableSignal<Map<string, Notebook>>;
+  private readonly _currentNotebook: WritableSignal<Notebook>;
 
-  constructor(channel:Channel, notebooks: WritableSignal<Map<string, Notebook>>) {
+  constructor(channel:Channel, currentNotebook: WritableSignal<Notebook>) {
     this._channel = channel;
-    this._notebooks = notebooks;
+    this._currentNotebook = currentNotebook;
   }
 
   response(data: object) {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'NOTE'){
       const newNotebook = new NotebookImpl(this._channel, message.data());
-      this._notebooks.update((notebooks) => {
-        return notebooks.set(newNotebook.id(), newNotebook);
-      });
+      this._currentNotebook.set(newNotebook);
     }
   }
 }
