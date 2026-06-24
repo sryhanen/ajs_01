@@ -45,6 +45,7 @@
  */
 import {Notebook} from './notebook';
 import {Channel} from '../channel/channel';
+import {Response} from '../channel/response';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {SafeJson} from '../safeJson/safeJson';
 import {MessageImpl} from '../message/messageImpl';
@@ -54,18 +55,23 @@ import {computed, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
+import {NotebookIdFilterImpl} from './notebookIdFilter/notebookIdFilterImpl';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
   private readonly _notebook: SafeJson;
   private readonly _paragraphCollection: ParagraphCollection;
   private readonly _componentView:ComponentView;
+  private readonly _responses:Response[];
 
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
     this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
     this._componentView = new ComponentViewStub();
+    this._responses = [
+      new NotebookIdFilterImpl(this._paragraphCollection, this.id())
+    ];
   }
 
   print(): Signal<RenderNode> {
@@ -100,17 +106,8 @@ export class NotebookImpl implements Notebook {
     }
   }
 
-  response(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    const messageData = new SafeJsonImpl(message.data());
-    if(messageData.propertyExists('noteId')){
-      if(messageData.getProperty('noteId', 'string') === this.id()){
-        this._paragraphCollection.response(data);
-      }
-    }
-    else{
-      this._paragraphCollection.response(data);
-    }
+  response(json: object): void {
+    this._responses.forEach(response => response.response(json));
   }
 
   isStub(): boolean {
