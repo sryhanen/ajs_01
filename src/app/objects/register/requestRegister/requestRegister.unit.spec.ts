@@ -46,11 +46,16 @@
 import {Mock} from 'vitest';
 import {RequestRegister} from './requestRegister';
 import {RequestRegisterImpl} from './requestRegisterImpl';
+import {Channel} from '../../channel/channel';
+import {FakeChannel} from '../../channel/fakeChannel';
 
 describe('ResponseRegister unit test', () => {
+  let channel: Channel;
   let requestRegister: RequestRegister;
+
   beforeEach(() => {
-    requestRegister = new RequestRegisterImpl();
+    channel = new FakeChannel();
+    requestRegister = new RequestRegisterImpl(channel);
   });
 
   describe('Birth', () => {
@@ -59,7 +64,7 @@ describe('ResponseRegister unit test', () => {
     });
   });
 
-  describe('Response behaviour', () => {
+  describe('Request behaviour', () => {
     let callback: Mock;
     const operation = 'op';
 
@@ -68,22 +73,35 @@ describe('ResponseRegister unit test', () => {
       requestRegister.register(operation, (data) => callback(data));
     });
 
-    it('Should execute callback on registered response', ()=> {
-      const response = {
+    it('Should execute callback on registered request', ()=> {
+      const request = {
         op:'op',
         data:{}
       };
-      requestRegister.request(response);
-      expect(callback).toHaveBeenCalledExactlyOnceWith(response);
+      requestRegister.request(request);
+      expect(callback).toHaveBeenCalledExactlyOnceWith(request);
     });
 
-    it('Should not execute callback on unregistered response', ()=> {
-      const response = {
-        op:'Unregistered',
-        data:{}
-      };
-      requestRegister.request(response);
-      expect(callback).toHaveBeenCalledTimes(0);
+    describe('Unregistered request', () => {
+      let channelSpy:Mock;
+      let request;
+
+      beforeEach(() => {
+        channelSpy = vi.spyOn(channel, 'request');
+        request = {
+          op:'Unregistered',
+          data:{}
+        };
+        requestRegister.request(request);
+      });
+
+      it('Should not execute callback', ()=> {
+        expect(callback).toHaveBeenCalledTimes(0);
+      });
+
+      it('Should request request', () => {
+        expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
+      });
     });
   });
 });

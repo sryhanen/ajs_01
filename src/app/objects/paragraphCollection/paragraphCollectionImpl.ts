@@ -78,7 +78,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     this._responseRegister.register('PARAGRAPH', (json) => this.paragraphResponse(json));
     this._responseRegister.register('PARAGRAPH_ADDED', (json) => this.paragraphAddedResponse(json));
     this._responseRegister.register('PARAGRAPH_REMOVED', (json) => this.paragraphRemovedResponse(json));
-    this._requestRegister = new RequestRegisterImpl();
+    this._requestRegister = new RequestRegisterImpl(this._channel);
     this._requestRegister.register('RUN_PARAGRAPH', (json) => this.runParagraphRequest(json));
     this._componentView = new ComponentViewStub();
   }

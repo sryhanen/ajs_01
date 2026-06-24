@@ -46,11 +46,14 @@
 import {RequestRegister} from './requestRegister';
 import {MessageImpl} from '../../message/messageImpl';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {Request} from '../../channel/request';
 
 export class RequestRegisterImpl implements RequestRegister {
+  private readonly _request:Request;
   private readonly _subscribers: Map<string, (json:object) => void>;
 
-  constructor(){
+  constructor(request:Request){
+    this._request = request;
     this._subscribers = new Map();
   }
 
@@ -63,6 +66,9 @@ export class RequestRegisterImpl implements RequestRegister {
     const subscription = this._subscribers.get(message.operation());
     if(subscription){
       subscription(json);
+    }
+    else{
+      this._request.request(json);
     }
   }
 }
