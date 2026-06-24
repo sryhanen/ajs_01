@@ -43,44 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Notebook} from '../../../notebook/notebook';
-import {Channel} from '../../../channel/channel';
-import {NoteResponse} from './noteResponse';
-import {FakeChannel} from '../../../channel/fakeChannel';
-import {NotebookImpl} from '../../../notebook/notebookImpl';
-import {signal, WritableSignal} from '@angular/core';
+import {NotebookIndex} from './notebookIndex';
+import {NotebookIndexImpl} from './notebookIndexImpl';
 
-describe('NoteResponse', () => {
-  let channel:Channel;
-  let notebookSignal: WritableSignal<Notebook>;
-  let noteResponse: NoteResponse;
-  let notebook: Notebook;
-  const notebookId = 'initialNotebookId';
-
+describe('NotebookIndex', () => {
+  let notebookIndex: NotebookIndex;
   beforeEach(() => {
-    channel = new FakeChannel();
-    notebook = new NotebookImpl(channel, {id:notebookId});
-    notebookSignal = signal(notebook);
-    noteResponse = new NoteResponse(channel, notebookSignal);
+    notebookIndex = new NotebookIndexImpl({id: 'notebook'});
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(noteResponse).toBeInstanceOf(NoteResponse);
+      expect(notebookIndex).toBeDefined();
     });
-  });
 
-  describe('Response', () => {
-    it('Should update notebookSignal', () => {
-      const newNotebookId = 'newNotebookId';
-      const response = {
-        op:'NOTE',
-        data:{
-          id:newNotebookId,
-        }
-      };
-      noteResponse.response(response);
-      expect(notebookSignal().id()).toEqual(newNotebookId);
+    it('Should have id', () => {
+      expect(notebookIndex.id()).toEqual('notebook');
+    });
+
+    it('Should print', () => {
+      expect(notebookIndex.print()()).toBeDefined();
     });
   });
 });

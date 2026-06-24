@@ -44,19 +44,15 @@
  * a licensee so wish it.
  */
 import {NotesInfoResponse} from './notesInfoResponse';
-import {FakeChannel} from '../../../channel/fakeChannel';
-import {Channel} from '../../../channel/channel';
-import {Notebook} from '../../../notebook/notebook';
 import {signal, WritableSignal} from '@angular/core';
+import {NotebookIndex} from '../../notebookIndex/notebookIndex';
 
 describe('NotesInfoResponse', () => {
-    let channel:Channel;
-    let notebookCollection: WritableSignal<Map<string, Notebook>>;
+    let notebookCollection: WritableSignal<Map<string, NotebookIndex>>;
     let notebookCollectionUpdate: NotesInfoResponse;
     beforeEach(() => {
-      channel  = new FakeChannel();
       notebookCollection = signal(new Map([]));
-      notebookCollectionUpdate = new NotesInfoResponse(notebookCollection, channel);
+      notebookCollectionUpdate = new NotesInfoResponse(notebookCollection);
     });
 
     describe('Birth', () => {
