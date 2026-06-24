@@ -58,7 +58,7 @@ import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../message/messageImpl';
 import {ParagraphOutputRequest} from './paragraphOutputRequest/paragraphOutputRequest';
 import {ParagraphOutputRequestImpl} from './paragraphOutputRequest/paragraphOutputRequestImpl';
-import {ParagraphOutputMessageImpl} from '../paragraphOutputMessage/paragraphOutputMessageImpl';
+import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ParagraphOutputRequestStub} from './paragraphOutputRequest/paragraphOutputRequestStub';
 import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
 import {ComponentView} from '../../rendering/componentView/componentView';

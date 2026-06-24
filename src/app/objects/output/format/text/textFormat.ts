@@ -53,7 +53,7 @@ import {ComponentView} from '../../../rendering/componentView/componentView';
 import {Channel} from '../../../channel/channel';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 import {MessageImpl} from '../../../message/messageImpl';
-import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraphOutputMessageImpl';
+import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {TextOutputView} from '../../../../ui/angular2+/output/outputViews/textOutputView/textOutputView';
 import {Printable} from '../../../rendering/printable/printable';
 

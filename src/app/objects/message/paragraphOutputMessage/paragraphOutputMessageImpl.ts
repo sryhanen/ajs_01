@@ -43,51 +43,55 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputSwitcher} from './outputSwitcher';
+import {ParagraphOutputMessage} from './paragraphOutputMessage';
+import {Message} from '../message';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {MessageImpl} from '../../message/messageImpl';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import { RenderNode } from '../../rendering/renderNode/renderNode';
-import {Printable} from '../../rendering/printable/printable';
-import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
-import {OutputSwitcherView} from '../../../ui/angular2+/output/switcher/outputSwitcherView';
-import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
+import {SafeJson} from '../../safeJson/safeJson';
 
-export class OutputSwitcherImpl implements OutputSwitcher {
-  private readonly _outputIsSwitchable:WritableSignal<boolean>;
-  private readonly _switchIsPending:WritableSignal<boolean>;
-  private readonly _switcherButtons: Printable[];
+export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
+  private readonly _message:Message;
 
-  constructor(switcherButtons: Printable[]) {
-    this._switcherButtons = switcherButtons;
-    this._outputIsSwitchable = signal(false);
-    this._switchIsPending = signal(false);
+  constructor(message:Message) {
+    this._message = message;
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      children:computed(() => []),
-      componentView: new ComponentViewImpl(OutputSwitcherView, computed(() => ({
-        switcherButtons: this._switcherButtons,
-        switchIsPending: this._switchIsPending(),
-        outputIsSwitchable: this._outputIsSwitchable(),
-      })))
-    }));
-  }
-
-  request(json: object) {
-    const message = new MessageImpl(new SafeJsonImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT_REQUEST'){
-      this._switchIsPending.set(true);
+  data(): object {
+    if(this._message.operation() !== 'PARAGRAPH_OUTPUT'){
+      throw new RangeError('Message operation is not "PARAGRAPH_OUTPUT"');
     }
+    return this._message.data();
   }
 
-  response(json: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      this._outputIsSwitchable.set(paragraphOutputMessage.isAggregated());
-      this._switchIsPending.set(false);
-    }
+  private safeData(): SafeJson {
+    return new SafeJsonImpl(this.data());
+  }
+
+  private safeOutputData():SafeJson {
+    return new SafeJsonImpl(this.safeData().getProperty('output', 'object'));
+  }
+
+  isAggregated(): boolean {
+    const safeOutputData = this.safeOutputData();
+    return safeOutputData.propertyExists('isAggregated') && safeOutputData.getProperty('isAggregated', 'boolean');
+  }
+
+  operation(): string {
+    return this._message.operation();
+  }
+
+  output(): object {
+    return this.safeData().getProperty('output', 'object');
+  }
+
+  outputOptions(): object {
+    return this.safeOutputData().getProperty('options', 'object');
+  }
+
+  outputType(): string {
+    return this.safeOutputData().getProperty('type', 'string');
+  }
+  
+  isStub(): boolean {
+    return false;
   }
 }

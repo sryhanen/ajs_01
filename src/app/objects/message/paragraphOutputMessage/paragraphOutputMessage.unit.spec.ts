@@ -46,7 +46,7 @@
 import {ParagraphOutputMessage} from './paragraphOutputMessage';
 import {ParagraphOutputMessageImpl} from './paragraphOutputMessageImpl';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {MessageImpl} from '../../message/messageImpl';
+import {MessageImpl} from '../messageImpl';
 
 describe('ParagraphOutputMessage unit test', () => {
   let paragraphOutputMessageData = {
@@ -103,6 +103,10 @@ describe('ParagraphOutputMessage unit test', () => {
 
     it('Should have options', () => {
       expect(paragraphOutputMessage.outputOptions()).toEqual(paragraphOutputMessageData.data.output.options);
+    });
+
+    it('Should not be a stub', () => {
+      expect(paragraphOutputMessage.isStub()).toBe(false);
     });
   });
 

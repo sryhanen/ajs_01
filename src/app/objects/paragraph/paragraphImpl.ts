@@ -62,7 +62,7 @@ export class ParagraphImpl implements Paragraph {
   private readonly _outputContainer: OutputContainer;
   private readonly _paragraph: SafeJson;
   private readonly _componentView: ComponentView;
-  private readonly _respondables:Response[];
+  private readonly _respondable:Response[];
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
@@ -86,7 +86,7 @@ export class ParagraphImpl implements Paragraph {
       }
     }
     this._componentView = new ComponentViewStub();
-    this._respondables = [
+    this._respondable = [
       new MessagePropertyFilterImpl([this._outputContainer], {name:'paragraphId', type:'string'}, this.id())
     ];
   }
@@ -120,6 +120,6 @@ export class ParagraphImpl implements Paragraph {
   }
 
   response(json: object): void {
-    this._respondables.forEach(respondable => respondable.response(json));
+    this._respondable.forEach(respondable => respondable.response(json));
   }
 }

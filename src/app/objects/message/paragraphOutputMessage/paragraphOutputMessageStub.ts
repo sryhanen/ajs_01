@@ -44,50 +44,33 @@
  * a licensee so wish it.
  */
 import {ParagraphOutputMessage} from './paragraphOutputMessage';
-import {Message} from '../../message/message';
-import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {SafeJson} from '../../safeJson/safeJson';
 
-export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
-  private readonly _message:Message;
-
-  constructor(message:Message) {
-    this._message = message;
+export class ParagraphOutputMessageStub implements ParagraphOutputMessage {
+  isStub(): boolean {
+    return true;
   }
 
   data(): object {
-    if(this._message.operation() !== 'PARAGRAPH_OUTPUT'){
-      throw new RangeError('Message operation is not "PARAGRAPH_OUTPUT"');
-    }
-    return this._message.data();
-  }
-
-  private safeData(): SafeJson {
-    return new SafeJsonImpl(this.data());
-  }
-
-  private safeOutputData():SafeJson {
-    return new SafeJsonImpl(this.safeData().getProperty('output', 'object'));
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
 
   isAggregated(): boolean {
-    const safeOutputData = this.safeOutputData();
-    return safeOutputData.propertyExists('isAggregated') && safeOutputData.getProperty('isAggregated', 'boolean');
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
 
   operation(): string {
-    return this._message.operation();
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
 
   output(): object {
-    return this.safeData().getProperty('output', 'object');
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
 
   outputOptions(): object {
-    return this.safeOutputData().getProperty('options', 'object');
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
 
   outputType(): string {
-    return this.safeOutputData().getProperty('type', 'string');
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
 }

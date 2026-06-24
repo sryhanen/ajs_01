@@ -50,7 +50,7 @@ import { RenderNode } from '../../../rendering/renderNode/renderNode';
 import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {ParagraphOutputMessageImpl} from '../../paragraphOutputMessage/paragraphOutputMessageImpl';
+import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {OutputType} from '../../outputType';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {ComponentView} from '../../../rendering/componentView/componentView';
