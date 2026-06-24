@@ -44,34 +44,35 @@
  * a licensee so wish it.
  */
 import {InterpreterErrorListener} from './interpreterErrorListener';
-import {Channel} from '../channel/channel';
 import {MessageImpl} from '../message/messageImpl';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
+import {computed, Signal} from '@angular/core';
+import { RenderNode } from '../rendering/renderNode/renderNode';
+import {ComponentView} from '../rendering/componentView/componentView';
+import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
+import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
+import {InterpreterErrorView} from '../../ui/angular2+/interpreterError/interpreterErrorView';
 
 export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
-  private readonly _channel: Channel;
-  private _toaster: { addToast: (message:string, severity:string)=>void; };
+  private _componentView:ComponentView;
 
-  constructor(channel: Channel) {
-    this._channel = channel;
-    this._toaster = {
-      addToast: (message:string, severity:string)=>{}
-    };
+  constructor() {
+    this._componentView = new ComponentViewStub();
   }
 
-  bind(toasterService: {addToast(): void}): void {
-    this._toaster = toasterService;
-  }
-
-  request(data: object): void {
-    this._channel.request(data);
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+     children: computed(() => []),
+     componentView: this._componentView
+    }));
   }
 
   response(data: object): void {
     const message = new MessageImpl(new SafeJsonImpl(data));
     if(message.operation() === 'INTERPRETER_ERROR'){
       const errorData = new SafeJsonImpl(message.data());
-      this._toaster.addToast(errorData.getProperty('message', 'string'), 'Danger');
+      const errorMessage = errorData.getProperty('message', 'string');
+      this._componentView = new ComponentViewImpl(InterpreterErrorView, computed(() => ({errorMessage: errorMessage})));
     }
   }
 }

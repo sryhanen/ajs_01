@@ -43,19 +43,33 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Directive, inject, Input, OnInit} from '@angular/core';
-import {ToasterService} from '../../../shared/components/Toaster/notifications.service';
-import {InterpreterErrorListener} from '../../../objects/interpreterErrorListener/interpreterErrorListener';
+import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/core';
+import * as bootstrap from 'bootstrap';
 
-@Directive({
-  selector: '[interpreter-error-popup]',
-  standalone: true
+@Component({
+  selector: 'interpreterErrorView',
+  template: `
+    <div #modal class="modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Alert</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>{{errorMessage()}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
 })
-export class InterpreterErrorDirective implements OnInit {
-  @Input('interpreter-error-popup') interpreterErrorListener:InterpreterErrorListener;
-  private toaster = inject(ToasterService);
+export class InterpreterErrorView implements AfterViewInit {
+  @ViewChild('modal') modal!: ElementRef;
+  errorMessage = input.required<string>();
 
-  ngOnInit() {
-    this.interpreterErrorListener.bind(this.toaster);
+  ngAfterViewInit() {
+    const myModal = new bootstrap.Modal(this.modal.nativeElement);
+    myModal.show();
   }
 }

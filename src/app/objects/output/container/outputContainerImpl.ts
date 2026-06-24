@@ -55,16 +55,20 @@ import {
 import {
   OutputFormatsWithValidatedOutputSwitch
 } from '../outputFormatsWithValidatedOutputSwitch/outputFormatsWithValidatedOutputSwitch';
+import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
+import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/interpreterErrorListenerImpl';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
   private readonly _outputFormatsWithValidatedOutputSwitch: OutputFormatsWithValidatedOutputSwitch;
+  private readonly _interpreterErrorListener:InterpreterErrorListener;
   private readonly _componentView:ComponentView;
   private readonly _paragraphId:string;
 
   constructor(channel:Channel, paragraphId:string) {
     this._channel = channel;
     this._outputFormatsWithValidatedOutputSwitch = new OutputFormatsWithValidatedOutputSwitchImpl(this);
+    this._interpreterErrorListener = new InterpreterErrorListenerImpl();
     this._paragraphId = paragraphId;
     this._componentView = new ComponentViewStub();
   }
@@ -75,6 +79,7 @@ export class OutputContainerImpl implements OutputContainer{
 
   response(json: object): void {
     this._outputFormatsWithValidatedOutputSwitch.response(json);
+    this._interpreterErrorListener.response(json);
   }
 
   print(): Signal<RenderNode> {
@@ -82,7 +87,10 @@ export class OutputContainerImpl implements OutputContainer{
       ({
         paragraphId:this._paragraphId,
         componentView: this._componentView,
-        children: computed(() => this._outputFormatsWithValidatedOutputSwitch.print()().children()),
+        children: computed(() => [
+          ...this._outputFormatsWithValidatedOutputSwitch.print()().children(),
+          this._interpreterErrorListener.print()()
+        ]),
       })
     );
   }

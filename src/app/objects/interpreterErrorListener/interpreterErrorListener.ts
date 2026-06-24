@@ -43,8 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
+import {Response} from '../channel/response';
+import {Printable} from '../rendering/printable/printable';
 
-export interface InterpreterErrorListener extends Channel {
-  bind(toasterService: {addToast(message:string, severity:string): void}): void;
-}
+export interface InterpreterErrorListener extends Response, Printable {}
