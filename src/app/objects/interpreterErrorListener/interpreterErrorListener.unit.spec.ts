@@ -43,66 +43,40 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
 import {InterpreterErrorListener} from './interpreterErrorListener';
-import {FakeChannel} from '../channel/fakeChannel';
 import {InterpreterErrorListenerImpl} from './interpreterErrorListenerImpl';
 
 describe('InterpreterErrorListener', () => {
-  let channel:Channel;
   let interpreterErrorListener: InterpreterErrorListener;
   beforeEach(() => {
-    channel = new FakeChannel();
-    interpreterErrorListener = new InterpreterErrorListenerImpl(channel);
+    interpreterErrorListener = new InterpreterErrorListenerImpl();
   });
 
   describe('Birth', () =>{
     it('Should initialize', () =>{
       expect(interpreterErrorListener).toBeInstanceOf(InterpreterErrorListenerImpl);
     });
-  });
 
-  describe('Request and response', () => {
-    const message = 'Something went wrong';
-    let toaster;
-    let response;
-
-    beforeEach(() =>{
-      toaster = {
-        addToast: () => {}
-      };
-      response = {
-        op: 'INTERPRETER_ERROR',
-        data: {
-          message:message
-        },
-      };
-      interpreterErrorListener.bind(toaster);
-    });
-
-    it('Should request channel', () =>{
-      const request = {test:'test'};
-      const spy = vi.spyOn(channel, 'request');
-      interpreterErrorListener.request(request);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(request);
-    });
-
-    it('Should add toast on error', () =>{
-      const spy = vi.spyOn(toaster, 'addToast');
-      expect(spy).toHaveBeenCalledTimes(0);
-      interpreterErrorListener.response(response);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(message, 'Danger');
-    });
-
-    it('Should not add toast on other response', () =>{
-      const spy = vi.spyOn(toaster, 'addToast');
-      expect(spy).toHaveBeenCalledTimes(0);
-      response.op = 'RANDOM_OPERATION';
-      interpreterErrorListener.response(response);
-      expect(spy).toHaveBeenCalledTimes(0);
+    it('Should print', () => {
+      const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
+      expect(interpreterErrorListenerPrinted).toBeDefined();
+      expect(interpreterErrorListenerPrinted.children()).toHaveLength(0);
+      expect(interpreterErrorListenerPrinted.componentView.isStub()).toBe(true);
     });
   });
 
+  describe('Response behavior', () =>{
+    it('Should have componentView after "INTERPRETER_ERROR" response', () =>{
+      const response = {
+        op:'INTERPRETER_ERROR',
+        data:{
+          message:'message'
+        }
+      };
+      interpreterErrorListener.response(response);
+      const componentView = interpreterErrorListener.print()().componentView;
+      expect(componentView.isStub()).toBe(false);
+      expect(componentView.inputs()()['errorMessage']).toEqual('message');
+    });
+  });
 });

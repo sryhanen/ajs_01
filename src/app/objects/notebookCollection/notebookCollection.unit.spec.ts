@@ -63,8 +63,10 @@ describe('NotebookCollection', () => {
     });
 
     it('Should print', () => {
-      const notebookCollectionPrinted =notebookCollection.print()();
-        expect(notebookCollectionPrinted).toBeDefined();
+      const notebookCollectionPrinted = notebookCollection.print()();
+      expect(notebookCollectionPrinted).toBeDefined();
+      expect(notebookCollectionPrinted.children()).toHaveLength(0);
+      expect(notebookCollectionPrinted.componentView.isStub()).toBe(true);
     });
   });
 
@@ -77,6 +79,21 @@ describe('NotebookCollection', () => {
       };
       notebookCollection.request(request);
       expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+  });
+
+  describe('NOTE response behavior', () => {
+    it('Should have add child to printed collection after note response', () => {
+      const response = {
+        op:'NOTE',
+        data:{
+          id:'note',
+          paragraphs:[]
+        }
+      };
+      notebookCollection.response(response);
+      const notebookCollectionPrinted = notebookCollection.print()();
+      expect(notebookCollectionPrinted.children()).toHaveLength(1);
     });
   });
 });
