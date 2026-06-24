@@ -45,42 +45,47 @@
  */
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
-import {Request} from '../channel/request';
-import {DefaultRequest} from './requests/default/defaultRequest';
-import {RunParagraphRequest} from './requests/runParagraph/runParagraphRequest';
+import {RunParagraphRequest} from './runParagraphRequest/runParagraphRequest';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
-import {ResponseRegister} from '../responseRegister/responseRegister';
-import {ResponseRegisterImpl} from '../responseRegister/responseRegisterImpl';
+import {ResponseRegister} from '../register/responseRegister/responseRegister';
+import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
 import {ParagraphMessageImpl} from '../message/paragraphMessage/paragraphMessageImpl';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {MessageImpl} from '../message/messageImpl';
 import {ParagraphAddedMessageImpl} from '../message/paragraphAddedMessage/paragraphAddedMessageImpl';
 import {ParagraphRemovedMessageImpl} from '../message/paragraphRemovedMessage/paragraphRemovedMessageImpl';
+import {RequestRegister} from '../register/requestRegister/requestRegister';
+import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterImpl';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
+  private readonly _channel: Channel;
   private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
   private readonly _decoratorParagraphs:WritableSignal<Map<string,  object>>;
-  private readonly _requests: Request[];
-  private readonly _componentView: ComponentView;
   private readonly _responseRegister:ResponseRegister;
+  private readonly _requestRegister:RequestRegister;
+  private readonly _componentView: ComponentView;
 
   constructor(channel: Channel, initialParagraphData: object[]) {
+    this._channel = channel;
     this._paragraphs = this.initializedParagraphs(initialParagraphData);
     this._decoratorParagraphs = this.initializedDecoratorParagraphs(initialParagraphData);
     this._responseRegister = new ResponseRegisterImpl();
     this._responseRegister.register('PARAGRAPH', (json) => this.paragraphResponse(json));
     this._responseRegister.register('PARAGRAPH_ADDED', (json) => this.paragraphAddedResponse(json));
     this._responseRegister.register('PARAGRAPH_REMOVED', (json) => this.paragraphRemovedResponse(json));
-    this._requests = [
-      new DefaultRequest(channel),
-      new RunParagraphRequest(channel, this._decoratorParagraphs)
-    ];
+    this._requestRegister = new RequestRegisterImpl();
+    this._requestRegister.register('RUN_PARAGRAPH', (json) => this.runParagraphRequest(json));
     this._componentView = new ComponentViewStub();
+  }
+
+  private runParagraphRequest(json:object):void {
+    const runParagraphRequest = new RunParagraphRequest(this, this._decoratorParagraphs());
+    runParagraphRequest.request(json);
   }
 
   private paragraphResponse(json:object):void{
@@ -157,7 +162,11 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   request(data: object): void {
-    this._requests.forEach(request => request.request(data));
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() !== 'RUN_PARAGRAPH'){
+      this._channel.request(data);
+    }
+    this._requestRegister.request(data);
   }
 
   response(json: object): void {

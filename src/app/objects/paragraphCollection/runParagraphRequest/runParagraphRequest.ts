@@ -43,68 +43,45 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {RunParagraphRequest} from './runParagraphRequest';
-import {FakeChannel} from '../../../channel/fakeChannel';
-import {Channel} from '../../../channel/channel';
-import {signal, WritableSignal} from '@angular/core';
+import {Request} from '../../channel/request';
+import {Channel} from '../../channel/channel';
+import {MessageImpl} from '../../message/messageImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {Message} from '../../message/message';
 
-describe('RunParagraphRequest', () => {
-  let channel: Channel;
-  let paragraphs: WritableSignal<Map<string, object>>;
-  const paragraphId = 'paragraphId';
-  const paragraphText = 'some text';
-  const paragraphConfig = {
-    prop:'config prop'
-  };
-  const paragraphSettings = {
-    params:{
-      prop:'config prop'
-    }
-  };
-  const defaultParagraphData = {
-    id: paragraphId,
-    text:paragraphText,
-    config: paragraphConfig,
-    settings: paragraphSettings
-  };
-  let runParagraphRequest: RunParagraphRequest;
+export class RunParagraphRequest implements Request {
+  private readonly _channel: Channel;
+  private readonly _decoratorParagraphs:Map<string,  object>;
 
-  beforeEach(() => {
-    channel = new FakeChannel();
-    paragraphs = signal(new Map([[defaultParagraphData.id, defaultParagraphData]]));
-    runParagraphRequest = new RunParagraphRequest(channel, paragraphs);
-  });
+  constructor(channel: Channel, decoratorParagraphs:Map<string,  object>){
+    this._channel = channel;
+    this._decoratorParagraphs = decoratorParagraphs;
+  }
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(runParagraphRequest).toBeInstanceOf(RunParagraphRequest);
-    });
-  });
-
-  describe('Request', () => {
-    const initialRequest = {
-      op:'RUN_PARAGRAPH',
-      data:{
-        id:paragraphId,
-        paragraph:'',
-        config:{},
-        params:{}
+  request(data: object) {
+    const message = new MessageImpl(new SafeJsonImpl(data));
+    if(message.operation() === 'RUN_PARAGRAPH'){
+      const runParagraphData = new SafeJsonImpl(message.data());
+      const paragraphId:string = runParagraphData.getProperty('id', 'string');
+      const paragraphData = this._decoratorParagraphs.get(paragraphId);
+      if(paragraphData === undefined){
+        throw new Error(`Failed to decorate run paragraph request: paragraph "${paragraphId}" not found in collection`);
       }
-    };
+      this._channel.request(this.decoratedMessage(message, paragraphData));
+    }
+  }
 
-    it('Should decorate request', () => {
-      const expectedRequest = {
-        op:'RUN_PARAGRAPH',
-        data:{
-          id:paragraphId,
-          paragraph:paragraphText,
-          config:paragraphConfig,
-          params:paragraphSettings.params
-        }
-      };
-      const channelSpy = vi.spyOn(channel, 'request');
-      runParagraphRequest.request(initialRequest);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
-    });
-  });
-});
+  private decoratedMessage(message:Message, paragraphData:object):object {
+    const data = message.data();
+    const decoratorData = new SafeJsonImpl(paragraphData);
+    data['paragraph'] = decoratorData.getProperty<string>('text', 'string');
+    data['config'] = decoratorData.getProperty<object>('config', 'object');
+    const settings = decoratorData.getProperty<object>('settings', 'object');
+    data['params'] = new SafeJsonImpl(settings).getProperty<object>('params', 'object');
+    return {
+      op: message.operation(),
+      data: data
+    };
+  }
+}
+
