@@ -57,9 +57,7 @@ import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {DataTablesPlugin} from './dataTablesPlugin/dataTablesPlugin';
 import {DataTablesPluginStub} from './dataTablesPlugin/dataTablesPluginStub';
-import {
-  DataTablesOutputView
-} from '../../../../ui/angular2+/output/outputViews/dataTablesOutputView/dataTablesOutputView';
+import {DataTablesOutputView} from '../../../../ui/angular2+/output/outputViews/dataTablesOutputView/dataTablesOutputView';
 import {Printable} from '../../../rendering/printable/printable';
 import {DataTablesFormat} from './dataTablesFormat';
 

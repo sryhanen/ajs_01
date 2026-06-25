@@ -48,7 +48,7 @@ import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {OutputType} from '../../outputType';
 
-describe('dataTablesFormat', () => {
+describe('DataTablesFormat unit test', () => {
   let channel:Channel;
   let dataTablesFormat:DataTablesFormatImpl;
 
@@ -66,6 +66,12 @@ describe('dataTablesFormat', () => {
       const buttons = dataTablesFormat.switcherButtons();
       expect(buttons).toHaveLength(1);
     });
+
+    it('Should print', () => {
+      const dataTablesFormatPrinted = dataTablesFormat.print()();
+      expect(dataTablesFormatPrinted.componentView.isStub()).toBe(true);
+      expect(dataTablesFormatPrinted.children()).toHaveLength(0);
+    });
   });
 
   describe('Request', () => {
@@ -79,12 +85,9 @@ describe('dataTablesFormat', () => {
   });
 
   describe('ComponentView updates', () => {
-    it('Should have component view stub', () => {
-      expect(dataTablesFormat.print()().componentView.isStub()).toBe(true);
-    });
-
-    it('Should not have component view stub after output response', () => {
-      const outputResponse = {
+    let outputResponse;
+    beforeEach(() => {
+      outputResponse = {
         op:'PARAGRAPH_OUTPUT',
         data:{
           output:{
@@ -95,27 +98,28 @@ describe('dataTablesFormat', () => {
         }
       };
       dataTablesFormat.response(outputResponse);
-      expect(dataTablesFormat.print()().componentView.isStub()).toBe(false);
+    });
+
+    it('Should have component view', () => {
+      const componentView = dataTablesFormat.print()().componentView;
+      expect(componentView.isStub()).toBe(false);
+      expect(componentView.inputs()()['dataTablesPlugin']).toBeDefined();
     });
 
     it('Should respond plugin on consequential output responses', () => {
-      const outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.dataTables,
-            data:{},
-            options:{},
-          }
-        }
-      };
-      dataTablesFormat.response(outputResponse);
       const plugin = dataTablesFormat.print()().componentView.inputs()()['dataTablesPlugin'] as Channel;
       const spy = vi.spyOn(plugin, 'response');
       dataTablesFormat.response(outputResponse);
       dataTablesFormat.response(outputResponse);
       dataTablesFormat.response(outputResponse);
       expect(spy).toHaveBeenCalledTimes(3);
+    });
+
+    it('Should not have component view after output type change', () => {
+      outputResponse.data.output.type = '';
+      dataTablesFormat.response(outputResponse);
+      const componentView = dataTablesFormat.print()().componentView;
+      expect(componentView.isStub()).toBe(true);
     });
   });
 });
