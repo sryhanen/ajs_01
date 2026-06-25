@@ -43,20 +43,42 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, ElementRef, inject, input, ViewChild} from '@angular/core';
-import {DomSanitizer} from '@angular/platform-browser';
+import {ComponentFixture} from '@angular/core/testing';
+import {render, screen} from '@testing-library/angular';
+import {HtmlOutputView} from './htmlOutputView';
 
-@Component({
-  selector: 'htmlView',
-  template: `
-    <div #anchor [innerHTML]="htmlContent()"></div>
-  `
-})
-export class HtmlOutputView {
-  htmlTemplate = input.required<string>();
-  @ViewChild('anchor') anchor: ElementRef;
-  private domSanitizer = inject(DomSanitizer);
-  protected htmlContent = computed(() => {
-    return this.domSanitizer.bypassSecurityTrustHtml(this.htmlTemplate());
+describe('HtmlOutputView functional test', () => {
+  const htmlTemplate = '<button>Test button</button>';
+  let fixture: ComponentFixture<HtmlOutputView>;
+  beforeEach(async () => {
+    const renderResult = await render(HtmlOutputView, {
+      inputs:{
+        htmlTemplate: htmlTemplate,
+      }
+    });
+    fixture = renderResult.fixture;
   });
-}
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should render htmlTemplate', () => {
+      expect(screen.getByRole('button')).toBeDefined();
+      expect(screen.getByText('Test button')).toBeDefined();
+    });
+  });
+
+  describe('Template change', () => {
+    it('Should have new template visible', () => {
+      const newHtmlTemplate = '<button>Test button2</button> <button>Test button3</button>';
+      fixture.componentRef.setInput('htmlTemplate', newHtmlTemplate);
+      fixture.detectChanges();
+      expect(screen.getAllByRole('button')).toHaveLength(2);
+      expect(screen.getByText('Test button2')).toBeDefined();
+      expect(screen.getByText('Test button3')).toBeDefined();
+      expect(() => screen.getByText('Test button')).toThrow();
+    });
+  });
+});
