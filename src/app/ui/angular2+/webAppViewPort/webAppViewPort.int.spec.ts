@@ -43,20 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
+import {FakeWebSocketService} from '../../../objects/webSocket/service/fakeWebSocketService';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {WebAppViewPort} from './webAppViewPort';
+import {By} from '@angular/platform-browser';
 import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
 
-@Component({
-  selector: 'web-app-view-port',
-  imports: [
-    RecursiveComponentDraw
-  ],
-  template: `
-    <recursive-component-draw [renderNode]="renderNode()" [containerId]="containerId()"></recursive-component-draw>
-  `
-})
-export class WebAppViewPort {
-  containerId= input.required<string>();
-  protected renderNode = computed(() => webAppRoot.print()());
-}
+describe('WebAppViewPort integration test', () => {
+  const containerId = 'containerId';
+  let fixture: ComponentFixture<WebAppViewPort>;
+
+  beforeEach(async () => {
+    webAppRoot.initialize(new FakeWebSocketService());
+    fixture = TestBed.createComponent(WebAppViewPort);
+    fixture.componentRef.setInput('containerId', containerId);
+    await fixture.whenStable();
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have rendered RecursiveComponentDraw', () =>  {
+      expect(fixture.debugElement.query(By.directive(RecursiveComponentDraw))).toBeDefined();
+    });
+  });
+});
