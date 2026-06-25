@@ -72,8 +72,12 @@ describe('ParagraphOutputMessage unit test', () => {
         output:{
           type:'type',
           isAggregated:true,
-          data:{},
-          options:{}
+          data:{
+            dataKey:'data'
+          },
+          options:{
+            optionsKey:'options'
+          }
         }
       }
     };
@@ -93,16 +97,24 @@ describe('ParagraphOutputMessage unit test', () => {
       expect(paragraphOutputMessage.operation()).toEqual(paragraphOutputMessageData.op);
     });
 
-    it('Should have output', () => {
-      expect(paragraphOutputMessage.output()).toEqual(paragraphOutputMessageData.data.output);
+    it('Should have outputData', () => {
+      expect(paragraphOutputMessage.outputData<object>('object')).toEqual(paragraphOutputMessageData.data.output.data);
     });
 
     it('Should have isAggregated', () => {
       expect(paragraphOutputMessage.isAggregated()).toEqual(paragraphOutputMessageData.data.output.isAggregated);
     });
 
-    it('Should have options', () => {
-      expect(paragraphOutputMessage.outputOptions()).toEqual(paragraphOutputMessageData.data.output.options);
+    describe('options', () => {
+      it('Should have options', () => {
+        expect(paragraphOutputMessage.options().isStub()).toBe(false);
+      });
+
+      it('Should have options stub', () => {
+        delete paragraphOutputMessageData.data.output.options;
+        paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new SafeJsonImpl(paragraphOutputMessageData)));
+        expect(paragraphOutputMessage.options().isStub()).toBe(true);
+      });
     });
 
     it('Should not be a stub', () => {
@@ -115,6 +127,11 @@ describe('ParagraphOutputMessage unit test', () => {
       paragraphOutputMessageData.op = '';
       paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new SafeJsonImpl(paragraphOutputMessageData)));
       expect(() => paragraphOutputMessage.data()).toThrow();
+      expect(() => paragraphOutputMessage.operation()).toThrow();
+      expect(() => paragraphOutputMessage.options()).toThrow();
+      expect(() => paragraphOutputMessage.type()).toThrow();
+      expect(() => paragraphOutputMessage.isAggregated()).toThrow();
+      expect(() => paragraphOutputMessage.outputData('object')).toThrow();
     });
   });
 });

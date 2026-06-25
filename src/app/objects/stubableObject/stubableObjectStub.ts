@@ -43,59 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphOutputMessage} from './paragraphOutputMessage';
-import {Message} from '../message';
-import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {SafeJson} from '../../safeJson/safeJson';
-import { StubableObject } from '../../stubableObject/stubableObject';
-import {TypedMessage} from '../typedMessage/typedMessage';
-import {StubableObjectImpl} from '../../stubableObject/stubableObjectImpl';
-import {StubableObjectStub} from '../../stubableObject/stubableObjectStub';
+import {StubableObject} from './stubableObject';
 
-export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
-  private readonly _message: Message;
-
-  constructor(message: Message) {
-    this._message = new TypedMessage('PARAGRAPH_OUTPUT', message);
-  }
-
-  isAggregated(): boolean {
-    return this.output().getProperty('isAggregated', 'boolean');
-  }
-
-  type(): string {
-    return this.output().getProperty('type', 'string');
-  }
-
-  outputData<T>(type: string): T {
-    return this.output().getProperty('data', type);
-  }
-
-  options(): StubableObject {
-    let options: StubableObject;
-    const output = this.output();
-    if(output.propertyExists('options')){
-      options = new StubableObjectImpl(output.getProperty('options', 'object'));
-    }
-    else{
-      options = new StubableObjectStub();
-    }
-    return options;
-  }
-
-  private output(): SafeJson {
-    return new SafeJsonImpl(new SafeJsonImpl(this.data()).getProperty('output', 'object'));
-  }
-
-  data(): object {
-    return this._message.data();
-  }
-
-  operation(): string {
-    return this._message.operation();
-  }
-
+export class StubableObjectStub implements StubableObject {
   isStub(): boolean {
-    return false;
+    return true;
+  }
+
+  value(): object {
+    throw new Error('StubableObjectStub: Method not implemented.');
   }
 }
