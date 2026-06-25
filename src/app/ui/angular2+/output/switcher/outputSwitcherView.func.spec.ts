@@ -43,25 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {ComponentFixture} from '@angular/core/testing';
+import {render} from '@testing-library/angular';
+import {OutputSwitcherView} from './outputSwitcherView';
+import {Signal} from '@angular/core';
+import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 
-@Component({
-  selector: 'output-switcher-button',
-  template: `
-    <button class="btn btn-secondary"
-            type="button"
-            aria-label="{{title()}}"
-            title="{{title()}}"
-            (click)="requestFormatSwitch()()">
-      <i class="{{icon()}}"></i>
-    </button>
-  `,
-  host:{
-    'class': 'btn-group',
-  }
-})
-export class OutputSwitcherButtonView {
-  requestFormatSwitch = input.required<() => void>();
-  title = input.required<string>();
-  icon = input.required<string>();
-}
+describe('OutputSwitcherView functional test', () => {
+  let fixture: ComponentFixture<OutputSwitcherView>;
+  let switcherButtons: Signal<RenderNode>;
+  let switchIsPending: boolean;
+  let outputIsSwitchable: boolean;
+
+  beforeEach(async () => {
+    const renderResult = await render(OutputSwitcherView, {
+      inputs:{
+      }
+    });
+    fixture = renderResult.fixture;
+  });
+});
