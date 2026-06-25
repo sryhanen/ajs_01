@@ -103,7 +103,7 @@ export class UPlotFormatImpl implements UPlotFormat {
     }));
   }
 
-  switcherButtons(): Printable[] {
-    return this._switcherButtons;
+  switcherButtons(): Signal<RenderNode>[] {
+    return this._switcherButtons.map(switcherButton => switcherButton.print());
   }
 }

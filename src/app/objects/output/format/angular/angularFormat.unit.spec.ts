@@ -47,7 +47,7 @@ import {FakeChannel} from '../../../channel/fakeChannel';
 import {AngularFormatImpl} from './angularFormatImpl';
 import {OutputType} from '../../outputType';
 
-describe('AngularFormat', () => {
+describe('AngularFormat unit test', () => {
   const channel = new FakeChannel();
   let angularFormat: AngularFormatImpl;
 

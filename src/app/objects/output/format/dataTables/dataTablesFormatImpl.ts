@@ -65,7 +65,7 @@ import {DataTablesFormat} from './dataTablesFormat';
 
 export class DataTablesFormatImpl implements DataTablesFormat {
   private readonly _channel: Channel;
-  private readonly _switcherButtons: Printable[];
+  private readonly _switcherButton: Printable;
   private readonly _componentViewStub: ComponentView;
   private readonly _componentView: WritableSignal<ComponentView>;
   private readonly _pluginStub: DataTablesPlugin;
@@ -73,9 +73,7 @@ export class DataTablesFormatImpl implements DataTablesFormat {
 
   constructor(channel: Channel) {
     this._channel = channel;
-    this._switcherButtons = [
-      new DataTableSwitcherButton(this)
-    ];
+    this._switcherButton = new DataTableSwitcherButton(this);
     this._componentViewStub = new ComponentViewStub();
     this._componentView = signal(this._componentViewStub);
     this._pluginStub = new DataTablesPluginStub();
@@ -114,7 +112,7 @@ export class DataTablesFormatImpl implements DataTablesFormat {
     this._channel.request(data);
   }
 
-  switcherButtons(): Printable[] {
-    return this._switcherButtons;
+  switcherButtons(): Signal<RenderNode>[] {
+    return [this._switcherButton.print()];
   }
 }

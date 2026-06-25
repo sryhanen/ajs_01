@@ -45,7 +45,9 @@
  */
 import {Printable} from '../../rendering/printable/printable';
 import {Response} from '../../channel/response';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {Signal} from '@angular/core';
 
 export interface OutputFormat extends Response, Printable {
-  switcherButtons(): Printable[];
+  switcherButtons(): Signal<RenderNode>[];
 }

@@ -48,7 +48,6 @@ import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../message/messageImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../../rendering/renderNode/renderNode';
-import {Printable} from '../../rendering/printable/printable';
 import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
 import {OutputSwitcherView} from '../../../ui/angular2+/output/switcher/outputSwitcherView';
 import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
@@ -56,9 +55,9 @@ import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/p
 export class OutputSwitcherImpl implements OutputSwitcher {
   private readonly _outputIsSwitchable:WritableSignal<boolean>;
   private readonly _switchIsPending:WritableSignal<boolean>;
-  private readonly _switcherButtons: Printable[];
+  private readonly _switcherButtons: Signal<RenderNode>[];
 
-  constructor(switcherButtons: Printable[]) {
+  constructor(switcherButtons: Signal<RenderNode>[]) {
     this._switcherButtons = switcherButtons;
     this._outputIsSwitchable = signal(false);
     this._switchIsPending = signal(false);

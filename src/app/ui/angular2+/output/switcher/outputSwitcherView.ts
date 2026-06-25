@@ -43,12 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {
-  Component, input,
-  OnInit,
-} from '@angular/core';
-import {Printable} from '../../../../objects/rendering/printable/printable';
+import {Component, input, Signal} from '@angular/core';
 import {NgComponentOutlet} from '@angular/common';
+import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 
 @Component({
   selector: 'output-switcher',
@@ -59,7 +56,7 @@ import {NgComponentOutlet} from '@angular/common';
     @if (outputIsSwitchable()) {
       <div class="btn-group" role="group">
         @for (button of switcherButtons(); track $index) {
-          @let componentView = button.print()().componentView;
+          @let componentView = button().componentView;
           <ng-container
             *ngComponentOutlet="componentView.component(); inputs: componentView.inputs()()">
           </ng-container>
@@ -72,7 +69,7 @@ import {NgComponentOutlet} from '@angular/common';
   `
 })
 export class OutputSwitcherView {
-  switcherButtons = input.required<Printable[]>();
+  switcherButtons = input.required<Signal<RenderNode>[]>();
   switchIsPending= input.required<boolean>();
   outputIsSwitchable= input.required<boolean>();
 }

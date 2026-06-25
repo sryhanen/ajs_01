@@ -54,7 +54,6 @@ import {ComponentViewImpl} from '../../../rendering/componentView/componentViewI
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {TextOutputView} from '../../../../ui/angular2+/output/outputViews/textOutputView/textOutputView';
-import {Printable} from '../../../rendering/printable/printable';
 
 export class TextFormat implements OutputFormat {
   private readonly _componentViewStub: ComponentView;
@@ -86,7 +85,7 @@ export class TextFormat implements OutputFormat {
     }));
   }
 
-  switcherButtons(): Printable[] {
+  switcherButtons(): Signal<RenderNode>[] {
     return [];
   }
 }
