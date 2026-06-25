@@ -43,24 +43,39 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, ElementRef, input, OnInit, ViewChild} from '@angular/core';
-import {AnsiUp} from 'ansi_up';
+import {ComponentFixture} from '@angular/core/testing';
+import {render, screen} from '@testing-library/angular';
+import {TextOutputView} from './textOutputView';
 
-@Component({
-  selector: 'textOutputView',
-  template: `
-    <div #anchor class="plain-text" [innerHTML]="textContent()"></div>
-  `
-})
-export class TextOutputView implements OnInit {
-  textOutput = input.required<string>();
-  @ViewChild('anchor') anchor: ElementRef;
-  private _ansiUp: AnsiUp;
-  protected textContent = computed(() => {
-    return this._ansiUp.ansi_to_html(this.textOutput());
+describe('TextOutputView functional test', () => {
+  const textOutput = 'text output';
+  let fixture: ComponentFixture<TextOutputView>;
+  beforeEach(async () => {
+    const renderResult = await render(TextOutputView, {
+      inputs:{
+        textOutput: textOutput,
+      }
+    });
+    fixture = renderResult.fixture;
   });
 
-  ngOnInit() {
-    this._ansiUp = new AnsiUp();
-  }
-}
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have text visible', () => {
+      expect(screen.getByText(textOutput)).toBeDefined();
+    });
+  });
+
+  describe('Input change', () => {
+    it('Should have new text visible', () => {
+      const newText = 'new text content';
+      fixture.componentRef.setInput('textOutput', newText);
+      fixture.detectChanges();
+      expect(screen.getByText(newText)).toBeDefined();
+      expect(() => screen.getByText(textOutput)).toThrow();
+    });
+  });
+});
