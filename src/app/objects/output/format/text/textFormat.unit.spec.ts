@@ -46,7 +46,7 @@
 import {TextFormat} from './textFormat';
 import {OutputType} from '../../outputType';
 
-describe('Text Format', () => {
+describe('TextFormat unit test', () => {
   let textFormat: TextFormat;
 
   beforeEach(() => {
@@ -61,15 +61,18 @@ describe('Text Format', () => {
     it('Should not have switcherButtons', () => {
       expect(textFormat.switcherButtons()).toEqual([]);
     });
+
+    it('Should print', () => {
+      const textFormatPrinted = textFormat.print()();
+      expect(textFormatPrinted.componentView.isStub()).toBe(true);
+      expect(textFormatPrinted.children()).toHaveLength(0);
+    });
   });
 
   describe('ComponentView updates', () => {
-    it('Should have component view stub', () => {
-      expect(textFormat.print()().componentView.isStub()).toBe(true);
-    });
-
-    it('Should not have stub after output response', () => {
-      const outputResponse = {
+    let outputResponse;
+    beforeEach(() => {
+      outputResponse = {
         op:'PARAGRAPH_OUTPUT',
         data:{
           output:{
@@ -79,7 +82,18 @@ describe('Text Format', () => {
         }
       };
       textFormat.response(outputResponse);
-      expect(textFormat.print()().componentView.isStub()).toBe(false);
+    });
+
+    it('Should have OutputView', () => {
+      const componentView = textFormat.print()().componentView;
+      expect(componentView.isStub()).toBe(false);
+      expect(componentView.inputs()()['textOutput']).toBeDefined();
+    });
+
+    it('Should not have componentView after output type change', () => {
+      outputResponse.data.output.type = '';
+      textFormat.response(outputResponse);
+      expect(textFormat.print()().componentView.isStub()).toBe(true);
     });
   });
 });

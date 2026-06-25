@@ -48,7 +48,7 @@ import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {OutputType} from '../../outputType';
 
-describe('uPlotFormat', () => {
+describe('uPlotFormat unit test', () => {
   let channel:Channel;
   let uPlotFormat: UPlotFormatImpl;
   beforeEach(() => {
@@ -65,6 +65,12 @@ describe('uPlotFormat', () => {
       const switcherButtons = uPlotFormat.switcherButtons();
       expect(switcherButtons).toHaveLength(4);
     });
+
+    it('Should print', () => {
+      const uPlotFormatPrinted = uPlotFormat.print()();
+      expect(uPlotFormatPrinted.componentView.isStub()).toBe(true);
+      expect(uPlotFormatPrinted.children()).toHaveLength(0);
+    });
   });
 
   describe('Request', () => {
@@ -78,12 +84,9 @@ describe('uPlotFormat', () => {
   });
 
   describe('ComponentView updates', () => {
-    it('Should have component view stub', () => {
-      expect(uPlotFormat.print()().componentView.isStub()).toBe(true);
-    });
-
-    it('Should not have stub after output response', () => {
-      const outputResponse = {
+    let outputResponse;
+    beforeEach(() => {
+      outputResponse = {
         op:'PARAGRAPH_OUTPUT',
         data:{
           output:{
@@ -94,7 +97,20 @@ describe('uPlotFormat', () => {
         }
       };
       uPlotFormat.response(outputResponse);
-      expect(uPlotFormat.print()().componentView.isStub()).toBe(false);
+    });
+
+    it('Should have componentView', () => {
+      const componentView = uPlotFormat.print()().componentView;
+      expect(componentView.isStub()).toBe(false);
+      expect(componentView.inputs()()['uPlotOptions']).toBeDefined();
+      expect(componentView.inputs()()['uPlotData']).toBeDefined();
+    });
+
+    it('Should not have component view after output type change', () => {
+      outputResponse.data.output.type = '';
+      uPlotFormat.response(outputResponse);
+      const componentView = uPlotFormat.print()().componentView;
+      expect(componentView.isStub()).toBe(true);
     });
   });
 });

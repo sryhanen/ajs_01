@@ -46,7 +46,7 @@
 import {HTMLFormat} from './htmlFormat';
 import {OutputType} from '../../outputType';
 
-describe('HTMLFormat', () => {
+describe('HTMLFormat unit test', () => {
   let htmlFormat: HTMLFormat;
 
   beforeEach(() => {
@@ -84,13 +84,13 @@ describe('HTMLFormat', () => {
       htmlFormat.response(outputResponse);
     });
 
-    it('Should have OutputView', () => {
+    it('Should have componentView', () => {
       const componentView = htmlFormat.print()().componentView;
       expect(componentView.isStub()).toBe(false);
       expect(componentView.inputs()()['htmlTemplate']).toBeDefined();
     });
 
-    it('Should have OutputView after output type change', () => {
+    it('Should not have componentView after output type change', () => {
       outputResponse.data.output.type = '';
       htmlFormat.response(outputResponse);
       expect(htmlFormat.print()().componentView.isStub()).toBe(true);

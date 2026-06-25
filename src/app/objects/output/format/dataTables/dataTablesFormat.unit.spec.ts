@@ -100,7 +100,7 @@ describe('DataTablesFormat unit test', () => {
       dataTablesFormat.response(outputResponse);
     });
 
-    it('Should have component view', () => {
+    it('Should have componentView', () => {
       const componentView = dataTablesFormat.print()().componentView;
       expect(componentView.isStub()).toBe(false);
       expect(componentView.inputs()()['dataTablesPlugin']).toBeDefined();
