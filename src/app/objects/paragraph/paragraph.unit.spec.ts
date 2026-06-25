@@ -89,7 +89,8 @@ describe('Paragraph', () => {
 
     it('Should print', () => {
       const paragraphPrinted = paragraph.print()();
-      expect(paragraphPrinted).toBeDefined();
+      expect(paragraphPrinted.componentView.isStub()).toBe(true);
+      expect(paragraphPrinted.children()).toHaveLength(1);
     });
   });
 
