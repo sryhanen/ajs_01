@@ -49,13 +49,14 @@ import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 
 describe('ParagraphCollection unit test', () => {
-  const channel: Channel = new FakeChannel();
+  let channel: Channel;
   const initialparagraphData: object[] = [
     {id:'para1'},
     {id:'para2'},
   ];
   let paragraphCollection: ParagraphCollection;
   beforeEach(() => {
+    channel = new FakeChannel();
     paragraphCollection = new ParagraphCollectionImpl(channel, initialparagraphData);
   });
 
@@ -66,7 +67,8 @@ describe('ParagraphCollection unit test', () => {
 
     it('Should print', () => {
       const paragraphCollectionPrinted = paragraphCollection.print()();
-      expect(paragraphCollectionPrinted).toBeDefined();
+      expect(paragraphCollectionPrinted.componentView.isStub()).toBe(true);
+      expect(paragraphCollectionPrinted.children()).toHaveLength(2);
     });
   });
 
@@ -79,6 +81,78 @@ describe('ParagraphCollection unit test', () => {
       };
       paragraphCollection.request(request);
       expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+
+    it('Should decorate RUN_PARAGRAPH request', () => {
+      const paragraphId = 'para1';
+      const paragraphText = 'paragraph text';
+      const paragraphConfig = {test1:'test1'};
+      const paragraphSettings = {params:{test2:'test2'}};
+      paragraphCollection = new ParagraphCollectionImpl(channel, [{
+        id:paragraphId,
+        text:paragraphText,
+        config:paragraphConfig,
+        settings:paragraphSettings,
+      }]);
+      const runParagraphRequest = {
+        op:'RUN_PARAGRAPH',
+        data:{
+          id:paragraphId,
+          paragraph:'',
+          config:{},
+          params:{}
+        }
+      };
+      const spy = vi.spyOn(channel, 'request');
+      paragraphCollection.request(runParagraphRequest);
+      const expectedRequest = {
+        op:'RUN_PARAGRAPH',
+        data:{
+          id:paragraphId,
+          paragraph:paragraphText,
+          config:paragraphConfig,
+          params:paragraphSettings.params
+        }
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
+
+  describe('Collection updates', () => {
+    it('Should add paragraph', () => {
+      const paragraphAddedResponse = {
+        op:'PARAGRAPH_ADDED',
+        data:{
+          paragraph:{
+            id:'para3',
+          },
+          index:0
+        }
+      };
+      paragraphCollection.response(paragraphAddedResponse);
+      expect(paragraphCollection.print()().children()).toHaveLength(3);
+    });
+
+    it('Should set paragraph', () => {
+      const paragraphResponse = {
+        op:'PARAGRAPH',
+        data:{
+          id:'para3'
+        }
+      };
+      paragraphCollection.response(paragraphResponse);
+      expect(paragraphCollection.print()().children()).toHaveLength(3);
+    });
+
+    it('Should remove paragraph', () => {
+      const paragraphRemovedResponse = {
+        op:'PARAGRAPH_REMOVED',
+        data:{
+          id:'para1',
+        }
+      };
+      paragraphCollection.response(paragraphRemovedResponse);
+      expect(paragraphCollection.print()().children()).toHaveLength(1);
     });
   });
 });

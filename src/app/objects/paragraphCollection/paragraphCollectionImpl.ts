@@ -84,7 +84,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   private runParagraphRequest(json:object):void {
-    const runParagraphRequest = new RunParagraphRequest(this, this._decoratorParagraphs);
+    const runParagraphRequest = new RunParagraphRequest(this._channel, this._decoratorParagraphs);
     runParagraphRequest.request(json);
   }
 
