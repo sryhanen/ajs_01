@@ -58,6 +58,16 @@ describe('OutputSwitcher', () => {
     it('Should initialize', () => {
       expect(outputSwitcher).toBeInstanceOf(OutputSwitcherImpl);
     });
+
+    it('Should print', () => {
+      const printed = outputSwitcher.print()();
+      const componentView = printed.componentView;
+      expect(printed.children()).toHaveLength(0);
+      expect(componentView.isStub()).toBe(false);
+      expect(componentView.inputs()()['switcherButtons']).toBeDefined();
+      expect(componentView.inputs()()['switchIsPending']).toBeDefined();
+      expect(componentView.inputs()()['outputIsSwitchable']).toBeDefined();
+    });
   });
 
   describe('State changes', () => {
