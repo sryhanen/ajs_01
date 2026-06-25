@@ -44,44 +44,21 @@
  * a licensee so wish it.
  */
 import {ComponentFixture} from '@angular/core/testing';
-import {render, screen} from '@testing-library/angular';
-import {OutputSwitcherView} from './outputSwitcherView';
-import {Component, signal, Signal} from '@angular/core';
-import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
-import {ComponentViewImpl} from '../../../../objects/rendering/componentView/componentViewImpl';
-import {By} from '@angular/platform-browser';
+import {render, screen, fireEvent} from '@testing-library/angular';
+import {OutputSwitcherButtonView} from './outputSwitcherButtonView';
 
 describe('OutputSwitcherView functional test', () => {
-  @Component({
-    selector:'fake-component',
-    template: ''
-  })
-  class FakeComponent {}
-
-  let fixture: ComponentFixture<OutputSwitcherView>;
-  let switcherButtons: Signal<RenderNode>[];
-  let switchIsPending: boolean;
-  let outputIsSwitchable: boolean;
+  let fixture: ComponentFixture<OutputSwitcherButtonView>;
+  const requestFormatSwitch = vi.fn();
+  const title = 'title';
+  const icon = 'icon';
 
   beforeEach(async () => {
-    switcherButtons = [
-      signal({
-        componentView: new ComponentViewImpl(FakeComponent, signal({test:''})),
-        children:signal([])
-      }),
-      signal({
-        componentView: new ComponentViewImpl(FakeComponent, signal({test:''})),
-        children:signal([])
-      })
-    ];
-    switchIsPending = false;
-    outputIsSwitchable = true;
-
-    const renderResult = await render(OutputSwitcherView, {
+    const renderResult = await render(OutputSwitcherButtonView, {
       inputs:{
-        switcherButtons: switcherButtons,
-        switchIsPending: switchIsPending,
-        outputIsSwitchable: outputIsSwitchable
+        title: title,
+        icon: icon,
+        requestFormatSwitch: requestFormatSwitch,
       }
     });
     fixture = renderResult.fixture;
@@ -92,33 +69,19 @@ describe('OutputSwitcherView functional test', () => {
       expect(fixture.componentInstance).toBeDefined();
     });
 
-    it('Should render group', () => {
-      expect(screen.getByRole('group')).toBeDefined();
+    it('Should render button', () => {
+      expect(screen.getByRole('button')).toBeDefined();
     });
 
-    it('Should render elements in the group', () => {
-      expect(fixture.debugElement.queryAll(By.directive(FakeComponent))).toHaveLength(2);
+    it('Should have label', () => {
+      expect(screen.getByLabelText(title)).toBeDefined();
     });
   });
 
-  describe('Content visibility', () => {
-    it('Should hide everything if output is not switchable', () => {
-      fixture.componentRef.setInput('outputIsSwitchable', false);
-      fixture.detectChanges();
-      expect(() => screen.getByRole('group')).toThrow();
-      expect(fixture.debugElement.queryAll(By.directive(FakeComponent))).toHaveLength(0);
-    });
-
-    describe('Status visibility', () => {
-      it('Not visible initially', () => {
-        expect(() => screen.getByRole('status')).toThrow();
-      });
-
-      it('Should be visible', () => {
-        fixture.componentRef.setInput('switchIsPending', true);
-        fixture.detectChanges();
-        expect(screen.getByRole('status')).toBeDefined();
-      });
+  describe('Button click', () => {
+    it('Should evoke callback on click', () => {
+      fireEvent.click(screen.getByRole('button'));
+      expect(requestFormatSwitch).toHaveBeenCalledTimes(1);
     });
   });
 });
