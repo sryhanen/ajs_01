@@ -47,20 +47,20 @@ import {webAppRoot} from './webAppRootImpl';
 import {WebSocketService} from '../webSocket/service/webSocketService';
 import {FakeWebSocketService} from '../webSocket/service/fakeWebSocketService';
 
-describe('WebAppRoot', () => {
+describe('WebAppRoot unit test', () => {
   const webSocketService: WebSocketService = new FakeWebSocketService();
 
   describe('Before initialization', () => {
-    it('rootObject() method throws error if singleton has not been initialized ', () => {
-      expect(() => webAppRoot.rootObject()).toThrow();
-    });
-
-    it('request() method throws error if singleton has not been initialized ', () => {
+    it('request() method throws error if singleton has not been initialized.', () => {
       expect(() => webAppRoot.request({})).toThrow();
     });
 
-    it('response() method throws error if singleton has not been initialized ', () => {
+    it('response() method throws error if singleton has not been initialized.', () => {
       expect(() => webAppRoot.response({})).toThrow();
+    });
+
+    it('print() method throws error if singleton has not been initialized.', () => {
+      expect(() => webAppRoot.print()).toThrow();
     });
   });
 
@@ -74,6 +74,22 @@ describe('WebAppRoot', () => {
       expect(spy).toHaveBeenCalledTimes(0);
       webAppRoot.request({op:'', data:{}});
       expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('Should print', () => {
+      expect(webAppRoot.print()().children()).toHaveLength(0);
+    });
+
+    it('Should update print signal after response', () => {
+      const noteResponse = {
+        op:'NOTE',
+        data:{
+          id:'note',
+          paragraphs:[]
+        }
+      };
+      webAppRoot.response(noteResponse);
+      expect(webAppRoot.print()().children()).toHaveLength(1);
     });
   });
 });

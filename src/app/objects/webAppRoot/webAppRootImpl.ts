@@ -49,12 +49,12 @@ import {NotebookCollection} from '../notebookCollection/notebookCollection';
 import {NotebookCollectionImpl} from '../notebookCollection/notebookCollectionImpl';
 import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {Printable} from '../rendering/printable/printable';
+import {signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;
+  private readonly _printSignal: WritableSignal<RenderNode> = signal(undefined);
 
   private _notebookCollection: WritableSignal<NotebookCollection>;
   private set notebookCollection(value: NotebookCollection){
@@ -81,20 +81,15 @@ class WebAppRootImpl implements WebAppRoot {
       return;
     }
     this.notebookCollection = new NotebookCollectionImpl(this);
+    this._printSignal.set(this._notebookCollection().print()());
     this.webSocket = new WebSocketChannel(this, webSocketService);
     this._hasInitialized = true;
   }
 
-  rootObject(): Signal<Printable> {
+  print(): Signal<RenderNode> {
     if(!this._hasInitialized){
       throw new Error('WebAppRoot not initialized');
     }
-    return computed(() => this.notebookCollection());
-  }
-
-  private readonly _printSignal: WritableSignal<RenderNode> = signal({children:undefined, componentView:undefined});
-
-  print(): Signal<RenderNode> {
     return this._printSignal;
   }
 
