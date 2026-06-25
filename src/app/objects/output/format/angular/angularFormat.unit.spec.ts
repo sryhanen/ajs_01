@@ -63,6 +63,12 @@ describe('AngularFormat', () => {
     it('Should not have switcherButtons', () => {
       expect(angularFormat.switcherButtons()).toEqual([]);
     });
+
+    it('Should print', () => {
+      const angularFormatPrinted = angularFormat.print()();
+      expect(angularFormatPrinted.componentView.isStub()).toBe(true);
+      expect(angularFormatPrinted.children()).toHaveLength(0);
+    });
   });
 
   describe('Request', () => {
@@ -78,22 +84,31 @@ describe('AngularFormat', () => {
   });
 
   describe('ComponentView updates', () => {
-    it('Should have component view stub', () => {
-      expect(angularFormat.print()().componentView.isStub()).toBe(true);
-    });
-
-    it('Should not have stub after output response', () => {
-      const outputResponse = {
+    let outputResponse;
+    const template = '<h1>template</h1>';
+    beforeEach(() => {
+      outputResponse = {
         op:'PARAGRAPH_OUTPUT',
         data:{
           output:{
             type:OutputType.angular,
-            data:'',
+            data:template,
           }
         }
       };
+    });
+
+    it('Should have component view', () => {
       angularFormat.response(outputResponse);
-      expect(angularFormat.print()().componentView.isStub()).toBe(false);
+      const componentView = angularFormat.print()().componentView;
+      expect(componentView.isStub()).toBe(false);
+      expect(componentView.inputs()()['template']).toEqual(template);
+    });
+
+    it('Should have not have component view after output type change', () => {
+      outputResponse.data.output.type = '';
+      angularFormat.response(outputResponse);
+      expect(angularFormat.print()().componentView.isStub()).toBe(true);
     });
   });
 });
