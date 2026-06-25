@@ -88,7 +88,7 @@ export class OutputContainerImpl implements OutputContainer{
         paragraphId:this._paragraphId,
         componentView: this._componentView,
         children: computed(() => [
-          ...this._outputFormatsWithValidatedOutputSwitch.print()().children(),
+          this._outputFormatsWithValidatedOutputSwitch.print()(),
           this._interpreterErrorListener.print()()
         ]),
       })

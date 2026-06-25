@@ -63,7 +63,10 @@ describe('OutputContainer', () => {
     });
 
     it('Should print', () => {
-      expect(outputContainer.print()).toBeDefined();
+      const outputContainerPrinted = outputContainer.print()();
+      expect(outputContainerPrinted.children()).toHaveLength(2);
+      expect(outputContainerPrinted.componentView.isStub()).toBe(true);
+      expect(outputContainerPrinted.paragraphId).toEqual('paragraphId');
     });
   });
 
