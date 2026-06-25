@@ -45,16 +45,16 @@
  */
 import {ParagraphOutputRequest} from './paragraphOutputRequest';
 import {Message} from '../../../message/message';
+import {TypedMessage} from '../../../message/typedMessage/typedMessage';
 
 export class ParagraphOutputRequestImpl implements ParagraphOutputRequest {
   private readonly _message:Message;
 
   constructor(message:Message) {
-    this._message = message;
+    this._message = new TypedMessage('PARAGRAPH_OUTPUT_REQUEST', message);
   }
 
   request(): object {
-    this.validateOperation();
     return {
       op:this.operation(),
       data:this.data(),
@@ -62,27 +62,18 @@ export class ParagraphOutputRequestImpl implements ParagraphOutputRequest {
   }
 
   type(): string {
-    this.validateOperation();
     return this._message.data()['type'];
   }
 
   operation(): string {
-    this.validateOperation();
     return this._message.operation();
   }
 
   data(): object {
-    this.validateOperation();
     return this._message.data();
   }
 
   isStub(): boolean {
     return false;
-  }
-
-  private validateOperation():void{
-    if(this._message.operation() !== 'PARAGRAPH_OUTPUT_REQUEST'){
-      throw new RangeError('Message operation is not "PARAGRAPH_OUTPUT_REQUEST".');
-    }
   }
 }

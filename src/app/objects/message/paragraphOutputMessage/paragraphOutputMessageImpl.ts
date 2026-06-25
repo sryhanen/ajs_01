@@ -60,7 +60,8 @@ export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
   }
 
   isAggregated(): boolean {
-    return this.output().getProperty('isAggregated', 'boolean');
+    const output = this.output();
+    return output.propertyExists('isAggregated') && output.getProperty('isAggregated', 'boolean');
   }
 
   type(): string {

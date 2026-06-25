@@ -101,9 +101,24 @@ describe('ParagraphOutputMessage unit test', () => {
       expect(paragraphOutputMessage.outputData<object>('object')).toEqual(paragraphOutputMessageData.data.output.data);
     });
 
-    it('Should have isAggregated', () => {
-      expect(paragraphOutputMessage.isAggregated()).toEqual(paragraphOutputMessageData.data.output.isAggregated);
+    describe('isAggregated', () => {
+      it('Should be true', () => {
+        expect(paragraphOutputMessage.isAggregated()).toEqual(true);
+      });
+
+      it('Should be false if property is false', () => {
+        paragraphOutputMessageData.data.output.isAggregated = false;
+        paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new SafeJsonImpl(paragraphOutputMessageData)));
+        expect(paragraphOutputMessage.isAggregated()).toEqual(false);
+      });
+
+      it('Should be false if property is undefined', () => {
+        delete paragraphOutputMessageData.data.output.isAggregated;
+        paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new SafeJsonImpl(paragraphOutputMessageData)));
+        expect(paragraphOutputMessage.isAggregated()).toEqual(false);
+      });
     });
+
 
     describe('options', () => {
       it('Should have options', () => {
