@@ -61,15 +61,18 @@ describe('HTMLFormat', () => {
     it('Should not have switcherButtons', () => {
       expect(htmlFormat.switcherButtons()).toEqual([]);
     });
+
+    it('Should print', () => {
+      const htmlFormatPrinted = htmlFormat.print()();
+      expect(htmlFormatPrinted.componentView.isStub()).toBe(true);
+      expect(htmlFormatPrinted.children()).toHaveLength(0);
+    });
   });
 
   describe('ComponentView updates', () => {
-    it('Should have component view stub', () => {
-      expect(htmlFormat.print()().componentView.isStub()).toBe(true);
-    });
-
-    it('Should not have stub after output response', () => {
-      const outputResponse = {
+    let outputResponse;
+    beforeEach(() => {
+      outputResponse = {
         op:'PARAGRAPH_OUTPUT',
         data:{
           output:{
@@ -79,7 +82,18 @@ describe('HTMLFormat', () => {
         }
       };
       htmlFormat.response(outputResponse);
-      expect(htmlFormat.print()().componentView.isStub()).toBe(false);
+    });
+
+    it('Should have OutputView', () => {
+      const componentView = htmlFormat.print()().componentView;
+      expect(componentView.isStub()).toBe(false);
+      expect(componentView.inputs()()['htmlTemplate']).toBeDefined();
+    });
+
+    it('Should have OutputView after output type change', () => {
+      outputResponse.data.output.type = '';
+      htmlFormat.response(outputResponse);
+      expect(htmlFormat.print()().componentView.isStub()).toBe(true);
     });
   });
 });
