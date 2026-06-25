@@ -54,7 +54,10 @@ import {Component, input} from '@angular/core';
             (click)="requestFormatSwitch()()">
       <i class="{{icon()}}"></i>
     </button>
-  `
+  `,
+  host:{
+    'class': 'btn-group',
+  }
 })
 export class OutputSwitcherButtonView {
   requestFormatSwitch = input.required<() => void>();
