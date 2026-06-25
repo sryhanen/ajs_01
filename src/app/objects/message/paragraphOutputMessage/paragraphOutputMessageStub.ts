@@ -43,34 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import { StubableObject } from '../../stubableObject/stubableObject';
 import {ParagraphOutputMessage} from './paragraphOutputMessage';
 
 export class ParagraphOutputMessageStub implements ParagraphOutputMessage {
   isStub(): boolean {
     return true;
   }
-
-  data(): object {
-    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
-  }
-
   isAggregated(): boolean {
     throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
-
+  type(): string {
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
+  }
+  outputData<T>(type: string): T {
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
+  }
+  options(): StubableObject {
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
+  }
+  data(): object {
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
+  }
   operation(): string {
-    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
-  }
-
-  output(): object {
-    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
-  }
-
-  outputOptions(): object {
-    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
-  }
-
-  outputType(): string {
     throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
 }

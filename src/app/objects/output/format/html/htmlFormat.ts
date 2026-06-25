@@ -48,7 +48,6 @@ import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {Channel} from '../../../channel/channel';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ComponentView} from '../../../rendering/componentView/componentView';
@@ -70,11 +69,11 @@ export class HTMLFormat implements OutputFormat{
     const message = new MessageImpl(new SafeJsonImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.outputType() !== OutputType.html) {
+      if(paragraphOutputMessage.type() !== OutputType.html) {
         this._componentView.set(this._componentViewStub);
         return;
       }
-      const htmlTemplate = new SafeJsonImpl(paragraphOutputMessage.output()).getProperty('data', 'string');
+      const htmlTemplate:string = paragraphOutputMessage.outputData('string');
       const componentView = new ComponentViewImpl(HtmlOutputView, signal({htmlTemplate: htmlTemplate}));
       this._componentView.set(componentView);
     }

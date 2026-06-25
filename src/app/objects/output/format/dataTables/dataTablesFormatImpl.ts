@@ -45,7 +45,6 @@
  */
 import {Channel} from '../../../channel/channel';
 import {DataTableSwitcherButton} from './switcherButton/dataTablesSwitcherButton';
-import {OutputFormat} from '../outputFormat';
 import {OutputType} from '../../outputType';
 import {DataTablesPluginImpl} from './dataTablesPlugin/dataTablesPluginImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
@@ -94,18 +93,18 @@ export class DataTablesFormatImpl implements DataTablesFormat {
     const message = new MessageImpl(new SafeJsonImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.outputType() !== OutputType.dataTables){
+      if(paragraphOutputMessage.type() !== OutputType.dataTables){
         this._componentView.set(this._componentViewStub);
         this._plugin.set(this._pluginStub);
         return;
       }
-      const dataTablesData = paragraphOutputMessage.output()['data'];
+      const dataTablesData:object = paragraphOutputMessage.outputData('object');
       if(!this._plugin().isStub()){
         this._plugin().response(dataTablesData);
       }
       else{
-        const dataTablesOptions = paragraphOutputMessage.outputOptions();
-        this._plugin.set(new DataTablesPluginImpl(this, dataTablesData, dataTablesOptions));
+        const dataTablesOptions = paragraphOutputMessage.options();
+        this._plugin.set(new DataTablesPluginImpl(this, dataTablesData, dataTablesOptions.value()));
         this._componentView.set(new ComponentViewImpl(DataTablesOutputView, signal({dataTablesPlugin: this._plugin()})));
       }
     }

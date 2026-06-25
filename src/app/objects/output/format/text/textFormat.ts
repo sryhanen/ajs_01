@@ -50,7 +50,6 @@ import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {ComponentView} from '../../../rendering/componentView/componentView';
-import {Channel} from '../../../channel/channel';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
@@ -70,11 +69,11 @@ export class TextFormat implements OutputFormat {
     const message = new MessageImpl(new SafeJsonImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.outputType() !== OutputType.text) {
+      if(paragraphOutputMessage.type() !== OutputType.text) {
         this._componentView.set(this._componentViewStub);
         return;
       }
-      const textOutput = new SafeJsonImpl(paragraphOutputMessage.output()).getProperty('data', 'string');
+      const textOutput:string = paragraphOutputMessage.outputData('string');
       const componentView = new ComponentViewImpl(TextOutputView, signal({textOutput: textOutput}));
       this._componentView.set(componentView);
     }

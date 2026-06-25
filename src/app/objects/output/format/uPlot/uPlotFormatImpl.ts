@@ -58,6 +58,7 @@ import {ComponentViewImpl} from '../../../rendering/componentView/componentViewI
 import {UPlotOutputView} from '../../../../ui/angular2+/output/outputViews/uPlotOutputView/uPlotOutputView';
 import {Printable} from '../../../rendering/printable/printable';
 import {UPlotFormat} from './uPlotFormat';
+import uPlot from 'uplot';
 
 export class UPlotFormatImpl implements UPlotFormat {
   private readonly _channel: Channel;
@@ -85,12 +86,12 @@ export class UPlotFormatImpl implements UPlotFormat {
     const message = new MessageImpl(new SafeJsonImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT') {
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.outputType() !== OutputType.uPlot){
+      if(paragraphOutputMessage.type() !== OutputType.uPlot){
         this._componentView.set(this._componentViewStub);
         return;
       }
-      const uPlotData = paragraphOutputMessage.output()['data'];
-      const uPlotOptions = paragraphOutputMessage.outputOptions();
+      const uPlotData:uPlot.AlignedData = paragraphOutputMessage.outputData('object');
+      const uPlotOptions = paragraphOutputMessage.options().value();
       this._componentView.set(new ComponentViewImpl(UPlotOutputView, signal({uPlotOptions: uPlotOptions, uPlotData: uPlotData})));
     }
   }
