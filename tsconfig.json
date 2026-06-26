@@ -30,6 +30,7 @@
     "./devServer/**/*",
     "./webpack.config.ts",
     "./webpack.config.dev.ts",
+    "./webpack.config.karma.ts",
     "./src/test/*",
     "./**/*.spec.ts"
   ]
