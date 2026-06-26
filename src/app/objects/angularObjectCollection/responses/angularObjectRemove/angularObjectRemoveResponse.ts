@@ -45,17 +45,14 @@
  */
 import {Response} from '../../../channel/response';
 import {AngularObject} from '../../../angularObject/angularObject';
-import {PushValue} from '../../../pushValue/pushValue';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 
 export class AngularObjectRemoveResponse implements Response {
   private readonly _angularObjects: AngularObject[];
-  private readonly _pushValues: PushValue<AngularObject[]>[];
 
-  constructor(angularObjects: AngularObject[], pushValues: PushValue<AngularObject[]>[]) {
+  constructor(angularObjects: AngularObject[]) {
     this._angularObjects = angularObjects;
-    this._pushValues = pushValues;
   }
 
   response(data: object) {
@@ -68,7 +65,6 @@ export class AngularObjectRemoveResponse implements Response {
         throw new Error(`Error during angular object remove: no object "${objectToRemoveName}" in current collection.`);
       }
       this._angularObjects.splice(objectIndex, 1);
-      this._pushValues.forEach(value => value.update(this._angularObjects));
     }
   }
 }

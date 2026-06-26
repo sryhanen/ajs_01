@@ -45,75 +45,53 @@
  */
 import {OutputContainer} from './outputContainer';
 import {Channel} from '../../channel/channel';
-import {Response} from '../../channel/response';
-import {OutputFormat} from '../format/outputFormat';
-import {OutputSwitcherImpl} from '../switcher/outputSwitcherImpl';
-import {OutputSwitcher} from '../switcher/outputSwitcher';
-import {TextFormat} from '../format/text/textFormat';
-import {DataTablesFormat} from '../format/dataTables/dataTablesFormat';
-import {uPlotFormat} from '../format/uPlot/uPlotFormat';
+import {computed, Signal} from '@angular/core';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {ComponentView} from '../../rendering/componentView/componentView';
+import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
+import {
+  OutputFormatsWithValidatedOutputSwitchImpl
+} from '../outputFormatsWithValidatedOutputSwitch/outputFormatsWithValidatedOutputSwitchImpl';
+import {
+  OutputFormatsWithValidatedOutputSwitch
+} from '../outputFormatsWithValidatedOutputSwitch/outputFormatsWithValidatedOutputSwitch';
 import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
 import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/interpreterErrorListenerImpl';
-import {AngularFormat} from '../format/angular/angularFormat';
-import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
-import {HTMLFormat} from '../format/html/htmlFormat';
-import {ParagraphOutputResponseImpl} from './responses/paragraphOutputResponse/paragraphOutputResponseImpl';
-import {OutputPlugin} from '../plugins/outputPlugin';
-import {PushValue} from '../../pushValue/pushValue';
-import {OutputPluginStub} from '../plugins/outputPluginStub';
-import {PushValueImpl} from '../../pushValue/pushValueImpl';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
-  private readonly _outputFormats:OutputFormat[];
-  private readonly _outputSwitcher:OutputSwitcher;
-  private readonly _errorListener: InterpreterErrorListener;
-  private readonly _responses: Response[];
-  private readonly _outputPluginListeners: PushValue<OutputPlugin>[];
-  private readonly _activePlugin:PushValue<OutputPlugin>;
+  private readonly _outputFormatsWithValidatedOutputSwitch: OutputFormatsWithValidatedOutputSwitch;
+  private readonly _interpreterErrorListener:InterpreterErrorListener;
+  private readonly _componentView:ComponentView;
+  private readonly _paragraphId:string;
 
-  constructor(channel:Channel, angularObjectCollection: AngularObjectCollection) {
+  constructor(channel:Channel, paragraphId:string) {
     this._channel = channel;
-    this._outputFormats = [
-      new DataTablesFormat(this),
-      new uPlotFormat(),
-      new TextFormat(),
-      new AngularFormat(this, angularObjectCollection),
-      new HTMLFormat()
-    ];
-    this._outputSwitcher = new OutputSwitcherImpl(this);
-    this._errorListener = new InterpreterErrorListenerImpl(this);
-    this._outputPluginListeners = [];
-    this._activePlugin = new PushValueImpl();
-    this._activePlugin.update(new OutputPluginStub());
-    this._responses = [
-      new ParagraphOutputResponseImpl(this, this._outputFormats, this._outputSwitcher, this._activePlugin, this._outputPluginListeners)
-    ];
+    this._outputFormatsWithValidatedOutputSwitch = new OutputFormatsWithValidatedOutputSwitchImpl(this);
+    this._interpreterErrorListener = new InterpreterErrorListenerImpl();
+    this._paragraphId = paragraphId;
+    this._componentView = new ComponentViewStub();
   }
 
-  outputPlugin(value: PushValue<OutputPlugin>): void {
-    value.update(this._activePlugin.value());
-    this._outputPluginListeners.push(value);
+  request(json: object): void {
+    this._channel.request(json);
   }
 
-  errorListener(): InterpreterErrorListener {
-    return this._errorListener;
+  response(json: object): void {
+    this._outputFormatsWithValidatedOutputSwitch.response(json);
+    this._interpreterErrorListener.response(json);
   }
 
-  outputSwitcher(): OutputSwitcher {
-    return this._outputSwitcher;
-  }
-
-  outputFormats(): OutputFormat[] {
-    return this._outputFormats;
-  }
-
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(data: object): void {
-    this._responses.forEach(response => response.response(data));
-    this._errorListener.response(data);
+  print(): Signal<RenderNode> {
+    return computed(() =>
+      ({
+        paragraphId:this._paragraphId,
+        componentView: this._componentView,
+        children: computed(() => [
+          this._outputFormatsWithValidatedOutputSwitch.print()(),
+          this._interpreterErrorListener.print()()
+        ]),
+      })
+    );
   }
 }

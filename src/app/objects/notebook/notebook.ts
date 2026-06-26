@@ -44,9 +44,9 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
-import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
+import {Printable} from '../rendering/printable/printable';
+import Stubable from '../../shared/interfaces/stubable';
 
-export interface Notebook extends Channel{
+export interface Notebook extends Channel, Printable, Stubable{
   id(): string;
-  paragraphCollection():ParagraphCollection;
 }

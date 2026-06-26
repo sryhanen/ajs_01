@@ -44,32 +44,48 @@
  * a licensee so wish it.
  */
 import {OutputFormat} from '../outputFormat';
-import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {TextPluginImpl} from '../../plugins/textPlugin/textPluginImpl';
-import {OutputPlugin} from '../../plugins/outputPlugin';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {RenderNode} from '../../../rendering/renderNode/renderNode';
+import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
+import {ComponentView} from '../../../rendering/componentView/componentView';
+import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import {MessageImpl} from '../../../message/messageImpl';
+import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
+import {TextOutputView} from '../../../../ui/angular2+/output/outputViews/textOutputView/textOutputView';
 
 export class TextFormat implements OutputFormat {
-  private readonly _switcherButtons: OutputSwitcherButton[];
-  private readonly _outputType: string;
+  private readonly _componentViewStub: ComponentView;
+  private readonly _componentView: WritableSignal<ComponentView>;
 
   constructor() {
-    this._outputType = OutputType.text;
-    this._switcherButtons = [];
+    this._componentViewStub = new ComponentViewStub();
+    this._componentView = signal(this._componentViewStub);
   }
 
-  plugin(paragraphOutputData: object): OutputPlugin {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData:string = safeParagraphOutputData.getProperty('data', 'string');
-    return new TextPluginImpl(outputData);
+  response(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    if(message.operation() === 'PARAGRAPH_OUTPUT'){
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
+      if(paragraphOutputMessage.type() !== OutputType.text) {
+        this._componentView.set(this._componentViewStub);
+        return;
+      }
+      const textOutput:string = paragraphOutputMessage.outputData('string');
+      const componentView = new ComponentViewImpl(TextOutputView, signal({textOutput: textOutput}));
+      this._componentView.set(componentView);
+    }
   }
 
-  switcherButtons(): OutputSwitcherButton[] {
-    return this._switcherButtons;
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      componentView: this._componentView(),
+      children: computed(() => []),
+    }));
   }
 
-  outputType(): string {
-    return this._outputType;
+  switcherButtons(): Signal<RenderNode>[] {
+    return [];
   }
 }

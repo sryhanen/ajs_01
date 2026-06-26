@@ -44,9 +44,6 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
-import {Notebook} from '../notebook/notebook';
-import {PushValue} from '../pushValue/pushValue';
+import {Printable} from '../rendering/printable/printable';
 
-export interface NotebookCollection extends Channel{
-  notebooks(value: PushValue<Notebook[]>):void;
-}
+export interface NotebookCollection extends Channel, Printable{}

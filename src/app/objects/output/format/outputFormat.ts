@@ -43,12 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputSwitcherButton} from '../switcher/button/outputSwitcherButton';
-import {OutputPlugin} from '../plugins/outputPlugin';
+import {Printable} from '../../rendering/printable/printable';
+import {Response} from '../../channel/response';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {Signal} from '@angular/core';
 
-export interface OutputFormat {
-  switcherButtons(): OutputSwitcherButton[];
-  outputType(): string;
-  plugin(paragraphOutputData:object): OutputPlugin;
+export interface OutputFormat extends Response, Printable {
+  switcherButtons(): Signal<RenderNode>[];
 }
-

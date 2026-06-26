@@ -47,89 +47,70 @@ import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
 import {OutputContainer} from '../output/container/outputContainer';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
-import {AngularObjectCollection} from '../angularObjectCollection/angularObjectCollection';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {MessageImpl} from '../message/messageImpl';
-import {AngularObjectCollectionImpl} from '../angularObjectCollection/angularObjectCollectionImpl';
+import {computed, Signal} from '@angular/core';
+import { RenderNode } from '../rendering/renderNode/renderNode';
+import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
+import {ComponentView} from '../rendering/componentView/componentView';
+import {ParagraphDataAsOutputMessageImpl} from './paragraphDataAsOutputMessage/paragraphDataAsOutputMessageImpl';
+import {ResponseRegister} from '../register/responseRegister/responseRegister';
+import {
+  ResponseRegisterWithPropertyFilter
+} from '../register/responseRegister/responseRegisterWithPropertyFilter/responseRegisterWithPropertyFilter';
+import {
+  ResponseRegisterWithDefaultResponseList
+} from '../register/responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
+import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
+import {RequestRegister} from '../register/requestRegister/requestRegister';
+import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterImpl';
+import {
+  RequestRegisterWithPropertyDecorator
+} from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 
-export class ParagraphImpl implements Paragraph{
+export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
-  private readonly _angularObjectCollection: AngularObjectCollection;
   private readonly _paragraph: SafeJson;
+  private readonly _componentView: ComponentView;
+  private readonly _responseRegister:ResponseRegister;
+  private readonly _requestRegister:RequestRegister;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
-    this._angularObjectCollection = new AngularObjectCollectionImpl(this);
-    this._outputContainer = new OutputContainerImpl(this, this._angularObjectCollection);
+    this._outputContainer = new OutputContainerImpl(this, this.id());
 
-    if(this._paragraph.propertyExists('output')){
-      const paragraphOutput = this._paragraph.getProperty<object>('output', 'object');
-      if(paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined){
-        console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
-      }
-      else{
-        const paragraphOutputMessage = {
-          op:'PARAGRAPH_OUTPUT',
-          data: {
-            noteId:'',
-            paragraphId:'',
-            output: paragraphOutput,
-          }
-        };
-        this._outputContainer.response(paragraphOutputMessage);
-      }
+    const paragraphDataAsOutputMessage = new ParagraphDataAsOutputMessageImpl(paragraph);
+    const paragraphOutputMessage = paragraphDataAsOutputMessage.paragraphOutputMessage();
+    if(!paragraphOutputMessage.isStub()){
+      const paragraphOutputMessageData = {
+        op:paragraphOutputMessage.operation(),
+        data:paragraphOutputMessage.data(),
+      };
+      this._outputContainer.response(paragraphOutputMessageData);
     }
+    this._componentView = new ComponentViewStub();
+    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer]), {name:'paragraphId', type:'string'}, this.id());
+    this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
+  }
+
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      children:computed(() => [this._outputContainer.print()()]),
+      componentView: this._componentView
+    }));
   }
 
   id(): string {
     return this._paragraph.getProperty('id', 'string');
   }
 
-  outputContainer(): OutputContainer {
-    return this._outputContainer;
+  request(json: object): void {
+    this._requestRegister.request(json);
   }
 
-  print():object {
-    return {
-      text:this._paragraph.getProperty<string>('text', 'string'),
-      config:this._paragraph.getProperty<object>('config', 'object'),
-      settings: this._paragraph.getProperty<object>('settings', 'object'),
-    };
-  }
-
-  request(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    const messageData = new SafeJsonImpl(message.data());
-    if(messageData.propertyExists('paragraphId')){
-      const decoratedData = message.data();
-      decoratedData['paragraphId'] = this.id();
-      const decoratedRequest = {
-        op:message.operation(),
-        data:decoratedData,
-      };
-      this._channel.request(decoratedRequest);
-    }
-    else {
-      this._channel.request(data);
-    }
-  }
-
-  response(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    const messageData = new SafeJsonImpl(message.data());
-    if(messageData.propertyExists('paragraphId')){
-      const paragraphId:string = messageData.getProperty('paragraphId', 'string');
-      if(paragraphId === this.id()){
-        this._outputContainer.response(data);
-        this._angularObjectCollection.response(data);
-      }
-    }
-    else{
-      this._outputContainer.response(data);
-      this._angularObjectCollection.response(data);
-    }
+  response(json: object): void {
+    this._responseRegister.response(json);
   }
 }

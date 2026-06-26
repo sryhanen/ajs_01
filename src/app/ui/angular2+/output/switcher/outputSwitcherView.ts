@@ -43,41 +43,33 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {
-  Component,
-  Input, OnInit, signal,
-} from '@angular/core';
-import {OutputSwitcher} from '../../../../objects/output/switcher/outputSwitcher';
-import {OutputSwitcherButtonView} from './button/outputSwitcherButtonView';
-import {OutputSwitcherButton} from '../../../../objects/output/switcher/button/outputSwitcherButton';
-import {WritableSignalAsPushValue} from '../../writableSignalAsPushValue/writableSignalAsPushValue';
+import {Component, input, Signal} from '@angular/core';
+import {NgComponentOutlet} from '@angular/common';
+import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 
 @Component({
   selector: 'output-switcher',
   imports: [
-    OutputSwitcherButtonView
+    NgComponentOutlet
   ],
   template: `
-    @let status = this.switcherStatus();
-    @if (status.isSwitchable) {
+    @if (outputIsSwitchable()) {
       <div class="btn-group" role="group">
-        @for (button of outputSwitcherButtons; track $index) {
-          <output-switcher-button class="btn-group" [outputSwitcherButton]="button"
-                                  [outputSwitcher]="outputSwitcher"></output-switcher-button>
+        @for (button of switcherButtons(); track $index) {
+          @let componentView = button().componentView;
+          <ng-container
+            *ngComponentOutlet="componentView.component(); inputs: componentView.inputs()()">
+          </ng-container>
         }
       </div>
-      @if (status.isLoading) {
+      @if (switchIsPending()) {
         <div class="spinner-border mx-2 text-primary" role="status"></div>
       }
     }
   `
 })
-export class OutputSwitcherView implements OnInit{
-  @Input({required:true}) outputSwitcher:OutputSwitcher;
-  @Input({required:true}) outputSwitcherButtons: OutputSwitcherButton[];
-  protected switcherStatus = signal({isSwitchable:false, isLoading:false});
-
-  ngOnInit(): void {
-    this.outputSwitcher.status(new WritableSignalAsPushValue(this.switcherStatus));
-  }
+export class OutputSwitcherView {
+  switcherButtons = input.required<Signal<RenderNode>[]>();
+  switchIsPending= input.required<boolean>();
+  outputIsSwitchable= input.required<boolean>();
 }

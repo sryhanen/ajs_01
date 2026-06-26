@@ -44,37 +44,6 @@
  * a licensee so wish it.
  */
 import {OutputFormat} from '../outputFormat';
-import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
 import {Channel} from '../../../channel/channel';
-import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
-import {AngularPluginImpl} from '../../plugins/angularPlugin/angularPluginImpl';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {OutputType} from '../../outputType';
-import {OutputPlugin} from '../../plugins/outputPlugin';
 
-export class AngularFormat implements OutputFormat {
-  private readonly _channel: Channel;
-  private readonly _angularObjectCollection:AngularObjectCollection;
-  private readonly _switcherButtons: OutputSwitcherButton[];
-  private readonly _outputType:string;
-
-  constructor(channel: Channel, angularObjectCollection:AngularObjectCollection) {
-    this._channel = channel;
-    this._angularObjectCollection = angularObjectCollection;
-    this._switcherButtons = [];
-    this._outputType = OutputType.angular;
-  }
-
-  outputType(): string {
-    return this._outputType;
-  }
-
-  plugin(paragraphOutputData: object): OutputPlugin {
-    const template:string = new SafeJsonImpl(paragraphOutputData).getProperty('data', 'string');
-    return new AngularPluginImpl(this._channel, template, this._angularObjectCollection);
-  }
-
-  switcherButtons(): OutputSwitcherButton[] {
-    return this._switcherButtons;
-  }
-}
+export interface AngularFormat extends OutputFormat, Channel {}

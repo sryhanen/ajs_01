@@ -43,29 +43,36 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputSwitcherButton} from '../../../switcher/button/outputSwitcherButton';
 import {OutputType} from '../../../outputType';
+import {Printable} from '../../../../rendering/printable/printable';
+import {Request} from '../../../../channel/request';
+import {computed, Signal} from '@angular/core';
+import { RenderNode } from '../../../../rendering/renderNode/renderNode';
+import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
+import {OutputSwitcherButtonView} from '../../../../../ui/angular2+/output/switcher/switcherButton/outputSwitcherButtonView';
 
-export class DataTableSwitcherButton implements OutputSwitcherButton {
-  private readonly _type:string = OutputType.dataTables;
+export class DataTableSwitcherButton implements Printable {
+  private readonly _type: string = OutputType.dataTables;
+  private readonly _request: Request;
 
-  icon(): string {
-    return 'fas fa-table';
+  constructor(request: Request) {
+    this._request = request;
   }
 
-  outputType(): string {
-    return this._type;
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      componentView: new ComponentViewImpl(OutputSwitcherButtonView, computed(() => ({
+        title: 'Table',
+        icon: 'fas fa-table',
+        requestFormatSwitch:() => {
+          this._request.request(this.outputSwitchRequestData());
+        }
+      }))),
+      children:computed(() => [])
+    }));
   }
 
-  requestData(): {
-    op: 'PARAGRAPH_OUTPUT_REQUEST',
-    data:{
-      paragraphId: string
-      noteId: string
-      type: string
-      requestOptions: object
-    }
-  } {
+  private outputSwitchRequestData(): object {
     return {
       op:'PARAGRAPH_OUTPUT_REQUEST',
       data: {
@@ -79,13 +86,5 @@ export class DataTableSwitcherButton implements OutputSwitcherButton {
         }
       }
     };
-  }
-
-  title(): string {
-    return 'Table';
-  }
-
-  isStub(): boolean {
-    return false;
   }
 }

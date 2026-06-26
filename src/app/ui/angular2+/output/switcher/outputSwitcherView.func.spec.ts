@@ -43,74 +43,82 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputSwitcher} from '../../../../objects/output/switcher/outputSwitcher';
-import {FakeChannel} from '../../../../objects/channel/fakeChannel';
-import {OutputSwitcherImpl} from '../../../../objects/output/switcher/outputSwitcherImpl';
-import {Channel} from '../../../../objects/channel/channel';
+import {ComponentFixture} from '@angular/core/testing';
+import {render, screen} from '@testing-library/angular';
 import {OutputSwitcherView} from './outputSwitcherView';
-import {render, screen, fireEvent, RenderResult} from '@testing-library/angular';
-import { test } from 'vitest';
-import {FakeOutputSwitcherButton} from '../../../../objects/output/switcher/button/fakeOutputSwitcherButton';
+import {Component, signal, Signal} from '@angular/core';
+import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
+import {ComponentViewImpl} from '../../../../objects/rendering/componentView/componentViewImpl';
+import {By} from '@angular/platform-browser';
 
-describe('OutputSwitcherView', () => {
-  let channel:Channel;
-  let outputSwitcher: OutputSwitcher;
-  let renderResult: RenderResult<unknown, unknown>;
+describe('OutputSwitcherView functional test', () => {
+  @Component({
+    selector:'fake-component',
+    template: ''
+  })
+  class FakeComponent {}
+
+  let fixture: ComponentFixture<OutputSwitcherView>;
+  let switcherButtons: Signal<RenderNode>[];
+  let switchIsPending: boolean;
+  let outputIsSwitchable: boolean;
+
   beforeEach(async () => {
-    channel = new FakeChannel();
-    outputSwitcher = new OutputSwitcherImpl(channel);
-    renderResult = await render(OutputSwitcherView, {
+    switcherButtons = [
+      signal({
+        componentView: new ComponentViewImpl(FakeComponent, signal({test:''})),
+        children:signal([])
+      }),
+      signal({
+        componentView: new ComponentViewImpl(FakeComponent, signal({test:''})),
+        children:signal([])
+      })
+    ];
+    switchIsPending = false;
+    outputIsSwitchable = true;
+
+    const renderResult = await render(OutputSwitcherView, {
       inputs:{
-        outputSwitcher: outputSwitcher,
-        outputSwitcherButtons: [new FakeOutputSwitcherButton()]
+        switcherButtons: switcherButtons,
+        switchIsPending: switchIsPending,
+        outputIsSwitchable: outputIsSwitchable
       }
     });
+    fixture = renderResult.fixture;
   });
 
   describe('Birth', () => {
-    test('Should have nothing visible by default', () => {
-      expect(() => screen.getByRole('group')).toThrow();
-      expect(() => screen.getAllByRole('button')).toThrow();
-      expect(() => screen.getByRole('status')).toThrow();
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should render group', () => {
+      expect(screen.getByRole('group')).toBeDefined();
+    });
+
+    it('Should render elements in the group', () => {
+      expect(fixture.debugElement.queryAll(By.directive(FakeComponent))).toHaveLength(2);
     });
   });
 
   describe('Content visibility', () => {
-    let paragraphOutputResponse;
-    beforeEach(() => {
-      paragraphOutputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            isAggregated: true,
-          }
-        }
-      };
+    it('Should hide everything if output is not switchable', () => {
+      fixture.componentRef.setInput('outputIsSwitchable', false);
+      fixture.detectChanges();
+      expect(() => screen.getByRole('group')).toThrow();
+      expect(fixture.debugElement.queryAll(By.directive(FakeComponent))).toHaveLength(0);
     });
 
-    test('Should have buttons visible', async () =>{
-      outputSwitcher.response(paragraphOutputResponse);
-      const buttonGroup = await screen.findByRole('group');
-      const buttons = await screen.findAllByRole('button');
-      expect(buttonGroup).toBeDefined();
-      expect(buttons).toHaveLength(1);
-    });
+    describe('Status visibility', () => {
+      it('Not visible initially', () => {
+        expect(() => screen.getByRole('status')).toThrow();
+      });
 
-    test('Should have loader visible', async () =>{
-      outputSwitcher.response(paragraphOutputResponse);
-      const button = await screen.findByRole('button');
-      fireEvent.click(button);
-      const loader = await screen.findByRole('status');
-      expect(loader).toBeDefined();
-    });
-
-    test('Should hide loader', async () =>{
-      outputSwitcher.response(paragraphOutputResponse);
-      const button = await screen.findByRole('button');
-      fireEvent.click(button);
-      outputSwitcher.response(paragraphOutputResponse);
-      renderResult.detectChanges();
-      expect(async () => await screen.findByRole('status')).rejects.toThrow();
+      it('Should be visible', () => {
+        fixture.componentRef.setInput('switchIsPending', true);
+        fixture.detectChanges();
+        expect(screen.getByRole('status')).toBeDefined();
+      });
     });
   });
 });

@@ -43,54 +43,49 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputSwitcherButton} from '../../../switcher/button/outputSwitcherButton';
 import {OutputType} from '../../../outputType';
+import {Printable} from '../../../../rendering/printable/printable';
+import {computed, Signal} from '@angular/core';
+import { RenderNode } from '../../../../rendering/renderNode/renderNode';
+import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
+import {OutputSwitcherButtonView} from '../../../../../ui/angular2+/output/switcher/switcherButton/outputSwitcherButtonView';
+import {Request} from '../../../../channel/request';
 
-export class uPlotSwitcherButton implements OutputSwitcherButton {
-  private readonly _title:string;
-  private readonly _icon:string;
-  private readonly _graphType:string;
-  private readonly _type:string = OutputType.uPlot;
+export class uPlotSwitcherButton implements Printable {
+  private readonly _request: Request;
+  private readonly _title: string;
+  private readonly _icon: string;
+  private readonly _graphType: string;
 
-  constructor(title:string, icon:string, graphType:string) {
+  constructor(request: Request, title: string, icon: string, graphType: string) {
+    this._request = request;
     this._title = title;
     this._icon = icon;
     this._graphType = graphType;
   }
 
-  outputType():string {
-    return this._type;
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      componentView: new ComponentViewImpl(OutputSwitcherButtonView, computed(() => ({
+        title: this._title,
+        icon: this._icon,
+        requestFormatSwitch:() => {
+          this._request.request(this.outputSwitchRequestData());
+        }
+      }))),
+      children:computed(() => [])
+    }));
   }
 
-  requestData():{
-    op: 'PARAGRAPH_OUTPUT_REQUEST',
-    data:{
-      paragraphId: string
-      noteId: string
-      type: string
-      requestOptions: object
-    }
-  }  {
+  private outputSwitchRequestData():object {
     return {
       op:'PARAGRAPH_OUTPUT_REQUEST',
       data:{
         paragraphId: '',
         noteId: '',
-        type: this._type,
+        type: OutputType.uPlot,
         requestOptions: {graphType: this._graphType}
       }
     };
-  }
-
-  icon(): string {
-    return this._icon;
-  }
-
-  title(): string {
-    return this._title;
-  }
-
-  isStub(): boolean {
-    return false;
   }
 }

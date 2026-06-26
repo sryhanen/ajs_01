@@ -43,67 +43,50 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
-import {OutputSwitcherButton} from './button/outputSwitcherButton';
 import {OutputSwitcher} from './outputSwitcher';
-import {OutputSwitcherButtonStub} from './button/outputSwitcherButtonStub';
-import {PushValue} from '../../pushValue/pushValue';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../message/messageImpl';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import { RenderNode } from '../../rendering/renderNode/renderNode';
+import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
+import {OutputSwitcherView} from '../../../ui/angular2+/output/switcher/outputSwitcherView';
+import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 
 export class OutputSwitcherImpl implements OutputSwitcher {
-  private readonly _channel: Channel;
-  private _activeButton: OutputSwitcherButton;
-  private readonly _status: {isSwitchable:boolean, isLoading:boolean};
-  private readonly _pushStatus: PushValue<{isSwitchable:boolean, isLoading:boolean}>[];
+  private readonly _outputIsSwitchable:WritableSignal<boolean>;
+  private readonly _switchIsPending:WritableSignal<boolean>;
+  private readonly _switcherButtons: Signal<RenderNode>[];
 
-  constructor(channel: Channel) {
-    this._channel = channel;
-    this._activeButton = new OutputSwitcherButtonStub();
-    this._status = {
-      isSwitchable: false,
-      isLoading: false,
-    };
-    this._pushStatus = [];
+  constructor(switcherButtons: Signal<RenderNode>[]) {
+    this._switcherButtons = switcherButtons;
+    this._outputIsSwitchable = signal(false);
+    this._switchIsPending = signal(false);
   }
 
-  requestFormatSwitch(outputSwitcherButton: OutputSwitcherButton): void {
-    this._activeButton = outputSwitcherButton;
-    this._status.isLoading = true;
-    this._pushStatus.forEach(value => value.update(this._status));
-    this._channel.request(outputSwitcherButton.requestData());
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      children:computed(() => []),
+      componentView: new ComponentViewImpl(OutputSwitcherView, computed(() => ({
+        switcherButtons: this._switcherButtons,
+        switchIsPending: this._switchIsPending(),
+        outputIsSwitchable: this._outputIsSwitchable(),
+      })))
+    }));
   }
 
-  outputTypeIsValid(outputType:string): boolean {
-    let isValid:boolean = true;
-    if(!this._activeButton.isStub()){
-      isValid = outputType === this._activeButton.outputType();
+  request(json: object) {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    if(message.operation() === 'PARAGRAPH_OUTPUT_REQUEST'){
+      this._switchIsPending.set(true);
     }
-    return isValid;
   }
 
-  activeButton(): OutputSwitcherButton {
-    return this._activeButton;
-  }
-
-  status(value: PushValue<{isSwitchable:boolean, isLoading:boolean}>):void {
-    value.update(this._status);
-    this._pushStatus.push(value);
-  }
-
-  response(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
+  response(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputData = new SafeJsonImpl(message.data());
-      const safeOutput = new SafeJsonImpl(paragraphOutputData.getProperty('output', 'object'));
-      if(safeOutput.propertyExists('isAggregated')){
-        this._status.isSwitchable = safeOutput.getProperty('isAggregated', 'boolean');
-      }
-      else{
-        this._status.isSwitchable = false;
-      }
-      this._status.isLoading = false;
-      this._pushStatus.forEach(value => value.update(this._status));
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
+      this._outputIsSwitchable.set(paragraphOutputMessage.isAggregated());
+      this._switchIsPending.set(false);
     }
   }
 }

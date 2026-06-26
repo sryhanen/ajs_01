@@ -44,10 +44,8 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
-import {OutputContainer} from '../output/container/outputContainer';
+import {Printable} from '../rendering/printable/printable';
 
-export interface Paragraph extends Channel {
-  outputContainer(): OutputContainer;
+export interface Paragraph extends Channel, Printable {
   id(): string;
-  print(): object;
 }

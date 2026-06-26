@@ -43,42 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {Channel} from '../../../channel/channel';
 import {OutputFormat} from '../outputFormat';
-import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
-import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
-import {GraphType} from './graphType';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {uPlotPluginImpl} from '../../plugins/uPlotPlugin/uPlotPluginImpl';
-import {OutputType} from '../../outputType';
-import uPlot from 'uplot';
-import {OutputPlugin} from '../../plugins/outputPlugin';
 
-export class uPlotFormat implements OutputFormat {
-  private readonly _switcherButtons:OutputSwitcherButton[];
-  private readonly _outputType: string;
-
-  constructor() {
-    this._outputType = OutputType.uPlot;
-    this._switcherButtons = [
-      new uPlotSwitcherButton('Line Chart', 'fas fa-chart-line', GraphType.line),
-      new uPlotSwitcherButton('Area Chart', 'fas fa-chart-area', GraphType.area),
-      new uPlotSwitcherButton('Bar Chart', 'fas fa-chart-bar', GraphType.bar),
-      new uPlotSwitcherButton('Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
-    ];
-  }
-
-  plugin(paragraphOutputData: object): OutputPlugin {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData: uPlot.AlignedData = safeParagraphOutputData.getProperty('data', 'object');
-    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
-    return new uPlotPluginImpl(outputData, outputOptions);
-  }
-
-  outputType(): string {
-    return this._outputType;
-  }
-
-  switcherButtons(): OutputSwitcherButton[] {
-    return this._switcherButtons;
-  }
-}
+export interface UPlotFormat extends OutputFormat, Channel {}

@@ -45,8 +45,8 @@
  */
 import {Channel} from '../channel/channel';
 import {WebSocketService} from '../webSocket/service/webSocketService';
+import {Printable} from '../rendering/printable/printable';
 
-export interface WebAppRoot extends Channel {
+export interface WebAppRoot extends Channel, Printable {
   initialize(webSocketService:WebSocketService):void;
-  rootObject(): Channel;
 }

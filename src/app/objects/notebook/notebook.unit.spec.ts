@@ -47,9 +47,6 @@ import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {Notebook} from './notebook';
 import {NotebookImpl} from './notebookImpl';
-import {PushValueImpl} from '../pushValue/pushValueImpl';
-import {Paragraph} from '../paragraph/paragraph';
-import {PushValue} from '../pushValue/pushValue';
 
 describe('Notebook unit test', () => {
   const notebookId = 'noteId';
@@ -79,59 +76,11 @@ describe('Notebook unit test', () => {
       expect(notebook.id()).toEqual(notebookId);
     });
 
-    it('Should have concrete ParagraphCollection', () =>{
+    it('Should print', () => {
       notebook = new NotebookImpl(channel, notebookData);
-      expect(notebook.paragraphCollection().isStub()).toBe(false);
-    });
-
-    it('Should have ParagraphCollectionStub', () =>{
-      notebook = new NotebookImpl(channel, {id:notebookId});
-      expect(notebook.paragraphCollection().isStub()).toBe(true);
-    });
-  });
-
-  describe('Response', () => {
-    describe('Filters responses', () => {
-      let paragraphs: PushValue<Paragraph[]>;
-      let paragraphSpy;
-
-      beforeEach(() => {
-        notebook = new NotebookImpl(channel, notebookData);
-        paragraphs = new PushValueImpl<Paragraph[]>();
-        notebook.paragraphCollection().paragraphs(paragraphs);
-        paragraphSpy = vi.spyOn(paragraphs.value()[0], 'response');
-      });
-
-      it('Should respond with right id', () =>{
-        const response = {
-          op:'',
-          data:{
-            noteId: notebookId
-          }
-        };
-        notebook.response(response);
-        expect(paragraphSpy).toHaveBeenCalledExactlyOnceWith(response);
-      });
-
-      it('Should not respond with wrong id', () =>{
-        const response = {
-          op:'',
-          data:{
-            noteId: 'wrongId'
-          }
-        };
-        notebook.response(response);
-        expect(paragraphSpy).toHaveBeenCalledTimes(0);
-      });
-
-      it('Should not respond if noteId property missing', () =>{
-        const response = {
-          op:'',
-          data:{}
-        };
-        notebook.response(response);
-        expect(paragraphSpy).toHaveBeenCalledExactlyOnceWith(response);
-      });
+      const notebookPrinted = notebook.print()();
+      expect(notebookPrinted.componentView.isStub()).toBe(true);
+      expect(notebookPrinted.children()).toHaveLength(1);
     });
   });
 

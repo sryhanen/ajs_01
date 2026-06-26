@@ -47,75 +47,67 @@ import {Notebook} from './notebook';
 import {Channel} from '../channel/channel';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {SafeJson} from '../safeJson/safeJson';
-import {MessageImpl} from '../message/messageImpl';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
-import {ParagraphCollectionStub} from '../paragraphCollection/paragraphCollectionStub';
+import {computed, Signal} from '@angular/core';
+import {RenderNode} from '../rendering/renderNode/renderNode';
+import {ComponentView} from '../rendering/componentView/componentView';
+import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
+import {ResponseRegister} from '../register/responseRegister/responseRegister';
+import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
+import {
+  ResponseRegisterWithDefaultResponseList
+} from '../register/responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
+import {
+  ResponseRegisterWithPropertyFilter
+} from '../register/responseRegister/responseRegisterWithPropertyFilter/responseRegisterWithPropertyFilter';
+import {RequestRegister} from '../register/requestRegister/requestRegister';
+import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterImpl';
+import {
+  RequestRegisterWithPropertyDecorator
+} from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
   private readonly _notebook: SafeJson;
   private readonly _paragraphCollection: ParagraphCollection;
+  private readonly _componentView:ComponentView;
+  private readonly _responseRegister:ResponseRegister;
+  private readonly _requestRegister:RequestRegister;
 
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
-    this._paragraphCollection = this.initializedParagraphCollection();
+    this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
+    this._componentView = new ComponentViewStub();
+    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._paragraphCollection]),{name:'noteId', type:'string'}, this.id());
+    this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'noteId', value:this.id()});
   }
 
-  private initializedParagraphCollection(): ParagraphCollection {
-    let paragraphCollection: ParagraphCollection;
-    if(this._notebook.propertyExists('paragraphs')) {
-      paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
-    }
-    else{
-      paragraphCollection = new ParagraphCollectionStub();
-    }
-    return paragraphCollection;
-  }
-
-
-  paragraphCollection(): ParagraphCollection {
-    return this._paragraphCollection;
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      componentView: this._componentView,
+      children: computed(() => {
+        const children:RenderNode[] = [];
+        children.push(this._paragraphCollection.print()());
+        return children;
+      }),
+    }));
   }
 
   id(): string {
     return this._notebook.getProperty('id', 'string');
   }
 
-  request(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    const messageData = new SafeJsonImpl(message.data());
-    if(messageData.propertyExists('noteId')){
-      const decoratedData = message.data();
-      decoratedData['noteId'] = this.id();
-      const decoratedRequest = {
-        op:message.operation(),
-        data:decoratedData,
-      };
-      this._channel.request(decoratedRequest);
-    }
-    else{
-      this._channel.request(data);
-    }
+  request(json: object): void {
+    this._requestRegister.request(json);
   }
 
-  response(data: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    const messageData = new SafeJsonImpl(message.data());
-    if(messageData.propertyExists('noteId')){
-      if(messageData.getProperty('noteId', 'string') === this.id()){
-        this.respondParagraphCollection(data);
-      }
-    }
-    else{
-      this.respondParagraphCollection(data);
-    }
+  response(json: object): void {
+    this._responseRegister.response(json);
   }
 
-  private respondParagraphCollection(data:object): void {
-    if(!this._paragraphCollection.isStub()){
-      this._paragraphCollection.response(data);
-    }
+  isStub(): boolean {
+    return false;
   }
 }

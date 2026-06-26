@@ -43,45 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputSwitcherButton} from '../../switcher/button/outputSwitcherButton';
-import {Channel} from '../../../channel/channel';
-import {Request} from '../../../channel/request';
-import {DataTableSwitcherButton} from './switcherButton/dataTablesSwitcherButton';
 import {OutputFormat} from '../outputFormat';
-import {OutputType} from '../../outputType';
-import {DataTablesPluginImpl} from '../../plugins/dataTablesPlugin/dataTablesPluginImpl';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import { OutputPlugin } from '../../plugins/outputPlugin';
+import {Channel} from '../../../channel/channel';
 
-export class DataTablesFormat implements OutputFormat, Request {
-  private readonly _channel: Channel;
-  private readonly _outputType: string;
-  private readonly _switcherButtons: OutputSwitcherButton[];
-
-  constructor(channel: Channel) {
-    this._channel = channel;
-    this._outputType = OutputType.dataTables;
-    this._switcherButtons = [
-      new DataTableSwitcherButton()
-    ];
-  }
-
-  plugin(paragraphOutputData: object): OutputPlugin {
-    const safeParagraphOutputData = new SafeJsonImpl(paragraphOutputData);
-    const outputData:object = safeParagraphOutputData.getProperty('data', 'object');
-    const outputOptions:object = safeParagraphOutputData.getProperty('options', 'object');
-    return new DataTablesPluginImpl(this._channel, outputData, outputOptions);
-  }
-
-  outputType(): string {
-    return this._outputType;
-  }
-
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  switcherButtons(): OutputSwitcherButton[] {
-    return this._switcherButtons;
-  }
-}
+export interface DataTablesFormat extends OutputFormat, Channel{}
