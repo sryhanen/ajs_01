@@ -90,7 +90,7 @@ describe('Paragraph', () => {
     it('Should print', () => {
       const paragraphPrinted = paragraph.print()();
       expect(paragraphPrinted.componentView.isStub()).toBe(true);
-      expect(paragraphPrinted.children()).toHaveLength(1);
+      expect(paragraphPrinted.children()).toHaveLength(2);
     });
   });
 

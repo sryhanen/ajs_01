@@ -67,10 +67,13 @@ import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterIm
 import {
   RequestRegisterWithPropertyDecorator
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
+import {DynamicForms} from '../dynamicForms/dynamicForms';
+import {DynamicFormsImpl} from '../dynamicForms/dynamicFormsImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
+  private readonly _dynamicForms:DynamicForms;
   private readonly _paragraph: SafeJson;
   private readonly _componentView: ComponentView;
   private readonly _responseRegister:ResponseRegister;
@@ -80,7 +83,7 @@ export class ParagraphImpl implements Paragraph {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
     this._outputContainer = new OutputContainerImpl(this, this.id());
-
+    this._dynamicForms = new DynamicFormsImpl(this);
     const paragraphDataAsOutputMessage = new ParagraphDataAsOutputMessageImpl(paragraph);
     const paragraphOutputMessage = paragraphDataAsOutputMessage.paragraphOutputMessage();
     if(!paragraphOutputMessage.isStub()){
@@ -91,13 +94,13 @@ export class ParagraphImpl implements Paragraph {
       this._outputContainer.response(paragraphOutputMessageData);
     }
     this._componentView = new ComponentViewStub();
-    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer]), {name:'paragraphId', type:'string'}, this.id());
+    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer, this._dynamicForms]), {name:'paragraphId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
   }
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      children:computed(() => [this._outputContainer.print()()]),
+      children:computed(() => [this._outputContainer.print()(), this._dynamicForms.print()()]),
       componentView: this._componentView
     }));
   }
