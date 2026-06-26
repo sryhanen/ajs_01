@@ -54,15 +54,22 @@ import {Request} from '../../../objects/channel/request';
   ],
   template: `
     <form [formGroup]="formGroup()" class="dynamic-form row" (submit)="submitFormRequest().request(formGroup().value)" role="form">
+      <div class="d-flex align-items-center gap-3 mb-3">
       @for(formField of form(); track $index){
+        <div>
+          <label [for]="formField.name" class="me-2">{{formField.name}}</label>
           @if(formField.type === 'checkbox') {
-            <input [aria-label]="formField.type" [type]="formField.type" [formControlName]="formField.name" [value]="formField.value" [checked]="formField.value">
+            <input [id]="formField.name" [aria-label]="formField.type" [type]="formField.type" [formControlName]="formField.name" [value]="formField.value" [checked]="formField.value">
           }
           @else{
-            <input [aria-label]="formField.type" [type]="formField.type" [formControlName]="formField.name" [value]="formField.value">
+            <input [id]="formField.name" [aria-label]="formField.type" [type]="formField.type" [formControlName]="formField.name" [value]="formField.value">
           }
+        </div>
         }
-    <button type="submit">Run paragraph</button>
+      </div>
+      <div>
+        <button type="submit">Run paragraph</button>
+      </div>
     </form>
   `
 })
