@@ -62,9 +62,11 @@ export class DynamicFormsImpl implements DynamicForms {
   private readonly _channel: Channel;
   private readonly _componentView: WritableSignal<ComponentView>;
   private readonly _responseRegister:ResponseRegister;
+  private readonly _paragraphId:string;
 
-  constructor(channel: Channel) {
+  constructor(channel: Channel, paragraphId:string) {
     this._channel = channel;
+    this._paragraphId = paragraphId;
     this._componentView = signal(new ComponentViewStub());
     this._responseRegister = new ResponseRegisterImpl();
     this._responseRegister.register('PARAGRAPH_FORM', (json) => this.paragraphFormResponse(json));
@@ -72,8 +74,9 @@ export class DynamicFormsImpl implements DynamicForms {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-     children:signal([]),
-     componentView:this._componentView(),
+      paragraphId: this._paragraphId,
+      children:signal([]),
+      componentView:this._componentView(),
     }));
   }
 
@@ -91,7 +94,7 @@ export class DynamicFormsImpl implements DynamicForms {
       DynamicFormsView,
       computed(() => ({
         form: paragraphFormMessage.form(),
-        request: new SubmitFormRequestImpl(this)
+        submitFormRequest: new SubmitFormRequestImpl(this)
       }))
     ));
   }

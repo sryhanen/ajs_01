@@ -55,7 +55,7 @@ describe('DynamicForms unit test', () => {
 
   beforeEach(() => {
     channel = new FakeChannel();
-    dynamicForms = new DynamicFormsImpl(channel);
+    dynamicForms = new DynamicFormsImpl(channel, 'paragraphId');
   });
 
   describe('Birth', () => {
@@ -96,7 +96,7 @@ describe('DynamicForms unit test', () => {
       expect(componentView.isStub()).toBe(false);
       expect(componentView.component()).toBeDefined();
       expect(componentView.inputs()()['form']).toBeDefined();
-      expect(componentView.inputs()()['request']).toBeDefined();
+      expect(componentView.inputs()()['submitFormRequest']).toBeDefined();
     });
   });
 });

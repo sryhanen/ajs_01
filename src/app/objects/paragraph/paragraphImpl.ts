@@ -83,7 +83,7 @@ export class ParagraphImpl implements Paragraph {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
     this._outputContainer = new OutputContainerImpl(this, this.id());
-    this._dynamicForms = new DynamicFormsImpl(this);
+    this._dynamicForms = new DynamicFormsImpl(this, this.id());
     const paragraphDataAsOutputMessage = new ParagraphDataAsOutputMessageImpl(paragraph);
     const paragraphOutputMessage = paragraphDataAsOutputMessage.paragraphOutputMessage();
     if(!paragraphOutputMessage.isStub()){
