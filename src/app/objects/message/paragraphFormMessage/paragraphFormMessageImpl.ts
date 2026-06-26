@@ -67,7 +67,7 @@ export class ParagraphFormMessageImpl implements ParagraphFormMessage {
   }
 
   private validateFormField(formField:object, property:string):void {
-    if(!formField[property]) {
+    if(!(property in formField)) {
       throw new Error(`${property} missing in form field: ${JSON.stringify(formField)}`);
     }
   }
