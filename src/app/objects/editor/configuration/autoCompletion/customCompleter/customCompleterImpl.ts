@@ -107,6 +107,6 @@ export class CustomCompleterImpl implements CustomCompleter {
   private editorSettingResponse(json:object):void {
     const editorSettingMessage = new EditorSettingMessageImpl(new MessageImpl(new SafeJsonImpl(json)));
     const newMode = `ace/mode/${editorSettingMessage.language()}`;
-    this._aceEditor.session.setMode(newMode);
+    this._aceEditor.getSession().setMode(newMode);
   }
 }

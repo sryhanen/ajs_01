@@ -86,6 +86,8 @@ export class AutoCompletionConfigurationImpl implements AutoCompletionConfigurat
   }
 
   response(json: object): void {
-    this._customCompleter.response(json);
+    if(this._customCompleter){
+      this._customCompleter.response(json);
+    }
   }
 }
