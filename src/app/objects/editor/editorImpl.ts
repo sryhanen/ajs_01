@@ -57,17 +57,20 @@ export class EditorImpl implements Editor {
   private readonly _channel:Channel;
   private readonly _componentView:ComponentView;
   private readonly _configuredEditor:ConfiguredEditor;
+  private readonly _paragraphId:string;
 
   constructor(channel:Channel, paragraphData: object) {
     this._channel = channel;
+    this._paragraphId = paragraphData['id'];
     this._configuredEditor = new ConfiguredEditorImpl(this, paragraphData);
     this._componentView = new ComponentViewImpl(EditorView, signal({editorConfiguration: this._configuredEditor}));
   }
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-     children: signal([]),
-     componentView:this._componentView
+      paragraphId:this._paragraphId,
+      children: signal([]),
+      componentView:this._componentView
     }));
   }
 
