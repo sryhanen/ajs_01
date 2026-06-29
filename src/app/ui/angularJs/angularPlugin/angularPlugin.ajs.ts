@@ -44,8 +44,8 @@
  * a licensee so wish it.
  */
 import angular, {IPostLink, IScope} from 'angular';
-import {AngularObject} from '../../objects/angularObject/angularObject';
-import {Request} from '../../objects/channel/request';
+import {AngularObject} from '../../../objects/angularObject/angularObject';
+import {Request} from '../../../objects/channel/request';
 
 export class AngularPluginAjs implements IPostLink{
   static $inject = ['$compile', '$scope', '$element'];

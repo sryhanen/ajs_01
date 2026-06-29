@@ -63,7 +63,7 @@ export class EditorImpl implements Editor {
     this._channel = channel;
     this._paragraphId = paragraphData['id'];
     this._configuredEditor = new ConfiguredEditorImpl(this, paragraphData);
-    this._componentView = new ComponentViewImpl(EditorView, signal({editorConfiguration: this._configuredEditor}));
+    this._componentView = new ComponentViewImpl(EditorView, signal({editorConfiguration: this._configuredEditor, paragraphId: this._paragraphId}));
   }
 
   print(): Signal<RenderNode> {

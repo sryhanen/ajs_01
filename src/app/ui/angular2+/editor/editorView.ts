@@ -43,9 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, inject, input, ViewChild} from '@angular/core';
 import ace from 'ace-builds';
 import {EditorConfiguration} from '../../../objects/editor/configuration/editorConfiguration';
+import {
+  EditorWithStateBroadcastOnFocusImpl
+} from '../../angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
 
 @Component({
   selector: 'editor-view',
@@ -55,9 +58,11 @@ import {EditorConfiguration} from '../../../objects/editor/configuration/editorC
 })
 export class EditorView implements AfterViewInit{
   editorConfiguration = input.required<EditorConfiguration>();
+  paragraphId = input.required<string>();
   @ViewChild('anchor') anchor: ElementRef;
+  private editorWithStateBroadcastOnFocus = inject(EditorWithStateBroadcastOnFocusImpl);
 
   ngAfterViewInit(): void {
-    this.editorConfiguration().configuredEditor(ace.edit(this.anchor.nativeElement));
+    this.editorWithStateBroadcastOnFocus.editor(this.editorConfiguration().configuredEditor(ace.edit(this.anchor.nativeElement)), this.paragraphId());
   }
 }
