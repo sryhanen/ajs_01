@@ -67,6 +67,8 @@ import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterIm
 import {
   RequestRegisterWithPropertyDecorator
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
+import {Editor} from '../editor/editor';
+import {EditorImpl} from '../editor/editorImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
@@ -75,13 +77,14 @@ export class ParagraphImpl implements Paragraph {
   private readonly _componentView: ComponentView;
   private readonly _responseRegister:ResponseRegister;
   private readonly _requestRegister:RequestRegister;
+  private readonly _editor:Editor;
 
-  constructor(channel: Channel, paragraph: object) {
+  constructor(channel: Channel, paragraphData: object) {
     this._channel = channel;
-    this._paragraph = new SafeJsonImpl(paragraph);
+    this._paragraph = new SafeJsonImpl(paragraphData);
     this._outputContainer = new OutputContainerImpl(this, this.id());
-
-    const paragraphDataAsOutputMessage = new ParagraphDataAsOutputMessageImpl(paragraph);
+    this._editor = new EditorImpl(this, paragraphData);
+    const paragraphDataAsOutputMessage = new ParagraphDataAsOutputMessageImpl(paragraphData);
     const paragraphOutputMessage = paragraphDataAsOutputMessage.paragraphOutputMessage();
     if(!paragraphOutputMessage.isStub()){
       const paragraphOutputMessageData = {
@@ -97,7 +100,7 @@ export class ParagraphImpl implements Paragraph {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      children:computed(() => [this._outputContainer.print()()]),
+      children:computed(() => [this._editor.print()(), this._outputContainer.print()()]),
       componentView: this._componentView
     }));
   }
