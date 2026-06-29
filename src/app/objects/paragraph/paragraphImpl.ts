@@ -94,7 +94,7 @@ export class ParagraphImpl implements Paragraph {
       this._outputContainer.response(paragraphOutputMessageData);
     }
     this._componentView = new ComponentViewStub();
-    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer]), {name:'paragraphId', type:'string'}, this.id());
+    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer, this._editor]), {name:'paragraphId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
   }
 
