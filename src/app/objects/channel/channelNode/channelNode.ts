@@ -47,5 +47,5 @@ import {Channel} from '../channel';
 import {Respondable} from '../respondable';
 
 export interface ChannelNode extends Channel {
-  addRespondable(respondable: Respondable): void;
+  addRespondable(respondable: Respondable, id:string): void;
 }

@@ -94,9 +94,10 @@ export class EditorView implements AfterViewInit, OnChanges {
         .configuredEditor(this.editor());
     this.configureReadOnly(configuredEditor);
     const customCompleter = new CustomCompleterImpl(this.channelNode(), configuredEditor);
-    this.channelNode().addRespondable(customCompleter);
+    const paragraphId = this.paragraphData()['id'];
+    this.channelNode().addRespondable(customCompleter, `customCompleter-${paragraphId}`);
     const editorWithAutoCompletions = new AutoCompletionConfigurationImpl(customCompleter);
-    this.editor.set(this.editorWithStateBroadcastOnFocus.editor(editorWithAutoCompletions.configuredEditor(configuredEditor), this.paragraphData()['id']));
+    this.editor.set(this.editorWithStateBroadcastOnFocus.editor(editorWithAutoCompletions.configuredEditor(configuredEditor), paragraphId));
   }
 
   private configureReadOnly(aceEditor: ace.Editor):void{

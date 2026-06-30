@@ -79,8 +79,8 @@ describe('ChannelNode unit test', () => {
     it('Should respond respondables', () => {
       const respondable1 = new FakeChannel();
       const respondable2 = new FakeChannel();
-      channelNode.addRespondable(respondable1);
-      channelNode.addRespondable(respondable2);
+      channelNode.addRespondable(respondable1, '1');
+      channelNode.addRespondable(respondable2, '2');
       const response = {
         op:'',
         data:{}

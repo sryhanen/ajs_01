@@ -49,15 +49,15 @@ import {Requestable} from '../requestable';
 
 export class ChannelNodeImpl implements ChannelNode {
   private readonly _requestable:Requestable;
-  private readonly _respondables:Respondable[];
+  private readonly _respondables:Map<string, Respondable>;
 
   constructor(requestable: Requestable) {
     this._requestable = requestable;
-    this._respondables = [];
+    this._respondables = new Map();
   }
 
-  addRespondable(respondable: Respondable): void {
-    this._respondables.push(respondable);
+  addRespondable(respondable: Respondable, id:string): void {
+    this._respondables.set(id, respondable);
   }
 
   request(json: object): void {
