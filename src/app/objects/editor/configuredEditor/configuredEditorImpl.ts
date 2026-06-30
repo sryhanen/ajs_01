@@ -46,8 +46,6 @@
 import ace from 'ace-builds';
 import {Channel} from '../../channel/channel';
 import {ConfiguredEditor} from './configuredEditor';
-import {AutoCompletionConfigurationImpl} from '../configuration/autoCompletion/autoCompletionConfigurationImpl';
-import {AutoCompletionConfiguration} from '../configuration/autoCompletion/autoCompletionConfiguration';
 import {TextConfiguration} from '../configuration/text/textConfiguration';
 import {LinesConfiguration} from '../configuration/lines/linesConfiguration';
 import {KeyCommandsConfiguration} from '../configuration/keyCommands/keyCommandsConfiguration';
@@ -58,12 +56,10 @@ import {AnnotationsConfiguration} from '../configuration/annotations/annotations
 export class ConfiguredEditorImpl implements ConfiguredEditor {
   private readonly _channel:Channel;
   private readonly _paragraphData:object;
-  private readonly _autoCompletionConfiguration:AutoCompletionConfiguration;
 
   constructor(channel:Channel, paragraphData: object) {
     this._channel = channel;
     this._paragraphData = paragraphData;
-    this._autoCompletionConfiguration = new AutoCompletionConfigurationImpl(channel);
   }
 
   configuredEditor(aceEditor: ace.Editor): ace.Editor {
@@ -75,12 +71,10 @@ export class ConfiguredEditorImpl implements ConfiguredEditor {
                 new HighlightsConfiguration(
                   new AutoCommitConfiguration(this,
                     new AnnotationsConfiguration(
-                      this._autoCompletionConfiguration
                     )))))).configuredEditor(aceEditor);
   }
 
   response(json: object): void {
-    this._autoCompletionConfiguration.response(json);
   }
 
   request(json: object) {

@@ -43,21 +43,17 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AutoCompletionConfiguration} from './autoCompletionConfiguration';
 import ace from 'ace-builds';
-import {Channel} from '../../../channel/channel';
 import {CustomCompleter} from '../../customCompleter/customCompleter';
-import {CustomCompleterImpl} from '../../customCompleter/customCompleterImpl';
 import {EditorConfiguration} from '../editorConfiguration';
 
-export class AutoCompletionConfigurationImpl implements AutoCompletionConfiguration {
-  private readonly _channel:Channel;
-  private readonly _langTools;
-  private _customCompleter:CustomCompleter;
+export class AutoCompletionConfigurationImpl implements EditorConfiguration {
+  private readonly _customCompleter:CustomCompleter;
   private readonly _editorConfiguration?: EditorConfiguration;
+  private readonly _langTools;
 
-  constructor(channel:Channel,editorConfiguration?: EditorConfiguration) {
-    this._channel = channel;
+  constructor(customCompleter:CustomCompleter, editorConfiguration?: EditorConfiguration) {
+    this._customCompleter = customCompleter;
     this._langTools = ace.require('ace/ext/language_tools');
     this._editorConfiguration = editorConfiguration;
   }
@@ -70,7 +66,6 @@ export class AutoCompletionConfigurationImpl implements AutoCompletionConfigurat
     else{
       editor = aceEditor;
     }
-    this._customCompleter = new CustomCompleterImpl(this._channel, editor);
     this._langTools.setCompleters([this._customCompleter, this._langTools.keyWordCompleter, this._langTools.snippetCompleter, this._langTools.textCompleter]);
     editor.commands.on('exec', (eventData)=> {
       if(eventData.command.name === 'startAutocomplete') {
@@ -83,11 +78,5 @@ export class AutoCompletionConfigurationImpl implements AutoCompletionConfigurat
       }
     });
     return editor;
-  }
-
-  response(json: object): void {
-    if(this._customCompleter){
-      this._customCompleter.response(json);
-    }
   }
 }

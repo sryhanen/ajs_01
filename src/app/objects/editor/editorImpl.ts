@@ -50,20 +50,20 @@ import {Channel} from '../channel/channel';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
 import {EditorView} from '../../ui/angular2+/editor/editorView';
-import {ConfiguredEditor} from './configuredEditor/configuredEditor';
-import {ConfiguredEditorImpl} from './configuredEditor/configuredEditorImpl';
+import {ChannelNodeImpl} from '../channel/channelNode/channelNodeImpl';
+import {ChannelNode} from '../channel/channelNode/channelNode';
 
 export class EditorImpl implements Editor {
   private readonly _channel:Channel;
   private readonly _componentView:ComponentView;
-  private readonly _configuredEditor:ConfiguredEditor;
+  private readonly _channelNode:ChannelNode;
   private readonly _paragraphId:string;
 
   constructor(channel:Channel, paragraphData: object) {
     this._channel = channel;
     this._paragraphId = paragraphData['id'];
-    this._configuredEditor = new ConfiguredEditorImpl(this, paragraphData);
-    this._componentView = new ComponentViewImpl(EditorView, signal({editorConfiguration: this._configuredEditor, paragraphId: this._paragraphId}));
+    this._channelNode = new ChannelNodeImpl(this);
+    this._componentView = new ComponentViewImpl(EditorView, signal({channelNode: this._channelNode, paragraphData: paragraphData}));
   }
 
   print(): Signal<RenderNode> {
@@ -79,6 +79,6 @@ export class EditorImpl implements Editor {
   }
 
   response(json: object): void {
-    this._configuredEditor.response(json);
+    this._channelNode.response(json);
   }
 }

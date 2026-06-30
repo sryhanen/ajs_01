@@ -44,11 +44,19 @@
  * a licensee so wish it.
  */
 import {AfterViewInit, Component, ElementRef, inject, input, ViewChild} from '@angular/core';
+import {EditorWithStateBroadcastOnFocusImpl} from '../../angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+import {ChannelNode} from '../../../objects/channel/channelNode/channelNode';
+import {CustomCompleterImpl} from '../../../objects/editor/customCompleter/customCompleterImpl';
 import ace from 'ace-builds';
-import {EditorConfiguration} from '../../../objects/editor/configuration/editorConfiguration';
+import {TextConfiguration} from '../../../objects/editor/configuration/text/textConfiguration';
+import {LinesConfiguration} from '../../../objects/editor/configuration/lines/linesConfiguration';
+import {KeyCommandsConfiguration} from '../../../objects/editor/configuration/keyCommands/keyCommandsConfiguration';
+import {HighlightsConfiguration} from '../../../objects/editor/configuration/highlights/highLightsConfiguration';
+import {AutoCommitConfiguration} from '../../../objects/editor/configuration/autoCommit/autoCommitConfiguration';
+import {AnnotationsConfiguration} from '../../../objects/editor/configuration/annotations/annotationsConfiguration';
 import {
-  EditorWithStateBroadcastOnFocusImpl
-} from '../../angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
+  AutoCompletionConfigurationImpl
+} from '../../../objects/editor/configuration/autoCompletion/autoCompletionConfigurationImpl';
 
 @Component({
   selector: 'editor-view',
@@ -57,12 +65,41 @@ import {
   `,
 })
 export class EditorView implements AfterViewInit{
-  editorConfiguration = input.required<EditorConfiguration>();
-  paragraphId = input.required<string>();
+  paragraphData = input.required<object>();
+  channelNode = input.required<ChannelNode>();
   @ViewChild('anchor') anchor: ElementRef;
   private editorWithStateBroadcastOnFocus = inject(EditorWithStateBroadcastOnFocusImpl);
 
   ngAfterViewInit(): void {
-    this.editorWithStateBroadcastOnFocus.editor(this.editorConfiguration().configuredEditor(ace.edit(this.anchor.nativeElement)), this.paragraphId());
+    this.setBasePath();
+    const editor =
+      new TextConfiguration(this.paragraphData(),
+        new LinesConfiguration(this.paragraphData(),
+          new KeyCommandsConfiguration(
+            new HighlightsConfiguration(
+              new AutoCommitConfiguration(this.channelNode(),
+                new AnnotationsConfiguration(
+                ))))))
+      .configuredEditor(ace.edit(this.anchor.nativeElement));
+
+    this.configureReadOnly(editor);
+    const customCompleter = new CustomCompleterImpl(this.channelNode(), editor);
+    this.channelNode().addRespondable(customCompleter);
+    const editorWithAutoCompletions = new AutoCompletionConfigurationImpl(customCompleter);
+    this.editorWithStateBroadcastOnFocus.editor(editorWithAutoCompletions.configuredEditor(editor), this.paragraphData()['id']);
+  }
+
+  private configureReadOnly(aceEditor: ace.Editor):void{
+    const status = this.paragraphData()['status'];
+    const editorIsDisabled = status === 'RUNNING' || status === 'PENDING';
+    aceEditor.setReadOnly(editorIsDisabled);
+    aceEditor.setStyle('paragraph-disable', editorIsDisabled);
+  }
+
+  private setBasePath(): void {
+    ace.config.set('basePath', '/');
+    ace.config.set('modePath', '/');
+    ace.config.set('themePath', '/');
+    ace.config.set('workerPath', '/');
   }
 }

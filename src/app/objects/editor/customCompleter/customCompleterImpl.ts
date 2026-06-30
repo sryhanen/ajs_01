@@ -45,22 +45,22 @@
  */
 import {CustomCompleter} from './customCompleter';
 import ace, {Ace} from 'ace-builds';
-import {Channel} from '../../channel/channel';
 import {ResponseRegisterImpl} from '../../register/responseRegister/responseRegisterImpl';
 import {ResponseRegister} from '../../register/responseRegister/responseRegister';
 import {CompletionListMessageImpl} from '../../message/completionListMessage/completionListMessageImpl';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../message/messageImpl';
 import {EditorSettingMessageImpl} from '../../message/editorSettingMessage/editorSettingMessageImpl';
+import {Requestable} from '../../channel/requestable';
 
 export class CustomCompleterImpl implements CustomCompleter {
-  private readonly _channel:Channel;
+  private readonly _requestable:Requestable;
   private readonly _aceEditor: ace.Editor;
   private _aceEditorCallback: Ace.CompleterCallback;
   private readonly _responseRegister:ResponseRegister;
 
-  constructor(channel:Channel, aceEditor:ace.Editor){
-    this._channel = channel;
+  constructor(requestable:Requestable, aceEditor:ace.Editor){
+    this._requestable = requestable;
     this._aceEditor = aceEditor;
     this._aceEditorCallback = () => {};
     this._responseRegister = new ResponseRegisterImpl();
@@ -81,7 +81,7 @@ export class CustomCompleterImpl implements CustomCompleter {
         cursor: editorValue.length,
       },
     };
-    this._channel.request(completionsRequest);
+    this._requestable.request(completionsRequest);
   }
 
   requestEditorSetting(editorValue: string): void {
@@ -92,7 +92,7 @@ export class CustomCompleterImpl implements CustomCompleter {
         paragraphText: editorValue
       }
     };
-    this._channel.request(editorSettingRequest);
+    this._requestable.request(editorSettingRequest);
   }
 
   response(json: object): void {
