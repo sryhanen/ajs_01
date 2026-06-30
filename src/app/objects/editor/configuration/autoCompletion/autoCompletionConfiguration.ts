@@ -44,6 +44,6 @@
  * a licensee so wish it.
  */
 import {EditorConfiguration} from '../editorConfiguration';
-import {Response} from '../../../channel/response';
+import {Respondable} from '../../../channel/respondable';
 
-export interface AutoCompletionConfiguration extends EditorConfiguration, Response{}
+export interface AutoCompletionConfiguration extends EditorConfiguration, Respondable{}

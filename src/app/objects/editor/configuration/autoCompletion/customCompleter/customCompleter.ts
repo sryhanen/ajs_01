@@ -43,10 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Response} from '../../../../channel/response';
+import {Respondable} from '../../../../channel/respondable';
 import ace from 'ace-builds';
 
-export interface CustomCompleter extends Response, ace.Ace.Completer{
+export interface CustomCompleter extends Respondable, ace.Ace.Completer{
   requestCompletions(editorValue:string):void;
   requestEditorSetting(editorValue:string):void;
 }

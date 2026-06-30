@@ -45,13 +45,13 @@
  */
 import {EditorConfiguration} from '../editorConfiguration';
 import ace from 'ace-builds';
-import {Request} from '../../../channel/request';
+import {Requestable} from '../../../channel/requestable';
 
 export class AutoCommitConfiguration implements EditorConfiguration {
-  private readonly _request:Request;
+  private readonly _request:Requestable;
   private readonly _editorConfiguration?: EditorConfiguration;
 
-  constructor(request:Request, editorConfiguration?: EditorConfiguration) {
+  constructor(request:Requestable, editorConfiguration?: EditorConfiguration) {
     this._request = request;
     this._editorConfiguration = editorConfiguration;
   }
