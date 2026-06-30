@@ -45,13 +45,13 @@
  */
 import {CustomCompleter} from './customCompleter';
 import ace, {Ace} from 'ace-builds';
-import {Channel} from '../../../../channel/channel';
-import {ResponseRegisterImpl} from '../../../../register/responseRegister/responseRegisterImpl';
-import {ResponseRegister} from '../../../../register/responseRegister/responseRegister';
-import {CompletionListMessageImpl} from '../../../../message/completionListMessage/completionListMessageImpl';
-import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';
-import {MessageImpl} from '../../../../message/messageImpl';
-import {EditorSettingMessageImpl} from '../../../../message/editorSettingMessage/editorSettingMessageImpl';
+import {Channel} from '../../channel/channel';
+import {ResponseRegisterImpl} from '../../register/responseRegister/responseRegisterImpl';
+import {ResponseRegister} from '../../register/responseRegister/responseRegister';
+import {CompletionListMessageImpl} from '../../message/completionListMessage/completionListMessageImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../../message/messageImpl';
+import {EditorSettingMessageImpl} from '../../message/editorSettingMessage/editorSettingMessageImpl';
 
 export class CustomCompleterImpl implements CustomCompleter {
   private readonly _channel:Channel;

@@ -46,8 +46,8 @@
 import {AutoCompletionConfiguration} from './autoCompletionConfiguration';
 import ace from 'ace-builds';
 import {Channel} from '../../../channel/channel';
-import {CustomCompleter} from './customCompleter/customCompleter';
-import {CustomCompleterImpl} from './customCompleter/customCompleterImpl';
+import {CustomCompleter} from '../../customCompleter/customCompleter';
+import {CustomCompleterImpl} from '../../customCompleter/customCompleterImpl';
 import {EditorConfiguration} from '../editorConfiguration';
 
 export class AutoCompletionConfigurationImpl implements AutoCompletionConfiguration {
