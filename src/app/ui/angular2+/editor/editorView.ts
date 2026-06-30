@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, inject, input, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, inject, input, OnChanges, signal, ViewChild, WritableSignal} from '@angular/core';
 import {EditorWithStateBroadcastOnFocusImpl} from '../../angularJs/editorWithStateBroadcastOnFocus/editorWithStateBroadcastOnFocusImpl';
 import {ChannelNode} from '../../../objects/channel/channelNode/channelNode';
 import {CustomCompleterImpl} from '../../../objects/editor/customCompleter/customCompleterImpl';
@@ -54,9 +54,7 @@ import {KeyCommandsConfiguration} from '../../../objects/editor/configuration/ke
 import {HighlightsConfiguration} from '../../../objects/editor/configuration/highlights/highLightsConfiguration';
 import {AutoCommitConfiguration} from '../../../objects/editor/configuration/autoCommit/autoCommitConfiguration';
 import {AnnotationsConfiguration} from '../../../objects/editor/configuration/annotations/annotationsConfiguration';
-import {
-  AutoCompletionConfigurationImpl
-} from '../../../objects/editor/configuration/autoCompletion/autoCompletionConfigurationImpl';
+import {AutoCompletionConfigurationImpl} from '../../../objects/editor/configuration/autoCompletion/autoCompletionConfigurationImpl';
 
 @Component({
   selector: 'editor-view',
@@ -64,15 +62,28 @@ import {
     <pre class="editor-container" #anchor></pre>
   `,
 })
-export class EditorView implements AfterViewInit{
+export class EditorView implements AfterViewInit, OnChanges {
   paragraphData = input.required<object>();
   channelNode = input.required<ChannelNode>();
   @ViewChild('anchor') anchor: ElementRef;
   private editorWithStateBroadcastOnFocus = inject(EditorWithStateBroadcastOnFocusImpl);
+  private editor:WritableSignal<ace.Editor>;
 
   ngAfterViewInit(): void {
     this.setBasePath();
-    const editor =
+    this.editor = signal(ace.edit(this.anchor.nativeElement));
+    this.configureEditor();
+  }
+
+  ngOnChanges() {
+    if(!this.editor){
+      return;
+    }
+    this.configureEditor();
+  }
+
+  private configureEditor(): void {
+    const configuredEditor =
       new TextConfiguration(this.paragraphData(),
         new LinesConfiguration(this.paragraphData(),
           new KeyCommandsConfiguration(
@@ -80,13 +91,12 @@ export class EditorView implements AfterViewInit{
               new AutoCommitConfiguration(this.channelNode(),
                 new AnnotationsConfiguration(
                 ))))))
-      .configuredEditor(ace.edit(this.anchor.nativeElement));
-
-    this.configureReadOnly(editor);
-    const customCompleter = new CustomCompleterImpl(this.channelNode(), editor);
+        .configuredEditor(this.editor());
+    this.configureReadOnly(configuredEditor);
+    const customCompleter = new CustomCompleterImpl(this.channelNode(), configuredEditor);
     this.channelNode().addRespondable(customCompleter);
     const editorWithAutoCompletions = new AutoCompletionConfigurationImpl(customCompleter);
-    this.editorWithStateBroadcastOnFocus.editor(editorWithAutoCompletions.configuredEditor(editor), this.paragraphData()['id']);
+    this.editor.set(this.editorWithStateBroadcastOnFocus.editor(editorWithAutoCompletions.configuredEditor(configuredEditor), this.paragraphData()['id']));
   }
 
   private configureReadOnly(aceEditor: ace.Editor):void{
