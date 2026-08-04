@@ -58,7 +58,7 @@ describe('AngularObjectUpdateMessage unit test', () => {
     data:{
       angularObject: {
         name:'name',
-        value:'value'
+        object:'value'
       },
       interpreterGroupId:'interpreterGroupId'
     }
@@ -84,8 +84,9 @@ describe('AngularObjectUpdateMessage unit test', () => {
     });
 
     it('Should have angularObject', () => {
-      const expectedAngularObject = new AngularObjectImpl(channel, messageData.data.angularObject, messageData.data.interpreterGroupId);
-      expect(angularObjectUpdateMessage.angularObject()).toEqual(expectedAngularObject);
+      const angularObject = angularObjectUpdateMessage.angularObject();
+      expect(angularObject.name()).toEqual(messageData.data.angularObject.name);
+      expect(angularObject.value()).toEqual(messageData.data.angularObject.object);
     });
   });
 
