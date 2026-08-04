@@ -44,26 +44,44 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
 
 @Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet
-  ],
+  selector:'dpl-log',
   template: `
-    @if(containerId() === paragraphId()){
-      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-      @if(!dplLog().isStub()){
-        <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
+    <div class="dpl-log">
+      <p>
+        <button
+          type="button"
+          class="btn btn-secondary btn-small my-2"
+          (click)="toggleLogVisibility()">
+          Show/Hide log
+        </button>
+      </p>
+      @if(showLog){
+        <div id="log" class="log-message">
+          <h3>Data Batch Status</h3>
+          @let batchMsg = dplLog().get('batchMsg');
+          @if(batchMsg){
+            <p class="batch-message">{{batchMsg}}</p>
+          }
+          @let message = dplLog().get('message');
+          @if(message){
+            <p>{{message}}</p>
+          }
+          @let timeMsg = dplLog().get('timeMsg');
+          @if(timeMsg){
+            <p class="overflow-auto">{{timeMsg}}</p>
+          }
+        </div>
       }
-    }
+    </div>
   `
 })
-export class ParagraphView{
-  output = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-  paragraphId = input.required<string>();
-  containerId = input.required<string>();
+export class DplLogView {
+  dplLog = input.required<Map<string,string>>();
+  protected showLog: boolean = false;
+
+  toggleLogVisibility():void{
+    this.showLog = !this.showLog;
+  }
 }

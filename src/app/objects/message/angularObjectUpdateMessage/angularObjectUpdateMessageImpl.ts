@@ -43,27 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
+import {AngularObjectUpdateMessage} from './angularObjectUpdateMessage';
+import {AngularObject} from '../../angularObject/angularObject';
+import {Message} from '../message';
+import {TypedMessage} from '../typedMessage/typedMessage';
+import {AngularObjectImpl} from '../../angularObject/angularObjectImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {Channel} from '../../channel/channel';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    @if(containerId() === paragraphId()){
-      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-      @if(!dplLog().isStub()){
-        <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-      }
-    }
-  `
-})
-export class ParagraphView{
-  output = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-  paragraphId = input.required<string>();
-  containerId = input.required<string>();
+export class AngularObjectUpdateMessageImpl implements AngularObjectUpdateMessage {
+  private readonly _message:Message;
+  private readonly _channel:Channel;
+
+  constructor(message:Message, channel:Channel) {
+    this._message = new TypedMessage('ANGULAR_OBJECT_UPDATE', message);
+    this._channel = channel;
+  }
+
+  angularObject(): AngularObject {
+    const messageData = new SafeJsonImpl(this.data());
+    const angularObjectData:object = messageData.getProperty('angularObject', 'object');
+    const interpreterGroupId:string = messageData.getProperty('interpreterGroupId', 'string');
+    return new AngularObjectImpl(this._channel, angularObjectData, interpreterGroupId);
+  }
+
+  data(): object {
+    return this._message.data();
+  }
+
+  operation(): string {
+    return this._message.operation();
+  }
 }

@@ -43,27 +43,49 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
+import {AngularObjectRemoveMessage} from './angularObjectRemoveMessage';
+import {AngularObjectRemoveMessageImpl} from './angularObjectRemoveMessageImpl';
+import {MessageImpl} from '../messageImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    @if(containerId() === paragraphId()){
-      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-      @if(!dplLog().isStub()){
-        <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-      }
+describe('AngularObjectRemoveMessage unit test', () => {
+  let angularObjectRemoveMessage: AngularObjectRemoveMessage;
+  const messageData = {
+    op: 'ANGULAR_OBJECT_REMOVE',
+    data:{
+      name:'name'
     }
-  `
-})
-export class ParagraphView{
-  output = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-  paragraphId = input.required<string>();
-  containerId = input.required<string>();
-}
+  };
+
+  beforeEach(() => {
+    angularObjectRemoveMessage = new AngularObjectRemoveMessageImpl(new MessageImpl(new SafeJsonImpl(messageData)));
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(angularObjectRemoveMessage).toBeDefined();
+    });
+
+    it('Should have data', () => {
+      expect(angularObjectRemoveMessage.data()).toEqual(messageData.data);
+    });
+
+    it('Should have operation', () => {
+      expect(angularObjectRemoveMessage.operation()).toEqual(messageData.op);
+    });
+
+    it('Should have name', () => {
+      expect(angularObjectRemoveMessage.name()).toEqual(messageData.data.name);
+    });
+  });
+
+  describe('Message validation', () => {
+    it('Should throw error if operation is not "ANGULAR_OBJECT_REMOVE"', () => {
+      messageData.op = '';
+      angularObjectRemoveMessage = new AngularObjectRemoveMessageImpl(new MessageImpl(new SafeJsonImpl(messageData)));
+      expect(() => angularObjectRemoveMessage.name()).toThrow();
+      expect(() => angularObjectRemoveMessage.data()).toThrow();
+      expect(() => angularObjectRemoveMessage.operation()).toThrow();
+    });
+  });
+});
