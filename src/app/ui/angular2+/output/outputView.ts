@@ -43,7 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
-import {Printable} from '../../rendering/printable/printable';
+import {Component, input} from '@angular/core';
+import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {NgComponentOutlet} from '@angular/common';
 
-export interface OutputFormats extends  Channel, Printable {}
+@Component({
+  selector: 'output-view',
+  imports: [
+    NgComponentOutlet
+  ],
+  template: `
+    @if(!interpreterError().isStub()){
+      <ng-container *ngComponentOutlet="interpreterError().component(); inputs: interpreterError().inputs()()"></ng-container>
+    }
+    <ng-container *ngComponentOutlet="outputSwitcher().component(); inputs: outputSwitcher().inputs()()"></ng-container>
+    @for(outputFormat of outputFormats(); track $index){
+      <ng-container *ngComponentOutlet="outputFormat.component(); inputs: outputFormat.inputs()()"></ng-container>
+    }
+  `
+})
+export class OutputView{
+  outputSwitcher = input.required<ComponentView>();
+  outputFormats = input.required<ComponentView[]>();
+  interpreterError = input.required<ComponentView>();
+
+}

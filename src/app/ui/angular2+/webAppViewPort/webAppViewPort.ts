@@ -45,18 +45,22 @@
  */
 import {Component, computed, input} from '@angular/core';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
-import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
+import {NgComponentOutlet} from '@angular/common';
 
 @Component({
   selector: 'web-app-view-port',
   imports: [
-    RecursiveComponentDraw
+    NgComponentOutlet
   ],
   template: `
-    <recursive-component-draw [renderNode]="renderNode()" [containerId]="containerId()"></recursive-component-draw>
+    <ng-container *ngComponentOutlet="componentView().component(); inputs: inputs()"></ng-container>
   `
 })
 export class WebAppViewPort {
   containerId= input.required<string>();
-  protected renderNode = computed(() => webAppRoot.print()());
+  protected componentView = computed(() => webAppRoot.print()().componentView);
+  protected inputs = computed(() => ({
+    ...this.componentView().inputs()(),
+    containerId: this.containerId(),
+  }));
 }

@@ -60,7 +60,6 @@ describe('InterpreterErrorListener', () => {
     it('Should print', () => {
       const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
       expect(interpreterErrorListenerPrinted).toBeDefined();
-      expect(interpreterErrorListenerPrinted.children()).toHaveLength(0);
       expect(interpreterErrorListenerPrinted.componentView.isStub()).toBe(true);
     });
   });

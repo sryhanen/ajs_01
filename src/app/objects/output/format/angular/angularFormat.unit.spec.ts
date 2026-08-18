@@ -67,7 +67,6 @@ describe('AngularFormat unit test', () => {
     it('Should print', () => {
       const angularFormatPrinted = angularFormat.print()();
       expect(angularFormatPrinted.componentView.isStub()).toBe(true);
-      expect(angularFormatPrinted.children()).toHaveLength(0);
     });
   });
 

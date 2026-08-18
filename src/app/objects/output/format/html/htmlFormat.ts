@@ -81,8 +81,7 @@ export class HTMLFormat implements OutputFormat{
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      componentView: this._componentView(),
-      children: computed(() => []),
+      componentView: this._componentView()
     }));
   }
 

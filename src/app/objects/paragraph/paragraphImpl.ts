@@ -45,13 +45,10 @@
  */
 import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
-import {OutputContainer} from '../output/container/outputContainer';
-import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {computed, Signal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
-import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {
@@ -67,10 +64,14 @@ import {
   RequestRegisterWithPropertyDecorator
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 import {ParagraphOutputMessageFactoryImpl} from './paragraphOutputMessageFactory/paragraphOutputMessageFactoryImpl';
+import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
+import {ParagraphView} from '../../ui/angular2+/paragraph/paragraphView';
+import {Output} from '../output/output';
+import {OutputImpl} from '../output/outputImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
-  private readonly _outputContainer: OutputContainer;
+  private readonly _output: Output;
   private readonly _paragraph: SafeJson;
   private readonly _componentView: ComponentView;
   private readonly _responseRegister:ResponseRegister;
@@ -79,25 +80,27 @@ export class ParagraphImpl implements Paragraph {
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
-    this._outputContainer = this.initializedOutputContainer(paragraph);
-    this._componentView = new ComponentViewStub();
-    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer]), {name:'paragraphId', type:'string'}, this.id());
+    this._output = this.initializedOutput(paragraph);
+    this._componentView = new ComponentViewImpl(ParagraphView, computed(() => ({
+      output: this._output.print()().componentView,
+      paragraphId:this.id()
+    })));
+    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._output]), {name:'paragraphId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
   }
 
-  private initializedOutputContainer(paragraph: object): OutputContainer {
-    const outputContainer = new OutputContainerImpl(this, this.id());
+  private initializedOutput(paragraph: object): Output {
+    const output = new OutputImpl(this, this.id());
     const paragraphOutputMessageFactory = new ParagraphOutputMessageFactoryImpl(paragraph);
     const paragraphOutputMessage = paragraphOutputMessageFactory.paragraphOutputMessage();
     if(!paragraphOutputMessage.isStub()){
-      outputContainer.response(paragraphOutputMessage.print());
+      output.response(paragraphOutputMessage.print());
     }
-    return outputContainer;
+    return output;
   }
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      children:computed(() => [this._outputContainer.print()()]),
       componentView: this._componentView
     }));
   }
