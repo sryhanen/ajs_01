@@ -43,28 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, input, OnDestroy, ViewChild} from '@angular/core';
-import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
-import {Api} from 'datatables.net-bs5';
+import {Component, computed, input, Signal} from '@angular/core';
+import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {NgComponentOutlet} from '@angular/common';
 
 @Component({
-  selector: 'dataTablesView',
+  selector: 'paragraph-collection',
+  imports: [
+    NgComponentOutlet
+  ],
   template: `
-    <ng-container ngProjectAs="[output-format]">
-        <table #table class="table table-bordered table-striped"></table>'
-    </ng-container>
+    @for (paragraph of componentViews(); track $index) {
+      <ng-container *ngComponentOutlet="paragraph.component; inputs: paragraph.inputs"></ng-container>
+    }
   `
 })
-export class DataTablesOutputView implements AfterViewInit, OnDestroy {
-  dataTablesPlugin = input.required<DataTablesPlugin>();
-  @ViewChild('table') table: ElementRef;
-  private dataTablesInstance:Api<unknown>;
+export class ParagraphCollectionView {
+  paragraphs = input.required<ComponentView[]>();
+  containerId= input.required<string>();
 
-  ngAfterViewInit() {
-    this.dataTablesInstance = this.dataTablesPlugin().initializedTable(this.table.nativeElement);
-  }
-
-  ngOnDestroy() {
-    this.dataTablesInstance.destroy(true);
-  }
+  protected componentViews:Signal<{component: {new(): unknown}, inputs: Record<string, unknown>}[]> = computed(() => this.paragraphs().map(paragraph => {
+    return {
+      component: paragraph.component(),
+      inputs: {
+        ...paragraph.inputs()(),
+        containerId:this.containerId()
+      }
+    };
+  }));
 }

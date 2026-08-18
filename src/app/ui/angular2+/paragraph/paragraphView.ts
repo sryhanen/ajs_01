@@ -43,28 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, input, OnDestroy, ViewChild} from '@angular/core';
-import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
-import {Api} from 'datatables.net-bs5';
+import {Component, input} from '@angular/core';
+import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {NgComponentOutlet} from '@angular/common';
 
 @Component({
-  selector: 'dataTablesView',
+  selector: 'paragraph',
+  imports: [
+    NgComponentOutlet
+  ],
   template: `
-    <ng-container ngProjectAs="[output-format]">
-        <table #table class="table table-bordered table-striped"></table>'
-    </ng-container>
+    @if(containerId() === paragraphId()){
+      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
+    }
   `
 })
-export class DataTablesOutputView implements AfterViewInit, OnDestroy {
-  dataTablesPlugin = input.required<DataTablesPlugin>();
-  @ViewChild('table') table: ElementRef;
-  private dataTablesInstance:Api<unknown>;
-
-  ngAfterViewInit() {
-    this.dataTablesInstance = this.dataTablesPlugin().initializedTable(this.table.nativeElement);
-  }
-
-  ngOnDestroy() {
-    this.dataTablesInstance.destroy(true);
-  }
+export class ParagraphView{
+  output = input.required<ComponentView>();
+  paragraphId = input.required<string>();
+  containerId = input.required<string>();
 }

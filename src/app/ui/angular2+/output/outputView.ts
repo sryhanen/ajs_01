@@ -43,39 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputContainer} from './outputContainer';
-import {Channel} from '../../channel/channel';
-import {FakeChannel} from '../../channel/fakeChannel';
-import {OutputContainerImpl} from './outputContainerImpl';
+import {Component, input} from '@angular/core';
+import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {NgComponentOutlet} from '@angular/common';
 
-describe('OutputContainer', () => {
-  let channel:Channel;
-  let outputContainer:OutputContainer;
+@Component({
+  selector: 'output-view',
+  imports: [
+    NgComponentOutlet
+  ],
+  template: `
+    @if(!interpreterError().isStub()){
+      <ng-container *ngComponentOutlet="interpreterError().component(); inputs: interpreterError().inputs()()"></ng-container>
+    }
+    <ng-container *ngComponentOutlet="outputSwitcher().component(); inputs: outputSwitcher().inputs()()"></ng-container>
+    @for(outputFormat of outputFormats(); track $index){
+      <ng-container *ngComponentOutlet="outputFormat.component(); inputs: outputFormat.inputs()()"></ng-container>
+    }
+  `
+})
+export class OutputView{
+  outputSwitcher = input.required<ComponentView>();
+  outputFormats = input.required<ComponentView[]>();
+  interpreterError = input.required<ComponentView>();
 
-  beforeEach(() => {
-    channel = new FakeChannel();
-    outputContainer = new OutputContainerImpl(channel, 'paragraphId');
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(outputContainer).toBeInstanceOf(OutputContainerImpl);
-    });
-
-    it('Should print', () => {
-      const outputContainerPrinted = outputContainer.print()();
-      expect(outputContainerPrinted.children()).toHaveLength(2);
-      expect(outputContainerPrinted.componentView.isStub()).toBe(true);
-      expect(outputContainerPrinted.paragraphId).toEqual('paragraphId');
-    });
-  });
-
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const channelSpy = vi.spyOn(channel, 'request');
-      const request = {test:'test'};
-      outputContainer.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
-  });
-});
+}
