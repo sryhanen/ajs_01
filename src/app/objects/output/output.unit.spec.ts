@@ -43,82 +43,67 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
-import {OutputFormats} from './outputFormats';
-import {FakeChannel} from '../../channel/fakeChannel';
-import {OutputFormatsImpl} from './outputFormatsImpl';
-import {Signal} from '@angular/core';
+import {Output} from './output';
+import {Channel} from '../channel/channel';
+import {FakeChannel} from '../channel/fakeChannel';
+import {OutputImpl} from './outputImpl';
+import {RenderNode} from '../rendering/renderNode/renderNode';
 
-describe('OutputFormats unit test', () => {
+describe('Output Unit Test', () => {
+  const paragraphId = 'paragraphId';
   let channel:Channel;
-  let outputFormats:OutputFormats;
+  let output:Output;
+
   beforeEach(() => {
     channel = new FakeChannel();
-    outputFormats = new OutputFormatsImpl(channel);
+    output = new OutputImpl(channel, paragraphId);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(outputFormats).toBeDefined();
-    });
+  describe('Printing', () => {
+    let outputPrinted:RenderNode;
 
-    it('Should print', () => {
-      const printed = outputFormats.print()();
-      expect(printed.componentView.isStub()).toBe(true);
-      expect(printed.children()).toHaveLength(6);
-    });
-  });
-
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const spy = vi.spyOn(channel, 'request');
-      const request = {
-        op:'',
-        data:{}
-      };
-      outputFormats.request(request);
-      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
-    });
-  });
-
-  describe('OutputSwitch validation', () => {
-    let outputSwitcherInputs: Signal<Record<string, unknown>>;
-    const switchedType = 'switchedType';
-    let paragraphOutputRequest;
-    let paragraphOutputResponse;
     beforeEach(() => {
-      paragraphOutputRequest = {
-        op:'PARAGRAPH_OUTPUT_REQUEST',
-        data:{
-          type:switchedType
-        }
-      };
-      paragraphOutputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:''
-          }
-        }
-      };
-      outputFormats.request(paragraphOutputRequest);
-      const outputSwitcher = outputFormats.print()().children().find(child => !child.componentView.isStub() && child.componentView.inputs()()['switchIsPending']);
-      outputSwitcherInputs = outputSwitcher.componentView.inputs();
-      expect(outputSwitcherInputs()['switchIsPending']).toBe(true);
+      outputPrinted = output.print()();
     });
 
-    it('Should send paragraph output request if response type does not match requested type', () => {
+    it('Should have paragraphId', () => {
+        expect(outputPrinted.paragraphId).toEqual(paragraphId);
+    });
+
+    it('Should have componentView', () => {
+      expect(outputPrinted.componentView.isStub()).toBe(false);
+    });
+  });
+
+  describe('Output response validation', () => {
+    const outputType = 'outputType';
+    const paragraphOutputRequest = {
+      op:'PARAGRAPH_OUTPUT_REQUEST',
+      data:{
+        type:outputType
+      }
+    };
+    const paragraphOutputResponse = {
+      op:'PARAGRAPH_OUTPUT',
+      data:{
+        output:{
+          type:'wrong type'
+        }
+      }
+    };
+
+    it('Should send paragraphOutputRequest if response type does not match requested type', () => {
+      output.request(paragraphOutputRequest);
       const spy = vi.spyOn(channel, 'request');
-      outputFormats.response(paragraphOutputResponse);
-      expect(outputSwitcherInputs()['switchIsPending']).toBe(true);
+      output.response(paragraphOutputResponse);
       expect(spy).toHaveBeenCalledExactlyOnceWith(paragraphOutputRequest);
     });
 
-    it('Should perform switch if response type matches requested type', () => {
+    it('Should not send paragraphOutputRequest if response type is valid', () => {
+      output.request(paragraphOutputRequest);
       const spy = vi.spyOn(channel, 'request');
-      paragraphOutputResponse.data.output.type = switchedType;
-      outputFormats.response(paragraphOutputResponse);
-      expect(outputSwitcherInputs()['switchIsPending']).toBe(false);
+      paragraphOutputResponse.data.output.type = outputType;
+      output.response(paragraphOutputResponse);
       expect(spy).toHaveBeenCalledTimes(0);
     });
   });
