@@ -65,7 +65,6 @@ describe('HTMLFormat unit test', () => {
     it('Should print', () => {
       const htmlFormatPrinted = htmlFormat.print()();
       expect(htmlFormatPrinted.componentView.isStub()).toBe(true);
-      expect(htmlFormatPrinted.children()).toHaveLength(0);
     });
   });
 

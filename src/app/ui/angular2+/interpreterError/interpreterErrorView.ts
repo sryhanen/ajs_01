@@ -47,21 +47,23 @@ import {AfterViewInit, Component, ElementRef, input, ViewChild} from '@angular/c
 import * as bootstrap from 'bootstrap';
 
 @Component({
-  selector: 'interpreterErrorView',
+  selector: 'interpreter-error',
   template: `
-    <div #modal class="modal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Alert</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>{{errorMessage()}}</p>
+    <ng-container ngProjectAs="[interpreter-error]">
+      <div #modal class="modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Alert</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p>{{errorMessage()}}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ng-container>
   `
 })
 export class InterpreterErrorView implements AfterViewInit {

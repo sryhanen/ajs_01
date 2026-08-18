@@ -49,10 +49,9 @@ import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {SafeJson} from '../safeJson/safeJson';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
-import {computed, Signal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
-import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
 import {
@@ -66,6 +65,8 @@ import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterIm
 import {
   RequestRegisterWithPropertyDecorator
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
+import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
+import {NotebookView} from '../../ui/angular2+/notebook/notebookView';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
@@ -79,19 +80,16 @@ export class NotebookImpl implements Notebook {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
     this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
-    this._componentView = new ComponentViewStub();
+    this._componentView = new ComponentViewImpl(NotebookView, computed(() => ({
+      paragraphCollection: this._paragraphCollection.print()().componentView
+    })));
     this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._paragraphCollection]),{name:'noteId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'noteId', value:this.id()});
   }
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      componentView: this._componentView,
-      children: computed(() => {
-        const children:RenderNode[] = [];
-        children.push(this._paragraphCollection.print()());
-        return children;
-      }),
+      componentView: this._componentView
     }));
   }
 

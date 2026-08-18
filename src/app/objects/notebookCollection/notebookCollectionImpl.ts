@@ -49,7 +49,6 @@ import {Channel} from '../channel/channel';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
-import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {NotebookIndex} from './notebookIndex/notebookIndex';
 import {NotebookStub} from '../notebook/notebookStub';
 import {NoteMessageImpl} from '../message/noteMessage/noteMessageImpl';
@@ -58,12 +57,16 @@ import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {NotesInfoMessageImpl} from '../message/notesInfoMessage/notesInfoMessageImpl';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
+import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
+import {NotebookCollectionView} from '../../ui/angular2+/notebookCollection/notebookCollectionView';
+import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;
   private readonly _responseRegister:ResponseRegister;
   private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
   private readonly _currentNotebook: WritableSignal<Notebook>;
+  private readonly _componentViewStub: ComponentView;
   private readonly _componentView:ComponentView;
 
   constructor(channel:Channel) {
@@ -73,7 +76,14 @@ export class NotebookCollectionImpl implements NotebookCollection{
     this._responseRegister.register('NOTE', (json) => this.noteResponse(json));
     this._notebookIndices = signal(new Map());
     this._currentNotebook = signal(new NotebookStub());
-    this._componentView = new ComponentViewStub();
+    this._componentViewStub = new ComponentViewStub();
+    this._componentView = new ComponentViewImpl(NotebookCollectionView, computed(() => {
+      let componentView = this._componentViewStub;
+      if(!this._currentNotebook().isStub()){
+        componentView = this._currentNotebook().print()().componentView;
+      }
+      return {currentNotebook: componentView};
+    }));
   }
 
   private notesInfoResponse(json:object):void{
@@ -86,14 +96,7 @@ export class NotebookCollectionImpl implements NotebookCollection{
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-        componentView: this._componentView,
-        children: computed(() => {
-          const renderableList: RenderNode[] = [];
-          if(!this._currentNotebook().isStub()) {
-            renderableList.push(this._currentNotebook().print()());
-          }
-          return renderableList;
-        }),
+        componentView: this._componentView
       })
     );
   }

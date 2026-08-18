@@ -43,10 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Message} from '../../../message/message';
-import Stubable from '../../../../shared/interfaces/stubable';
+import {Component, computed, input, Signal} from '@angular/core';
+import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {NgComponentOutlet} from '@angular/common';
 
-export interface ParagraphOutputRequest extends Message, Stubable {
-  type():string;
-  request():object;
+@Component({
+  selector: 'paragraph-collection',
+  imports: [
+    NgComponentOutlet
+  ],
+  template: `
+    @for (paragraph of componentViews(); track $index) {
+      <ng-container *ngComponentOutlet="paragraph.component; inputs: paragraph.inputs"></ng-container>
+    }
+  `
+})
+export class ParagraphCollectionView {
+  paragraphs = input.required<ComponentView[]>();
+  containerId= input.required<string>();
+
+  protected componentViews:Signal<{component: {new(): unknown}, inputs: Record<string, unknown>}[]> = computed(() => this.paragraphs().map(paragraph => {
+    return {
+      component: paragraph.component(),
+      inputs: {
+        ...paragraph.inputs()(),
+        containerId:this.containerId()
+      }
+    };
+  }));
 }
