@@ -43,6 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface Response {
-  response(data: object):void;
+import {Component, input} from '@angular/core';
+import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {NgComponentOutlet} from '@angular/common';
+
+@Component({
+  selector: 'paragraph',
+  imports: [
+    NgComponentOutlet
+  ],
+  template: `
+    @if(containerId() === paragraphId()){
+      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
+    }
+  `
+})
+export class ParagraphView{
+  output = input.required<ComponentView>();
+  paragraphId = input.required<string>();
+  containerId = input.required<string>();
 }

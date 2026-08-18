@@ -55,7 +55,9 @@ import {UPlotOptions} from '../../../../../objects/output/format/uPlot/uPlotPlug
 @Component({
   selector: 'uPlotOutputView',
   template: `
-    <div #anchor></div>
+    <ng-container ngProjectAs="[output-format]">
+        <div #anchor></div>
+    </ng-container>
   `
 })
 export class UPlotOutputView implements AfterViewInit, OnChanges, OnDestroy {
