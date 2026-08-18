@@ -43,77 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {FakeChannel} from '../channel/fakeChannel';
-import {Channel} from '../channel/channel';
-import {Notebook} from './notebook';
-import {NotebookImpl} from './notebookImpl';
+import {ParagraphOutputRequest} from './paragraphOutputRequest';
+import {Message} from '../../message/message';
+import {TypedMessage} from '../../message/typedMessage/typedMessage';
 
-describe('Notebook unit test', () => {
-  const notebookId = 'noteId';
-  const notebookParagraphs = [
-    {id:'paragraph1'}
-  ];
-  let notebookData: {id:string, paragraphs?: {id:string}[]};
-  let channel: Channel;
-  let notebook: Notebook;
+export class ParagraphOutputRequestImpl implements ParagraphOutputRequest {
+  private readonly _message:Message;
 
-  beforeEach(() => {
-    notebookData = {
-      id: notebookId,
-      paragraphs:notebookParagraphs
+  constructor(message:Message) {
+    this._message = new TypedMessage('PARAGRAPH_OUTPUT_REQUEST', message);
+  }
+
+  request(): object {
+    return {
+      op:this.operation(),
+      data:this.data(),
     };
-    channel = new FakeChannel();
-  });
+  }
 
-  describe('Birth', () => {
-    it('Should have been initialized', () =>{
-      notebook = new NotebookImpl(channel, notebookData);
-      expect(notebook).toBeInstanceOf(NotebookImpl);
-    });
+  type(): string {
+    return this._message.data()['type'];
+  }
 
-    it('Should have id', () => {
-      notebook = new NotebookImpl(channel, notebookData);
-      expect(notebook.id()).toEqual(notebookId);
-    });
+  operation(): string {
+    return this._message.operation();
+  }
 
-    it('Should print', () => {
-      notebook = new NotebookImpl(channel, notebookData);
-      const notebookPrinted = notebook.print()();
-      expect(notebookPrinted.componentView.isStub()).toBe(false);
-    });
-  });
+  data(): object {
+    return this._message.data();
+  }
 
-  describe('Request', () => {
-    let channelSpy;
-    beforeEach(() => {
-      channelSpy = vi.spyOn(channel, 'request');
-      notebook = new NotebookImpl(channel, notebookData);
-    });
-
-    it('Should decorate with noteId', () => {
-      const request = {
-        op:'',
-        data:{
-          noteId: ''
-        }
-      };
-      const decoratedRequest = {
-        op:'',
-        data:{
-          noteId: notebookId,
-        }
-      };
-      notebook.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(decoratedRequest);
-    });
-
-    it('Should request channel', () => {
-      const request = {
-        op:'',
-        data:{}
-      };
-      notebook.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
-  });
-});
+  isStub(): boolean {
+    return false;
+  }
+}

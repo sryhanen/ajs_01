@@ -43,6 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface Request {
-  request(data:object):void;
+import {Component, computed, input} from '@angular/core';
+import {NgComponentOutlet} from '@angular/common';
+import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+
+@Component({
+  selector: 'notebook-collection',
+  imports: [
+    NgComponentOutlet
+  ],
+  template: `
+    @if(!currentNotebook().isStub()){
+      <ng-container *ngComponentOutlet="currentNotebook().component(); inputs: inputs()"></ng-container>
+    }
+  `
+})
+export class NotebookCollectionView {
+  currentNotebook = input.required<ComponentView>();
+  containerId= input.required<string>();
+  protected inputs = computed(() => ({
+    ...this.currentNotebook().inputs()(),
+    containerId: this.containerId(),
+  }));
 }

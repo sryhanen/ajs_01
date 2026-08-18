@@ -43,41 +43,68 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {Output} from './output';
+import {Channel} from '../channel/channel';
+import {FakeChannel} from '../channel/fakeChannel';
+import {OutputImpl} from './outputImpl';
+import {RenderNode} from '../rendering/renderNode/renderNode';
 
+describe('Output Unit Test', () => {
+  const paragraphId = 'paragraphId';
+  let channel:Channel;
+  let output:Output;
 
-@Component({
-  selector: 'recursive-component-draw',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    @if(!componentView().isStub()){
-      <ng-container
-        *ngComponentOutlet="component(); inputs: inputs()">
-      </ng-container>
-    }
-    @for (child of renderNode().children(); track $index) {
-      @if(child.paragraphId === undefined || child.paragraphId === this.containerId()){
-        <recursive-component-draw [renderNode]="child" [containerId]="containerId()"></recursive-component-draw>
+  beforeEach(() => {
+    channel = new FakeChannel();
+    output = new OutputImpl(channel, paragraphId);
+  });
+
+  describe('Printing', () => {
+    let outputPrinted:RenderNode;
+
+    beforeEach(() => {
+      outputPrinted = output.print()();
+    });
+
+    it('Should have paragraphId', () => {
+        expect(outputPrinted.paragraphId).toEqual(paragraphId);
+    });
+
+    it('Should have componentView', () => {
+      expect(outputPrinted.componentView.isStub()).toBe(false);
+    });
+  });
+
+  describe('Output response validation', () => {
+    const outputType = 'outputType';
+    const paragraphOutputRequest = {
+      op:'PARAGRAPH_OUTPUT_REQUEST',
+      data:{
+        type:outputType
       }
-    }
-  `
-})
-export class RecursiveComponentDraw {
-  renderNode = input.required<RenderNode>();
-  containerId = input.required<string>();
-  protected componentView = computed(() => this.renderNode().componentView);
-  protected component = computed(() => {
-    if(!this.componentView().isStub()){
-      return this.componentView().component();
-    }
+    };
+    const paragraphOutputResponse = {
+      op:'PARAGRAPH_OUTPUT',
+      data:{
+        output:{
+          type:'wrong type'
+        }
+      }
+    };
+
+    it('Should send paragraphOutputRequest if response type does not match requested type', () => {
+      output.request(paragraphOutputRequest);
+      const spy = vi.spyOn(channel, 'request');
+      output.response(paragraphOutputResponse);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(paragraphOutputRequest);
+    });
+
+    it('Should not send paragraphOutputRequest if response type is valid', () => {
+      output.request(paragraphOutputRequest);
+      const spy = vi.spyOn(channel, 'request');
+      paragraphOutputResponse.data.output.type = outputType;
+      output.response(paragraphOutputResponse);
+      expect(spy).toHaveBeenCalledTimes(0);
+    });
   });
-  protected inputs = computed(() => {
-    if(!this.componentView().isStub()){
-      return this.componentView().inputs()();
-    }
-  });
-}
+});

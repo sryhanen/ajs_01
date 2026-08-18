@@ -48,16 +48,24 @@ import {FakeWebSocketService} from '../../../objects/webSocket/service/fakeWebSo
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {WebAppViewPort} from './webAppViewPort';
 import {By} from '@angular/platform-browser';
-import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
+import {ComponentViewImpl} from '../../../objects/rendering/componentView/componentViewImpl';
+import {Component, signal} from '@angular/core';
 
 describe('WebAppViewPort integration test', () => {
   const containerId = 'containerId';
   let fixture: ComponentFixture<WebAppViewPort>;
 
+  @Component({
+    selector: 'fake-component',
+    template: ''
+  })
+  class FakeComponent{}
+
   beforeEach(async () => {
     webAppRoot.initialize(new FakeWebSocketService());
     fixture = TestBed.createComponent(WebAppViewPort);
     fixture.componentRef.setInput('containerId', containerId);
+    fixture.componentRef.setInput('componentView', new ComponentViewImpl(FakeComponent, signal({})));
     await fixture.whenStable();
   });
 
@@ -66,8 +74,8 @@ describe('WebAppViewPort integration test', () => {
       expect(fixture.componentInstance).toBeDefined();
     });
 
-    it('Should have rendered RecursiveComponentDraw', () =>  {
-      expect(fixture.debugElement.query(By.directive(RecursiveComponentDraw))).toBeDefined();
+    it('Should have rendered component', () =>  {
+      expect(fixture.debugElement.query(By.directive(FakeComponent))).toBeDefined();
     });
   });
 });

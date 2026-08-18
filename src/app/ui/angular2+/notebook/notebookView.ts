@@ -43,37 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphOutputRequest} from './paragraphOutputRequest';
-import {Message} from '../../../message/message';
-import {TypedMessage} from '../../../message/typedMessage/typedMessage';
+import {Component, computed, input} from '@angular/core';
+import {NgComponentOutlet} from '@angular/common';
+import {ComponentView} from '../../../objects/rendering/componentView/componentView';
 
-export class ParagraphOutputRequestImpl implements ParagraphOutputRequest {
-  private readonly _message:Message;
-
-  constructor(message:Message) {
-    this._message = new TypedMessage('PARAGRAPH_OUTPUT_REQUEST', message);
-  }
-
-  request(): object {
-    return {
-      op:this.operation(),
-      data:this.data(),
-    };
-  }
-
-  type(): string {
-    return this._message.data()['type'];
-  }
-
-  operation(): string {
-    return this._message.operation();
-  }
-
-  data(): object {
-    return this._message.data();
-  }
-
-  isStub(): boolean {
-    return false;
-  }
+@Component({
+  selector: 'notebook',
+  imports: [
+    NgComponentOutlet
+  ],
+  template: `
+    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: inputs()"></ng-container>
+  `
+})
+export class NotebookView {
+  paragraphCollection = input.required<ComponentView>();
+  containerId= input.required<string>();
+  protected inputs = computed(() => ({
+    ...this.paragraphCollection().inputs()(),
+    containerId: this.containerId(),
+  }));
 }

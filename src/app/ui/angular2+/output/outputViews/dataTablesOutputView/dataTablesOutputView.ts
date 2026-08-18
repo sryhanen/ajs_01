@@ -50,7 +50,9 @@ import {Api} from 'datatables.net-bs5';
 @Component({
   selector: 'dataTablesView',
   template: `
-    <table #table class="table table-bordered table-striped"></table>
+    <ng-container ngProjectAs="[output-format]">
+        <table #table class="table table-bordered table-striped"></table>
+    </ng-container>
   `
 })
 export class DataTablesOutputView implements AfterViewInit, OnDestroy {

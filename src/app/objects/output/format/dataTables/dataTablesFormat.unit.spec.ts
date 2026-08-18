@@ -70,7 +70,6 @@ describe('DataTablesFormat unit test', () => {
     it('Should print', () => {
       const dataTablesFormatPrinted = dataTablesFormat.print()();
       expect(dataTablesFormatPrinted.componentView.isStub()).toBe(true);
-      expect(dataTablesFormatPrinted.children()).toHaveLength(0);
     });
   });
 
