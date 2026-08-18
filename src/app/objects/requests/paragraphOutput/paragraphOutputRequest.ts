@@ -43,37 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphOutputRequest} from './paragraphOutputRequest';
-import {Message} from '../../../message/message';
-import {TypedMessage} from '../../../message/typedMessage/typedMessage';
+import {Message} from '../../message/message';
+import Stubable from '../../../shared/interfaces/stubable';
 
-export class ParagraphOutputRequestImpl implements ParagraphOutputRequest {
-  private readonly _message:Message;
-
-  constructor(message:Message) {
-    this._message = new TypedMessage('PARAGRAPH_OUTPUT_REQUEST', message);
-  }
-
-  request(): object {
-    return {
-      op:this.operation(),
-      data:this.data(),
-    };
-  }
-
-  type(): string {
-    return this._message.data()['type'];
-  }
-
-  operation(): string {
-    return this._message.operation();
-  }
-
-  data(): object {
-    return this._message.data();
-  }
-
-  isStub(): boolean {
-    return false;
-  }
+export interface ParagraphOutputRequest extends Message, Stubable {
+  type():string;
+  request():object;
 }

@@ -65,7 +65,6 @@ describe('TextFormat unit test', () => {
     it('Should print', () => {
       const textFormatPrinted = textFormat.print()();
       expect(textFormatPrinted.componentView.isStub()).toBe(true);
-      expect(textFormatPrinted.children()).toHaveLength(0);
     });
   });
 

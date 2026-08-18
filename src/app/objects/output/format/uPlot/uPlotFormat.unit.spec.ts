@@ -69,7 +69,6 @@ describe('uPlotFormat unit test', () => {
     it('Should print', () => {
       const uPlotFormatPrinted = uPlotFormat.print()();
       expect(uPlotFormatPrinted.componentView.isStub()).toBe(true);
-      expect(uPlotFormatPrinted.children()).toHaveLength(0);
     });
   });
 

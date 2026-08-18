@@ -50,30 +50,32 @@ import { RenderNode } from '../../../../rendering/renderNode/renderNode';
 import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
 import {OutputSwitcherButtonView} from '../../../../../ui/angular2+/output/switcher/switcherButton/outputSwitcherButtonView';
 import {Request} from '../../../../channel/request';
+import {ComponentView} from '../../../../rendering/componentView/componentView';
 
 export class uPlotSwitcherButton implements Printable {
   private readonly _request: Request;
   private readonly _title: string;
   private readonly _icon: string;
   private readonly _graphType: string;
+  private readonly _componentView: ComponentView;
 
   constructor(request: Request, title: string, icon: string, graphType: string) {
     this._request = request;
     this._title = title;
     this._icon = icon;
     this._graphType = graphType;
+    this._componentView = new ComponentViewImpl(OutputSwitcherButtonView, computed(() => ({
+      title: this._title,
+      icon: this._icon,
+      requestFormatSwitch:() => {
+        this._request.request(this.outputSwitchRequestData());
+      }
+    })));
   }
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      componentView: new ComponentViewImpl(OutputSwitcherButtonView, computed(() => ({
-        title: this._title,
-        icon: this._icon,
-        requestFormatSwitch:() => {
-          this._request.request(this.outputSwitchRequestData());
-        }
-      }))),
-      children:computed(() => [])
+      componentView: this._componentView
     }));
   }
 
