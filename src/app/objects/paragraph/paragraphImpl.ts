@@ -47,7 +47,7 @@ import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {computed, signal, Signal} from '@angular/core';
+import {computed, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
@@ -68,6 +68,8 @@ import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
 import {ParagraphView} from '../../ui/angular2+/paragraph/paragraphView';
 import {Output} from '../output/output';
 import {OutputImpl} from '../output/outputImpl';
+import {DynamicForms} from '../dynamicForms/dynamicForms';
+import {DynamicFormsImpl} from '../dynamicForms/dynamicFormsImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
@@ -76,16 +78,23 @@ export class ParagraphImpl implements Paragraph {
   private readonly _componentView: ComponentView;
   private readonly _responseRegister:ResponseRegister;
   private readonly _requestRegister:RequestRegister;
+  private readonly _dynamicForm: DynamicForms;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
     this._output = this.initializedOutput(paragraph);
+    this._dynamicForm = new DynamicFormsImpl(this);
     this._componentView = new ComponentViewImpl(ParagraphView, computed(() => ({
       output: this._output.print()().componentView,
+      dynamicForm: this._dynamicForm.print()().componentView,
       paragraphId:this.id()
     })));
-    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._output]), {name:'paragraphId', type:'string'}, this.id());
+    const defaultResponseList = [
+      this._output,
+      this._dynamicForm
+    ];
+    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), defaultResponseList), {name:'paragraphId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
   }
 

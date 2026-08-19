@@ -55,11 +55,13 @@ import {NgComponentOutlet} from '@angular/common';
   template: `
     @if(containerId() === paragraphId()){
       <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
+      <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
     }
   `
 })
 export class ParagraphView{
   output = input.required<ComponentView>();
+  dynamicForm = input.required<ComponentView>();
   paragraphId = input.required<string>();
   containerId = input.required<string>();
 }
