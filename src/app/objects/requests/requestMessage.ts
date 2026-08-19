@@ -43,48 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {Requestable} from '../../../objects/channel/requestable';
-import {SubmitFormRequest} from '../../../objects/requests/submitForm/submitFormRequest';
-
-@Component({
-  selector: 'dynamic-form',
-  imports: [
-    ReactiveFormsModule
-  ],
-  template: `
-    <form [formGroup]="formGroup()" class="dynamic-form row" (submit)="submitFormRequest()" role="form">
-      <div class="d-flex align-items-center gap-3 mb-3">
-      @for(formField of form(); track $index){
-        <div>
-          <label [for]="formField.name" class="me-2">{{formField.name}}</label>
-          @if(formField.type === 'checkbox') {
-            <input [id]="formField.name" [aria-label]="formField.type" [type]="formField.type" [formControlName]="formField.name" [value]="formField.value" [checked]="formField.value">
-          }
-          @else{
-            <input [id]="formField.name" [aria-label]="formField.type" [type]="formField.type" [formControlName]="formField.name" [value]="formField.value">
-          }
-        </div>
-        }
-      </div>
-      <div>
-        <button type="submit">Run paragraph</button>
-      </div>
-    </form>
-  `
-})
-export class DynamicFormsView {
-  form = input.required<{type:string, name:string, value:unknown}[]>();
-  requestable = input.required<Requestable>();
-  formGroup = computed(() => {
-    const formFields = {};
-    this.form().forEach(formField => formFields[formField.name] = new FormControl(formField.value));
-    return new FormGroup(formFields);
-  });
-
-  protected submitFormRequest():void{
-    const submitFormRequest = new SubmitFormRequest(this.formGroup().value, this.requestable());
-    submitFormRequest.send();
-  }
+export interface RequestMessage {
+  send():void;
 }
