@@ -55,11 +55,15 @@ import {NgComponentOutlet} from '@angular/common';
   template: `
     @if(containerId() === paragraphId()){
       <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
+      @if(!dplLog().isStub()){
+        <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
+      }
     }
   `
 })
 export class ParagraphView{
   output = input.required<ComponentView>();
+  dplLog = input.required<ComponentView>();
   paragraphId = input.required<string>();
   containerId = input.required<string>();
 }
