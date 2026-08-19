@@ -79,15 +79,6 @@ describe('Editor unit test', () => {
       expect(componentView.component()).toEqual(EditorView);
       expect(componentView.inputs()()['editor']).toBeDefined();
       expect(componentView.inputs()()['editorConfigurationRules']).toBeDefined();
-      expect(componentView.inputs()()['paragraphId']).toBeDefined();
-    });
-
-    it('Should not have children', () => {
-      expect(printedEditor().children()).toEqual([]);
-    });
-
-    it('Should have paragraphId', () => {
-      expect(printedEditor().paragraphId).toEqual('id');
     });
   });
 

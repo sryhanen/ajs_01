@@ -50,13 +50,12 @@ import {OutputImpl} from './outputImpl';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 
 describe('Output Unit Test', () => {
-  const paragraphId = 'paragraphId';
   let channel:Channel;
   let output:Output;
 
   beforeEach(() => {
     channel = new FakeChannel();
-    output = new OutputImpl(channel, paragraphId);
+    output = new OutputImpl(channel);
   });
 
   describe('Printing', () => {
@@ -64,10 +63,6 @@ describe('Output Unit Test', () => {
 
     beforeEach(() => {
       outputPrinted = output.print()();
-    });
-
-    it('Should have paragraphId', () => {
-        expect(outputPrinted.paragraphId).toEqual(paragraphId);
     });
 
     it('Should have componentView', () => {
