@@ -58,12 +58,10 @@ describe('InterpreterErrorView functional test', () => {
     checkbox,
     password,
   ];
-  let requestJson:object;
   let requestable:Requestable;
   let fixture: ComponentFixture<DynamicFormView>;
 
   beforeEach(async () => {
-    requestJson = undefined;
     requestable = new FakeChannel();
     const renderResult = await render(DynamicFormView, {
       inputs: {
@@ -99,14 +97,21 @@ describe('InterpreterErrorView functional test', () => {
 
   describe('Form submission', () => {
     it('Should send expected request data on submission', () => {
-      expect(requestJson).not.toBeDefined();
+      const requestSpy = vi.spyOn(requestable, 'request');
       fireEvent.click(screen.getByRole('button'));
-      const expectedRequestData = {
-        [textInput.name]:textInput.value,
-        [password.name]:password.value,
-        [checkbox.name]:checkbox.value,
+      const expectedRequest = {
+        op:'SUBMIT_FORM',
+        data:{
+          noteId:'',
+          paragraphId:'',
+          form:{
+            [textInput.name]:textInput.value,
+            [password.name]:password.value,
+            [checkbox.name]:checkbox.value,
+          }
+        }
       };
-      expect(requestJson).toEqual(expectedRequestData);
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
     });
   });
 

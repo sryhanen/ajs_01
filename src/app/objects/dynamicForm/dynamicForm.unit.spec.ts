@@ -95,7 +95,7 @@ describe('DynamicForm unit test', () => {
       expect(componentView.isStub()).toBe(false);
       expect(componentView.component()).toBeDefined();
       expect(componentView.inputs()()['form']).toBeDefined();
-      expect(componentView.inputs()()['request']).toBeDefined();
+      expect(componentView.inputs()()['requestable']).toBeDefined();
     });
   });
 });
