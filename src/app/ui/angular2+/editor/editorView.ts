@@ -49,7 +49,7 @@ import {
   ElementRef,
   inject,
   input,
-  OnChanges,
+  OnChanges, OnDestroy,
   Renderer2,
   ViewChild,
 } from '@angular/core';
@@ -62,7 +62,7 @@ import {AceEditorConfiguration} from '../../../objects/editor/configuration/aceE
     <div #anchor></div>
   `,
 })
-export class EditorView implements AfterViewInit, OnChanges {
+export class EditorView implements AfterViewInit, OnChanges, OnDestroy {
   paragraphId = input.required<string>();
   editor = input.required<ace.Editor>();
   editorConfigurationRules = input.required<AceEditorConfiguration[]>();
@@ -80,6 +80,10 @@ export class EditorView implements AfterViewInit, OnChanges {
       this.configureEditor();
       this.renderer.appendChild(this.anchor.nativeElement, this.editor().container);
     }
+  }
+
+  ngOnDestroy() {
+    this.editor().destroy();
   }
 
   private configureEditor():void {
