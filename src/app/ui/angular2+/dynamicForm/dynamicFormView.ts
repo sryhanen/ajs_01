@@ -74,7 +74,7 @@ import {SubmitFormRequest} from '../../../objects/requests/submitForm/submitForm
     </form>
   `
 })
-export class DynamicFormsView {
+export class DynamicFormView {
   form = input.required<{type:string, name:string, value:unknown}[]>();
   requestable = input.required<Requestable>();
   formGroup = computed(() => {

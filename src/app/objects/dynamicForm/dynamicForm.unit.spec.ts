@@ -45,28 +45,27 @@
  */
 
 import {Channel} from '../channel/channel';
-import {DynamicForms} from './dynamicForms';
+import {DynamicForm} from './dynamicForm';
 import {FakeChannel} from '../channel/fakeChannel';
-import {DynamicFormsImpl} from './dynamicFormsImpl';
+import {DynamicFormImpl} from './dynamicFormImpl';
 
-describe('DynamicForms unit test', () => {
+describe('DynamicForm unit test', () => {
   let channel:Channel;
-  let dynamicForms:DynamicForms;
+  let dynamicForm:DynamicForm;
 
   beforeEach(() => {
     channel = new FakeChannel();
-    dynamicForms = new DynamicFormsImpl(channel);
+    dynamicForm = new DynamicFormImpl(channel);
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(dynamicForms).toBeDefined();
+      expect(dynamicForm).toBeDefined();
     });
 
     it('Should print', () => {
-      const printed = dynamicForms.print()();
+      const printed = dynamicForm.print()();
       expect(printed.componentView.isStub()).toBe(true);
-      expect(printed.children()).toHaveLength(0);
     });
   });
 
@@ -77,7 +76,7 @@ describe('DynamicForms unit test', () => {
         op:'',
         data:{}
       };
-      dynamicForms.request(request);
+      dynamicForm.request(request);
       expect(spy).toHaveBeenCalledExactlyOnceWith(request);
     });
   });
@@ -91,8 +90,8 @@ describe('DynamicForms unit test', () => {
     };
 
     it('Should print view after "PARAGRAPH_FORM" response', () => {
-      dynamicForms.response(paragraphFormResponse);
-      const componentView = dynamicForms.print()().componentView;
+      dynamicForm.response(paragraphFormResponse);
+      const componentView = dynamicForm.print()().componentView;
       expect(componentView.isStub()).toBe(false);
       expect(componentView.component()).toBeDefined();
       expect(componentView.inputs()()['form']).toBeDefined();

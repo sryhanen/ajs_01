@@ -45,8 +45,9 @@
  */
 import {ComponentFixture} from '@angular/core/testing';
 import {render, screen, fireEvent} from '@testing-library/angular';
-import {DynamicFormsView} from './dynamicFormsView';
-import {Request} from '../../../objects/channel/request';
+import {DynamicFormView} from './dynamicFormView';
+import {Requestable} from '../../../objects/channel/requestable';
+import {FakeChannel} from '../../../objects/channel/fakeChannel';
 
 describe('InterpreterErrorView functional test', () => {
   const textInput = {type:'text', name:'textInput', value:'Default text'};
@@ -58,19 +59,16 @@ describe('InterpreterErrorView functional test', () => {
     password,
   ];
   let requestJson:object;
-  const submitRequest:Request = {
-    request(json: object) {
-      requestJson = json;
-    }
-  };
-  let fixture: ComponentFixture<DynamicFormsView>;
+  let requestable:Requestable;
+  let fixture: ComponentFixture<DynamicFormView>;
 
   beforeEach(async () => {
     requestJson = undefined;
-    const renderResult = await render(DynamicFormsView, {
+    requestable = new FakeChannel();
+    const renderResult = await render(DynamicFormView, {
       inputs: {
         form: form,
-        submitFormRequest: submitRequest
+        requestable: requestable
       }
     });
     fixture = renderResult.fixture;

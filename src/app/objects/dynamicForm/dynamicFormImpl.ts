@@ -43,7 +43,54 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {DynamicForm} from './dynamicForm';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {RenderNode} from '../rendering/renderNode/renderNode';
 import {Channel} from '../channel/channel';
-import {Printable} from '../rendering/printable/printable';
+import {ComponentView} from '../rendering/componentView/componentView';
+import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
+import {MessageImpl} from '../message/messageImpl';
+import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
+import {ResponseRegister} from '../register/responseRegister/responseRegister';
+import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
+import {ParagraphFormMessageImpl} from '../message/paragraphFormMessage/paragraphFormMessageImpl';
+import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
+import {DynamicFormView} from '../../ui/angular2+/dynamicForm/dynamicFormView';
 
-export interface DynamicForms extends Channel, Printable {}
+export class DynamicFormImpl implements DynamicForm {
+  private readonly _channel: Channel;
+  private readonly _componentView: WritableSignal<ComponentView>;
+  private readonly _responseRegister:ResponseRegister;
+
+  constructor(channel: Channel) {
+    this._channel = channel;
+    this._componentView = signal(new ComponentViewStub());
+    this._responseRegister = new ResponseRegisterImpl();
+    this._responseRegister.register('PARAGRAPH_FORM', (json) => this.paragraphFormResponse(json));
+  }
+
+  print(): Signal<RenderNode> {
+    return computed(() => ({
+      componentView:this._componentView(),
+    }));
+  }
+
+  request(json: object): void {
+    this._channel.request(json);
+  }
+
+  response(json: object): void {
+    this._responseRegister.response(json);
+  }
+
+  private paragraphFormResponse(json: object): void {
+    const paragraphFormMessage = new ParagraphFormMessageImpl(new MessageImpl(new SafeJsonImpl(json)));
+    this._componentView.set(new ComponentViewImpl(
+      DynamicFormView,
+      computed(() => ({
+        form: paragraphFormMessage.form(),
+        requestable:this
+      }))
+    ));
+  }
+}

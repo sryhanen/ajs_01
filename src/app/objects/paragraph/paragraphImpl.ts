@@ -68,8 +68,8 @@ import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
 import {ParagraphView} from '../../ui/angular2+/paragraph/paragraphView';
 import {Output} from '../output/output';
 import {OutputImpl} from '../output/outputImpl';
-import {DynamicForms} from '../dynamicForms/dynamicForms';
-import {DynamicFormsImpl} from '../dynamicForms/dynamicFormsImpl';
+import {DynamicForm} from '../dynamicForm/dynamicForm';
+import {DynamicFormImpl} from '../dynamicForm/dynamicFormImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
@@ -78,13 +78,13 @@ export class ParagraphImpl implements Paragraph {
   private readonly _componentView: ComponentView;
   private readonly _responseRegister:ResponseRegister;
   private readonly _requestRegister:RequestRegister;
-  private readonly _dynamicForm: DynamicForms;
+  private readonly _dynamicForm: DynamicForm;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
     this._output = this.initializedOutput(paragraph);
-    this._dynamicForm = new DynamicFormsImpl(this);
+    this._dynamicForm = new DynamicFormImpl(this);
     this._componentView = new ComponentViewImpl(ParagraphView, computed(() => ({
       output: this._output.print()().componentView,
       dynamicForm: this._dynamicForm.print()().componentView,
