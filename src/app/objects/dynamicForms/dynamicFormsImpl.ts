@@ -56,7 +56,6 @@ import {ResponseRegisterImpl} from '../register/responseRegister/responseRegiste
 import {ParagraphFormMessageImpl} from '../message/paragraphFormMessage/paragraphFormMessageImpl';
 import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
 import {DynamicFormsView} from '../../ui/angular2+/dynamicForms/dynamicFormsView';
-import {SubmitFormRequestImpl} from './submitFormRequest/submitFormRequestImpl';
 
 export class DynamicFormsImpl implements DynamicForms {
   private readonly _channel: Channel;
@@ -72,8 +71,7 @@ export class DynamicFormsImpl implements DynamicForms {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-     children:signal([]),
-     componentView:this._componentView(),
+      componentView:this._componentView(),
     }));
   }
 
@@ -91,7 +89,7 @@ export class DynamicFormsImpl implements DynamicForms {
       DynamicFormsView,
       computed(() => ({
         form: paragraphFormMessage.form(),
-        request: new SubmitFormRequestImpl(this)
+        requestable:this
       }))
     ));
   }

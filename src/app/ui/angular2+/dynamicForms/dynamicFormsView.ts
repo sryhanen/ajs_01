@@ -53,7 +53,7 @@ import {Request} from '../../../objects/channel/request';
     ReactiveFormsModule
   ],
   template: `
-    <form [formGroup]="formGroup()" class="dynamic-form row" (submit)="submitFormRequest().request(formGroup().value)" role="form">
+    <form [formGroup]="formGroup()" class="dynamic-form row" (submit)="submitFormRequest()" role="form">
       <div class="d-flex align-items-center gap-3 mb-3">
       @for(formField of form(); track $index){
         <div>
@@ -75,10 +75,14 @@ import {Request} from '../../../objects/channel/request';
 })
 export class DynamicFormsView {
   form = input.required<{type:string, name:string, value:unknown}[]>();
-  submitFormRequest = input.required<Request>();
+  requestable = input.required<Request>();
   formGroup = computed(() => {
     const formFields = {};
     this.form().forEach(formField => formFields[formField.name] = new FormControl(formField.value));
     return new FormGroup(formFields);
   });
+
+  protected submitFormRequest():void{
+
+  }
 }
