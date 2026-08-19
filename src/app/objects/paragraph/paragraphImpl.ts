@@ -70,11 +70,14 @@ import {Output} from '../output/output';
 import {OutputImpl} from '../output/outputImpl';
 import {DplLog} from '../dplLog/dplLog';
 import {DplLogImpl} from '../dplLog/dplLogImpl';
+import {DynamicForm} from '../dynamicForm/dynamicForm';
+import {DynamicFormImpl} from '../dynamicForm/dynamicFormImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _output: Output;
   private readonly _dplLog: DplLog;
+  private readonly _dynamicForm: DynamicForm;
   private readonly _paragraph: SafeJson;
   private readonly _componentView: ComponentView;
   private readonly _responseRegister:ResponseRegister;
@@ -85,14 +88,18 @@ export class ParagraphImpl implements Paragraph {
     this._paragraph = new SafeJsonImpl(paragraph);
     this._output = this.initializedOutput(paragraph);
     this._dplLog = new DplLogImpl(this);
+    this._dynamicForm = new DynamicFormImpl(this);
+    this._dynamicForm = new DynamicFormImpl(this);
     this._componentView = new ComponentViewImpl(ParagraphView, computed(() => ({
       output: this._output.print()().componentView,
       dplLog: this._dplLog.print()().componentView,
+      dynamicForm: this._dynamicForm.print()().componentView,
       paragraphId:this.id()
     })));
     const defaultResponseList = [
       this._output,
       this._dplLog,
+      this._dynamicForm
     ];
     this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), defaultResponseList), {name:'paragraphId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});

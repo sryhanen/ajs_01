@@ -43,31 +43,59 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    @if(containerId() === paragraphId()){
-      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-      @if(!dynamicForm().isStub()){
-        <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+import {Channel} from '../channel/channel';
+import {DynamicForm} from './dynamicForm';
+import {FakeChannel} from '../channel/fakeChannel';
+import {DynamicFormImpl} from './dynamicFormImpl';
+
+describe('DynamicForm unit test', () => {
+  let channel:Channel;
+  let dynamicForm:DynamicForm;
+
+  beforeEach(() => {
+    channel = new FakeChannel();
+    dynamicForm = new DynamicFormImpl(channel);
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(dynamicForm).toBeDefined();
+    });
+
+    it('Should print', () => {
+      const printed = dynamicForm.print()();
+      expect(printed.componentView.isStub()).toBe(true);
+    });
+  });
+
+  describe('Request', () => {
+    it('Should request channel', () => {
+      const spy = vi.spyOn(channel, 'request');
+      const request = {
+        op:'',
+        data:{}
+      };
+      dynamicForm.request(request);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+  });
+
+  describe('"PARAGRAPH_FORM" response', () => {
+    const paragraphFormResponse = {
+      op:'PARAGRAPH_FORM',
+      data: {
+        form:[]
       }
-      @if(!dplLog().isStub()){
-        <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-      }
-    }
-  `
-})
-export class ParagraphView{
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-  paragraphId = input.required<string>();
-  containerId = input.required<string>();
-}
+    };
+
+    it('Should print view after "PARAGRAPH_FORM" response', () => {
+      dynamicForm.response(paragraphFormResponse);
+      const componentView = dynamicForm.print()().componentView;
+      expect(componentView.isStub()).toBe(false);
+      expect(componentView.component()).toBeDefined();
+      expect(componentView.inputs()()['form']).toBeDefined();
+      expect(componentView.inputs()()['requestable']).toBeDefined();
+    });
+  });
+});

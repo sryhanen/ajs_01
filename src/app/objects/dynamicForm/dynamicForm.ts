@@ -43,31 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
+import {Channel} from '../channel/channel';
+import {Printable} from '../rendering/printable/printable';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    @if(containerId() === paragraphId()){
-      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-      @if(!dynamicForm().isStub()){
-        <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
-      }
-      @if(!dplLog().isStub()){
-        <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-      }
-    }
-  `
-})
-export class ParagraphView{
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-  paragraphId = input.required<string>();
-  containerId = input.required<string>();
-}
+export interface DynamicForm extends Channel, Printable {}

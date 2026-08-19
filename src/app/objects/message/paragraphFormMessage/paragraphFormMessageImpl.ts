@@ -43,31 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
+import {ParagraphFormMessage} from './paragraphFormMessage';
+import {Message} from '../message';
+import {TypedMessage} from '../typedMessage/typedMessage';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    @if(containerId() === paragraphId()){
-      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-      @if(!dynamicForm().isStub()){
-        <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
-      }
-      @if(!dplLog().isStub()){
-        <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-      }
-    }
-  `
-})
-export class ParagraphView{
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-  paragraphId = input.required<string>();
-  containerId = input.required<string>();
+export class ParagraphFormMessageImpl implements ParagraphFormMessage {
+  private readonly _message:Message;
+
+  constructor(message:Message) {
+    this._message = new TypedMessage('PARAGRAPH_FORM', message);
+  }
+
+  form(): { type: string; name: string; value: unknown }[] {
+    const messageData = new SafeJsonImpl(this._message.data());
+    return messageData.getProperty('form', 'object');
+  }
+
+  operation(): string {
+    return this._message.operation();
+  }
+
+  data(): object {
+    return this._message.data();
+  }
 }

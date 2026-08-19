@@ -43,31 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
+import {RequestMessage} from '../requestMessage';
+import {Requestable} from '../../channel/requestable';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    @if(containerId() === paragraphId()){
-      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-      @if(!dynamicForm().isStub()){
-        <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+export class SubmitFormRequest implements RequestMessage {
+  private readonly _requestable: Requestable;
+  private readonly _form: Record<string, unknown>;
+
+  constructor(form: Record<string, unknown>, requestable:Requestable) {
+    this._form = form;
+    this._requestable = requestable;
+  }
+
+  send(): void {
+    this._requestable.request({
+      op:'SUBMIT_FORM',
+      data:{
+        noteId:'',
+        paragraphId:'',
+        form: this._form
       }
-      @if(!dplLog().isStub()){
-        <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-      }
-    }
-  `
-})
-export class ParagraphView{
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-  paragraphId = input.required<string>();
-  containerId = input.required<string>();
+    });
+  }
 }

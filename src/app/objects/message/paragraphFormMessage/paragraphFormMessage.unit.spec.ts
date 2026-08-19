@@ -43,31 +43,54 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
+import {ParagraphFormMessage} from './paragraphFormMessage';
+import {ParagraphFormMessageImpl} from './paragraphFormMessageImpl';
+import {MessageImpl} from '../messageImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    @if(containerId() === paragraphId()){
-      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-      @if(!dynamicForm().isStub()){
-        <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+describe('ParagraphFormMessage unit test', () => {
+  const form = [
+    {name:'name1', value:'value1', type:'type1'},
+    {name:'name2', value:'value2', type:'type2'},
+  ];
+  let paragraphFormMessageData;
+  let paragraphFormMessage: ParagraphFormMessage;
+
+  beforeEach(() => {
+    paragraphFormMessageData = {
+      op:'PARAGRAPH_FORM',
+      data:{
+        form:form
       }
-      @if(!dplLog().isStub()){
-        <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-      }
-    }
-  `
-})
-export class ParagraphView{
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-  paragraphId = input.required<string>();
-  containerId = input.required<string>();
-}
+    };
+    paragraphFormMessage = new ParagraphFormMessageImpl(new MessageImpl(new SafeJsonImpl(paragraphFormMessageData)));
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(paragraphFormMessage).toBeDefined();
+    });
+
+    it('Should have operation', () => {
+      expect(paragraphFormMessage.operation()).toEqual('PARAGRAPH_FORM');
+    });
+
+    it('Should have data', () => {
+      expect(paragraphFormMessage.data()).toEqual(paragraphFormMessageData.data);
+    });
+
+    it('Should have form', () => {
+      expect(paragraphFormMessage.form()).toEqual(form);
+    });
+  });
+
+  describe('Message validation', () => {
+    it('Should throw if operation is not "PARAGRAPH_FORM"', () => {
+      paragraphFormMessageData.op = '';
+      paragraphFormMessage = new ParagraphFormMessageImpl(new MessageImpl(new SafeJsonImpl(paragraphFormMessageData)));
+      expect(() => paragraphFormMessage.operation()).toThrow();
+      expect(() => paragraphFormMessage.data()).toThrow();
+      expect(() => paragraphFormMessage.form()).toThrow();
+    });
+  });
+});
