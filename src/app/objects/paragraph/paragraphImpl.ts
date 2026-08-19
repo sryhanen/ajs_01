@@ -47,7 +47,7 @@ import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {computed, signal, Signal} from '@angular/core';
+import {computed, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
@@ -68,10 +68,13 @@ import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
 import {ParagraphView} from '../../ui/angular2+/paragraph/paragraphView';
 import {Output} from '../output/output';
 import {OutputImpl} from '../output/outputImpl';
+import {Editor} from '../editor/editor';
+import {EditorImpl} from '../editor/editorImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _output: Output;
+  private readonly _editor: Editor;
   private readonly _paragraph: SafeJson;
   private readonly _componentView: ComponentView;
   private readonly _responseRegister:ResponseRegister;
@@ -81,11 +84,17 @@ export class ParagraphImpl implements Paragraph {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
     this._output = this.initializedOutput(paragraph);
+    this._editor = new EditorImpl(this, paragraph);
     this._componentView = new ComponentViewImpl(ParagraphView, computed(() => ({
+      editor: this._editor.print()().componentView,
       output: this._output.print()().componentView,
       paragraphId:this.id()
     })));
-    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._output]), {name:'paragraphId', type:'string'}, this.id());
+    const defaultResponseList = [
+      this._output,
+      this._editor,
+    ];
+    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), defaultResponseList), {name:'paragraphId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
   }
 

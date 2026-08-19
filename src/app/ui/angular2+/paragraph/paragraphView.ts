@@ -54,11 +54,13 @@ import {NgComponentOutlet} from '@angular/common';
   ],
   template: `
     @if(containerId() === paragraphId()){
+      <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
       <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
     }
   `
 })
 export class ParagraphView{
+  editor = input.required<ComponentView>();
   output = input.required<ComponentView>();
   paragraphId = input.required<string>();
   containerId = input.required<string>();
