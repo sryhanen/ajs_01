@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {NgComponentOutlet} from '@angular/common';
 import {ComponentView} from '../../../objects/rendering/componentView/componentView';
 
@@ -53,14 +53,9 @@ import {ComponentView} from '../../../objects/rendering/componentView/componentV
     NgComponentOutlet
   ],
   template: `
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: inputs()"></ng-container>
+    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
   `
 })
 export class NotebookView {
   paragraphCollection = input.required<ComponentView>();
-  containerId= input.required<string>();
-  protected inputs = computed(() => ({
-    ...this.paragraphCollection().inputs()(),
-    containerId: this.containerId(),
-  }));
 }

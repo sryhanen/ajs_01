@@ -97,8 +97,7 @@ export class ParagraphImpl implements Paragraph {
       editor: this._editor.print()().componentView,
       output: this._output.print()().componentView,
       dplLog: this._dplLog.print()().componentView,
-      dynamicForm: this._dynamicForm.print()().componentView,
-      paragraphId:this.id()
+      dynamicForm: this._dynamicForm.print()().componentView
     })));
     const defaultResponseList = [
       this._output,

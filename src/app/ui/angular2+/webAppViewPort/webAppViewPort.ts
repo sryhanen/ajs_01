@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
+import {Component, computed} from '@angular/core';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 import {NgComponentOutlet} from '@angular/common';
 
@@ -53,14 +53,9 @@ import {NgComponentOutlet} from '@angular/common';
     NgComponentOutlet
   ],
   template: `
-    <ng-container *ngComponentOutlet="componentView().component(); inputs: inputs()"></ng-container>
+    <ng-container *ngComponentOutlet="componentView().component(); inputs: componentView().inputs()()"></ng-container>
   `
 })
 export class WebAppViewPort {
-  containerId= input.required<string>();
   protected componentView = computed(() => webAppRoot.print()().componentView);
-  protected inputs = computed(() => ({
-    ...this.componentView().inputs()(),
-    containerId: this.containerId(),
-  }));
 }

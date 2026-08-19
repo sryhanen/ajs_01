@@ -53,15 +53,13 @@ import {NgComponentOutlet} from '@angular/common';
     NgComponentOutlet
   ],
   template: `
-    @if(containerId() === paragraphId()){
-      <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
-      <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-      @if(!dynamicForm().isStub()){
-        <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
-      }
-      @if(!dplLog().isStub()){
-        <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-      }
+    <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
+    <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
+    @if(!dynamicForm().isStub()){
+      <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+    }
+    @if(!dplLog().isStub()){
+      <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
     }
   `
 })
@@ -70,6 +68,4 @@ export class ParagraphView{
   output = input.required<ComponentView>();
   dynamicForm = input.required<ComponentView>();
   dplLog = input.required<ComponentView>();
-  paragraphId = input.required<string>();
-  containerId = input.required<string>();
 }
