@@ -86,14 +86,16 @@ export class ParagraphImpl implements Paragraph {
   private readonly _responseRegister:ResponseRegister;
   private readonly _requestRegister:RequestRegister;
 
-  constructor(channel: Channel, paragraph: object) {
+  constructor(channel: Channel, paragraphData: object) {
     this._channel = channel;
-    this._paragraph = new SafeJsonImpl(paragraph);
-    this._output = this.initializedOutput(paragraph);
+    this._paragraph = new SafeJsonImpl(paragraphData);
+    this._output = this.initializedOutput(paragraphData);
     this._dplLog = new DplLogImpl(this);
     this._dynamicForm = new DynamicFormImpl(this);
-    this._editor = new EditorImpl(this, paragraph);
+    this._editor = new EditorImpl(this, paragraphData);
     this._componentView = new ComponentViewImpl(ParagraphView, computed(() => ({
+      paragraphData:paragraphData,
+      requestable:this,
       editor: this._editor.print()().componentView,
       output: this._output.print()().componentView,
       dplLog: this._dplLog.print()().componentView,

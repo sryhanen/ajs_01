@@ -44,39 +44,39 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
-import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
+import {Requestable} from '../../../../../../objects/channel/requestable';
+import {
+  ChangeParagraphPositionRequest
+} from '../../../../../../objects/requests/changeParagraphPositionRequest/changeParagraphPositionRequest';
 
 @Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet,
-    ParagraphControlsView,
-    ParagraphProgressBar
-  ],
+  selector:'paragraph-position-select',
   template: `
-    <div class="paragraph paragraph-box">
-        <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
-        <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
-        <paragraph-progress-bar [paragraphData]="paragraphData()"></paragraph-progress-bar>
-        <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-        @if(!dynamicForm().isStub()){
-          <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
-        }
-        @if(!dplLog().isStub()){
-          <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-        }
-    </div>
+    @let configuration = positionConfiguration.get(position());
+    <li class="dropdown-item d-flex align-items-center">
+        <li class="d-flex align-items-center">
+          <a role="button" class="dropdown-item" (click)="changeParagraphPositionRequest()">
+                      <span class="drop-icon">
+                        <i role="img" class="fas" [class]="configuration.class"></i>
+                      </span>
+            {{configuration.visibleText}}
+          </a>
+        </li>
   `
 })
-export class ParagraphView{
-  paragraphData = input.required<object>();
+export class ParagraphPositionSelect {
   requestable = input.required<Requestable>();
-  editor = input.required<ComponentView>();
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
+  position = input.required<string>();
+  paragraphId = input.required<string>();
+  protected positionConfiguration = new Map([
+    ['top', {visibleText:'Move to the top', class:'fa-angle-double-up'}],
+    ['above', {visibleText:'Move up', class:'fa-angle-up'}],
+    ['below', {visibleText:'Move down', class:'fa-angle-down'}],
+    ['bottom', {visibleText:'Move to the bottom', class:'fa-angle-double-down'}],
+  ]);
+
+  protected changeParagraphPositionRequest():void{
+    const changeParagraphPositionRequest = new ChangeParagraphPositionRequest(this.requestable(), this.position(), this.paragraphId());
+    changeParagraphPositionRequest.send();
+  }
 }

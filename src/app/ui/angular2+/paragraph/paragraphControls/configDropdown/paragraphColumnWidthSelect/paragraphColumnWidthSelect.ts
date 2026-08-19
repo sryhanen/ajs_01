@@ -44,39 +44,40 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
-import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
+import {FormsModule} from '@angular/forms';
+import {Requestable} from '../../../../../../objects/channel/requestable';
+import {CommitParagraphRequest} from '../../../../../../objects/requests/commitParagraph/commitParagraphRequest';
 
 @Component({
-  selector: 'paragraph',
+  selector: 'paragraph-column-width-select',
   imports: [
-    NgComponentOutlet,
-    ParagraphControlsView,
-    ParagraphProgressBar
+    FormsModule
   ],
   template: `
-    <div class="paragraph paragraph-box">
-        <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
-        <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
-        <paragraph-progress-bar [paragraphData]="paragraphData()"></paragraph-progress-bar>
-        <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-        @if(!dynamicForm().isStub()){
-          <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+    <li class="dropdown-item d-flex align-items-center">
+      <span class="drop-icon">
+          <i class="fas fa-left-right"></i>
+      </span>
+      Width
+      <span class="ms-auto" (click)="$event.stopPropagation()">
+        <select role="listbox" [(ngModel)]="paragraphData()['config']['colWidth']"
+                (ngModelChange)="commitParagraphRequest()"
+                class="form-select form-select-sm">
+        @for (colWidthOption of colWidthOptions; track $index){
+          <option [value]="colWidthOption">{{colWidthOption}}</option>
         }
-        @if(!dplLog().isStub()){
-          <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-        }
-    </div>
+        </select>
+      </span>
+    </li>
   `
 })
-export class ParagraphView{
-  paragraphData = input.required<object>();
+export class ParagraphColumnWidthSelect {
   requestable = input.required<Requestable>();
-  editor = input.required<ComponentView>();
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
+  paragraphData = input.required<object>();
+  protected colWidthOptions = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+  protected commitParagraphRequest():void {
+    const commitParagraphRequest = new CommitParagraphRequest(this.requestable(), this.paragraphData());
+    commitParagraphRequest.send();
+  }
 }

@@ -44,39 +44,40 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
-import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
+import {Requestable} from '../../../../../../objects/channel/requestable';
+import {FormsModule} from '@angular/forms';
+import {CommitParagraphRequest} from '../../../../../../objects/requests/commitParagraph/commitParagraphRequest';
 
 @Component({
-  selector: 'paragraph',
+  selector: 'paragraph-font-size-select',
   imports: [
-    NgComponentOutlet,
-    ParagraphControlsView,
-    ParagraphProgressBar
+    FormsModule
   ],
   template: `
-    <div class="paragraph paragraph-box">
-        <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
-        <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
-        <paragraph-progress-bar [paragraphData]="paragraphData()"></paragraph-progress-bar>
-        <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-        @if(!dynamicForm().isStub()){
-          <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
-        }
-        @if(!dplLog().isStub()){
-          <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-        }
-    </div>
+    <li class="dropdown-item d-flex align-items-center">
+            <span class="drop-icon">
+              <i class="fas fa-text-height"></i>
+            </span>
+      Font size
+      <span class="ms-auto" (click)="$event.stopPropagation()">
+        <select role="listbox" [(ngModel)]="paragraphData()['config']['fontSize']"
+                (ngModelChange)="commitParagraphRequest()"
+                class="form-select form-select-sm">
+          @for(fontSizeOption of fontSizeOptions; track $index){
+            <option [value]="fontSizeOption">{{fontSizeOption}}</option>
+          }
+        </select>
+      </span>
+    </li>
   `
 })
-export class ParagraphView{
-  paragraphData = input.required<object>();
+export class ParagraphFontSizeSelect {
   requestable = input.required<Requestable>();
-  editor = input.required<ComponentView>();
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
+  paragraphData = input.required<object>();
+  protected fontSizeOptions = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+
+  protected commitParagraphRequest():void {
+    const commitParagraphRequest = new CommitParagraphRequest(this.requestable(), this.paragraphData());
+    commitParagraphRequest.send();
+  }
 }

@@ -43,40 +43,65 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
-import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
+import {ComponentFixture} from '@angular/core/testing';
+import {Requestable} from '../../../../../../objects/channel/requestable';
+import {FakeChannel} from '../../../../../../objects/channel/fakeChannel';
+import {fireEvent, render, screen} from '@testing-library/angular';
+import {ParagraphFontSizeSelect} from './paragraphFontSizeSelect';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet,
-    ParagraphControlsView,
-    ParagraphProgressBar
-  ],
-  template: `
-    <div class="paragraph paragraph-box">
-        <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
-        <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
-        <paragraph-progress-bar [paragraphData]="paragraphData()"></paragraph-progress-bar>
-        <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-        @if(!dynamicForm().isStub()){
-          <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+describe('Paragraph font size select integration test', () => {
+  let fixture: ComponentFixture<ParagraphFontSizeSelect>;
+  let requestable:Requestable;
+  const paragraphData = {
+    id:'id',
+    text:'text',
+    title:'title',
+    settings:{},
+    config:{
+      fontSize: 9,
+    }
+  };
+
+  beforeEach(async () => {
+    requestable = new FakeChannel();
+    const renderResult = await render(ParagraphFontSizeSelect, {
+      inputs:{
+        requestable: requestable,
+        paragraphData: paragraphData,
+      }
+    });
+    fixture = renderResult.fixture;
+  });
+
+  describe('Birth', () => {
+    it('Should have initialized', () => {
+      expect(fixture.nativeElement).toBeDefined();
+      expect(screen.getByRole('listbox')).toBeDefined();
+      expect(screen.getByText('Font size')).toBeDefined();
+      expect(screen.getByText(9)).toBeDefined();
+      expect(screen.getByText(20)).toBeDefined();
+    });
+  });
+
+  describe('Changing font size', () => {
+    it('Should send expected request on change', () => {
+      const spy = vi.spyOn(requestable, 'request');
+      const fontSize = 20;
+      fireEvent.change(screen.getByText(fontSize), { target: { value: fontSize } });
+      const expectedRequest = {
+        op:'COMMIT_PARAGRAPH',
+        data:{
+          noteId:'',
+          paragraphId:paragraphData.id,
+          paragraph:paragraphData.text,
+          title:paragraphData.title,
+          params:paragraphData.settings,
+          config:{
+            fontSize: fontSize.toString(),
+          }
         }
-        @if(!dplLog().isStub()){
-          <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-        }
-    </div>
-  `
-})
-export class ParagraphView{
-  paragraphData = input.required<object>();
-  requestable = input.required<Requestable>();
-  editor = input.required<ComponentView>();
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-}
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
+});

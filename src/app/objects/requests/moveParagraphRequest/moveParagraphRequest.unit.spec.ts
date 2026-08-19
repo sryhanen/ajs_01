@@ -43,40 +43,34 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
-import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
+import {Requestable} from '../../channel/requestable';
+import {RequestMessage} from '../requestMessage';
+import {FakeChannel} from '../../channel/fakeChannel';
+import {MoveParagraphRequest} from './moveParagraphRequest';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet,
-    ParagraphControlsView,
-    ParagraphProgressBar
-  ],
-  template: `
-    <div class="paragraph paragraph-box">
-        <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
-        <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
-        <paragraph-progress-bar [paragraphData]="paragraphData()"></paragraph-progress-bar>
-        <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-        @if(!dynamicForm().isStub()){
-          <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+describe('Move paragraph request unit test', () => {
+  let requestable:Requestable;
+  const paragraphId = 'paragraphId';
+  const index = 1;
+  let moveParagraphRequest: RequestMessage;
+
+  beforeEach(() => {
+    requestable = new FakeChannel();
+    moveParagraphRequest = new MoveParagraphRequest(requestable, paragraphId, index);
+  });
+
+  describe('Sending request', () => {
+    it('Should send expected request', () => {
+      const spy = vi.spyOn(requestable, 'request');
+      moveParagraphRequest.send();
+      const expectedRequest = {
+        op:'MOVE_PARAGRAPH',
+        data:{
+          index:index,
+          id:paragraphId,
         }
-        @if(!dplLog().isStub()){
-          <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-        }
-    </div>
-  `
-})
-export class ParagraphView{
-  paragraphData = input.required<object>();
-  requestable = input.required<Requestable>();
-  editor = input.required<ComponentView>();
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-}
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
+});

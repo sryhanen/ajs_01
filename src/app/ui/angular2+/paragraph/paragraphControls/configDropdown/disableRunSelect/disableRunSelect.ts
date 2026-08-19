@@ -43,40 +43,40 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
-import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
+import {Component, computed, input, model} from '@angular/core';
+import {Requestable} from '../../../../../../objects/channel/requestable';
+import {CommitParagraphRequest} from '../../../../../../objects/requests/commitParagraph/commitParagraphRequest';
 
 @Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet,
-    ParagraphControlsView,
-    ParagraphProgressBar
-  ],
+  selector: 'disable-run-select',
   template: `
-    <div class="paragraph paragraph-box">
-        <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
-        <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
-        <paragraph-progress-bar [paragraphData]="paragraphData()"></paragraph-progress-bar>
-        <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-        @if(!dynamicForm().isStub()){
-          <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
-        }
-        @if(!dplLog().isStub()){
-          <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-        }
-    </div>
+    <li class="d-flex align-items-center">
+      <a role="button" class="dropdown-item" (click)="commitParagraphRequest($event)">
+              <span class="drop-icon">
+                <i class="fas fa-play"></i>
+              </span>
+        {{paragraphIsEnabled() ? 'Disable' : 'Enable'}} run
+      </a>
+    </li>
   `
 })
-export class ParagraphView{
-  paragraphData = input.required<object>();
+export class DisableRunSelect {
   requestable = input.required<Requestable>();
-  editor = input.required<ComponentView>();
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
+  paragraphData = model.required<object>();
+  paragraphIsEnabled = computed(() => this.paragraphData()['config']['enabled']);
+
+  protected commitParagraphRequest($event:PointerEvent):void {
+    $event.stopPropagation();
+    this.paragraphData.update(paragraphData => {
+      return {
+        ...paragraphData,
+        config:{
+          ...paragraphData['config'],
+          enabled: !this.paragraphIsEnabled()
+        }
+      };
+    });
+    const commitParagraphRequest = new CommitParagraphRequest(this.requestable(), this.paragraphData());
+    commitParagraphRequest.send();
+  }
 }

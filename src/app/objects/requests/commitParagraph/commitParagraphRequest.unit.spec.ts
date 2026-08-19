@@ -43,40 +43,43 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
-import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
+import {Requestable} from '../../channel/requestable';
+import {RequestMessage} from '../requestMessage';
+import {FakeChannel} from '../../channel/fakeChannel';
+import {CommitParagraphRequest} from './commitParagraphRequest';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet,
-    ParagraphControlsView,
-    ParagraphProgressBar
-  ],
-  template: `
-    <div class="paragraph paragraph-box">
-        <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
-        <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
-        <paragraph-progress-bar [paragraphData]="paragraphData()"></paragraph-progress-bar>
-        <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-        @if(!dynamicForm().isStub()){
-          <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+describe('Commit paragraph request unit test', () => {
+  let requestable:Requestable;
+  const paragraphData = {
+    id:'paragraphId',
+    text:'text',
+    title:'title',
+    config: {},
+    settings: {}
+  };
+  let commitParagraphRequest: RequestMessage;
+
+  beforeEach(() => {
+    requestable = new FakeChannel();
+    commitParagraphRequest = new CommitParagraphRequest(requestable, paragraphData);
+  });
+
+  describe('Sending request', () => {
+    it('Should send expected request', () => {
+      const spy = vi.spyOn(requestable, 'request');
+      commitParagraphRequest.send();
+      const expectedRequest = {
+        op: 'COMMIT_PARAGRAPH',
+        data:{
+          paragraphId:paragraphData.id,
+          noteId:'',
+          title: paragraphData.title,
+          paragraph:paragraphData.text,
+          config: paragraphData.config,
+          params: paragraphData.settings,
         }
-        @if(!dplLog().isStub()){
-          <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-        }
-    </div>
-  `
-})
-export class ParagraphView{
-  paragraphData = input.required<object>();
-  requestable = input.required<Requestable>();
-  editor = input.required<ComponentView>();
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-}
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
+});

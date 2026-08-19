@@ -43,40 +43,46 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
-import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
+import {ComponentFixture} from '@angular/core/testing';
+import {CancelParagraphRunView} from './cancelParagraphRunView';
+import {Requestable} from '../../../../../objects/channel/requestable';
+import {fireEvent, render, screen} from '@testing-library/angular';
+import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
 
-@Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet,
-    ParagraphControlsView,
-    ParagraphProgressBar
-  ],
-  template: `
-    <div class="paragraph paragraph-box">
-        <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
-        <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
-        <paragraph-progress-bar [paragraphData]="paragraphData()"></paragraph-progress-bar>
-        <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-        @if(!dynamicForm().isStub()){
-          <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+describe('CancelParagraphRunView functional test', () => {
+  let fixture: ComponentFixture<CancelParagraphRunView>;
+  let requestable: Requestable;
+  const paragraphId = 'paragraphId';
+
+  beforeEach(async () => {
+    requestable = new FakeChannel();
+    const renderResult = await render(CancelParagraphRunView, {
+      inputs:{
+        requestable:requestable,
+        paragraphId:paragraphId,
+      }
+    });
+    fixture = renderResult.fixture;
+  });
+
+  describe('Birth', () => {
+    it('Should have initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+      expect(screen.getByRole('button')).toBeDefined();
+    });
+  });
+
+  describe('Cancelling paragraph run', () => {
+    it('Should send expected request on button click', () => {
+      const requestSpy = vi.spyOn(requestable, 'request');
+      fireEvent.click(screen.getByRole('button'));
+      const expectedRequest = {
+        op:'CANCEL_PARAGRAPH',
+        data:{
+          id:paragraphId
         }
-        @if(!dplLog().isStub()){
-          <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-        }
-    </div>
-  `
-})
-export class ParagraphView{
-  paragraphData = input.required<object>();
-  requestable = input.required<Requestable>();
-  editor = input.required<ComponentView>();
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
-}
+      };
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
+});

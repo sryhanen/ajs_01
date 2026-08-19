@@ -43,40 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
-import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
+import {Component, input, model} from '@angular/core';
+import {Requestable} from '../../../../../objects/channel/requestable';
+import {RunParagraphRequest} from '../../../../../objects/requests/runParagraphRequest/runParagraphRequest';
 
 @Component({
-  selector: 'paragraph',
-  imports: [
-    NgComponentOutlet,
-    ParagraphControlsView,
-    ParagraphProgressBar
-  ],
+  selector: 'run-paragraph',
   template: `
-    <div class="paragraph paragraph-box">
-        <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
-        <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
-        <paragraph-progress-bar [paragraphData]="paragraphData()"></paragraph-progress-bar>
-        <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-        @if(!dynamicForm().isStub()){
-          <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
-        }
-        @if(!dplLog().isStub()){
-          <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-        }
-    </div>
+    <i class="me-2 fas fa-play"
+       role="button"
+       title="Run this paragraph"
+       (click)="runParagraphRequest()">
+    </i>
   `
 })
-export class ParagraphView{
-  paragraphData = input.required<object>();
+export class RunParagraphView {
   requestable = input.required<Requestable>();
-  editor = input.required<ComponentView>();
-  output = input.required<ComponentView>();
-  dynamicForm = input.required<ComponentView>();
-  dplLog = input.required<ComponentView>();
+  paragraphData = model.required<object>();
+
+  protected runParagraphRequest():void{
+    const runParagraphRequest = new RunParagraphRequest(this.requestable(), this.paragraphData());
+    runParagraphRequest.send();
+  }
 }
