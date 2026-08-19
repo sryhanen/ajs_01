@@ -47,7 +47,7 @@ import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {computed, signal, Signal} from '@angular/core';
+import {computed, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';

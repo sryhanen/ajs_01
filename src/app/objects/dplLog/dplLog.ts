@@ -44,6 +44,6 @@
  * a licensee so wish it.
  */
 import {Printable} from '../rendering/printable/printable';
-import {Response} from '../channel/response';
+import {Respondable} from '../channel/respondable';
 
-export interface DplLog extends Printable, Response {}
+export interface DplLog extends Printable, Respondable {}
