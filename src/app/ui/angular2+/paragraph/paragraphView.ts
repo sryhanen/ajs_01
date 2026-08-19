@@ -55,7 +55,9 @@ import {NgComponentOutlet} from '@angular/common';
   template: `
     @if(containerId() === paragraphId()){
       <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
-      <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+      @if(!dynamicForm().isStub()){
+        <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
+      }
     }
   `
 })
