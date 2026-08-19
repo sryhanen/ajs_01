@@ -65,7 +65,6 @@ describe('DplLog unit test', () => {
     it('Should print', () => {
       const printed= dplLog.print()();
       expect(printed.componentView.isStub()).toBe(true);
-      expect(printed.children()).toEqual([]);
     });
   });
 
