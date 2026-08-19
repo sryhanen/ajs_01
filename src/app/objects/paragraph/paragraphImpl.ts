@@ -111,7 +111,7 @@ export class ParagraphImpl implements Paragraph {
   }
 
   private initializedOutput(paragraph: object): Output {
-    const output = new OutputImpl(this, this.id());
+    const output = new OutputImpl(this);
     const paragraphOutputMessageFactory = new ParagraphOutputMessageFactoryImpl(paragraph);
     const paragraphOutputMessage = paragraphOutputMessageFactory.paragraphOutputMessage();
     if(!paragraphOutputMessage.isStub()){

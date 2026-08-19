@@ -71,7 +71,6 @@ import {ParagraphOutputRequest} from '../requests/paragraphOutput/paragraphOutpu
 
 export class OutputImpl implements Output {
   private readonly _channel: Channel;
-  private readonly _paragraphId:string;
   private readonly _outputFormats: OutputFormat[];
   private readonly _outputSwitcher:OutputSwitcher;
   private _previousParagraphOutputRequest: ParagraphOutputRequest;
@@ -79,9 +78,8 @@ export class OutputImpl implements Output {
   private readonly _componentView:ComponentView;
   private readonly _responseRegister: ResponseRegister;
 
-  constructor(channel:Channel, paragraphId:string) {
+  constructor(channel:Channel) {
     this._channel = channel;
-    this._paragraphId = paragraphId;
     this._outputFormats = [
       new DataTablesFormatImpl(this),
       new HTMLFormat(),
@@ -107,7 +105,6 @@ export class OutputImpl implements Output {
   print(): Signal<RenderNode> {
     return computed(() =>
       ({
-        paragraphId:this._paragraphId,
         componentView: this._componentView
       })
     );
