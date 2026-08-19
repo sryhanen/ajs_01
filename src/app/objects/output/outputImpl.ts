@@ -44,8 +44,7 @@
  * a licensee so wish it.
  */
 import {Output} from './output';
-import {computed, Signal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
+import {computed, signal, Signal} from '@angular/core';
 import {Channel} from '../channel/channel';
 import {OutputFormat} from './format/outputFormat';
 import {OutputSwitcher} from './switcher/outputSwitcher';
@@ -71,7 +70,6 @@ import {ParagraphOutputRequest} from '../requests/paragraphOutput/paragraphOutpu
 
 export class OutputImpl implements Output {
   private readonly _channel: Channel;
-  private readonly _paragraphId:string;
   private readonly _outputFormats: OutputFormat[];
   private readonly _outputSwitcher:OutputSwitcher;
   private _previousParagraphOutputRequest: ParagraphOutputRequest;
@@ -79,9 +77,8 @@ export class OutputImpl implements Output {
   private readonly _componentView:ComponentView;
   private readonly _responseRegister: ResponseRegister;
 
-  constructor(channel:Channel, paragraphId:string) {
+  constructor(channel:Channel) {
     this._channel = channel;
-    this._paragraphId = paragraphId;
     this._outputFormats = [
       new DataTablesFormatImpl(this),
       new HTMLFormat(),
@@ -94,23 +91,18 @@ export class OutputImpl implements Output {
     this._previousParagraphOutputRequest = new ParagraphOutputRequestStub();
     this._interpreterErrorListener = new InterpreterErrorListenerImpl();
     this._componentView = new ComponentViewImpl(OutputView, computed(() => ({
-      outputSwitcher: this._outputSwitcher.print()().componentView,
+      outputSwitcher: this._outputSwitcher.print()(),
       outputFormats: this._outputFormats
-        .filter(outputFormat => !outputFormat.print()().componentView.isStub())
-        .map(outputFormat => outputFormat.print()().componentView),
-      interpreterError: this._interpreterErrorListener.print()().componentView
+        .filter(outputFormat => !outputFormat.print()().isStub())
+        .map(outputFormat => outputFormat.print()()),
+      interpreterError: this._interpreterErrorListener.print()()
     })));
     this._responseRegister = new ResponseRegisterImpl();
     this._responseRegister.register('PARAGRAPH_OUTPUT', (json) => this.paragraphOutputResponse(json));
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() =>
-      ({
-        paragraphId:this._paragraphId,
-        componentView: this._componentView
-      })
-    );
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   request(json: object): void {

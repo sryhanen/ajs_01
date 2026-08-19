@@ -48,7 +48,6 @@ import {GraphType} from './graphType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {OutputType} from '../../outputType';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {Channel} from '../../../channel/channel';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
@@ -103,13 +102,11 @@ export class UPlotFormatImpl implements UPlotFormat {
     }
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView()
-    }));
+  print(): Signal<ComponentView> {
+    return computed(() => this._componentView());
   }
 
-  switcherButtons(): Signal<RenderNode>[] {
-    return this._switcherButtons.map(switcherButton => switcherButton.print());
+  switcherButtons(): ComponentView[] {
+    return this._switcherButtons.map(switcherButton => switcherButton.print()());
   }
 }

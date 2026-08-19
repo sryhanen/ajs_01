@@ -50,7 +50,6 @@ import {SafeJson} from '../safeJson/safeJson';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 import {computed, signal, Signal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
@@ -81,16 +80,14 @@ export class NotebookImpl implements Notebook {
     this._notebook = new SafeJsonImpl(notebook);
     this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
     this._componentView = new ComponentViewImpl(NotebookView, computed(() => ({
-      paragraphCollection: this._paragraphCollection.print()().componentView
+      paragraphCollection: this._paragraphCollection.print()()
     })));
     this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._paragraphCollection]),{name:'noteId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'noteId', value:this.id()});
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView
-    }));
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   id(): string {

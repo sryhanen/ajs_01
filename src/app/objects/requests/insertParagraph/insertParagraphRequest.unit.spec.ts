@@ -43,9 +43,30 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ComponentView} from '../componentView/componentView';
+import {Requestable} from '../../channel/requestable';
+import {RequestMessage} from '../requestMessage';
+import {FakeChannel} from '../../channel/fakeChannel';
+import {InsertParagraphRequest} from './insertParagraphRequest';
 
-export interface RenderNode {
-  paragraphId?:string;
-  componentView: ComponentView;
-}
+describe('InsertParagraphRequest unit test', () => {
+  let requestable:Requestable;
+  let insertParagraphRequest: RequestMessage;
+  const index = 1;
+
+  beforeEach(() => {
+    requestable = new FakeChannel();
+    insertParagraphRequest = new InsertParagraphRequest(requestable, index);
+  });
+
+  describe('Sending request', () => {
+    it('Should send expected request', () => {
+      const spy = vi.spyOn(requestable, 'request');
+      const expectedRequest = {
+        op: 'INSERT_PARAGRAPH',
+        data: {index: index}
+      };
+      insertParagraphRequest.send();
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
+});

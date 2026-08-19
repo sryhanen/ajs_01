@@ -47,7 +47,6 @@ import {OutputFormat} from '../outputFormat';
 import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ComponentView} from '../../../rendering/componentView/componentView';
@@ -79,13 +78,11 @@ export class HTMLFormat implements OutputFormat{
     }
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView()
-    }));
+  print(): Signal<ComponentView> {
+    return computed(() => this._componentView());
   }
 
-  switcherButtons(): Signal<RenderNode>[] {
+  switcherButtons(): ComponentView[] {
     return [];
   }
 }

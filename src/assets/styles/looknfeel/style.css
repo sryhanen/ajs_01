@@ -193,6 +193,13 @@ body.dark-mode {
  * a licensee so wish it.
  */
 /* Buttons */
+button:disabled i {
+  color: var(--primary-300) !important;
+  cursor: default !important;
+}
+.dark-mode button:disabled i {
+  color: var(--tertiary-600) !important;
+}
 .btn {
   text-transform: uppercase;
   letter-spacing: 0.02rem;
@@ -3842,14 +3849,11 @@ div.dt-button-collection {
 .paragraph .control .tooltip {
   z-index: 10003;
 }
-.paragraph .paragraph-title .paragraph-title-inactive {
+.paragraph-title-inactive {
   font: 700 16px 'Roboto', sans-serif;
   color: var(--primary-700);
   text-transform: uppercase;
   word-spacing: 3px;
-}
-.paragraph .paragraph-title input {
-  width: 50%;
 }
 .dark-mode .paragraph .execution-time,
 .dark-mode .paragraph .elapsed-time {

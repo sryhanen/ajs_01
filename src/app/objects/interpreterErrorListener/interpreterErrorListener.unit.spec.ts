@@ -60,7 +60,7 @@ describe('InterpreterErrorListener', () => {
     it('Should print', () => {
       const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
       expect(interpreterErrorListenerPrinted).toBeDefined();
-      expect(interpreterErrorListenerPrinted.componentView.isStub()).toBe(true);
+      expect(interpreterErrorListenerPrinted.isStub()).toBe(true);
     });
   });
 
@@ -73,7 +73,7 @@ describe('InterpreterErrorListener', () => {
         }
       };
       interpreterErrorListener.response(response);
-      const componentView = interpreterErrorListener.print()().componentView;
+      const componentView = interpreterErrorListener.print()();
       expect(componentView.isStub()).toBe(false);
       expect(componentView.inputs()()['errorMessage']).toEqual('message');
     });

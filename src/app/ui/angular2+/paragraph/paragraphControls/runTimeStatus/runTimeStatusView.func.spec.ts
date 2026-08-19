@@ -43,48 +43,48 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {Requestable} from '../../../objects/channel/requestable';
-import {SubmitFormRequest} from '../../../objects/requests/submitForm/submitFormRequest';
+import {ComponentFixture} from '@angular/core/testing';
+import {RunTimeStatusView} from './runTimeStatusView';
+import {render, screen} from '@testing-library/angular';
 
-@Component({
-  selector: 'dynamic-form',
-  imports: [
-    ReactiveFormsModule
-  ],
-  template: `
-    <form [formGroup]="formGroup()" class="dynamic-form row" (submit)="submitFormRequest()" role="form">
-      <div class="d-flex align-items-center gap-3 mb-3">
-      @for(formField of form(); track $index){
-        <div>
-          <label [for]="formField.name" class="me-2">{{formField.name}}</label>
-          @if(formField.type === 'checkbox') {
-            <input [id]="formField.name" [aria-label]="formField.type" [type]="formField.type" [formControlName]="formField.name" [value]="formField.value" [checked]="formField.value">
-          }
-          @else{
-            <input [id]="formField.name" [aria-label]="formField.type" [type]="formField.type" [formControlName]="formField.name" [value]="formField.value">
-          }
-        </div>
-        }
-      </div>
-      <div>
-        <button type="submit">Run paragraph</button>
-      </div>
-    </form>
-  `
-})
-export class DynamicFormView {
-  form = input.required<{type:string, name:string, value:unknown}[]>();
-  requestable = input.required<Requestable>();
-  formGroup = computed(() => {
-    const formFields = {};
-    this.form().forEach(formField => formFields[formField.name] = new FormControl(formField.value));
-    return new FormGroup(formFields);
+describe('RunTimeStatusView functional test', () => {
+  let fixture: ComponentFixture<RunTimeStatusView>;
+  const paragraphData = {
+    status:'RUNNING',
+  };
+
+  beforeEach(async () => {
+    const renderResult = await render(RunTimeStatusView, {
+      inputs:{
+        paragraphData:paragraphData,
+      }
+    });
+    fixture = renderResult.fixture;
   });
 
-  protected submitFormRequest():void{
-    const submitFormRequest = new SubmitFormRequest(this.formGroup().value, this.requestable());
-    submitFormRequest.send();
-  }
-}
+  describe('Birth', () => {
+    it('Should have been initialized', () =>  {
+      expect(fixture.componentInstance).toBeDefined();
+      expect(screen.getByText('RUNNING')).toBeDefined();
+      expect(screen.getByText('RUNNING')).toHaveClass('status-running');
+    });
+  });
+
+  describe('Class name is defined by status', () => {
+    it('Should have changed class name', () =>  {
+      fixture.componentRef.setInput('paragraphData',{status:'PENDING'});
+      fixture.detectChanges();
+      expect(screen.getByText('PENDING')).toBeDefined();
+      expect(screen.getByText('PENDING')).toHaveClass('status-pending');
+      expect(screen.getByText('PENDING')).not.toHaveClass('status-running');
+    });
+
+    it('Should not have class name', () =>  {
+      fixture.componentRef.setInput('paragraphData',{status: 'test'});
+      fixture.detectChanges();
+      expect(screen.getByText('test')).toBeDefined();
+      expect(screen.getByText('test')).not.toHaveClass('status-pending');
+      expect(screen.getByText('test')).not.toHaveClass('status-running');
+    });
+  });
+});

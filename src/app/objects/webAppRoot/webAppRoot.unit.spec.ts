@@ -85,7 +85,7 @@ describe('WebAppRoot unit test', () => {
         }
       };
       webAppRoot.response(noteResponse);
-      expect(webAppRoot.print()().componentView.isStub()).toBe(false);
+      expect(webAppRoot.print()().isStub()).toBe(false);
     });
   });
 });

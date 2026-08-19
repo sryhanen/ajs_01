@@ -66,7 +66,7 @@ describe('AngularFormat unit test', () => {
 
     it('Should print', () => {
       const angularFormatPrinted = angularFormat.print()();
-      expect(angularFormatPrinted.componentView.isStub()).toBe(true);
+      expect(angularFormatPrinted.isStub()).toBe(true);
     });
   });
 
@@ -99,7 +99,7 @@ describe('AngularFormat unit test', () => {
 
     it('Should have component view', () => {
       angularFormat.response(outputResponse);
-      const componentView = angularFormat.print()().componentView;
+      const componentView = angularFormat.print()();
       expect(componentView.isStub()).toBe(false);
       expect(componentView.inputs()()['template']).toEqual(template);
     });
@@ -107,7 +107,7 @@ describe('AngularFormat unit test', () => {
     it('Should have not have component view after output type change', () => {
       outputResponse.data.output.type = '';
       angularFormat.response(outputResponse);
-      expect(angularFormat.print()().componentView.isStub()).toBe(true);
+      expect(angularFormat.print()().isStub()).toBe(true);
     });
   });
 });

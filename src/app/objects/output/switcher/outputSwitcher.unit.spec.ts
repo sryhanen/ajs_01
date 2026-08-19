@@ -60,8 +60,7 @@ describe('OutputSwitcher', () => {
     });
 
     it('Should print', () => {
-      const printed = outputSwitcher.print()();
-      const componentView = printed.componentView;
+      const componentView = outputSwitcher.print()();
       expect(componentView.isStub()).toBe(false);
       expect(componentView.inputs()()['switcherButtons']).toBeDefined();
       expect(componentView.inputs()()['switchIsPending']).toBeDefined();
@@ -85,8 +84,7 @@ describe('OutputSwitcher', () => {
     };
 
     beforeEach(() => {
-      const printed = outputSwitcher.print()();
-      const componentView = printed.componentView;
+      const componentView = outputSwitcher.print()();
       inputSignal = componentView.inputs();
     });
 

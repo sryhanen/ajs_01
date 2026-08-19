@@ -64,7 +64,7 @@ describe('DplLog unit test', () => {
 
     it('Should print', () => {
       const printed= dplLog.print()();
-      expect(printed.componentView.isStub()).toBe(true);
+      expect(printed.isStub()).toBe(true);
     });
   });
 
@@ -98,8 +98,7 @@ describe('DplLog unit test', () => {
 
     it('AngularObjectUpdate response should update componentView', () => {
       dplLog.response(batchMsgResponse);
-      const printed= dplLog.print()();
-      const componentView = printed.componentView;
+      const componentView= dplLog.print()();
       expect(componentView.isStub()).toBe(false);
       const inputs = componentView.inputs()()['dplLog'] as Map<string, string>;
       expect(inputs).toBeDefined();
@@ -109,8 +108,7 @@ describe('DplLog unit test', () => {
     it('AngularObjectRemove should delete angular object', () => {
       dplLog.response(batchMsgResponse);
       dplLog.response(timeMsgResponse);
-      const printed= dplLog.print()();
-      const componentView = printed.componentView;
+      const componentView= dplLog.print()();
       const inputs1 = componentView.inputs()()['dplLog'] as Map<string, string>;
       expect(inputs1).toBeDefined();
       expect(inputs1.get(batchMsgResponse.data.angularObject.name)).toBeDefined();
@@ -124,9 +122,9 @@ describe('DplLog unit test', () => {
     it('Deleting all angular objects should change component view to stub', () => {
       dplLog.response(timeMsgResponse);
       const printed= dplLog.print();
-      expect(printed().componentView.isStub()).toBe(false);
+      expect(printed().isStub()).toBe(false);
       dplLog.response(removeTimeMsgResponse);
-      expect(printed().componentView.isStub()).toBe(true);
+      expect(printed().isStub()).toBe(true);
     });
   });
 });

@@ -45,7 +45,6 @@
  */
 import {Editor} from './editor';
 import {computed, signal, Signal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
 import {Channel} from '../channel/channel';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
@@ -75,7 +74,7 @@ export class EditorImpl implements Editor {
     this._paragraphId = paragraphData['id'];
     this._aceEditor = this.initializedAceEditor();
     this._customCompleter = new CustomCompleterImpl(this, this._aceEditor);
-    this._componentView = new ComponentViewImpl(EditorView, signal({paragraphId: this._paragraphId, editor: this._aceEditor, editorConfigurationRules: this.configurationRules(paragraphData, this._customCompleter)}));
+    this._componentView = new ComponentViewImpl(EditorView, signal({editor: this._aceEditor, editorConfigurationRules: this.configurationRules(paragraphData, this._customCompleter)}));
   }
 
   private initializedAceEditor(): ace.Editor {
@@ -85,12 +84,8 @@ export class EditorImpl implements Editor {
     return ace.edit(preElement);
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      paragraphId:this._paragraphId,
-      children: signal([]),
-      componentView:this._componentView
-    }));
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   request(json: object): void {

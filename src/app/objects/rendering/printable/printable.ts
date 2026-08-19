@@ -45,8 +45,8 @@
  */
 
 import {Signal} from '@angular/core';
-import {RenderNode} from '../renderNode/renderNode';
+import {ComponentView} from '../componentView/componentView';
 
 export interface Printable {
-  print(): Signal<RenderNode>;
+  print(): Signal<ComponentView>;
 }

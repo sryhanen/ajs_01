@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {NgComponentOutlet} from '@angular/common';
 import {ComponentView} from '../../../objects/rendering/componentView/componentView';
 
@@ -54,15 +54,10 @@ import {ComponentView} from '../../../objects/rendering/componentView/componentV
   ],
   template: `
     @if(!currentNotebook().isStub()){
-      <ng-container *ngComponentOutlet="currentNotebook().component(); inputs: inputs()"></ng-container>
+      <ng-container *ngComponentOutlet="currentNotebook().component(); inputs: currentNotebook().inputs()()"></ng-container>
     }
   `
 })
 export class NotebookCollectionView {
   currentNotebook = input.required<ComponentView>();
-  containerId= input.required<string>();
-  protected inputs = computed(() => ({
-    ...this.currentNotebook().inputs()(),
-    containerId: this.containerId(),
-  }));
 }

@@ -64,7 +64,7 @@ describe('HTMLFormat unit test', () => {
 
     it('Should print', () => {
       const htmlFormatPrinted = htmlFormat.print()();
-      expect(htmlFormatPrinted.componentView.isStub()).toBe(true);
+      expect(htmlFormatPrinted.isStub()).toBe(true);
     });
   });
 
@@ -84,7 +84,7 @@ describe('HTMLFormat unit test', () => {
     });
 
     it('Should have componentView', () => {
-      const componentView = htmlFormat.print()().componentView;
+      const componentView = htmlFormat.print()();
       expect(componentView.isStub()).toBe(false);
       expect(componentView.inputs()()['htmlTemplate']).toBeDefined();
     });
@@ -92,7 +92,7 @@ describe('HTMLFormat unit test', () => {
     it('Should not have componentView after output type change', () => {
       outputResponse.data.output.type = '';
       htmlFormat.response(outputResponse);
-      expect(htmlFormat.print()().componentView.isStub()).toBe(true);
+      expect(htmlFormat.print()().isStub()).toBe(true);
     });
   });
 });

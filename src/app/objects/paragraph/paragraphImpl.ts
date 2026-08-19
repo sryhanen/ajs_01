@@ -47,8 +47,7 @@ import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {computed, Signal} from '@angular/core';
-import { RenderNode } from '../rendering/renderNode/renderNode';
+import {computed, signal, Signal} from '@angular/core';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {
@@ -86,19 +85,20 @@ export class ParagraphImpl implements Paragraph {
   private readonly _responseRegister:ResponseRegister;
   private readonly _requestRegister:RequestRegister;
 
-  constructor(channel: Channel, paragraph: object) {
+  constructor(channel: Channel, paragraphData: object) {
     this._channel = channel;
-    this._paragraph = new SafeJsonImpl(paragraph);
-    this._output = this.initializedOutput(paragraph);
+    this._paragraph = new SafeJsonImpl(paragraphData);
+    this._output = this.initializedOutput(paragraphData);
     this._dplLog = new DplLogImpl(this);
     this._dynamicForm = new DynamicFormImpl(this);
-    this._editor = new EditorImpl(this, paragraph);
+    this._editor = new EditorImpl(this, paragraphData);
     this._componentView = new ComponentViewImpl(ParagraphView, computed(() => ({
-      editor: this._editor.print()().componentView,
-      output: this._output.print()().componentView,
-      dplLog: this._dplLog.print()().componentView,
-      dynamicForm: this._dynamicForm.print()().componentView,
-      paragraphId:this.id()
+      paragraphData:paragraphData,
+      requestable:this,
+      editor: this._editor.print()(),
+      output: this._output.print()(),
+      dplLog: this._dplLog.print()(),
+      dynamicForm: this._dynamicForm.print()()
     })));
     const defaultResponseList = [
       this._output,
@@ -111,7 +111,7 @@ export class ParagraphImpl implements Paragraph {
   }
 
   private initializedOutput(paragraph: object): Output {
-    const output = new OutputImpl(this, this.id());
+    const output = new OutputImpl(this);
     const paragraphOutputMessageFactory = new ParagraphOutputMessageFactoryImpl(paragraph);
     const paragraphOutputMessage = paragraphOutputMessageFactory.paragraphOutputMessage();
     if(!paragraphOutputMessage.isStub()){
@@ -120,10 +120,8 @@ export class ParagraphImpl implements Paragraph {
     return output;
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView
-    }));
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   id(): string {

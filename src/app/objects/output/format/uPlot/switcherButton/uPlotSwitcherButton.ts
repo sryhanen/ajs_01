@@ -45,8 +45,7 @@
  */
 import {OutputType} from '../../../outputType';
 import {Printable} from '../../../../rendering/printable/printable';
-import {computed, Signal} from '@angular/core';
-import { RenderNode } from '../../../../rendering/renderNode/renderNode';
+import {computed, signal, Signal} from '@angular/core';
 import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
 import {OutputSwitcherButtonView} from '../../../../../ui/angular2+/output/switcher/switcherButton/outputSwitcherButtonView';
 import {Requestable} from '../../../../channel/requestable';
@@ -73,10 +72,8 @@ export class uPlotSwitcherButton implements Printable {
     })));
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView
-    }));
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   private outputSwitchRequestData():object {

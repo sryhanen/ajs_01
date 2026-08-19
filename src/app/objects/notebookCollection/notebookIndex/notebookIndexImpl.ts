@@ -43,8 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {computed, Signal} from '@angular/core';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {signal, Signal} from '@angular/core';
 import {SafeJson} from '../../safeJson/safeJson';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {ComponentView} from '../../rendering/componentView/componentView';
@@ -64,9 +63,7 @@ export class NotebookIndexImpl implements NotebookIndex {
     return this._notebookIndexData.getProperty('id', 'string');
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView
-    }));
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 }

@@ -56,8 +56,7 @@ describe('DataTables SwitcherButton unit test', () => {
     });
 
     it('Should print', () => {
-      const dataTableSwitcherButtonPrinted = dataTablesSwitcherButton.print()();
-      const componentView = dataTableSwitcherButtonPrinted.componentView;
+      const componentView = dataTablesSwitcherButton.print()();
       expect(componentView.isStub()).toBe(false);
       expect(componentView.inputs()()['title']).toBeDefined();
       expect(componentView.inputs()()['icon']).toBeDefined();

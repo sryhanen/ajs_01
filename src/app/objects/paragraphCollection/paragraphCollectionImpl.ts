@@ -49,7 +49,6 @@ import {RunParagraphRequest} from './runParagraphRequest/runParagraphRequest';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
@@ -82,7 +81,8 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     this._requestRegister = new RequestRegisterImpl(this._channel);
     this._requestRegister.register('RUN_PARAGRAPH', (json) => this.runParagraphRequest(json));
     this._componentView = new ComponentViewImpl(ParagraphCollectionView, computed(() => ({
-      paragraphs: Array.from(this._paragraphs().values()).map(paragraph => paragraph.print()().componentView),
+      paragraphs: Array.from(this._paragraphs().values()).map(paragraph => paragraph.print()()),
+      requestable: this
     })));
   }
 
@@ -149,10 +149,8 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     });
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView
-    }));
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   request(data: object): void {

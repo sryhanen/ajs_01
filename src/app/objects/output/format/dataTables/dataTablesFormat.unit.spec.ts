@@ -69,7 +69,7 @@ describe('DataTablesFormat unit test', () => {
 
     it('Should print', () => {
       const dataTablesFormatPrinted = dataTablesFormat.print()();
-      expect(dataTablesFormatPrinted.componentView.isStub()).toBe(true);
+      expect(dataTablesFormatPrinted.isStub()).toBe(true);
     });
   });
 
@@ -100,13 +100,13 @@ describe('DataTablesFormat unit test', () => {
     });
 
     it('Should have componentView', () => {
-      const componentView = dataTablesFormat.print()().componentView;
+      const componentView = dataTablesFormat.print()();
       expect(componentView.isStub()).toBe(false);
       expect(componentView.inputs()()['dataTablesPlugin']).toBeDefined();
     });
 
     it('Should respond plugin on consequential output responses', () => {
-      const plugin = dataTablesFormat.print()().componentView.inputs()()['dataTablesPlugin'] as Channel;
+      const plugin = dataTablesFormat.print()().inputs()()['dataTablesPlugin'] as Channel;
       const spy = vi.spyOn(plugin, 'response');
       dataTablesFormat.response(outputResponse);
       dataTablesFormat.response(outputResponse);
@@ -117,7 +117,7 @@ describe('DataTablesFormat unit test', () => {
     it('Should not have component view after output type change', () => {
       outputResponse.data.output.type = '';
       dataTablesFormat.response(outputResponse);
-      const componentView = dataTablesFormat.print()().componentView;
+      const componentView = dataTablesFormat.print()();
       expect(componentView.isStub()).toBe(true);
     });
   });
