@@ -51,7 +51,7 @@ import {Api} from 'datatables.net-bs5';
   selector: 'dataTablesView',
   template: `
     <ng-container ngProjectAs="[output-format]">
-        <table #table class="table table-bordered table-striped"></table>'
+        <table #table class="table table-bordered table-striped"></table>
     </ng-container>
   `
 })
