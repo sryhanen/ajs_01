@@ -105,7 +105,7 @@ export class EditorImpl implements Editor {
     return [
       new TextConfiguration(paragraphData),
       new LinesConfiguration(paragraphData),
-      new KeyCommandsConfiguration(),
+      new KeyCommandsConfiguration(this._paragraphId, this),
       new HighlightsConfiguration(),
       new AutoCommitConfiguration(this),
       new AnnotationsConfiguration(),
