@@ -46,6 +46,5 @@
 import {ComponentView} from '../componentView/componentView';
 
 export interface RenderNode {
-  paragraphId?:string;
   componentView: ComponentView;
 }

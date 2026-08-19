@@ -63,7 +63,6 @@ import {AceEditorConfiguration} from '../../../objects/editor/configuration/aceE
   `,
 })
 export class EditorView implements AfterViewInit, OnChanges, OnDestroy {
-  paragraphId = input.required<string>();
   editor = input.required<ace.Editor>();
   editorConfigurationRules = input.required<AceEditorConfiguration[]>();
   @ViewChild('anchor') anchor: ElementRef;
