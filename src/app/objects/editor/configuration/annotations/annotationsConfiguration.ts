@@ -43,18 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import angular from 'angular';
-import {downgradeComponent, downgradeInjectable} from '@angular/upgrade/static';
-import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
-import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {WebAppViewPort} from './ui/angular2+/webAppViewPort/webAppViewPort';
+import {AceEditorConfiguration} from '../aceEditorConfiguration';
+import ace from 'ace-builds';
 
-angular.module('zeppelinWebApp').factory('authenticationServiceImpl', downgradeInjectable(AuthenticationServiceImpl));
-
-angular.module('zeppelinWebApp').factory('webSocketService', downgradeInjectable(WebSocketServiceImpl));
-
-angular.module('zeppelinWebApp')
-  .directive(
-    'webAppViewPort',
-    downgradeComponent({ component: WebAppViewPort }) as angular.IDirectiveFactory
-  );
+export class AnnotationsConfiguration implements AceEditorConfiguration {
+  applyConfiguration(aceEditor: ace.Editor): void {
+    aceEditor.on('change', (delta:ace.Ace.Delta)=> {
+      const timeConsumingQuery = aceEditor.find(/index\s*=\s*("\*"|\*)(\s|\||$)/);
+      if(timeConsumingQuery){
+        aceEditor.getSession().setAnnotations([
+          {
+            row:timeConsumingQuery.start.row,
+            column:timeConsumingQuery.start.column,
+            text: 'The search query "index=*" can be time-consuming. Please consider using date-range filters to narrow down your search.',
+            type: 'error'
+          }
+        ]);
+      }
+      else{
+        aceEditor.getSession().setAnnotations([]);
+      }
+    });
+  }
+}

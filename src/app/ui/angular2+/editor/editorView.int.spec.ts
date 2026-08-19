@@ -43,8 +43,47 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface Editor {
-  set fontSize(value: number);
-  set showGutter(value:boolean);
-  set disableEdit(value:boolean);
-}
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {EditorView} from './editorView';
+import ace from 'ace-builds';
+import {render, screen} from '@testing-library/angular';
+
+describe('EditorView integration test', () => {
+  vi.spyOn(window['ace'], 'require').mockImplementation(() => {
+    return {
+      setCompleters: () =>{}
+    };
+  });
+  const paragraphData = {
+    id:'paragraphId',
+    text:'initial text value',
+    status:'READY',
+    config:{
+      lineNumbers:true,
+      fontSize:10
+    }
+  };
+  let fixture: ComponentFixture<EditorView>;
+
+  beforeEach(async () => {
+    const renderResult = await render(EditorView, {
+      inputs:{
+        paragraphId: paragraphData.id,
+        editor: ace.edit(document.createElement('div')),
+        editorConfigurationRules:[]
+      }
+    });
+    fixture = renderResult.fixture;
+    await fixture.whenStable();
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have rendered textbox', () => {
+      expect(screen.getByRole('textbox')).toBeDefined();
+    });
+  });
+});

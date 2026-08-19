@@ -43,30 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {render, screen} from '@testing-library/angular';
-import { EditorComponent } from './editor.component';
-import {createAngularTestingModule} from '@angular/upgrade/static/testing';
-import {WebsocketMessageService} from '../shared/components/websocket/websocket-message.service';
-import {WsMessageListenerImpl} from '../shared/components/websocket/wsMessageListenerImpl';
+import {AceEditorConfiguration} from '../aceEditorConfiguration';
+import ace from 'ace-builds';
 
-describe('EditorImpl', () => {
-  beforeEach(async () => {
-    await render(EditorComponent, {
-      imports: [
-        createAngularTestingModule(['zeppelinWebApp']),
-      ],
-      providers: [
-        { provide: WebsocketMessageService, useValue: {} },
-        { provide: WsMessageListenerImpl, useValue: {} }
-      ],
-      inputs:{
-        editorId:'editorId',
-      }
+export class LinesConfiguration implements AceEditorConfiguration {
+  private readonly _paragraphData: object;
+
+  constructor(paragraphData: object) {
+    this._paragraphData = paragraphData;
+  }
+
+  applyConfiguration(aceEditor: ace.Editor): void {
+    const lineNumbers = this._paragraphData['config']['lineNumbers'];
+    if(lineNumbers){
+      aceEditor.renderer.setShowGutter(lineNumbers);
+    }
+    aceEditor.setShowFoldWidgets(false);
+    aceEditor.getSession().setUseWrapMode(true);
+    aceEditor.setOptions({
+      maxLines: 30,
+      enableBasicAutocompletion: true,
     });
-  });
-
-  test('It should render', async () => {
-    const element = screen.getByRole('textbox');
-    expect(element).toBeTruthy();
-  });
-});
+  }
+}

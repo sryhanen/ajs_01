@@ -43,8 +43,56 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ConfiguredEditor} from './configuredEditor';
 
-export interface DefaultConfiguration {
-  apply(): ConfiguredEditor;
+import {AceEditorConfiguration} from '../aceEditorConfiguration';
+import ace from 'ace-builds';
+import {RunParagraphRequest} from '../../../requests/runParagraph/runParagraphRequest';
+import {Requestable} from '../../../channel/requestable';
+
+export class KeyCommandsConfiguration implements AceEditorConfiguration{
+  private readonly _paragraphId:string;
+  private readonly _requestable:Requestable;
+
+  constructor(paragraphId:string,requestable:Requestable) {
+    this._paragraphId = paragraphId;
+    this._requestable = requestable;
+  }
+
+  applyConfiguration(aceEditor:ace.Editor): void {
+    this.bindKeys(aceEditor);
+    this.removeDefaultCommands(aceEditor);
+    this.addCustomCommands(aceEditor);
+  }
+
+  private removeDefaultCommands(aceEditor:ace.Editor):void {
+    aceEditor.commands.removeCommand('showSettingsMenu');
+    aceEditor.commands.removeCommand('find');
+    aceEditor.commands.removeCommand('replace');
+  }
+
+  private bindKeys(aceEditor:ace.Editor):void {
+    aceEditor.commands.bindKey('tab', 'startAutocomplete');
+    aceEditor.commands.bindKey('ctrl-space', null);
+  }
+
+  private addCustomCommands(aceEditor:ace.Editor): void {
+    const requestableAlias = this._requestable;
+    const paragraphIdAlias = this._paragraphId;
+    aceEditor.commands.addCommand({
+      name: 'Run paragraph',
+      bindKey: {
+        win: 'Shift-Enter',
+        mac: 'Shift-Enter'
+      },
+      exec: function() {
+        const runParagraphRequest = new RunParagraphRequest(requestableAlias, {
+          id: paragraphIdAlias,
+          paragraph: aceEditor.getValue(),
+          config: {},
+          params: {}
+        });
+        runParagraphRequest.send();
+      }
+    });
+  }
 }

@@ -43,18 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import angular from 'angular';
-import {downgradeComponent, downgradeInjectable} from '@angular/upgrade/static';
-import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
-import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {WebAppViewPort} from './ui/angular2+/webAppViewPort/webAppViewPort';
+import {AceEditorConfiguration} from '../aceEditorConfiguration';
+import ace from 'ace-builds';
+import {Requestable} from '../../../channel/requestable';
 
-angular.module('zeppelinWebApp').factory('authenticationServiceImpl', downgradeInjectable(AuthenticationServiceImpl));
+export class AutoCommitConfiguration implements AceEditorConfiguration {
+  private readonly _requestable:Requestable;
 
-angular.module('zeppelinWebApp').factory('webSocketService', downgradeInjectable(WebSocketServiceImpl));
+  constructor(requestable:Requestable) {
+    this._requestable = requestable;
+  }
 
-angular.module('zeppelinWebApp')
-  .directive(
-    'webAppViewPort',
-    downgradeComponent({ component: WebAppViewPort }) as angular.IDirectiveFactory
-  );
+  applyConfiguration(aceEditor: ace.Editor): void {
+    aceEditor.on('change', () => {
+      const commitParagraphRequest = {
+        op:'COMMIT_PARAGRAPH',
+        data:{
+          paragraphId: '', //This needs to be changed on server side from id to paragraphId
+          noteId: '',
+          title: '',
+          paragraph: aceEditor.getValue(),
+          config: '',
+          params: '',
+        }
+      };
+      this._requestable.request(commitParagraphRequest);
+    });
+  }
+}

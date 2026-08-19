@@ -43,9 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ace from 'ace-builds';
+import {RequestMessage} from '../requestMessage';
+import {Requestable} from '../../channel/requestable';
 
-export interface EditorCompletions {
-  language(editorLanguage: string): Promise<string>;
-  remoteCompleter(queryText:string): Promise<ace.Ace.Completer>;
+export class RunParagraphRequest implements RequestMessage {
+  private readonly _requestable: Requestable;
+  private readonly _paragraphState:{
+    id: string,
+    paragraph: string,
+    config: object,
+    params: object
+  };
+
+  constructor(requestable: Requestable, paragraphState:{id: string, paragraph: string, config: object, params: object}) {
+    this._requestable = requestable;
+    this._paragraphState = paragraphState;
+  }
+
+  send():void{
+    this._requestable.request({
+      op: 'RUN_PARAGRAPH',
+      data: this._paragraphState
+    });
+  }
 }

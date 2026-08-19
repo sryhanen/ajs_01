@@ -43,18 +43,52 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import angular from 'angular';
-import {downgradeComponent, downgradeInjectable} from '@angular/upgrade/static';
-import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
-import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {WebAppViewPort} from './ui/angular2+/webAppViewPort/webAppViewPort';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  inject,
+  input,
+  OnChanges, OnDestroy,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
+import ace from 'ace-builds';
+import {AceEditorConfiguration} from '../../../objects/editor/configuration/aceEditorConfiguration';
 
-angular.module('zeppelinWebApp').factory('authenticationServiceImpl', downgradeInjectable(AuthenticationServiceImpl));
+@Component({
+  selector: 'editor-view',
+  template: `
+    <div #anchor></div>
+  `,
+})
+export class EditorView implements AfterViewInit, OnChanges, OnDestroy {
+  paragraphId = input.required<string>();
+  editor = input.required<ace.Editor>();
+  editorConfigurationRules = input.required<AceEditorConfiguration[]>();
+  @ViewChild('anchor') anchor: ElementRef;
+  private renderer = inject(Renderer2);
 
-angular.module('zeppelinWebApp').factory('webSocketService', downgradeInjectable(WebSocketServiceImpl));
+  ngAfterViewInit(): void {
+    this.configureEditor();
+    this.renderer.appendChild(this.anchor.nativeElement, this.editor().container);
+  }
 
-angular.module('zeppelinWebApp')
-  .directive(
-    'webAppViewPort',
-    downgradeComponent({ component: WebAppViewPort }) as angular.IDirectiveFactory
-  );
+  ngOnChanges() {
+    if(this.anchor){
+      this.anchor.nativeElement.replaceChildren();
+      this.configureEditor();
+      this.renderer.appendChild(this.anchor.nativeElement, this.editor().container);
+    }
+  }
+
+  ngOnDestroy() {
+    this.editor().destroy();
+  }
+
+  private configureEditor():void {
+    for(const configurationRule of this.editorConfigurationRules()){
+      configurationRule.applyConfiguration(this.editor());
+    }
+  }
+}

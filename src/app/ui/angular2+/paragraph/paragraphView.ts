@@ -54,6 +54,7 @@ import {NgComponentOutlet} from '@angular/common';
   ],
   template: `
     @if(containerId() === paragraphId()){
+      <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
       <ng-container *ngComponentOutlet="output().component(); inputs: output().inputs()()"></ng-container>
       @if(!dynamicForm().isStub()){
         <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
@@ -65,6 +66,7 @@ import {NgComponentOutlet} from '@angular/common';
   `
 })
 export class ParagraphView{
+  editor = input.required<ComponentView>();
   output = input.required<ComponentView>();
   dynamicForm = input.required<ComponentView>();
   dplLog = input.required<ComponentView>();

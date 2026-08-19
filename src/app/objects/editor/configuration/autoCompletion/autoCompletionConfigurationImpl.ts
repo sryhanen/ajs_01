@@ -44,67 +44,29 @@
  * a licensee so wish it.
  */
 import ace from 'ace-builds';
-import {
-  AfterViewInit,
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  inject,
-} from '@angular/core';
-import {Editor} from './editor';
-import {ConfiguredEditor} from './configuration/configuredEditor';
-import {EditorCompletionsImpl} from './completions/editorCompletionsImpl';
-import {WebsocketMessageService} from '../shared/components/websocket/websocket-message.service';
-import {WsMessageListener} from '../shared/components/websocket/wsMessageListener';
-import {WsMessageListenerImpl} from '../shared/components/websocket/wsMessageListenerImpl';
-import {DefaultConfigurationImpl} from './configuration/defaultConfigurationImpl';
+import {CustomCompleter} from '../../customCompleter/customCompleter';
+import {AceEditorConfiguration} from '../aceEditorConfiguration';
 
-@Component({
-  selector: 'editor',
-  template: `
-    <pre class="editor-container" [id]='editorId'></pre>
-  `,
-})
-export class EditorComponent implements Editor, AfterViewInit{
-  private _websocketMessageService = inject(WebsocketMessageService);
-  private _wsMessageListenerService: WsMessageListener = inject(WsMessageListenerImpl);
-  private _editor: ConfiguredEditor;
+export class AutoCompletionConfigurationImpl implements AceEditorConfiguration {
+  private readonly _customCompleter:CustomCompleter;
+  private readonly _langTools;
 
-  ngAfterViewInit() {
-    const editor = ace.edit(this.editorId);
-    editor.setValue(this.editorContent);
-    const editorCompletions = new EditorCompletionsImpl(this.editorId, this._wsMessageListenerService, this._websocketMessageService);
-    this._editor = new DefaultConfigurationImpl(editor, this.changedContent, editorCompletions, this.onEditorFocus).apply();
+  constructor(customCompleter:CustomCompleter) {
+    this._customCompleter = customCompleter;
+    this._langTools = ace.require('ace/ext/language_tools');
   }
 
-  @Input({ required: true }) editorId: string;
-
-  @Input() editorContent: string;
-
-  @Input()
-  set showGutter(value:boolean) {
-    if(this._editor){
-      this._editor.lineNumbers(value);
-    }
-  };
-
-  @Input()
-  set fontSize(value: number){
-    if(this._editor){
-      this._editor.setFontSize(value);
-    }
+  applyConfiguration(aceEditor: ace.Editor): void {
+    this._langTools.setCompleters([this._customCompleter, this._langTools.keyWordCompleter, this._langTools.snippetCompleter, this._langTools.textCompleter]);
+    aceEditor.commands.on('exec', (eventData)=> {
+      if(eventData.command.name === 'startAutocomplete') {
+        this._customCompleter.requestCompletions(aceEditor.getValue());
+      }
+    });
+    aceEditor.on('change', (delta:ace.Ace.Delta)=> {
+      if(delta.start.row === 0) {
+        this._customCompleter.requestEditorSetting(aceEditor.getValue());
+      }
+    });
   }
-
-  @Input()
-  set disableEdit(value:boolean) {
-    if(this._editor){
-      this._editor.readonly(value);
-    }
-  }
-
-  @Output() changedContent = new EventEmitter<string>();
-
-  @Output() onEditorFocus = new EventEmitter<boolean>();
 }
-

@@ -43,18 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import angular from 'angular';
-import {downgradeComponent, downgradeInjectable} from '@angular/upgrade/static';
-import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
-import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {WebAppViewPort} from './ui/angular2+/webAppViewPort/webAppViewPort';
+import {AceEditorConfiguration} from '../aceEditorConfiguration';
+import ace from 'ace-builds';
 
-angular.module('zeppelinWebApp').factory('authenticationServiceImpl', downgradeInjectable(AuthenticationServiceImpl));
+export class HighlightsConfiguration implements AceEditorConfiguration {
+  applyConfiguration(aceEditor:ace.Editor): void {
+    this.setHighLights(aceEditor,false);
+    aceEditor.on('blur', ()=> {
+      this.setHighLights(aceEditor,false);
+    });
+    aceEditor.on('focus', ()=> {
+      this.setHighLights(aceEditor,true);
+    });
+  }
 
-angular.module('zeppelinWebApp').factory('webSocketService', downgradeInjectable(WebSocketServiceImpl));
-
-angular.module('zeppelinWebApp')
-  .directive(
-    'webAppViewPort',
-    downgradeComponent({ component: WebAppViewPort }) as angular.IDirectiveFactory
-  );
+  private setHighLights(aceEditor:ace.Editor, value:boolean):void {
+    aceEditor.setHighlightActiveLine(value);
+    aceEditor.setHighlightGutterLine(value);
+  }
+}

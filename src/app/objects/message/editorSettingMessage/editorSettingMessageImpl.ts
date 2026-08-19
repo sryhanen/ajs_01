@@ -43,18 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import angular from 'angular';
-import {downgradeComponent, downgradeInjectable} from '@angular/upgrade/static';
-import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
-import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {WebAppViewPort} from './ui/angular2+/webAppViewPort/webAppViewPort';
+import {EditorSettingMessage} from './editorSettingMessage';
+import {Message} from '../message';
+import {TypedMessage} from '../typedMessage/typedMessage';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
-angular.module('zeppelinWebApp').factory('authenticationServiceImpl', downgradeInjectable(AuthenticationServiceImpl));
+export class EditorSettingMessageImpl implements EditorSettingMessage {
+  private readonly _message:Message;
 
-angular.module('zeppelinWebApp').factory('webSocketService', downgradeInjectable(WebSocketServiceImpl));
+  constructor(message:Message){
+    this._message = new TypedMessage('EDITOR_SETTING', message);
+  }
 
-angular.module('zeppelinWebApp')
-  .directive(
-    'webAppViewPort',
-    downgradeComponent({ component: WebAppViewPort }) as angular.IDirectiveFactory
-  );
+  language(): string {
+    const editorSettingsData = new SafeJsonImpl(this._message.data());
+    const editorProperty = new SafeJsonImpl(editorSettingsData.getProperty<object>('editor', 'object'));
+    return editorProperty.getProperty('language', 'string');
+  }
+
+  data(): object {
+    return this._message.data();
+  }
+
+  operation(): string {
+    return this._message.operation();
+  }
+}

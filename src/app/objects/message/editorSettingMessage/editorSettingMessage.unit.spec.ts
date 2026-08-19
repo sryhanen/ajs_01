@@ -43,18 +43,51 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import angular from 'angular';
-import {downgradeComponent, downgradeInjectable} from '@angular/upgrade/static';
-import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
-import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {WebAppViewPort} from './ui/angular2+/webAppViewPort/webAppViewPort';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../messageImpl';
+import {EditorSettingMessageImpl} from './editorSettingMessageImpl';
+import {EditorSettingMessage} from './editorSettingMessage';
 
-angular.module('zeppelinWebApp').factory('authenticationServiceImpl', downgradeInjectable(AuthenticationServiceImpl));
+describe('EditorSettingMessage unit test', () => {
+  const editorSettingMessageData = {
+    op:'EDITOR_SETTING',
+    data:{
+      editor:{
+        language: 'language'
+      }
+    }
+  };
+  let editorSettingMessage: EditorSettingMessage;
 
-angular.module('zeppelinWebApp').factory('webSocketService', downgradeInjectable(WebSocketServiceImpl));
+  beforeEach(() => {
+    editorSettingMessage = new EditorSettingMessageImpl(new MessageImpl(new SafeJsonImpl(editorSettingMessageData)));
+  });
 
-angular.module('zeppelinWebApp')
-  .directive(
-    'webAppViewPort',
-    downgradeComponent({ component: WebAppViewPort }) as angular.IDirectiveFactory
-  );
+  describe('Birth', () => {
+    it('Should be defined', () => {
+      expect(editorSettingMessage).toBeDefined();
+    });
+
+    it('Should have data', () => {
+      expect(editorSettingMessage.data()).toEqual(editorSettingMessageData.data);
+    });
+
+    it('Should have operation', () => {
+      expect(editorSettingMessage.operation()).toEqual('EDITOR_SETTING');
+    });
+
+    it('Should have language', () => {
+      expect(editorSettingMessage.language()).toEqual(editorSettingMessageData.data.editor.language);
+    });
+  });
+
+  describe('Validation', () => {
+    it('Should throw if operation is not "EDITOR_SETTING"', () => {
+      editorSettingMessageData.op = '';
+      editorSettingMessage = new EditorSettingMessageImpl(new MessageImpl(new SafeJsonImpl(editorSettingMessageData)));
+      expect(() => editorSettingMessage.data()).toThrow();
+      expect(() => editorSettingMessage.operation()).toThrow();
+      expect(() => editorSettingMessage.language()).toThrow();
+    });
+  });
+});

@@ -43,18 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import angular from 'angular';
-import {downgradeComponent, downgradeInjectable} from '@angular/upgrade/static';
-import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
-import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {WebAppViewPort} from './ui/angular2+/webAppViewPort/webAppViewPort';
+import {AceEditorConfiguration} from '../aceEditorConfiguration';
+import ace from 'ace-builds';
 
-angular.module('zeppelinWebApp').factory('authenticationServiceImpl', downgradeInjectable(AuthenticationServiceImpl));
+export class ReadOnlyConfiguration implements AceEditorConfiguration {
+  private readonly _paragraphData: object;
 
-angular.module('zeppelinWebApp').factory('webSocketService', downgradeInjectable(WebSocketServiceImpl));
+  constructor(paragraphData: object) {
+    this._paragraphData = paragraphData;
+  }
 
-angular.module('zeppelinWebApp')
-  .directive(
-    'webAppViewPort',
-    downgradeComponent({ component: WebAppViewPort }) as angular.IDirectiveFactory
-  );
+  applyConfiguration(aceEditor: ace.Editor): void {
+    const status = this._paragraphData['status'];
+    const editorIsDisabled = status === 'RUNNING' || status === 'PENDING';
+    aceEditor.setReadOnly(editorIsDisabled);
+    aceEditor.setStyle('paragraph-disable', editorIsDisabled);
+  }
+}

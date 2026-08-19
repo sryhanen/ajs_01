@@ -43,43 +43,63 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ace from 'ace-builds';
-import {WsMessageListener} from '../../shared/components/websocket/wsMessageListener';
-import {EditorCompletions} from './editorCompletions';
+import {Editor} from './editor';
+import {EditorImpl} from './editorImpl';
+import {FakeChannel} from '../channel/fakeChannel';
+import {Signal} from '@angular/core';
+import {RenderNode} from '../rendering/renderNode/renderNode';
+import {EditorView} from '../../ui/angular2+/editor/editorView';
+import {Channel} from '../channel/channel';
 
-export class EditorCompletionsImpl implements EditorCompletions {
-  private _websocketMessageService;
-  private _wsMessageListenerService:WsMessageListener;
-  private readonly _paragraphId:string;
+describe('Editor unit test', () => {
+  let editor: Editor;
+  let channel:Channel;
 
-  constructor(paragraphId: string, wsMessageListenerService:WsMessageListener, websocketMessageService) {
-    this._paragraphId = paragraphId;
-    this._wsMessageListenerService = wsMessageListenerService;
-    this._websocketMessageService = websocketMessageService;
-  }
+  beforeEach(() => {
+    channel = new FakeChannel();
+    editor = new EditorImpl(channel, {id:'id'});
+  });
 
-  async language(editorLanguage: string): Promise<string> {
-    this._websocketMessageService.getEditorSetting(this._paragraphId, editorLanguage);
-    const editorSettings = await this._wsMessageListenerService.expectMessage('EDITOR_SETTINGS') as {editor:{completionKey:string, completionSupport:boolean, editorOnDblClick:boolean, language:string}};
-    return`ace/mode/${editorSettings.editor.language}`;
-  }
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(editor).toBeDefined();
+    });
+  });
 
-  async remoteCompleter(queryText:string): Promise<ace.Ace.Completer> {
-    this._websocketMessageService.completion(this._paragraphId, queryText, queryText.length);
-    const data = await this._wsMessageListenerService.expectMessage('COMPLETION_LIST') as {completions: {name:string, value:string}[]};
-    const completions: ace.Ace.Completion[] = data.completions.map(function(completion) {
-      return {
-        name: completion.name,
-        value: completion.value,
-        score: 300,
-      };
+  describe('Print', () => {
+    let printedEditor: Signal<RenderNode>;
+
+    beforeEach(() => {
+      printedEditor = editor.print();
     });
 
-    return {
-      getCompletions: function(editor, session, pos, prefix, callback) {
-        callback(null, completions);
-      }
-    };
-  }
+    it('Should have componentView', () => {
+      const componentView = printedEditor().componentView;
+      expect(componentView.isStub()).toBe(false);
+      expect(componentView.component()).toEqual(EditorView);
+      expect(componentView.inputs()()['editor']).toBeDefined();
+      expect(componentView.inputs()()['editorConfigurationRules']).toBeDefined();
+      expect(componentView.inputs()()['paragraphId']).toBeDefined();
+    });
 
-}
+    it('Should not have children', () => {
+      expect(printedEditor().children()).toEqual([]);
+    });
+
+    it('Should have paragraphId', () => {
+      expect(printedEditor().paragraphId).toEqual('id');
+    });
+  });
+
+  describe('Request', () => {
+    it('Should request channel', () => {
+      const channelSpy = vi.spyOn(channel, 'request');
+      const request = {
+        op:'',
+        data:{}
+      };
+      editor.request(request);
+      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+  });
+});

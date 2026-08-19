@@ -43,44 +43,52 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {EditorCompletionsImpl} from './editorCompletionsImpl';
-import {EditorCompletions} from './editorCompletions';
-import {WsMessageListener} from '../../shared/components/websocket/wsMessageListener';
 
-describe('EditorCompletionsImpl', () => {
-  let editorCompletions: EditorCompletions;
+import {CompletionListMessage} from './completionListMessage';
+import {CompletionListMessageImpl} from './completionListMessageImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../messageImpl';
 
-  const fakeWsMessageListener: WsMessageListener = {
-    expectMessage(operation: string): Promise<object> {
-      let promise: Promise<object>;
-      if(operation === 'EDITOR_SETTINGS'){
-        promise = Promise.resolve({editor:{completionKey:'fake', completionSupport:true, editorOnDblClick:true, language:'fake'}});
-      }
-      if(operation === 'COMPLETION_LIST'){
-        promise = Promise.resolve({completions:[]});
-      }
-      return promise;
+describe('CompletionListMessage unit test', () => {
+  const completionListMessageData = {
+    op:'COMPLETION_LIST',
+    data:{
+      completions:[
+        {name:'name', value:'value'},
+      ]
     }
   };
-  const fakeWsMessageService = {
-    getEditorSetting: () => {},
-    completion: () => {}
-  };
+  let completionListMessage: CompletionListMessage;
 
   beforeEach(() => {
-    editorCompletions = new EditorCompletionsImpl('paragraphId', fakeWsMessageListener, fakeWsMessageService);
+    completionListMessage = new CompletionListMessageImpl(new MessageImpl(new SafeJsonImpl(completionListMessageData)));
   });
 
-  test('It should initialize', () => {
-    expect(editorCompletions).toBeInstanceOf(EditorCompletionsImpl);
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(completionListMessage).toBeDefined();
+    });
+
+    it('Should have operation', () => {
+      expect(completionListMessage.operation()).toEqual('COMPLETION_LIST');
+    });
+
+    it('Should have data', () => {
+      expect(completionListMessage.data()).toEqual(completionListMessageData.data);
+    });
+
+    it('Should have completions', () => {
+      expect(completionListMessage.completions()).toEqual(completionListMessageData.data.completions);
+    });
   });
 
-  test('Test language method',async () => {
-    expect(await editorCompletions.language('')).toEqual('ace/mode/fake');
-  });
-
-  test('Test remoteCompleter method',async () => {
-    const completer = await editorCompletions.remoteCompleter('');
-    expect(completer.getCompletions).toBeDefined();
+  describe('Validation', () => {
+    it('Should throw if message operation is not "COMPLETION_LIST"', () => {
+      completionListMessageData.op = '';
+      completionListMessage = new CompletionListMessageImpl(new MessageImpl(new SafeJsonImpl(completionListMessageData)));
+      expect(() => completionListMessage.data()).toThrow();
+      expect(() => completionListMessage.operation()).toThrow();
+      expect(() => completionListMessage.completions()).toThrow();
+    });
   });
 });

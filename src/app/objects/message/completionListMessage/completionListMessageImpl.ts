@@ -43,33 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ConfiguredEditor} from './configuredEditor';
-import ace from 'ace-builds';
+import {CompletionListMessage} from './completionListMessage';
+import {Message} from '../message';
+import {TypedMessage} from '../typedMessage/typedMessage';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 
-export class ConfiguredEditorImpl implements ConfiguredEditor {
-  private readonly _editor: ace.Ace.Editor;
+export class CompletionListMessageImpl implements CompletionListMessage {
+  private readonly _message:Message;
 
-  constructor(editor: ace.Ace.Editor) {
-    this._editor = editor;
+  constructor(message:Message){
+    this._message = new TypedMessage('COMPLETION_LIST', message);
   }
 
-  lineNumbers(value: boolean): void {
-    this._editor.renderer.setShowGutter(value);
+  completions(): { name: string; value: string }[] {
+    const completionListData = new SafeJsonImpl(this._message.data());
+    return completionListData.getProperty('completions', 'object');
   }
 
-  readonly(value: boolean): void {
-    this._editor.setReadOnly(value);
-    if(value){
-      this._editor.setStyle('paragraph-disable');
-    }
-    else{
-      this._editor.setStyle('paragraph-disable', false);
-    }
+  data(): object {
+    return this._message.data();
   }
 
-  setFontSize(value: number): void {
-    this._editor.setOptions({
-      fontSize: value,
-    });
+  operation(): string {
+    return this._message.operation();
   }
 }

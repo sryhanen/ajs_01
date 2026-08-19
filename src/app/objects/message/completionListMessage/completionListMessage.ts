@@ -43,8 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface ConfiguredEditor {
-  readonly(value:boolean):void;
-  setFontSize(value:number):void;
-  lineNumbers(value:boolean):void;
+import {Message} from '../message';
+
+export interface CompletionListMessage extends Message {
+  completions(): {name:string, value:string}[];
 }
