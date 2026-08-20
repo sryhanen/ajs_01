@@ -50,11 +50,12 @@ import {CopyParagraphRequest} from '../../../../../objects/requests/copyParagrap
 @Component({
   selector: 'copy-paragraph',
   template: `
-    <i class="fas fa-copy me-3"
-       role="button"
-       title="Clone paragraph (Ctrl+Shift+C)"
-       (click)="copyParagraphRequest()">
-    </i>
+    <button class="bg-transparent border-0 p-0" (click)="copyParagraphRequest()">
+        <i class="fas fa-copy me-3"
+           role="button"
+           title="Clone paragraph (Ctrl+Shift+C)">
+        </i>
+    </button>
   `
 })
 export class CopyParagraphView {

@@ -5,11 +5,12 @@ import {CommitParagraphRequest} from '../../../../../objects/requests/commitPara
 @Component({
   selector: 'toggle-line-numbers',
   template: `
-    <i class="fas fa-list-ol me-3"
-       role="button"
-       (click)="commitParagraphRequest()"
-       title="{{hideLineNumbers() ? 'Hide' : 'Show' }} line numbers">
-    </i>
+    <button class="bg-transparent border-0 p-0"  (click)="commitParagraphRequest()">
+        <i class="fas fa-list-ol me-3"
+           role="button"
+           title="{{hideLineNumbers() ? 'Hide' : 'Show' }} line numbers">
+        </i>
+    </button>
   `
 })
 export class ToggleLineNumbersView {

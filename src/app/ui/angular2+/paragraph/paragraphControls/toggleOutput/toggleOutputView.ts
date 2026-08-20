@@ -50,11 +50,12 @@ import {CommitParagraphRequest} from '../../../../../objects/requests/commitPara
 @Component({
   selector: 'toggle-output',
   template: `
-    <i [class]="classNames()"
-       [title]="title()"
-       role="button"
-       (click)="commitParagraphRequest()">
-    </i>
+    <button class="bg-transparent border-0 p-0"  (click)="commitParagraphRequest()">
+        <i [class]="classNames()"
+           [title]="title()"
+           role="button">
+        </i>
+    </button>
   `
 })
 export class ToggleOutputView {

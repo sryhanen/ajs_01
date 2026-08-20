@@ -61,6 +61,7 @@ import {RemoveParagraphButton} from './removeParagraphButton/removeParagraphButt
     RemoveParagraphButton
   ],
   template: `
+    <button class="bg-transparent border-0 p-0">
     <div class="dropdown">
       <i class="fas fa-gear"
          role="button"
@@ -101,6 +102,7 @@ import {RemoveParagraphButton} from './removeParagraphButton/removeParagraphButt
         <remove-paragraph-button [paragraphId]="paragraphId()" [requestable]="requestable()"></remove-paragraph-button>
       </ul>
     </div>
+    </button>
   `
 })
 export class ConfigDropdown {

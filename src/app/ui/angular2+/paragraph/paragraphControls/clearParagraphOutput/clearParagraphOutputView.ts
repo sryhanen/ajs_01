@@ -52,11 +52,12 @@ import {
 @Component({
   selector: 'clear-paragraph-output',
   template: `
-    <i class="fas fa-eraser me-3"
-       role="button"
-       title="Clear output"
-       (click)="clearParagraphOutputRequest()">
-    </i>
+    <button class="bg-transparent border-0 p-0"  (click)="clearParagraphOutputRequest()">
+        <i class="fas fa-eraser me-3"
+           role="button"
+           title="Clear output">
+        </i>
+    </button>
   `
 })
 export class ClearParagraphOutputView {

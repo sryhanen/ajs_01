@@ -50,11 +50,12 @@ import {CommitParagraphRequest} from '../../../../../objects/requests/commitPara
 @Component({
   selector: 'toggle-title',
   template: `
-    <i class="fas fa-font me-3"
-       [title]="titleText()"
-       role="button"
-       (click)="commitParagraphRequest()">
-    </i>
+    <button class="bg-transparent border-0 p-0"  (click)="commitParagraphRequest()">
+        <i class="fas fa-font me-3"
+           [title]="titleText()"
+           role="button">
+        </i>
+    </button>
   `
 })
 export class ToggleTitleView {

@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {Requestable} from '../../../../objects/channel/requestable';
 import {ToggleTitleView} from './toggleTitle/toggleTitleView';
 import {ToggleOutputView} from './toggleOutput/toggleOutputView';
@@ -71,27 +71,38 @@ import {ConfigDropdown} from './configDropdown/configDropdown';
     ConfigDropdown
   ],
   template: `
-    <div class="control d-flex align-items-center">
-      <div class="flex-fill d-flex align-items-center">
-        <div class="responsive-col d-flex align-items-center">
-          <toggle-editor [paragraphData]="paragraphData()" [requestable]="requestable()"></toggle-editor>
-          <toggle-output [paragraphData]="paragraphData()" [requestable]="requestable()"></toggle-output>
-          <copy-paragraph [paragraphData]="paragraphData()" [requestable]="requestable()"></copy-paragraph>
-          <clear-paragraph-output [paragraphId]="paragraphData()['id']" [requestable]="requestable()"></clear-paragraph-output>
-          <toggle-title [paragraphData]="paragraphData()" [requestable]="requestable()"></toggle-title>
-          <toggle-line-numbers [paragraphData]="paragraphData()" [requestable]="requestable()"></toggle-line-numbers>
-        </div>
-        <div class="ms-auto d-flex align-items-center">
-          <run-time-status-view [paragraphData]="paragraphData()"></run-time-status-view>
-          <cancel-paragraph-run [paragraphId]="paragraphData()['id']" [requestable]="requestable()"></cancel-paragraph-run>
-          <run-paragraph [paragraphData]="paragraphData()" [requestable]="requestable()"></run-paragraph>
-          <paragraph-config-dropdown [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-config-dropdown>
+    <form (submit)="$event.preventDefault()">
+      <div class="control d-flex align-items-center">
+        <div class="flex-fill d-flex align-items-center">
+          <div class="responsive-col d-flex align-items-center">
+            <fieldset [disabled]="paragraphIsRunning()">
+              <toggle-editor [paragraphData]="paragraphData()" [requestable]="requestable()"></toggle-editor>
+              <toggle-output [paragraphData]="paragraphData()" [requestable]="requestable()"></toggle-output>
+              <copy-paragraph [paragraphData]="paragraphData()" [requestable]="requestable()"></copy-paragraph>
+              <clear-paragraph-output [paragraphId]="paragraphData()['id']" [requestable]="requestable()"></clear-paragraph-output>
+              <toggle-title [paragraphData]="paragraphData()" [requestable]="requestable()"></toggle-title>
+              <toggle-line-numbers [paragraphData]="paragraphData()" [requestable]="requestable()"></toggle-line-numbers>
+            </fieldset>
+          </div>
+          <div class="ms-auto d-flex align-items-center">
+            <run-time-status-view [paragraphData]="paragraphData()"></run-time-status-view>
+            <fieldset [disabled]="!paragraphIsRunning()">
+                <cancel-paragraph-run [paragraphId]="paragraphData()['id']" [requestable]="requestable()"></cancel-paragraph-run>
+            </fieldset>
+            <fieldset [disabled]="paragraphIsRunning()" class="ms-auto d-flex align-items-center">
+                <run-paragraph [paragraphData]="paragraphData()" [requestable]="requestable()"></run-paragraph>
+                <paragraph-config-dropdown [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-config-dropdown>
+            </fieldset>
+          </div>
         </div>
       </div>
-    </div>
+    </form>
+
   `
 })
 export class ParagraphControlsView {
   requestable = input.required<Requestable>();
   paragraphData = input.required<object>();
+  paragraphStatus = computed(() => this.paragraphData()['status']);
+  paragraphIsRunning = computed(() => this.paragraphStatus() === 'PENDING' || this.paragraphStatus() === 'RUNNING');
 }

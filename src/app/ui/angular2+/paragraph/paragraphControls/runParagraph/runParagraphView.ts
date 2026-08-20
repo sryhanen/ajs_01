@@ -50,11 +50,12 @@ import {RunParagraphRequest} from '../../../../../objects/requests/runParagraph/
 @Component({
   selector: 'run-paragraph',
   template: `
-    <i class="me-2 fas fa-play"
-       role="button"
-       title="Run this paragraph"
-       (click)="runParagraphRequest()">
-    </i>
+    <button class="bg-transparent border-0 p-0"  (click)="runParagraphRequest()">
+        <i class="me-2 fas fa-play"
+           role="button"
+           title="Run this paragraph">
+        </i>
+    </button>
   `
 })
 export class RunParagraphView {

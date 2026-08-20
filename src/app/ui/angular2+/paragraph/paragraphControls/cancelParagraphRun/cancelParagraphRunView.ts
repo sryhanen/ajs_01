@@ -50,11 +50,12 @@ import {Requestable} from '../../../../../objects/channel/requestable';
 @Component({
   selector: 'cancel-paragraph-run',
   template: `
-    <i class="me-2 fas fa-pause"
-       role="button"
-       title="Cancel paragraph run"
-       (click)="cancelParagraphRunRequest()">
-    </i>
+    <button class="bg-transparent border-0 p-0"  (click)="cancelParagraphRunRequest()">
+        <i class="me-2 fas fa-pause"
+           role="button"
+           title="Cancel paragraph run">
+        </i>
+    </button>
   `
 })
 export class CancelParagraphRunView {
