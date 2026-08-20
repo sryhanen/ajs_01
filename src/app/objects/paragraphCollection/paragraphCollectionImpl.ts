@@ -83,6 +83,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     this._requestRegister.register('RUN_PARAGRAPH', (json) => this.runParagraphRequest(json));
     this._componentView = new ComponentViewImpl(ParagraphCollectionView, computed(() => ({
       paragraphs: Array.from(this._paragraphs().values()).map(paragraph => paragraph.print()().componentView),
+      requestable: this
     })));
   }
 

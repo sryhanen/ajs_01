@@ -84,7 +84,6 @@ describe('RunParagraphView functional test', () => {
         data:{
           id:paragraphData.id,
           paragraph:paragraphData.text,
-          title:paragraphData.title,
           config:paragraphData.config,
           params: paragraphData.settings
         }

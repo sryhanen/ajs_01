@@ -45,25 +45,37 @@
  */
 import {ComponentFixture} from '@angular/core/testing';
 import {ParagraphPositionSelect} from './paragraphPositionSelect';
-import {fireEvent, render, screen} from '@testing-library/angular';
+import {fireEvent, render, RenderResult, screen} from '@testing-library/angular';
 import {Requestable} from '../../../../../../objects/channel/requestable';
 import {FakeChannel} from '../../../../../../objects/channel/fakeChannel';
 
 describe('Paragraph position select integration test', () => {
   let fixture:ComponentFixture<ParagraphPositionSelect>;
+  let renderResult: RenderResult<ParagraphPositionSelect, ParagraphPositionSelect>;
   let requestable: Requestable;
-  const paragraphId = 'paragraphId';
-  const initialPosition = 'top';
+  const lastParagraphIndex = 3;
+  let paragraphData = {
+    id:'paragraphId',
+    index:0,
+    lastParagraphIndex:lastParagraphIndex,
+  };
+  const topPosition = 'top';
 
   beforeEach(async () => {
     requestable = new FakeChannel();
-    const renderResult = await render(ParagraphPositionSelect, {
+    paragraphData = {
+      id:'paragraphId',
+      index:0,
+      lastParagraphIndex:3,
+    };
+    renderResult = await render(ParagraphPositionSelect, {
       inputs:{
-        paragraphId:paragraphId,
+        paragraphData: paragraphData,
         requestable:requestable,
-        position: initialPosition
+        position: topPosition
       }
     });
+
     fixture = renderResult.fixture;
   });
 
@@ -75,100 +87,133 @@ describe('Paragraph position select integration test', () => {
   });
 
   describe('Position arguments', () => {
+    describe('Top position', () => {
+      it('Should have expected elements rendered', () => {
+        expect(screen.getByText('Move to the top')).toBeDefined();
+        expect(screen.getByRole('img')).toHaveClass('fa-angle-double-up');
+      });
+    });
+
+    describe('Above position', () => {
+      it('Should have expected elements rendered', () => {
+        fixture.componentRef.setInput('position','above');
+        fixture.detectChanges();
+        expect(screen.getByText('Move up')).toBeDefined();
+        expect(screen.getByRole('img')).toHaveClass('fa-angle-up');
+      });
+    });
+
+    describe('Below position', () => {
+      it('Should have expected elements rendered', () => {
+        fixture.componentRef.setInput('position','below');
+        fixture.detectChanges();
+        expect(screen.getByText('Move down')).toBeDefined();
+        expect(screen.getByRole('img')).toHaveClass('fa-angle-down');
+      });
+    });
+
+    describe('Bottom position', () => {
+      it('Should have expected elements rendered', () => {
+        fixture.componentRef.setInput('position','bottom');
+        fixture.detectChanges();
+        expect(screen.getByText('Move to the bottom')).toBeDefined();
+        expect(screen.getByRole('img')).toHaveClass('fa-angle-double-down');
+      });
+    });
+  });
+
+  describe('MoveParagraph position requests', () => {
     let spy;
-    let expectedRequest = {
-      op:'CHANGE_PARAGRAPH_POSITION',
-      data:{
-        position:'',
-        paragraphId:paragraphId,
-      }
-    };
     beforeEach(() => {
-      expectedRequest = {
-        op:'CHANGE_PARAGRAPH_POSITION',
-        data:{
-          position:initialPosition,
-          paragraphId:paragraphId,
-        }
-      };
       spy = vi.spyOn(requestable, 'request');
     });
 
-    describe('Top', () => {
-      it('Should have matching text for the given position', () => {
-        expect(screen.getByText('Move to the top')).toBeDefined();
-      });
+    it('Move position to top', () => {
+      fireEvent.click(screen.getByRole('button'));
+      const expectedRequest = {
+        op:'MOVE_PARAGRAPH',
+        data:{
+          id: paragraphData.id,
+          index:0,
+        }
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
 
-      it('Should have matching class for the given position', () => {
-        expect(screen.getByRole('img')).toHaveClass('fa-angle-double-up');
-      });
+    it('Move position to bottom', () => {
+      fixture.componentRef.setInput('position','bottom');
+      fixture.detectChanges();
+      fireEvent.click(screen.getByRole('button'));
+      const expectedRequest = {
+        op:'MOVE_PARAGRAPH',
+        data:{
+          id: paragraphData.id,
+          index:lastParagraphIndex,
+        }
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
 
-      it('Should send request when clicking button', () => {
+    describe('Move position to above', () => {
+      it('Position move when current index is 0', () => {
+        fixture.componentRef.setInput('position','above');
+        fixture.detectChanges();
         fireEvent.click(screen.getByRole('button'));
+        const expectedRequest = {
+          op:'MOVE_PARAGRAPH',
+          data:{
+            id: paragraphData.id,
+            index:0,
+          }
+        };
+        expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+      });
+      it('Position move when current index is 2', () => {
+        paragraphData.index = 2;
+        fixture.componentRef.setInput('position','above');
+        fixture.componentRef.setInput('paragraphData',paragraphData);
+        fixture.detectChanges();
+        fireEvent.click(screen.getByRole('button'));
+        const expectedRequest = {
+          op:'MOVE_PARAGRAPH',
+          data:{
+            id: paragraphData.id,
+            index:1,
+          }
+        };
         expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
       });
     });
 
-    describe('Above', () => {
-      beforeEach(() => {
-        fixture.componentRef.setInput('position','above');
+    describe('Move position to below', () => {
+      it('Position move when current index is 0', () => {
+        fixture.componentRef.setInput('position','below');
         fixture.detectChanges();
-      });
-
-      it('Should have matching text for the given position', () => {
-        expect(screen.getByText('Move up')).toBeDefined();
-      });
-
-      it('Should have matching class for the given position', () => {
-        expect(screen.getByRole('img')).toHaveClass('fa-angle-up');
-      });
-
-      it('Should send request when clicking button', () => {
         fireEvent.click(screen.getByRole('button'));
-        expectedRequest.data.position = 'above';
+        const expectedRequest = {
+          op:'MOVE_PARAGRAPH',
+          data:{
+            id: paragraphData.id,
+            index:1,
+          }
+        };
         expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
       });
 
-      describe('Below', () => {
-        beforeEach(() => {
-          fixture.componentRef.setInput('position','below');
-          fixture.detectChanges();
-        });
-
-        it('Should have matching text for the given position', () => {
-          expect(screen.getByText('Move down')).toBeDefined();
-        });
-
-        it('Should have matching class for the given position', () => {
-          expect(screen.getByRole('img')).toHaveClass('fa-angle-down');
-        });
-
-        it('Should send request when clicking button', () => {
-          fireEvent.click(screen.getByRole('button'));
-          expectedRequest.data.position = 'below';
-          expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
-        });
-      });
-
-      describe('Bottom', () => {
-        beforeEach(() => {
-          fixture.componentRef.setInput('position','bottom');
-          fixture.detectChanges();
-        });
-
-        it('Should have matching text for the given position', () => {
-          expect(screen.getByText('Move to the bottom')).toBeDefined();
-        });
-
-        it('Should have matching class for the given position', () => {
-          expect(screen.getByRole('img')).toHaveClass('fa-angle-double-down');
-        });
-
-        it('Should send request when clicking button', () => {
-          fireEvent.click(screen.getByRole('button'));
-          expectedRequest.data.position = 'bottom';
-          expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
-        });
+      it('Position move when current index is last index', () => {
+        paragraphData.index = 3;
+        fixture.componentRef.setInput('position','below');
+        fixture.componentRef.setInput('paragraphData',paragraphData);
+        fixture.detectChanges();
+        fireEvent.click(screen.getByRole('button'));
+        const expectedRequest = {
+          op:'MOVE_PARAGRAPH',
+          data:{
+            id: paragraphData.id,
+            index:3,
+          }
+        };
+        expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
       });
     });
   });

@@ -87,13 +87,13 @@ import {RemoveParagraphButton} from './removeParagraphButton/removeParagraphButt
         <li class="divider">
           <hr class="dropdown-divider">
         </li>
-        <paragraph-position-select [paragraphId]="paragraphId()" [position]="'top'"
+        <paragraph-position-select [paragraphData]="paragraphData()" [position]="'top'"
                                    [requestable]="requestable()"></paragraph-position-select>
-        <paragraph-position-select [paragraphId]="paragraphId()" [position]="'above'"
+        <paragraph-position-select [paragraphData]="paragraphData()" [position]="'above'"
                                    [requestable]="requestable()"></paragraph-position-select>
-        <paragraph-position-select [paragraphId]="paragraphId()" [position]="'below'"
+        <paragraph-position-select [paragraphData]="paragraphData()" [position]="'below'"
                                    [requestable]="requestable()"></paragraph-position-select>
-        <paragraph-position-select [paragraphId]="paragraphId()" [position]="'bottom'"
+        <paragraph-position-select [paragraphData]="paragraphData()" [position]="'bottom'"
                                    [requestable]="requestable()"></paragraph-position-select>
         <li class="divider">
           <hr class="dropdown-divider">

@@ -43,11 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {Requestable} from '../../../../../../objects/channel/requestable';
-import {
-  ChangeParagraphPositionRequest
-} from '../../../../../../objects/requests/changeParagraphPositionRequest/changeParagraphPositionRequest';
+import {MoveParagraphRequest} from '../../../../../../objects/requests/moveParagraphRequest/moveParagraphRequest';
 
 @Component({
   selector:'paragraph-position-select',
@@ -55,7 +53,7 @@ import {
     @let configuration = positionConfiguration.get(position());
     <li class="dropdown-item d-flex align-items-center">
         <li class="d-flex align-items-center">
-          <a role="button" class="dropdown-item" (click)="changeParagraphPositionRequest()">
+          <a role="button" class="dropdown-item" (click)="moveParagraphRequest()">
                       <span class="drop-icon">
                         <i role="img" class="fas" [class]="configuration.class"></i>
                       </span>
@@ -66,8 +64,9 @@ import {
 })
 export class ParagraphPositionSelect {
   requestable = input.required<Requestable>();
-  position = input.required<string>();
-  paragraphId = input.required<string>();
+  position = input.required<'top' | 'above' | 'below' | 'bottom'>();
+  paragraphData = input.required<object>();
+  paragraphId = computed(() => this.paragraphData()['id']);
   protected positionConfiguration = new Map([
     ['top', {visibleText:'Move to the top', class:'fa-angle-double-up'}],
     ['above', {visibleText:'Move up', class:'fa-angle-up'}],
@@ -75,8 +74,31 @@ export class ParagraphPositionSelect {
     ['bottom', {visibleText:'Move to the bottom', class:'fa-angle-double-down'}],
   ]);
 
-  protected changeParagraphPositionRequest():void{
-    const changeParagraphPositionRequest = new ChangeParagraphPositionRequest(this.requestable(), this.position(), this.paragraphId());
-    changeParagraphPositionRequest.send();
+  protected moveParagraphRequest():void{
+    const moveParagraphRequest = new MoveParagraphRequest(this.requestable(), this.paragraphId(), this.calculateNewIndex());
+    moveParagraphRequest.send();
+  }
+
+  private calculateNewIndex():number {
+    const lastParagraphIndex = this.paragraphData()['lastParagraphIndex'];
+    const currentIndex = this.paragraphData()['index'];
+    let newIndex = currentIndex;
+    if(this.position() === 'top'){
+      newIndex = 0;
+    }
+    else if(this.position() === 'bottom'){
+      newIndex = lastParagraphIndex;
+    }
+    else if(this.position() === 'above'){
+      if(currentIndex > 0) {
+        newIndex = currentIndex - 1;
+      }
+    }
+    else if(this.position() === 'below'){
+      if(currentIndex < lastParagraphIndex){
+        newIndex = currentIndex + 1;
+      }
+    }
+    return newIndex;
   }
 }

@@ -43,21 +43,42 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {ComponentView} from '../../../objects/rendering/componentView/componentView';
 import {NgComponentOutlet} from '@angular/common';
+import {NewParagraphButton} from './newParagraphButton/newParagraphButton';
+import {Requestable} from '../../../objects/channel/requestable';
 
 @Component({
   selector: 'paragraph-collection',
   imports: [
-    NgComponentOutlet
+    NgComponentOutlet,
+    NewParagraphButton
   ],
   template: `
-    @for (paragraph of paragraphs(); track $index) {
-      <ng-container *ngComponentOutlet="paragraph.component(); inputs: paragraph.inputs()()"></ng-container>
+    @for (paragraph of paragraphsWithIndices(); track $index) {
+      <new-paragraph-button [index]="$index" [requestable]="requestable()"></new-paragraph-button>
+      <ng-container *ngComponentOutlet="paragraph.component; inputs: paragraph.inputs"></ng-container>
     }
   `
 })
 export class ParagraphCollectionView {
   paragraphs = input.required<ComponentView[]>();
+  requestable = input.required<Requestable>();
+  paragraphsWithIndices = computed(() => {
+    const lastParagraphIndex = this.paragraphs().length - 1;
+    const paragraphsWithIndices : {component: {new(): unknown}, inputs: Record<string, unknown>}[] = [];
+    let index = 0;
+    for (const paragraph of this.paragraphs()) {
+      const inputs = paragraph.inputs()();
+      inputs['paragraphData']['index'] = index;
+      inputs['paragraphData']['lastParagraphIndex'] = lastParagraphIndex;
+      paragraphsWithIndices.push({
+        component: paragraph.component(),
+        inputs: inputs
+      });
+      index += 1;
+    }
+    return paragraphsWithIndices;
+  });
 }
