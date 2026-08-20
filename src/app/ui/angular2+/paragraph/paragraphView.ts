@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {ComponentView} from '../../../objects/rendering/componentView/componentView';
 import {NgComponentOutlet} from '@angular/common';
 import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
@@ -58,7 +58,7 @@ import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
     ParagraphProgressBar
   ],
   template: `
-    <div class="paragraph paragraph-box">
+    <div class="paragraph paragraph-box paragraph-col" [class]="paragraphWidthClass()">
         <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
         <ng-container *ngComponentOutlet="editor().component(); inputs: editor().inputs()()"></ng-container>
         <paragraph-progress-bar [paragraphData]="paragraphData()"></paragraph-progress-bar>
@@ -79,4 +79,5 @@ export class ParagraphView{
   output = input.required<ComponentView>();
   dynamicForm = input.required<ComponentView>();
   dplLog = input.required<ComponentView>();
+  paragraphWidthClass = computed(() => `col-md-${this.paragraphData()['config']['colWidth']}`);
 }
