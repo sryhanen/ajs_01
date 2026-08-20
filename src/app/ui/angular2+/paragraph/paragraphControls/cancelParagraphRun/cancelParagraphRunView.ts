@@ -52,7 +52,6 @@ import {Requestable} from '../../../../../objects/channel/requestable';
   template: `
     <button class="bg-transparent border-0 p-0"  (click)="cancelParagraphRunRequest()">
         <i class="me-2 fas fa-pause"
-           role="button"
            title="Cancel paragraph run">
         </i>
     </button>

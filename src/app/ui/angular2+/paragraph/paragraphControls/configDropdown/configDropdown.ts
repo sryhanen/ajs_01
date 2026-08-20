@@ -64,7 +64,6 @@ import {RemoveParagraphButton} from './removeParagraphButton/removeParagraphButt
     <button class="bg-transparent border-0 p-0">
     <div class="dropdown">
       <i class="fas fa-gear"
-         role="button"
          data-bs-toggle="dropdown"
          type="button"
          aria-haspopup="true"

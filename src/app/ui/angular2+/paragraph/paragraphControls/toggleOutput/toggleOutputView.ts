@@ -52,8 +52,7 @@ import {CommitParagraphRequest} from '../../../../../objects/requests/commitPara
   template: `
     <button class="bg-transparent border-0 p-0"  (click)="commitParagraphRequest()">
         <i [class]="classNames()"
-           [title]="title()"
-           role="button">
+           [title]="title()">
         </i>
     </button>
   `

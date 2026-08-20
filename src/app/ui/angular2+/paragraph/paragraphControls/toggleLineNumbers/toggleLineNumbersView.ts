@@ -7,7 +7,6 @@ import {CommitParagraphRequest} from '../../../../../objects/requests/commitPara
   template: `
     <button class="bg-transparent border-0 p-0"  (click)="commitParagraphRequest()">
         <i class="fas fa-list-ol me-3"
-           role="button"
            title="{{hideLineNumbers() ? 'Hide' : 'Show' }} line numbers">
         </i>
     </button>

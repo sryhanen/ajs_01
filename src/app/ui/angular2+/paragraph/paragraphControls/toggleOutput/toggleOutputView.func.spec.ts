@@ -83,7 +83,7 @@ describe('ToggleOutputView functional test', () => {
 
     it('Should have specific title and class name', () => {
       expect(screen.getByTitle('Hide output')).toBeDefined();
-      expect(screen.getByRole('button')).toHaveClass('fa-book');
+      expect(screen.getByRole('button').querySelector('i')).toHaveClass('fa-book');
     });
   });
 
@@ -113,7 +113,7 @@ describe('ToggleOutputView functional test', () => {
 
     it('Should have changed title and class name', () => {
       expect(screen.getByTitle('Show output')).toBeDefined();
-      expect(screen.getByRole('button')).toHaveClass('fa-book-open');
+      expect(screen.getByRole('button').querySelector('i')).toHaveClass('fa-book-open');
     });
   });
 });

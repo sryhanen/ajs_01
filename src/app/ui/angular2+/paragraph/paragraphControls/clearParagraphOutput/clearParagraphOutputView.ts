@@ -54,7 +54,6 @@ import {
   template: `
     <button class="bg-transparent border-0 p-0"  (click)="clearParagraphOutputRequest()">
         <i class="fas fa-eraser me-3"
-           role="button"
            title="Clear output">
         </i>
     </button>

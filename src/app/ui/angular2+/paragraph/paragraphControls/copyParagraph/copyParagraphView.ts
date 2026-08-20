@@ -52,7 +52,6 @@ import {CopyParagraphRequest} from '../../../../../objects/requests/copyParagrap
   template: `
     <button class="bg-transparent border-0 p-0" (click)="copyParagraphRequest()">
         <i class="fas fa-copy me-3"
-           role="button"
            title="Clone paragraph (Ctrl+Shift+C)">
         </i>
     </button>

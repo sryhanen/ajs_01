@@ -81,7 +81,7 @@ describe('ToggleEditorView functional test', () => {
 
     it('Should have specific class and title', () => {
       expect(screen.getByTitle('Hide editor')).toBeDefined();
-      expect(screen.getByRole('button')).toHaveClass('fa-compress');
+      expect(screen.getByRole('button').querySelector('i')).toHaveClass('fa-compress');
     });
   });
 
@@ -112,7 +112,7 @@ describe('ToggleEditorView functional test', () => {
 
     it('Should have changed title and class name', () => {
       expect(screen.getByTitle('Show editor')).toBeDefined();
-      expect(screen.getByRole('button')).toHaveClass('fa-expand');
+      expect(screen.getByRole('button').querySelector('i')).toHaveClass('fa-expand');
     });
   });
 });

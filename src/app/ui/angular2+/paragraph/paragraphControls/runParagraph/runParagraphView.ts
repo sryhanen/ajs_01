@@ -52,7 +52,6 @@ import {RunParagraphRequest} from '../../../../../objects/requests/runParagraph/
   template: `
     <button class="bg-transparent border-0 p-0"  (click)="runParagraphRequest()">
         <i class="me-2 fas fa-play"
-           role="button"
            title="Run this paragraph">
         </i>
     </button>
