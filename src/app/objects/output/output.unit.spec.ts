@@ -47,7 +47,7 @@ import {Output} from './output';
 import {Channel} from '../channel/channel';
 import {FakeChannel} from '../channel/fakeChannel';
 import {OutputImpl} from './outputImpl';
-import {RenderNode} from '../rendering/renderNode/renderNode';
+import {ComponentView} from '../rendering/componentView/componentView';
 
 describe('Output Unit Test', () => {
   let channel:Channel;
@@ -59,14 +59,14 @@ describe('Output Unit Test', () => {
   });
 
   describe('Printing', () => {
-    let outputPrinted:RenderNode;
+    let outputPrinted:ComponentView;
 
     beforeEach(() => {
       outputPrinted = output.print()();
     });
 
     it('Should have componentView', () => {
-      expect(outputPrinted.componentView.isStub()).toBe(false);
+      expect(outputPrinted.isStub()).toBe(false);
     });
   });
 

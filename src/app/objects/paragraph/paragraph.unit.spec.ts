@@ -89,7 +89,7 @@ describe('Paragraph', () => {
 
     it('Should print', () => {
       const paragraphPrinted = paragraph.print()();
-      expect(paragraphPrinted.componentView.isStub()).toBe(false);
+      expect(paragraphPrinted.isStub()).toBe(false);
     });
   });
 

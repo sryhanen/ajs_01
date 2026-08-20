@@ -66,8 +66,8 @@ describe('NotebookCollection', () => {
     it('Should print', () => {
       const notebookCollectionPrinted = notebookCollection.print()();
       expect(notebookCollectionPrinted).toBeDefined();
-      expect(notebookCollectionPrinted.componentView.isStub()).toBe(false);
-      expect((notebookCollectionPrinted.componentView.inputs()()['currentNotebook'] as ComponentView).isStub()).toBe(true);
+      expect(notebookCollectionPrinted.isStub()).toBe(false);
+      expect((notebookCollectionPrinted.inputs()()['currentNotebook'] as ComponentView).isStub()).toBe(true);
     });
   });
 
@@ -94,7 +94,7 @@ describe('NotebookCollection', () => {
       };
       notebookCollection.response(response);
       const notebookCollectionPrinted = notebookCollection.print()();
-      expect((notebookCollectionPrinted.componentView.inputs()()['currentNotebook'] as ComponentView).isStub()).toBe(false);
+      expect((notebookCollectionPrinted.inputs()()['currentNotebook'] as ComponentView).isStub()).toBe(false);
     });
   });
 });

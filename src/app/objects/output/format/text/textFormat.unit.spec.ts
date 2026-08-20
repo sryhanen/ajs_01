@@ -64,7 +64,7 @@ describe('TextFormat unit test', () => {
 
     it('Should print', () => {
       const textFormatPrinted = textFormat.print()();
-      expect(textFormatPrinted.componentView.isStub()).toBe(true);
+      expect(textFormatPrinted.isStub()).toBe(true);
     });
   });
 
@@ -84,7 +84,7 @@ describe('TextFormat unit test', () => {
     });
 
     it('Should have OutputView', () => {
-      const componentView = textFormat.print()().componentView;
+      const componentView = textFormat.print()();
       expect(componentView.isStub()).toBe(false);
       expect(componentView.inputs()()['textOutput']).toBeDefined();
     });
@@ -92,7 +92,7 @@ describe('TextFormat unit test', () => {
     it('Should not have componentView after output type change', () => {
       outputResponse.data.output.type = '';
       textFormat.response(outputResponse);
-      expect(textFormat.print()().componentView.isStub()).toBe(true);
+      expect(textFormat.print()().isStub()).toBe(true);
     });
   });
 });

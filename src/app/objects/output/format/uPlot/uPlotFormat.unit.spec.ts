@@ -68,7 +68,7 @@ describe('uPlotFormat unit test', () => {
 
     it('Should print', () => {
       const uPlotFormatPrinted = uPlotFormat.print()();
-      expect(uPlotFormatPrinted.componentView.isStub()).toBe(true);
+      expect(uPlotFormatPrinted.isStub()).toBe(true);
     });
   });
 
@@ -104,7 +104,7 @@ describe('uPlotFormat unit test', () => {
     });
 
     it('Should have componentView', () => {
-      const componentView = uPlotFormat.print()().componentView;
+      const componentView = uPlotFormat.print()();
       expect(componentView.isStub()).toBe(false);
       expect(componentView.inputs()()['basicOptions']).toBeDefined();
       expect(componentView.inputs()()['graphType']).toBeDefined();
@@ -114,7 +114,7 @@ describe('uPlotFormat unit test', () => {
     it('Should not have component view after output type change', () => {
       outputResponse.data.output.type = '';
       uPlotFormat.response(outputResponse);
-      const componentView = uPlotFormat.print()().componentView;
+      const componentView = uPlotFormat.print()();
       expect(componentView.isStub()).toBe(true);
     });
   });

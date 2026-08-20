@@ -47,9 +47,9 @@ import {Editor} from './editor';
 import {EditorImpl} from './editorImpl';
 import {FakeChannel} from '../channel/fakeChannel';
 import {Signal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
 import {EditorView} from '../../ui/angular2+/editor/editorView';
 import {Channel} from '../channel/channel';
+import {ComponentView} from '../rendering/componentView/componentView';
 
 describe('Editor unit test', () => {
   let editor: Editor;
@@ -67,14 +67,14 @@ describe('Editor unit test', () => {
   });
 
   describe('Print', () => {
-    let printedEditor: Signal<RenderNode>;
+    let printedEditor: Signal<ComponentView>;
 
     beforeEach(() => {
       printedEditor = editor.print();
     });
 
     it('Should have componentView', () => {
-      const componentView = printedEditor().componentView;
+      const componentView = printedEditor();
       expect(componentView.isStub()).toBe(false);
       expect(componentView.component()).toEqual(EditorView);
       expect(componentView.inputs()()['editor']).toBeDefined();

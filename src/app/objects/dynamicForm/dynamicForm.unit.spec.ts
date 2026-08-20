@@ -65,7 +65,7 @@ describe('DynamicForm unit test', () => {
 
     it('Should print', () => {
       const printed = dynamicForm.print()();
-      expect(printed.componentView.isStub()).toBe(true);
+      expect(printed.isStub()).toBe(true);
     });
   });
 
@@ -91,7 +91,7 @@ describe('DynamicForm unit test', () => {
 
     it('Should print view after "PARAGRAPH_FORM" response', () => {
       dynamicForm.response(paragraphFormResponse);
-      const componentView = dynamicForm.print()().componentView;
+      const componentView = dynamicForm.print()();
       expect(componentView.isStub()).toBe(false);
       expect(componentView.component()).toBeDefined();
       expect(componentView.inputs()()['form']).toBeDefined();
