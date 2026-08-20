@@ -45,8 +45,8 @@
  */
 import {Component, computed, input} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {Requestable} from '../../../objects/channel/requestable';
-import {SubmitFormRequest} from '../../../objects/requests/submitForm/submitFormRequest';
+import {Requestable} from '../../../../objects/channel/requestable';
+import {SubmitFormRequest} from '../../../../objects/requests/submitForm/submitFormRequest';
 
 @Component({
   selector: 'dynamic-form',

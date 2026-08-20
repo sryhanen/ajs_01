@@ -54,7 +54,7 @@ import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
 import {ParagraphFormMessageImpl} from '../message/paragraphFormMessage/paragraphFormMessageImpl';
 import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
-import {DynamicFormView} from '../../ui/angular2+/dynamicForm/dynamicFormView';
+import {DynamicFormView} from '../../ui/angular2+/paragraph/dynamicForm/dynamicFormView';
 
 export class DynamicFormImpl implements DynamicForm {
   private readonly _channel: Channel;

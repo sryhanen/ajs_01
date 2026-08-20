@@ -46,8 +46,8 @@
 import {ComponentFixture} from '@angular/core/testing';
 import {render, screen, fireEvent} from '@testing-library/angular';
 import {DynamicFormView} from './dynamicFormView';
-import {Requestable} from '../../../objects/channel/requestable';
-import {FakeChannel} from '../../../objects/channel/fakeChannel';
+import {Requestable} from '../../../../objects/channel/requestable';
+import {FakeChannel} from '../../../../objects/channel/fakeChannel';
 
 describe('InterpreterErrorView functional test', () => {
   const textInput = {type:'text', name:'textInput', value:'Default text'};

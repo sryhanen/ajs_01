@@ -53,7 +53,7 @@ import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
-import {DplLogView} from '../../ui/angular2+/dplLog/dplLogView';
+import {DplLogView} from '../../ui/angular2+/paragraph/dplLog/dplLogView';
 import {AngularObjectRemoveMessageImpl} from '../message/angularObjectRemoveMessage/angularObjectRemoveMessageImpl';
 import {Channel} from '../channel/channel';
 
