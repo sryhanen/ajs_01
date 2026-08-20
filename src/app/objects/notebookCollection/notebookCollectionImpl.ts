@@ -47,7 +47,6 @@ import {NotebookCollection} from './notebookCollection';
 import {Notebook} from '../notebook/notebook';
 import {Channel} from '../channel/channel';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {NotebookIndex} from './notebookIndex/notebookIndex';
 import {NotebookStub} from '../notebook/notebookStub';
@@ -80,7 +79,7 @@ export class NotebookCollectionImpl implements NotebookCollection{
     this._componentView = new ComponentViewImpl(NotebookCollectionView, computed(() => {
       let componentView = this._componentViewStub;
       if(!this._currentNotebook().isStub()){
-        componentView = this._currentNotebook().print()().componentView;
+        componentView = this._currentNotebook().print()();
       }
       return {currentNotebook: componentView};
     }));
@@ -94,11 +93,8 @@ export class NotebookCollectionImpl implements NotebookCollection{
     this._currentNotebook.set(new NoteMessageImpl(new MessageImpl(new SafeJsonImpl(json))).notebook(this));
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-        componentView: this._componentView
-      })
-    );
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   request(data: object): void {

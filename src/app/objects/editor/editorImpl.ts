@@ -45,7 +45,6 @@
  */
 import {Editor} from './editor';
 import {computed, signal, Signal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
 import {Channel} from '../channel/channel';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
@@ -85,10 +84,8 @@ export class EditorImpl implements Editor {
     return ace.edit(preElement);
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView:this._componentView
-    }));
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   request(json: object): void {

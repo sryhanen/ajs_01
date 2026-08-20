@@ -47,8 +47,7 @@ import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {computed, Signal} from '@angular/core';
-import { RenderNode } from '../rendering/renderNode/renderNode';
+import {computed, signal, Signal} from '@angular/core';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {
@@ -96,10 +95,10 @@ export class ParagraphImpl implements Paragraph {
     this._componentView = new ComponentViewImpl(ParagraphView, computed(() => ({
       paragraphData:paragraphData,
       requestable:this,
-      editor: this._editor.print()().componentView,
-      output: this._output.print()().componentView,
-      dplLog: this._dplLog.print()().componentView,
-      dynamicForm: this._dynamicForm.print()().componentView
+      editor: this._editor.print()(),
+      output: this._output.print()(),
+      dplLog: this._dplLog.print()(),
+      dynamicForm: this._dynamicForm.print()()
     })));
     const defaultResponseList = [
       this._output,
@@ -121,10 +120,8 @@ export class ParagraphImpl implements Paragraph {
     return output;
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView
-    }));
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   id(): string {

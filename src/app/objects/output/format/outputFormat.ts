@@ -45,9 +45,8 @@
  */
 import {Printable} from '../../rendering/printable/printable';
 import {Respondable} from '../../channel/respondable';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {Signal} from '@angular/core';
+import {ComponentView} from '../../rendering/componentView/componentView';
 
 export interface OutputFormat extends Respondable, Printable {
-  switcherButtons(): Signal<RenderNode>[];
+  switcherButtons(): ComponentView[];
 }

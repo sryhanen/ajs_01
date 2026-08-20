@@ -57,5 +57,5 @@ import {NgComponentOutlet} from '@angular/common';
   `
 })
 export class WebAppViewPort {
-  protected componentView = computed(() => webAppRoot.print()().componentView);
+  protected componentView = computed(() => webAppRoot.print()());
 }

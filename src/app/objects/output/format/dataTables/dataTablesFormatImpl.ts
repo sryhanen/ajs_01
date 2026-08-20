@@ -49,7 +49,6 @@ import {OutputType} from '../../outputType';
 import {DataTablesPluginImpl} from './dataTablesPlugin/dataTablesPluginImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import { RenderNode } from '../../../rendering/renderNode/renderNode';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
@@ -78,10 +77,8 @@ export class DataTablesFormatImpl implements DataTablesFormat {
     this._plugin = signal(this._pluginStub);
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView()
-    }));
+  print(): Signal<ComponentView> {
+    return computed(() => this._componentView());
   }
 
   response(json: object): void {
@@ -110,7 +107,7 @@ export class DataTablesFormatImpl implements DataTablesFormat {
     this._channel.request(data);
   }
 
-  switcherButtons(): Signal<RenderNode>[] {
-    return [this._switcherButton.print()];
+  switcherButtons(): ComponentView[] {
+    return [this._switcherButton.print()()];
   }
 }

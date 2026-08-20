@@ -47,30 +47,30 @@ import {OutputSwitcher} from './outputSwitcher';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../message/messageImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import { RenderNode } from '../../rendering/renderNode/renderNode';
 import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
 import {OutputSwitcherView} from '../../../ui/angular2+/output/switcher/outputSwitcherView';
 import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
+import {ComponentView} from '../../rendering/componentView/componentView';
 
 export class OutputSwitcherImpl implements OutputSwitcher {
   private readonly _outputIsSwitchable:WritableSignal<boolean>;
   private readonly _switchIsPending:WritableSignal<boolean>;
-  private readonly _switcherButtons: Signal<RenderNode>[];
+  private readonly _switcherButtons: ComponentView[];
+  private readonly _componentView:ComponentView;
 
-  constructor(switcherButtons: Signal<RenderNode>[]) {
+  constructor(switcherButtons: ComponentView[]) {
     this._switcherButtons = switcherButtons;
     this._outputIsSwitchable = signal(false);
     this._switchIsPending = signal(false);
+    this._componentView = new ComponentViewImpl(OutputSwitcherView, computed(() => ({
+      switcherButtons: this._switcherButtons,
+      switchIsPending: this._switchIsPending(),
+      outputIsSwitchable: this._outputIsSwitchable(),
+    })));
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: new ComponentViewImpl(OutputSwitcherView, computed(() => ({
-        switcherButtons: this._switcherButtons.map(switcherButton => switcherButton().componentView),
-        switchIsPending: this._switchIsPending(),
-        outputIsSwitchable: this._outputIsSwitchable(),
-      })))
-    }));
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   request(json: object) {

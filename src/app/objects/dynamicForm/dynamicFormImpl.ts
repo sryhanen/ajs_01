@@ -45,7 +45,6 @@
  */
 import {DynamicForm} from './dynamicForm';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
 import {Channel} from '../channel/channel';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
@@ -69,10 +68,8 @@ export class DynamicFormImpl implements DynamicForm {
     this._responseRegister.register('PARAGRAPH_FORM', (json) => this.paragraphFormResponse(json));
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView:this._componentView(),
-    }));
+  print(): Signal<ComponentView> {
+    return computed(() => this._componentView());
   }
 
   request(json: object): void {

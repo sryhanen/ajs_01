@@ -46,7 +46,6 @@
 import {Channel} from '../../../channel/channel';
 import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import { RenderNode } from '../../../rendering/renderNode/renderNode';
 import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
 import {MessageImpl} from '../../../message/messageImpl';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
@@ -89,13 +88,11 @@ export class AngularFormatImpl implements AngularFormat {
     }
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView(),
-    }));
+  print(): Signal<ComponentView> {
+    return computed(() => this._componentView());
   }
 
-  switcherButtons(): Signal<RenderNode>[] {
+  switcherButtons(): ComponentView[] {
     return [];
   }
 }

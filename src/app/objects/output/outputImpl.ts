@@ -44,8 +44,7 @@
  * a licensee so wish it.
  */
 import {Output} from './output';
-import {computed, Signal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
+import {computed, signal, Signal} from '@angular/core';
 import {Channel} from '../channel/channel';
 import {OutputFormat} from './format/outputFormat';
 import {OutputSwitcher} from './switcher/outputSwitcher';
@@ -92,22 +91,18 @@ export class OutputImpl implements Output {
     this._previousParagraphOutputRequest = new ParagraphOutputRequestStub();
     this._interpreterErrorListener = new InterpreterErrorListenerImpl();
     this._componentView = new ComponentViewImpl(OutputView, computed(() => ({
-      outputSwitcher: this._outputSwitcher.print()().componentView,
+      outputSwitcher: this._outputSwitcher.print()(),
       outputFormats: this._outputFormats
-        .filter(outputFormat => !outputFormat.print()().componentView.isStub())
-        .map(outputFormat => outputFormat.print()().componentView),
-      interpreterError: this._interpreterErrorListener.print()().componentView
+        .filter(outputFormat => !outputFormat.print()().isStub())
+        .map(outputFormat => outputFormat.print()()),
+      interpreterError: this._interpreterErrorListener.print()()
     })));
     this._responseRegister = new ResponseRegisterImpl();
     this._responseRegister.register('PARAGRAPH_OUTPUT', (json) => this.paragraphOutputResponse(json));
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() =>
-      ({
-        componentView: this._componentView
-      })
-    );
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
   }
 
   request(json: object): void {

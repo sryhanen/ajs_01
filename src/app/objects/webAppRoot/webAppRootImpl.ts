@@ -50,11 +50,11 @@ import {NotebookCollectionImpl} from '../notebookCollection/notebookCollectionIm
 import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
 import {signal, Signal, WritableSignal} from '@angular/core';
-import { RenderNode } from '../rendering/renderNode/renderNode';
+import {ComponentView} from '../rendering/componentView/componentView';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;
-  private readonly _printSignal: WritableSignal<RenderNode> = signal(undefined);
+  private readonly _printSignal: WritableSignal<ComponentView> = signal(undefined);
 
   private _notebookCollection: WritableSignal<NotebookCollection>;
   private set notebookCollection(value: NotebookCollection){
@@ -86,7 +86,7 @@ class WebAppRootImpl implements WebAppRoot {
     this._hasInitialized = true;
   }
 
-  print(): Signal<RenderNode> {
+  print(): Signal<ComponentView> {
     if(!this._hasInitialized){
       throw new Error('WebAppRoot not initialized');
     }

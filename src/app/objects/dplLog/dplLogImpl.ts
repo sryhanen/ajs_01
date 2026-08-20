@@ -45,7 +45,6 @@
  */
 import {DplLog} from './dplLog';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
 import {AngularObjectUpdateMessageImpl} from '../message/angularObjectUpdateMessage/angularObjectUpdateMessageImpl';
@@ -75,10 +74,8 @@ export class DplLogImpl implements DplLog {
     this._responseRegister.register('ANGULAR_OBJECT_REMOVE', (json) => this.angularObjectRemoveResponse(json));
   }
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView()
-    }));
+  print(): Signal<ComponentView> {
+    return computed(() => this._componentView());
   }
 
   response(json: object): void {
