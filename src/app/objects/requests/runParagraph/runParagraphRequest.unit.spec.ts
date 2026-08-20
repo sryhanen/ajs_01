@@ -52,10 +52,9 @@ describe('Run paragraph request unit test', () => {
   let requestable:Requestable;
   const paragraphData = {
     id:'paragraphId',
-    text:'text',
-    title:'title',
+    paragraph:'text',
     config: {},
-    settings: {}
+    params: {}
   };
   let runParagraphRequest: RequestMessage;
 
@@ -72,10 +71,9 @@ describe('Run paragraph request unit test', () => {
         op:'RUN_PARAGRAPH',
         data:{
           id:paragraphData.id,
-          title: paragraphData.title,
-          paragraph:paragraphData.text,
+          paragraph:paragraphData.paragraph,
           config: paragraphData.config,
-          params: paragraphData.settings,
+          params: paragraphData.params,
         }
       };
       expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);

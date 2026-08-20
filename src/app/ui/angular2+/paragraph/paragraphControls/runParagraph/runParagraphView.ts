@@ -45,7 +45,7 @@
  */
 import {Component, input, model} from '@angular/core';
 import {Requestable} from '../../../../../objects/channel/requestable';
-import {RunParagraphRequest} from '../../../../../objects/requests/runParagraphRequest/runParagraphRequest';
+import {RunParagraphRequest} from '../../../../../objects/requests/runParagraph/runParagraphRequest';
 
 @Component({
   selector: 'run-paragraph',
@@ -62,7 +62,12 @@ export class RunParagraphView {
   paragraphData = model.required<object>();
 
   protected runParagraphRequest():void{
-    const runParagraphRequest = new RunParagraphRequest(this.requestable(), this.paragraphData());
+    const runParagraphRequest = new RunParagraphRequest(this.requestable(), {
+      id: this.paragraphData()['id'],
+      paragraph: this.paragraphData()['text'],
+      config: this.paragraphData()['config'],
+      params: this.paragraphData()['settings']
+    });
     runParagraphRequest.send();
   }
 }
