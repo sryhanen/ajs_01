@@ -49,13 +49,17 @@ import {NgComponentOutlet} from '@angular/common';
 import {ParagraphControlsView} from './paragraphControls/paragraphControlsView';
 import {Requestable} from '../../../objects/channel/requestable';
 import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
+import {ParagraphExecutionTimeView} from './paragraphExecutionTime/paragraphExecutionTimeView';
+import {ParagraphElapsedTimeView} from './paragraphElapsedTime/paragraphElapsedTimeView';
 
 @Component({
   selector: 'paragraph',
   imports: [
     NgComponentOutlet,
     ParagraphControlsView,
-    ParagraphProgressBar
+    ParagraphProgressBar,
+    ParagraphExecutionTimeView,
+    ParagraphElapsedTimeView
   ],
   template: `
     <div class="paragraph paragraph-box paragraph-col" [class]="paragraphWidthClass()">
@@ -66,9 +70,15 @@ import {ParagraphProgressBar} from './progressBar/paragraphProgressBar';
         @if(!dynamicForm().isStub()){
           <ng-container *ngComponentOutlet="dynamicForm().component(); inputs: dynamicForm().inputs()()"></ng-container>
         }
-        @if(!dplLog().isStub()){
-          <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
-        }
+        <div class="paragraph-footer">
+          <paragraph-execution-time [paragraphData]="paragraphData()"></paragraph-execution-time>
+          <div class="paragraph-footer-elapsed">
+            @if(!dplLog().isStub()){
+              <ng-container *ngComponentOutlet="dplLog().component(); inputs: dplLog().inputs()()"></ng-container>
+            }
+            <paragraph-elapsed-time [paragraphData]="paragraphData()"></paragraph-elapsed-time>
+          </div>
+        </div>
     </div>
   `
 })
