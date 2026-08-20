@@ -43,30 +43,44 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {RequestMessage} from '../requestMessage';
-import {Requestable} from '../../channel/requestable';
-import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {ComponentFixture} from '@angular/core/testing';
+import {NewParagraphButton} from './newParagraphButton';
+import {Requestable} from '../../../../objects/channel/requestable';
+import {FakeChannel} from '../../../../objects/channel/fakeChannel';
+import {fireEvent, render, screen} from '@testing-library/angular';
 
-export class RunParagraphRequest implements RequestMessage {
-  private readonly _requestable:Requestable;
-  private readonly _paragraphData:object;
+describe('NewParagraphButton integration test', () => {
+  let requestable:Requestable;
+  let fixture: ComponentFixture<NewParagraphButton>;
+  const index = 1;
 
-  constructor(requestable:Requestable, paragraphData:object) {
-    this._requestable = requestable;
-    this._paragraphData = paragraphData;
-  }
-
-  send(): void {
-    const safeParagraphData = new SafeJsonImpl(this._paragraphData);
-    this._requestable.request({
-      op:'RUN_PARAGRAPH',
-      data:{
-        id: safeParagraphData.getProperty('id', 'string'),
-        title: safeParagraphData.getProperty('title', 'string'),
-        paragraph: safeParagraphData.getProperty('text', 'string'),
-        config: safeParagraphData.getProperty('config', 'object'),
-        params: safeParagraphData.getProperty('settings', 'object'),
+  beforeEach(async () => {
+    requestable = new FakeChannel();
+    const renderResult = await render(NewParagraphButton, {
+      inputs:{
+        index:index,
+        requestable:requestable,
       }
     });
-  }
-}
+    fixture = renderResult.fixture;
+  });
+
+  describe('Birth', () => {
+    it('Should have been initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+      expect(screen.getByRole('button')).toBeDefined();
+    });
+  });
+
+  describe('Inserting new paragraph', () => {
+    it('Should send expected request', () => {
+      const spy = vi.spyOn(requestable, 'request');
+      fireEvent.click(screen.getByRole('button'));
+      const expectedRequest = {
+        op: 'INSERT_PARAGRAPH',
+        data: {index: index}
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+  });
+});
