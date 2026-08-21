@@ -56,9 +56,9 @@ import {Requestable} from '../../../../objects/channel/requestable';
   template: `
     @if(!isEditing()) {
       <button class="bg-transparent border-0 p-0" (click)="startEditing()">
-        <i class="paragraph-title-inactive">
+        <div class="paragraph-title-inactive">
           {{titleText()}}
-        </i>
+        </div>
       </button>
     }
     @else {
@@ -78,11 +78,14 @@ export class ParagraphTitleView implements OnInit {
   requestable = input.required<Requestable>();
   paragraphData = input.required<object>();
   isEditing = signal(false);
-  protected titleText = model('');
+  protected titleText = model('Untitled');
   private originalTitle:string;
 
   ngOnInit() {
-    this.titleText.set(this.paragraphData()['title']);
+    const paragraphTitle = this.paragraphData()['title'];
+    if(paragraphTitle){
+      this.titleText.set(paragraphTitle);
+    }
   }
 
   protected startEditing()  {

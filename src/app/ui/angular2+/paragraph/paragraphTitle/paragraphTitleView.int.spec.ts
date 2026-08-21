@@ -47,8 +47,8 @@ import {Requestable} from '../../../../objects/channel/requestable';
 import {ParagraphTitleView} from './paragraphTitleView';
 import {fireEvent, render, screen} from '@testing-library/angular';
 import {FakeChannel} from '../../../../objects/channel/fakeChannel';
-import {ComponentFixture} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
+import {ComponentFixture} from '@angular/core/testing';
 
 describe('ParagraphTitleView integration test', () => {
   let requestable:Requestable;
@@ -61,25 +61,49 @@ describe('ParagraphTitleView integration test', () => {
     settings:{}
   };
 
-  beforeEach(async () => {
+  beforeEach(() => {
     requestable = new FakeChannel();
-    await render(ParagraphTitleView, {
-      imports: [FormsModule],
-      inputs:{
-        requestable: requestable,
-        paragraphData: paragraphData,
-      }
-    });
   });
 
   describe('Birth', () => {
-    it('Should have rendered title', () => {
+    it('Should have rendered title', async () => {
+      await render(ParagraphTitleView, {
+        imports: [FormsModule],
+        inputs:{
+          requestable: requestable,
+          paragraphData: paragraphData,
+        }
+      });
       expect(screen.getByText(title)).toBeDefined();
+    });
+
+    it('Should render default title if paragraph title is not defined', async () => {
+      const paragraphDataWithoutTitle = {
+        ...paragraphData,
+        title:'',
+      };
+      await render(ParagraphTitleView, {
+        imports: [FormsModule],
+        inputs:{
+          requestable: requestable,
+          paragraphData: paragraphDataWithoutTitle,
+        }
+      });
+      expect(screen.getByText(/Untitled/i)).toBeDefined();
     });
   });
 
   describe('Changing title', () => {
     const newTitle = 'new title';
+    beforeEach(async () => {
+      await render(ParagraphTitleView, {
+        imports: [FormsModule],
+        inputs:{
+          requestable: requestable,
+          paragraphData: paragraphData,
+        }
+      });
+    });
 
     it('Should have input visible after click', () => {
       fireEvent.click(screen.getByText(title));
