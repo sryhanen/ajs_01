@@ -65,7 +65,7 @@ import {ParagraphTitleView} from './paragraphTitle/paragraphTitleView';
   ],
   template: `
     <div class="paragraph paragraph-box paragraph-col" [class]="paragraphWidthClass()">
-      <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-controls>
+      <paragraph-controls [paragraphData]="paragraphData()" [requestable]="requestable()" [paragraphIsRunning]="paragraphIsRunning()"></paragraph-controls>
       <form (submit)="$event.preventDefault()">
         <fieldset [disabled]="paragraphIsRunning()">
             <paragraph-title [paragraphData]="paragraphData()" [requestable]="requestable()"></paragraph-title>
@@ -91,12 +91,12 @@ import {ParagraphTitleView} from './paragraphTitle/paragraphTitleView';
 })
 export class ParagraphView{
   paragraphData = input.required<object>();
-  paragraphStatus = computed(() => this.paragraphData()['status']);
-  paragraphIsRunning = computed(() => this.paragraphStatus() === 'PENDING' || this.paragraphStatus() === 'RUNNING');
   requestable = input.required<Requestable>();
   editor = input.required<ComponentView>();
   output = input.required<ComponentView>();
   dynamicForm = input.required<ComponentView>();
   dplLog = input.required<ComponentView>();
   paragraphWidthClass = computed(() => `col-md-${this.paragraphData()['config']['colWidth']}`);
+  paragraphStatus = computed(() => this.paragraphData()['status']);
+  paragraphIsRunning = computed(() => this.paragraphStatus() === 'PENDING' || this.paragraphStatus() === 'RUNNING');
 }

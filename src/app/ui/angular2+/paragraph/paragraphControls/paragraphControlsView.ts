@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {Requestable} from '../../../../objects/channel/requestable';
 import {ToggleTitleView} from './toggleTitle/toggleTitleView';
 import {ToggleOutputView} from './toggleOutput/toggleOutputView';
@@ -103,6 +103,5 @@ import {ConfigDropdown} from './configDropdown/configDropdown';
 export class ParagraphControlsView {
   requestable = input.required<Requestable>();
   paragraphData = input.required<object>();
-  paragraphStatus = computed(() => this.paragraphData()['status']);
-  paragraphIsRunning = computed(() => this.paragraphStatus() === 'PENDING' || this.paragraphStatus() === 'RUNNING');
+  paragraphIsRunning = input.required<boolean>();
 }
