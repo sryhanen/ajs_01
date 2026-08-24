@@ -43,21 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {NoteRevisionMessage} from './noteRevisionMessage';
+import {Message} from '../message';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class NoteRevisionMessageImpl implements NoteRevisionMessage{
+  private readonly _message:Message;
+
+  constructor(message:Message) {
+    this._message = message;
+  }
+
+  note(): object {
+    return this.data()['note'];
+  }
+
+  revisionId(): string {
+    return this.data()['revisionId'];
+  }
+
+  data(): object {
+    return this._message.data();
+  }
+
+  operation(): string {
+    return this._message.operation();
+  }
 }

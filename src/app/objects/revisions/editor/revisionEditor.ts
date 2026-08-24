@@ -43,21 +43,46 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {Printable} from '../../rendering/printable/printable';
+import {signal, Signal} from '@angular/core';
+import {ComponentView} from '../../rendering/componentView/componentView';
+import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
+import {RevisionEditorView} from '../../../ui/angular2+/revision/editor/revisionEditorView';
+import {AceEditorConfiguration} from '../../editor/configuration/aceEditorConfiguration';
+import {TextConfiguration} from '../../editor/configuration/text/textConfiguration';
+import {LinesConfiguration} from '../../editor/configuration/lines/linesConfiguration';
+import {HighlightsConfiguration} from '../../editor/configuration/highlights/highLightsConfiguration';
+import ace from 'ace-builds';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class RevisionEditor implements Printable {
+  private readonly _componentView: ComponentView;
+
+  constructor(revisionParagraphData:object) {
+    const editor = this.initializedAceEditor();
+    this.configurationRules(revisionParagraphData).forEach((rule) => {
+      rule.applyConfiguration(editor);
+    });
+    editor.setReadOnly(true);
+    this._componentView = new ComponentViewImpl(RevisionEditorView, signal({
+      editor: editor,
+    }));
+  }
+
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
+  }
+
+  private initializedAceEditor(): ace.Editor {
+    const preElement = document.createElement('pre');
+    preElement.classList.add('editor-container');
+    return ace.edit(preElement);
+  }
+
+  private configurationRules(paragraphData:object):AceEditorConfiguration[] {
+    return [
+      new TextConfiguration(paragraphData),
+      new LinesConfiguration(paragraphData),
+      new HighlightsConfiguration(),
+    ];
+  }
 }

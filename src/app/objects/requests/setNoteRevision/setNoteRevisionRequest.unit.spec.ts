@@ -43,21 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {Requestable} from '../../channel/requestable';
+import {SetNoteRevisionRequest} from './setNoteRevisionRequest';
+import {RequestMessage} from '../requestMessage';
+import {FakeChannel} from '../../channel/fakeChannel';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
-}
+describe('SetNoteRevisionRequest unit test', () => {
+  let requestable:Requestable;
+  const revisionId = 'revisionId';
+  let setNoteRevisionRequest:RequestMessage;
+
+  beforeEach(() => {
+    requestable = new FakeChannel();
+    setNoteRevisionRequest = new SetNoteRevisionRequest(requestable, revisionId);
+  });
+
+  it('Should send expected request', () => {
+    const spy = vi.spyOn(requestable, 'request');
+    setNoteRevisionRequest.send();
+    const expectedRequest = {
+      op: 'SET_NOTE_REVISION',
+      data: {
+        noteId: '',
+        revisionId: revisionId,
+      }
+    };
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
+});

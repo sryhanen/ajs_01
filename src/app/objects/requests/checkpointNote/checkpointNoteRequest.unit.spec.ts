@@ -43,21 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {RequestMessage} from '../requestMessage';
+import {Requestable} from '../../channel/requestable';
+import {CheckpointNoteRequest} from './checkpointNoteRequest';
+import {FakeChannel} from '../../channel/fakeChannel';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
-}
+describe('Checkpoint note request unit test', () => {
+  let checkpointNoteRequest: RequestMessage;
+  let requestable: Requestable;
+  const commitMessage = 'commit message';
+
+  beforeEach(() => {
+    requestable = new FakeChannel();
+    checkpointNoteRequest = new CheckpointNoteRequest(requestable, commitMessage);
+  });
+
+  it('Should send expected request', () => {
+    const spy = vi.spyOn(requestable, 'request');
+    checkpointNoteRequest.send();
+    const expectedRequest = {
+      op: 'CHECKPOINT_NOTE',
+      data: {
+        noteId: '',
+        commitMessage: commitMessage,
+      }
+    };
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
+});

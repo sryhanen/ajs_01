@@ -43,21 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {Requestable} from '../../channel/requestable';
+import {FakeChannel} from '../../channel/fakeChannel';
+import {NoteRevisionForCompareRequest} from './noteRevisionForCompareRequest';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
-}
+describe('Note revision for compare request unit test', () => {
+  const requestable:Requestable = new FakeChannel();
+  const revisionId = 'revision id';
+  const position = 'position';
+  const spy = vi.spyOn(requestable, 'request');
+
+  const noteRevisionForCompareRequest = new NoteRevisionForCompareRequest(requestable, revisionId, position);
+
+  it('Should send expected request', () => {
+    noteRevisionForCompareRequest.send();
+    const expectedRequest = {
+      op: 'NOTE_REVISION_FOR_COMPARE',
+      data: {
+        noteId: '',
+        revisionId: revisionId,
+        position: position,
+      }
+    };
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
+});

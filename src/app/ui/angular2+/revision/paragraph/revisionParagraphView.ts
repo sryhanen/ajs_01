@@ -43,21 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
+import {ComponentView} from '../../../../objects/rendering/componentView/componentView';
 import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
 
 @Component({
-  selector: 'notebook',
+  selector: 'revision-paragraph',
   imports: [
     NgComponentOutlet
   ],
   template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
+    <h2>{{ titleText() }}</h2>
+    <ng-container *ngComponentOutlet="revisionEditor().component(); inputs: revisionEditor().inputs()()"></ng-container>
   `
 })
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class RevisionParagraphView {
+  title= input.required<string>();
+  revisionEditor = input.required<ComponentView>();
+  titleText = computed(() => this.title() ? this.title() : 'Untitled');
 }

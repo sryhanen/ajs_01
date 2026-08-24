@@ -44,20 +44,22 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
+import {ComponentView} from '../../../../objects/rendering/componentView/componentView';
 import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
 
 @Component({
-  selector: 'notebook',
+  selector: 'revision-notebook',
   imports: [
     NgComponentOutlet
   ],
   template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
+    <h1>{{ title() }}</h1>
+    @for (revisionParagraph of revisionParagraphs(); track $index) {
+      <ng-container *ngComponentOutlet="revisionParagraph.component(); inputs: revisionParagraph.inputs()()"></ng-container>
+    }
   `
 })
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class RevisionNotebookView {
+  title = input.required<string>();
+  revisionParagraphs = input.required<ComponentView[]>();
 }

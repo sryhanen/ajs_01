@@ -43,21 +43,45 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {ListRevisionHistoryMessage} from './listRevisionHistoryMessage';
+import {ListRevisionHistoryMessageImpl} from './listRevisionHistoryMessageImpl';
+import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../messageImpl';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
-}
+describe('List revision history message unit test', () => {
+  let listRevisionHistoryMessage: ListRevisionHistoryMessage;
+  const messageData = {
+    op:'LIST_REVISION_HISTORY',
+    data:{
+      revisionList:[]
+    }
+  };
+
+  beforeEach(() => {
+    listRevisionHistoryMessage = new ListRevisionHistoryMessageImpl(new MessageImpl(new SafeJsonImpl(messageData)));
+  });
+
+  describe('Birth', () => {
+    it('Should have operation', () => {
+      expect(listRevisionHistoryMessage.operation()).toEqual(messageData.op);
+    });
+
+    it('Should have data', () => {
+      expect(listRevisionHistoryMessage.data()).toEqual(messageData.data);
+    });
+
+    it('Should have revisionList', () => {
+      expect(listRevisionHistoryMessage.revisionList()).toEqual(messageData.data.revisionList);
+    });
+  });
+
+  describe('Message validation', () => {
+    it('Should throw if operation is not correct', () => {
+      messageData.op = 'wrong_operation';
+      listRevisionHistoryMessage = new ListRevisionHistoryMessageImpl(new MessageImpl(new SafeJsonImpl(messageData)));
+      expect(() => listRevisionHistoryMessage.operation()).toThrow();
+      expect(() => listRevisionHistoryMessage.data()).toThrow();
+      expect(() => listRevisionHistoryMessage.revisionList()).toThrow();
+    });
+  });
+});

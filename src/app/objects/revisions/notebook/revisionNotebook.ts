@@ -43,21 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {signal, Signal} from '@angular/core';
+import {Printable} from '../../rendering/printable/printable';
+import {ComponentView} from '../../rendering/componentView/componentView';
+import {RevisionParagraph} from '../paragraph/revisionParagraph';
+import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
+import {RevisionNotebookView} from '../../../ui/angular2+/revision/notebook/revisionNotebookView';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class RevisionNotebook implements Printable {
+  private readonly _revisionNotebookData:object;
+  private readonly _revisionParagraphs: Printable[];
+  private readonly _componentView: ComponentView;
+
+  constructor(revisionNotebookData:object) {
+    this._revisionNotebookData = revisionNotebookData;
+    this._revisionParagraphs = this._revisionNotebookData['paragraphs'].map(revisionParagraphData => new RevisionParagraph(revisionParagraphData));
+    this._componentView = new ComponentViewImpl(RevisionNotebookView, signal({
+      title: this._revisionNotebookData['title'],
+      revisionParagraphs: this._revisionParagraphs.map(revisionParagraph => revisionParagraph.print()()),
+    }));
+  }
+
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
+  }
 }

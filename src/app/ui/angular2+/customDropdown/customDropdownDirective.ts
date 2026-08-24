@@ -43,21 +43,64 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {
+  Directive,
+  input,
+  ViewContainerRef,
+  TemplateRef,
+  ElementRef,
+  inject
+} from '@angular/core';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
+@Directive({
+  selector: '[customDropdown]',
+  exportAs: 'customDropdown',
+  host: {
+    '(click)': 'onClick()',
+    '(document:click)':'onDocumentClick($event.target)'
+  }
 })
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class CustomDropdownDirective {
+  dropdownContent = input.required<TemplateRef<unknown>>();
+  protected isOpen= false;
+  private dropdownMenuElement: HTMLElement;
+  private elementRef = inject(ElementRef);
+  private vcr = inject(ViewContainerRef);
+
+  onClick() {
+    this.toggleDropdown();
+  }
+
+  onDocumentClick(target: HTMLElement) {
+    if (this.isOpen) {
+      const clickedInsideButton = this.elementRef.nativeElement.contains(target);
+      const clickedInsideMenu = this.dropdownMenuElement.contains(target);
+      if (!clickedInsideButton && !clickedInsideMenu) {
+        this.close();
+      }
+    }
+  }
+
+  private toggleDropdown() {
+    if (this.isOpen) {
+      this.close();
+    } else {
+      this.open();
+    }
+  }
+
+  private open() {
+    const viewRef = this.vcr.createEmbeddedView(this.dropdownContent());
+    this.dropdownMenuElement = viewRef.rootNodes[0] as HTMLElement;
+    if (this.dropdownMenuElement) {
+      this.dropdownMenuElement.classList.add('custom-dropdown');
+    }
+    this.isOpen = true;
+  }
+
+  close() {
+    this.vcr.clear();
+    this.dropdownMenuElement = null;
+    this.isOpen = false;
+  }
 }

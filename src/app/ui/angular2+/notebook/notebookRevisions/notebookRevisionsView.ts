@@ -44,20 +44,35 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
+import {Requestable} from '../../../../objects/channel/requestable';
+import {FormsModule} from '@angular/forms';
+import {CommitMessageSaveView} from './commitMessageSave/commitMessageSaveView';
+import {RevisionCommit} from '../../../../objects/revisionCommit/revisionCommit';
 import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {ComponentView} from '../../../../objects/rendering/componentView/componentView';
 
 @Component({
-  selector: 'notebook',
+  selector: 'notebook-revisions',
   imports: [
-    NgComponentOutlet
+    FormsModule,
+    CommitMessageSaveView,
+    NgComponentOutlet,
   ],
   template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
+    <div class="btn-group me-2"
+         role="group"
+         aria-label="version control">
+      <commit-message-save [requestable]="requestable()"></commit-message-save>
+      @if (revisionCommits().length > 1) {
+        <ng-container *ngComponentOutlet="notebookRevisionsComparer().component(); inputs: notebookRevisionsComparer().inputs()()"></ng-container>
+        <ng-container *ngComponentOutlet="notebookRevisionSelect().component(); inputs: notebookRevisionSelect().inputs()()"></ng-container>
+      }
+    </div>
   `
 })
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class NotebookRevisionsView {
+  requestable = input.required<Requestable>();
+  revisionCommits = input.required<RevisionCommit[]>();
+  notebookRevisionSelect = input.required<ComponentView>();
+  notebookRevisionsComparer = input.required<ComponentView>();
 }

@@ -2468,6 +2468,19 @@ div.dtsp-panesContainer div.dtsp-searchPane div.dtsp-topRow button {
  * a licensee so wish it.
  */
 /* Notebook */
+.custom-dropdown {
+  position: absolute;
+  z-index: 999;
+  top: 100%;
+  margin-top: 0.25em;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #eaeaea;
+  padding: 12px;
+  width: max-content;
+  min-width: 100%;
+  height: auto;
+}
 .notebook-mt {
   margin-top: 105px !important;
   padding-top: 26px;
@@ -2712,9 +2725,6 @@ div.dtsp-panesContainer div.dtsp-searchPane div.dtsp-topRow button {
   word-wrap: break-word;
   white-space: initial;
   width: max-content;
-}
-.commit-container:hover {
-  background: transparent !important;
 }
 .commit-container input {
   padding: 3px 5px;

@@ -18,17 +18,8 @@ limitations under the License.
     <div class="notebook-mt"
          data-bs-toggle="collapse"
          data-bs-target="#noteActionCollapse"></div>
-    <!-- revisions comparator-->
-    <div ng-if="showRevisionsComparator" class="row">
-      <div class="col-12">
-        <div class="revisions-comparator mt-5 mb-2">
-          <h2>Version History</h2>
-          <revisions-comparator note-revisions="noteRevisions" class="row"></revisions-comparator>
-        </div>
-      </div>
-    </div>
-    <div id="content" class="notebook-content row">
-      <!-- permissions -->
+    <web-app-view-port></web-app-view-port>
+      <!--
       <div ng-if="showPermissions && ticket.principal && !isAnonymous"
            class="permissions d-flex flex-column">
         <h2>Notebook Permissions</h2>
@@ -133,8 +124,8 @@ limitations under the License.
           </button>
         </div>
       </div>
-      <web-app-view-port></web-app-view-port>
     </div>
+    -->
   </div>
 </div>
 

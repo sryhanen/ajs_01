@@ -43,21 +43,60 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {Component} from '@angular/core';
+import {CustomDropdownDirective} from './customDropdownDirective';
+import {fireEvent, render, screen} from '@testing-library/angular';
 
 @Component({
-  selector: 'notebook',
+  selector: 'test-host',
   imports: [
-    NgComponentOutlet
+    CustomDropdownDirective
   ],
   template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
+    <button customDropdown="content" #dropdown="customDropdown" [dropdownContent]="dropdownContent">Dropdown anchor</button>
+    <ng-template #dropdownContent>
+      <h1>Dropdown content</h1>
+    </ng-template>
+    <button (click)="dropdown.close()">Close dropdown button</button>
   `
 })
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
-}
+class TestHost {}
+
+describe('CustomDropdownDirective integration test', () => {
+  let dropDownAnchor: HTMLElement;
+  let closeDropDownButton: HTMLElement;
+
+  beforeEach(async () => {
+    await render(TestHost);
+    dropDownAnchor = screen.getByText('Dropdown anchor');
+    closeDropDownButton = screen.getByText('Close dropdown button');
+  });
+
+
+  describe('Birth', () => {
+    it('Should have been rendered', () => {
+      expect(dropDownAnchor).toBeDefined();
+      expect(closeDropDownButton).toBeDefined();
+    });
+
+    it('Should not have directive content visible', () => {
+      expect(() => screen.getByText('Dropdown content')).toThrow();
+    });
+  });
+
+  describe('Opening and closing dropdown', () => {
+    it('Should open and close dropdown when clicking anchor element', () => {
+      fireEvent.click(dropDownAnchor);
+      expect(screen.getByText('Dropdown content')).toBeDefined();
+      fireEvent.click(dropDownAnchor);
+      expect(() => screen.getByText('Dropdown content')).toThrow();
+    });
+
+    it('Should close directive when clicking button bound to the directive close method', () => {
+      fireEvent.click(dropDownAnchor);
+      expect(screen.getByText('Dropdown content')).toBeDefined();
+      fireEvent.click(closeDropDownButton);
+      expect(() => screen.getByText('Dropdown content')).toThrow();
+    });
+  });
+});

@@ -43,21 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {Printable} from '../../rendering/printable/printable';
+import {signal, Signal} from '@angular/core';
+import {ComponentView} from '../../rendering/componentView/componentView';
+import {RevisionEditor} from '../editor/revisionEditor';
+import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
+import {RevisionParagraphView} from '../../../ui/angular2+/revision/paragraph/revisionParagraphView';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class RevisionParagraph implements Printable {
+  private readonly _revisionEditor:Printable;
+  private readonly _componentView: ComponentView;
+
+  constructor(revisionParagraphData:object) {
+    this._revisionEditor = new RevisionEditor(revisionParagraphData);
+    this._componentView = new ComponentViewImpl(RevisionParagraphView, signal({
+      title: revisionParagraphData['title'],
+      revisionEditor:this._revisionEditor.print()()
+    }));
+  }
+
+  print(): Signal<ComponentView> {
+    return signal(this._componentView);
+  }
 }

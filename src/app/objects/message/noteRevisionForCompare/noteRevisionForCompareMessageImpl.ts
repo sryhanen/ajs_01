@@ -43,21 +43,34 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {NoteRevisionForCompareMessage} from './noteRevisionForCompareMessage';
+import {Message} from '../message';
+import {TypedMessage} from '../typedMessage/typedMessage';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class NoteRevisionForCompareMessageImpl implements NoteRevisionForCompareMessage {
+  private readonly _message:Message;
+
+  constructor(message:Message) {
+    this._message = new TypedMessage('NOTE_REVISION_FOR_COMPARE', message);
+  }
+
+  revisionId(): string {
+    return this.data()['revisionId'];
+  }
+
+  note(): object {
+    return this.data()['note'];
+  }
+
+  position():string {
+    return this.data()['position'];
+  }
+
+  operation(): string {
+    return this._message.operation();
+  }
+
+  data(): object {
+    return this._message.data();
+  }
 }

@@ -43,21 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {Message} from '../message';
+import {TypedMessage} from '../typedMessage/typedMessage';
+import {ListRevisionHistoryMessage} from './listRevisionHistoryMessage';
+import {RevisionCommit} from '../../revisionCommit/revisionCommit';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookRevisions = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class ListRevisionHistoryMessageImpl implements ListRevisionHistoryMessage {
+  private readonly _message:Message;
+
+  constructor(message:Message) {
+    this._message = new TypedMessage('LIST_REVISION_HISTORY', message);
+  }
+
+  revisionList(): RevisionCommit[] {
+    return this._message.data()['revisionList'];
+  }
+
+  data(): object {
+    return this._message.data();
+  }
+
+  operation(): string {
+    return this._message.operation();
+  }
 }
