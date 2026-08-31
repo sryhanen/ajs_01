@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
-import {Authentication} from '../../../shared/objects/security/authentication';
+import {Authentication} from '../../authentication/authentication';
 import {Message} from '../message';
 
 export class MessageWithAuthenticationInfoImpl implements MessageWithAuthenticationInfo {

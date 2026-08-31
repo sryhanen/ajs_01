@@ -53,7 +53,7 @@ import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {TextOutputView} from '../../../../ui/angular2+/output/outputViews/textOutputView/textOutputView';
+import {TextOutputView} from '../../../../ui/angular2+/ components/output/outputViews/textOutputView/textOutputView';
 
 export class TextFormat implements OutputFormat {
   private readonly _componentViewStub: ComponentView;

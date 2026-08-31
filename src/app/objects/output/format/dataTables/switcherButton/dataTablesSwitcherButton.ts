@@ -49,7 +49,7 @@ import {Request} from '../../../../channel/request';
 import {computed, Signal} from '@angular/core';
 import { RenderNode } from '../../../../rendering/renderNode/renderNode';
 import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
-import {OutputSwitcherButtonView} from '../../../../../ui/angular2+/output/switcher/switcherButton/outputSwitcherButtonView';
+import {OutputSwitcherButtonView} from '../../../../../ui/angular2+/ components/output/switcher/switcherButton/outputSwitcherButtonView';
 
 export class DataTableSwitcherButton implements Printable {
   private readonly _type: string = OutputType.dataTables;

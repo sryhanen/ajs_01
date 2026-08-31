@@ -51,7 +51,7 @@ import { RenderNode } from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
-import {InterpreterErrorView} from '../../ui/angular2+/interpreterError/interpreterErrorView';
+import {InterpreterErrorView} from '../../ui/angular2+/ components/interpreterError/interpreterErrorView';
 
 export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
   private readonly _paragraphId:string;

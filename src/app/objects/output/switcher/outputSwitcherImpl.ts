@@ -49,7 +49,7 @@ import {MessageImpl} from '../../message/messageImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../../rendering/renderNode/renderNode';
 import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
-import {OutputSwitcherView} from '../../../ui/angular2+/output/switcher/outputSwitcherView';
+import {OutputSwitcherView} from '../../../ui/angular2+/ components/output/switcher/outputSwitcherView';
 import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 
 export class OutputSwitcherImpl implements OutputSwitcher {

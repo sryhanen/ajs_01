@@ -47,7 +47,7 @@
  * Module for mocking Angular2+ services of which AngularJs modules are dependent.
  */
 
-import {AuthenticationStub} from '../app/shared/objects/security/authenticationStub';
+import {AuthenticationStub} from '../app/objects/authentication/authenticationStub';
 
 beforeEach(angular.mock.module('zeppelinWebApp', function ($provide) {
   $provide.service('authenticationServiceImpl', function () {

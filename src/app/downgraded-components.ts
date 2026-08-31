@@ -45,10 +45,10 @@
  */
 import angular from 'angular';
 import {downgradeComponent, downgradeInjectable} from '@angular/upgrade/static';
-import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
+import {AuthenticationServiceImpl} from './ui/angular2+/services/authentication/authenticationServiceImpl';
 import {EditorComponent} from './editor/editor.component';
 import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {WebAppViewPort} from './ui/angular2+/webAppViewPort/webAppViewPort';
+import {WebAppViewPort} from './ui/angular2+/ components/webAppViewPort/webAppViewPort';
 
 angular.module('zeppelinWebApp').factory('authenticationServiceImpl', downgradeInjectable(AuthenticationServiceImpl));
 angular.module('zeppelinWebApp')

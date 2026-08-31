@@ -45,7 +45,7 @@
  */
 import {inject, Injectable} from '@angular/core';
 import {WebSocketService} from './webSocketService';
-import {AuthenticationServiceImpl} from '../../../shared/services/authenticationServiceImpl';
+import {AuthenticationServiceImpl} from '../../../ui/angular2+/services/authentication/authenticationServiceImpl';
 import {MessageWithAuthenticationInfoImpl} from '../../message/messageWithAuthenticationInfo/messageWithAuthenticationInfoImpl';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {MessageImpl} from '../../message/messageImpl';

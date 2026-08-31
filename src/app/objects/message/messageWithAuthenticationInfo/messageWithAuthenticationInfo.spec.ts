@@ -45,10 +45,10 @@
  */
 import {MessageWithAuthenticationInfo} from './messageWithAuthenticationInfo';
 import {MessageWithAuthenticationInfoImpl} from './messageWithAuthenticationInfoImpl';
-import {Authentication} from '../../../shared/objects/security/authentication';
-import {AuthenticationStub} from '../../../shared/objects/security/authenticationStub';
-import {Ticket} from '../../../shared/types/securityTicket';
-import {AuthenticationImpl} from '../../../shared/objects/security/authenticationImpl';
+import {Authentication} from '../../authentication/authentication';
+import {AuthenticationStub} from '../../authentication/authenticationStub';
+import {Ticket} from '../../authentication/securityTicket/securityTicket';
+import {AuthenticationImpl} from '../../authentication/authenticationImpl';
 import {Message} from '../message';
 import {MessageImpl} from '../messageImpl';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';

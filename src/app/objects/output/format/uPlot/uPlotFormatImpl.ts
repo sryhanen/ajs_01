@@ -55,7 +55,7 @@ import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessag
 import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
-import {UPlotOutputView} from '../../../../ui/angular2+/output/outputViews/uPlotOutputView/uPlotOutputView';
+import {UPlotOutputView} from '../../../../ui/angular2+/ components/output/outputViews/uPlotOutputView/uPlotOutputView';
 import {Printable} from '../../../rendering/printable/printable';
 import {UPlotFormat} from './uPlotFormat';
 import uPlot from 'uplot';

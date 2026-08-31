@@ -55,7 +55,7 @@ import {OutputType} from '../../outputType';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
-import {AngularOutputView} from '../../../../ui/angular2+/output/outputViews/angularOutputView/angularOutputView';
+import {AngularOutputView} from '../../../../ui/angular2+/ components/output/outputViews/angularOutputView/angularOutputView';
 import {AngularFormat} from './angularFormat';
 
 export class AngularFormatImpl implements AngularFormat {
