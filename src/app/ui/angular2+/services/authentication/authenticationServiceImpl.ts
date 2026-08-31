@@ -46,10 +46,10 @@
 import { Injectable, inject } from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
-import {Ticket} from '../types/securityTicket';
-import {AuthenticationImpl} from '../objects/security/authenticationImpl';
-import {AuthenticationStub} from '../objects/security/authenticationStub';
-import {Authentication} from '../objects/security/authentication';
+import {Ticket} from '../../../../objects/authentication/securityTicket/securityTicket';
+import {AuthenticationImpl} from '../../../../objects/authentication/authenticationImpl';
+import {AuthenticationStub} from '../../../../objects/authentication/authenticationStub';
+import {Authentication} from '../../../../objects/authentication/authentication';
 import {AuthenticationService} from './authenticationService';
 
 @Injectable({ providedIn: 'root' })

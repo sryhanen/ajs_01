@@ -43,9 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {HttpResponse} from '@angular/common/http';
-import {Ticket} from '../types/securityTicket';
+import {AuthenticationAPIEndpoint} from './authenticationAPIEndpoint';
+import {Authentication} from '../../../../objects/authentication/authentication';
 
-export interface AuthenticationAPIEndpoint {
-  requestTicket(): Promise<HttpResponse<Ticket> | void>;
+export interface AuthenticationService extends AuthenticationAPIEndpoint{
+  authentication(): Authentication;
 }
