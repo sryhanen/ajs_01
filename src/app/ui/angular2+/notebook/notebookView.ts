@@ -53,8 +53,12 @@ import {ComponentView} from '../../../objects/rendering/componentView/componentV
     NgComponentOutlet
   ],
   template: `
-    <ng-container *ngComponentOutlet="notebookActionbar().component(); inputs: notebookActionbar().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
+    <div class="container-fluid px-5">
+      <ng-container *ngComponentOutlet="notebookActionbar().component(); inputs: notebookActionbar().inputs()()"></ng-container>
+      <div class="notebook-mt">
+        <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
+      </div>
+    </div>
   `
 })
 export class NotebookView {

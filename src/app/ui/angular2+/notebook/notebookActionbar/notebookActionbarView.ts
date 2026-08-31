@@ -53,7 +53,21 @@ import {NgComponentOutlet} from '@angular/common';
     NgComponentOutlet
   ],
   template: `
-    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
+    <div class="note-action">
+      <nav class="navbar navbar-expand-xl note-action-container collapse show" id="noteActionCollapse">
+        <div class="container-fluid px-5">
+          <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
+        </div>
+      </nav>
+      <div class="collapse-button container-fluid px-5 position-relative text-end">
+        <button class="btn btn-collapse"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#noteActionCollapse"
+                aria-expanded="true">
+        </button>
+      </div>
+    </div>
   `
 })
 export class NotebookActionbarView {
