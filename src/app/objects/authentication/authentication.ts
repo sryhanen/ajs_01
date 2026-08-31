@@ -43,40 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Authentication} from './authentication';
-import {Ticket} from '../../types/securityTicket';
+import Stubable from '../../shared/interfaces/stubable';
 
-export class AuthenticationImpl implements Authentication{
-  private readonly _ticket:string;
-  private readonly _principal:string;
-  private readonly _roles:string;
-  private readonly _screenUsername:string;
-  private readonly _redirectURL:string;
-
-  constructor(ticket:Ticket) {
-    this._ticket = ticket.ticket;
-    this._principal = ticket.principal;
-    this._roles = ticket.roles;
-    this._screenUsername = ticket.principal;
-    this._redirectURL = ticket.redirectURL;
-  }
-
-  isStub(): boolean {
-    return false;
-  }
-
-  redirect(): void {
-    if(this._redirectURL !== undefined){
-      window.location.replace(this._redirectURL);
-    }
-  }
-
-  ticket(): {principal: string, ticket: string, roles: string, screenUsername: string}{
-    return {
-      ticket:this._ticket,
-      principal:this._principal,
-      roles:this._roles,
-      screenUsername:this._screenUsername,
-    };
-  }
+export interface Authentication extends Stubable {
+  ticket(): {
+    principal: string,
+    ticket: string,
+    roles: string,
+    screenUsername: string,
+  };
+  redirect(): void;
 }
