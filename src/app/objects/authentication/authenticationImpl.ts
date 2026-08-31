@@ -71,7 +71,7 @@ export class AuthenticationImpl implements Authentication{
     }
   }
 
-  ticket(): {principal: string, ticket: string, roles: string, screenUsername: string}{
+  ticket(): Omit<Ticket, 'redirectUrl'> & {screenUsername: string}{
     return {
       ticket:this._ticket,
       principal:this._principal,

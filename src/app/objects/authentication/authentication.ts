@@ -44,13 +44,9 @@
  * a licensee so wish it.
  */
 import Stubable from '../../shared/interfaces/stubable';
+import {Ticket} from './securityTicket/securityTicket';
 
 export interface Authentication extends Stubable {
-  ticket(): {
-    principal: string,
-    ticket: string,
-    roles: string,
-    screenUsername: string,
-  };
+  ticket(): Omit<Ticket, 'redirectUrl'> & {screenUsername: string};
   redirect(): void;
 }

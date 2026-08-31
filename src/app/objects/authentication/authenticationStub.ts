@@ -44,6 +44,7 @@
  * a licensee so wish it.
  */
 import {Authentication} from './authentication';
+import {Ticket} from './securityTicket/securityTicket';
 
 export class AuthenticationStub implements Authentication{
   constructor(){}
@@ -56,7 +57,7 @@ export class AuthenticationStub implements Authentication{
     throw new Error('Stub object only implements isStub().');
   }
 
-  ticket(): {principal: string, ticket: string, roles: string, screenUsername: string} {
+  ticket(): Omit<Ticket, 'redirectUrl'> & {screenUsername: string} {
     throw new Error('Stub object only implements isStub().');
   }
 }
