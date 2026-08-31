@@ -43,35 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ComponentFixture} from '@angular/core/testing';
-import {render, screen} from '@testing-library/angular';
-import {DataTablesOutputView} from './dataTablesOutputView';
-import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
-import {DataTablesPluginImpl} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPluginImpl';
-import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
+import {Component, computed, input} from '@angular/core';
+import {webAppRoot} from '../../../../objects/webAppRoot/webAppRootImpl';
+import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
 
-describe('DataTablesOutputView functional test', () => {
-  let dataTablesPlugin: DataTablesPlugin;
-  let fixture: ComponentFixture<DataTablesOutputView>;
-  beforeEach(async () => {
-    dataTablesPlugin = new DataTablesPluginImpl(new FakeChannel(), {data: [{test:'test'}], draw:0, recordsTotal: 1, recordsFiltered: 1}, {headers:['test']});
-    const renderResult = await render(DataTablesOutputView, {
-      inputs:{
-        dataTablesPlugin: dataTablesPlugin,
-      }
-    });
-    fixture = renderResult.fixture;
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(fixture.componentInstance).toBeDefined();
-    });
-
-    it('Should have rendered table', () => {
-      expect(screen.getByRole('table')).toBeDefined();
-      expect(screen.getByRole('columnheader')).toBeDefined();
-      expect(screen.getAllByRole('row').length).toBeGreaterThan(0);
-    });
-  });
-});
+@Component({
+  selector: 'web-app-view-port',
+  imports: [
+    RecursiveComponentDraw
+  ],
+  template: `
+    <recursive-component-draw [renderNode]="renderNode()" [containerId]="containerId()"></recursive-component-draw>
+  `
+})
+export class WebAppViewPort {
+  containerId= input.required<string>();
+  protected renderNode = computed(() => webAppRoot.print()());
+}

@@ -43,41 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {ComponentFixture} from '@angular/core/testing';
+import {render, screen} from '@testing-library/angular';
+import {DataTablesOutputView} from './dataTablesOutputView';
+import {DataTablesPlugin} from '../../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
+import {DataTablesPluginImpl} from '../../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPluginImpl';
+import {FakeChannel} from '../../../../../../objects/channel/fakeChannel';
 
-
-@Component({
-  selector: 'recursive-component-draw',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    @if(!componentView().isStub()){
-      <ng-container
-        *ngComponentOutlet="component(); inputs: inputs()">
-      </ng-container>
-    }
-    @for (child of renderNode().children(); track $index) {
-      @if(child.paragraphId === undefined || child.paragraphId === this.containerId()){
-        <recursive-component-draw [renderNode]="child" [containerId]="containerId()"></recursive-component-draw>
+describe('DataTablesOutputView functional test', () => {
+  let dataTablesPlugin: DataTablesPlugin;
+  let fixture: ComponentFixture<DataTablesOutputView>;
+  beforeEach(async () => {
+    dataTablesPlugin = new DataTablesPluginImpl(new FakeChannel(), {data: [{test:'test'}], draw:0, recordsTotal: 1, recordsFiltered: 1}, {headers:['test']});
+    const renderResult = await render(DataTablesOutputView, {
+      inputs:{
+        dataTablesPlugin: dataTablesPlugin,
       }
-    }
-  `
-})
-export class RecursiveComponentDraw {
-  renderNode = input.required<RenderNode>();
-  containerId = input.required<string>();
-  protected componentView = computed(() => this.renderNode().componentView);
-  protected component = computed(() => {
-    if(!this.componentView().isStub()){
-      return this.componentView().component();
-    }
+    });
+    fixture = renderResult.fixture;
   });
-  protected inputs = computed(() => {
-    if(!this.componentView().isStub()){
-      return this.componentView().inputs()();
-    }
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have rendered table', () => {
+      expect(screen.getByRole('table')).toBeDefined();
+      expect(screen.getByRole('columnheader')).toBeDefined();
+      expect(screen.getAllByRole('row').length).toBeGreaterThan(0);
+    });
   });
-}
+});

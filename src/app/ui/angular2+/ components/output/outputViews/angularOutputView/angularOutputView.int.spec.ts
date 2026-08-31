@@ -44,31 +44,34 @@
  * a licensee so wish it.
  */
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {UPlotOutputView} from './uPlotOutputView';
-import {By} from '@angular/platform-browser';
-import {
-  BasicOptionsImpl
-} from '../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/options/basicOptionsImpl';
+import {AngularOutputView} from './angularOutputView';
+import {FakeChannel} from '../../../../../../objects/channel/fakeChannel';
+import {AngularViewUpgradeModule} from './angularViewUpgradeModule';
+import {Component} from '@angular/core';
 
-describe('UPlotOutputView integration test', () => {
-  let fixture: ComponentFixture<UPlotOutputView>;
-  const basicOptions = new BasicOptionsImpl([], [], '', '');
-  const uPlotData = [[1,2],[1,2]];
+describe('AngularOutputView integration test', () => {
+  let fixture: ComponentFixture<AngularOutputView>;
+  @Component({
+    selector: 'ajs-angular-view',
+    template: ''
+  })
+  class FakeAngularViewUpgradeModule{}
+
   beforeEach(async () => {
-    fixture = TestBed.createComponent(UPlotOutputView);
-    fixture.componentRef.setInput('basicOptions', basicOptions);
-    fixture.componentRef.setInput('graphType', '');
-    fixture.componentRef.setInput('uPlotData', uPlotData);
+    TestBed.overrideComponent(AngularOutputView, {
+      remove: { imports: [AngularViewUpgradeModule] },
+      add: { imports: [FakeAngularViewUpgradeModule] }
+    });
+    fixture = TestBed.createComponent(AngularOutputView);
+    fixture.componentRef.setInput('template', '');
+    fixture.componentRef.setInput('angularObjects', []);
+    fixture.componentRef.setInput('requestable', new FakeChannel());
     await fixture.whenStable();
   });
 
   describe('Birth', () => {
     it('Should be initialized', () => {
       expect(fixture.componentInstance).toBeDefined();
-    });
-
-    it('Should have rendered canvas', () => {
-      expect(fixture.debugElement.query(By.css('canvas'))).toBeDefined();
     });
   });
 });

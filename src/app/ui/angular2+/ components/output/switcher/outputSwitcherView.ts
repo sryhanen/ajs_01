@@ -43,41 +43,33 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  input,
-  OnChanges,
-  OnDestroy,
-  ViewChild
-} from '@angular/core';
-import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
-import {Api} from 'datatables.net-bs5';
+import {Component, input, Signal} from '@angular/core';
+import {NgComponentOutlet} from '@angular/common';
+import {RenderNode} from '../../../../../objects/rendering/renderNode/renderNode';
 
 @Component({
-  selector: 'dataTablesView',
+  selector: 'output-switcher',
+  imports: [
+    NgComponentOutlet
+  ],
   template: `
-    <table #table class="table table-bordered table-striped"></table>
+    @if (outputIsSwitchable()) {
+      <div class="btn-group" role="group">
+        @for (button of switcherButtons(); track $index) {
+          @let componentView = button().componentView;
+          <ng-container
+            *ngComponentOutlet="componentView.component(); inputs: componentView.inputs()()">
+          </ng-container>
+        }
+      </div>
+      @if (switchIsPending()) {
+        <div class="spinner-border mx-2 text-primary" role="status"></div>
+      }
+    }
   `
 })
-export class DataTablesOutputView implements AfterViewInit, OnDestroy, OnChanges {
-  dataTablesPlugin = input.required<DataTablesPlugin>();
-  @ViewChild('table') table: ElementRef;
-  private dataTablesInstance:Api<unknown>;
-
-  ngAfterViewInit() {
-    this.dataTablesInstance = this.dataTablesPlugin().initializedTable(this.table.nativeElement);
-  }
-
-  ngOnChanges() {
-    if(this.dataTablesInstance){
-      this.dataTablesInstance.destroy();
-      this.dataTablesInstance = this.dataTablesPlugin().initializedTable(this.table.nativeElement);
-    }
-  }
-
-  ngOnDestroy() {
-    this.dataTablesInstance.destroy(true);
-  }
+export class OutputSwitcherView {
+  switcherButtons = input.required<Signal<RenderNode>[]>();
+  switchIsPending= input.required<boolean>();
+  outputIsSwitchable= input.required<boolean>();
 }

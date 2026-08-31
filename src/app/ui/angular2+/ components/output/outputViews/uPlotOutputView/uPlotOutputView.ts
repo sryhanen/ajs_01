@@ -45,12 +45,12 @@
  */
 import {AfterViewInit, Component, ElementRef, input, OnChanges, OnDestroy, ViewChild} from '@angular/core';
 import uPlot from 'uplot';
-import {BasicOptions} from '../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/options/basicOptions';
-import {GraphType} from '../../../../../objects/output/format/uPlot/graphType';
-import {BarChartOptionsImpl} from '../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/options/barChartOptionsImpl';
-import {ResizeListener} from '../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/resizeListener/resizeListener';
-import {ResizeListenerImpl} from '../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/resizeListener/resizeListenerImpl';
-import {UPlotOptions} from '../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/options/uPlotOptions';
+import {BasicOptions} from '../../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/options/basicOptions';
+import {GraphType} from '../../../../../../objects/output/format/uPlot/graphType';
+import {BarChartOptionsImpl} from '../../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/options/barChartOptionsImpl';
+import {ResizeListener} from '../../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/resizeListener/resizeListener';
+import {ResizeListenerImpl} from '../../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/resizeListener/resizeListenerImpl';
+import {UPlotOptions} from '../../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/options/uPlotOptions';
 
 @Component({
   selector: 'uPlotOutputView',

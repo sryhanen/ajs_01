@@ -43,22 +43,41 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {AngularViewUpgradeModule} from './angularViewUpgradeModule';
-import {AngularObject} from '../../../../../objects/angularObject/angularObject';
-import {Request} from '../../../../../objects/channel/request';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  input,
+  OnChanges,
+  OnDestroy,
+  ViewChild
+} from '@angular/core';
+import {DataTablesPlugin} from '../../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
+import {Api} from 'datatables.net-bs5';
 
 @Component({
-  selector: 'angular-view',
-  imports: [
-    AngularViewUpgradeModule
-  ],
+  selector: 'dataTablesView',
   template: `
-    <ajs-angular-view [template]="template()" [angularObjects]="angularObjects()" [requestable]="requestable()"></ajs-angular-view>
+    <table #table class="table table-bordered table-striped"></table>
   `
 })
-export class AngularOutputView {
-  template = input.required<string>();
-  angularObjects= input.required<AngularObject[]>();
-  requestable = input.required<Request>();
+export class DataTablesOutputView implements AfterViewInit, OnDestroy, OnChanges {
+  dataTablesPlugin = input.required<DataTablesPlugin>();
+  @ViewChild('table') table: ElementRef;
+  private dataTablesInstance:Api<unknown>;
+
+  ngAfterViewInit() {
+    this.dataTablesInstance = this.dataTablesPlugin().initializedTable(this.table.nativeElement);
+  }
+
+  ngOnChanges() {
+    if(this.dataTablesInstance){
+      this.dataTablesInstance.destroy();
+      this.dataTablesInstance = this.dataTablesPlugin().initializedTable(this.table.nativeElement);
+    }
+  }
+
+  ngOnDestroy() {
+    this.dataTablesInstance.destroy(true);
+  }
 }

@@ -47,8 +47,8 @@ import {ComponentFixture} from '@angular/core/testing';
 import {render, screen} from '@testing-library/angular';
 import {OutputSwitcherView} from './outputSwitcherView';
 import {Component, signal, Signal} from '@angular/core';
-import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
-import {ComponentViewImpl} from '../../../../objects/rendering/componentView/componentViewImpl';
+import {RenderNode} from '../../../../../objects/rendering/renderNode/renderNode';
+import {ComponentViewImpl} from '../../../../../objects/rendering/componentView/componentViewImpl';
 import {By} from '@angular/platform-browser';
 
 describe('OutputSwitcherView functional test', () => {

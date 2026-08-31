@@ -43,35 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {AngularOutputView} from './angularOutputView';
-import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
+import {Component, input} from '@angular/core';
 import {AngularViewUpgradeModule} from './angularViewUpgradeModule';
-import {Component} from '@angular/core';
+import {AngularObject} from '../../../../../../objects/angularObject/angularObject';
+import {Request} from '../../../../../../objects/channel/request';
 
-describe('AngularOutputView integration test', () => {
-  let fixture: ComponentFixture<AngularOutputView>;
-  @Component({
-    selector: 'ajs-angular-view',
-    template: ''
-  })
-  class FakeAngularViewUpgradeModule{}
-
-  beforeEach(async () => {
-    TestBed.overrideComponent(AngularOutputView, {
-      remove: { imports: [AngularViewUpgradeModule] },
-      add: { imports: [FakeAngularViewUpgradeModule] }
-    });
-    fixture = TestBed.createComponent(AngularOutputView);
-    fixture.componentRef.setInput('template', '');
-    fixture.componentRef.setInput('angularObjects', []);
-    fixture.componentRef.setInput('requestable', new FakeChannel());
-    await fixture.whenStable();
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(fixture.componentInstance).toBeDefined();
-    });
-  });
-});
+@Component({
+  selector: 'angular-view',
+  imports: [
+    AngularViewUpgradeModule
+  ],
+  template: `
+    <ajs-angular-view [template]="template()" [angularObjects]="angularObjects()" [requestable]="requestable()"></ajs-angular-view>
+  `
+})
+export class AngularOutputView {
+  template = input.required<string>();
+  angularObjects= input.required<AngularObject[]>();
+  requestable = input.required<Request>();
+}

@@ -43,23 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Directive, ElementRef, Inject, Injector, input} from '@angular/core';
-import { UpgradeComponent } from '@angular/upgrade/static';
-import {AngularObject} from '../../../../../objects/angularObject/angularObject';
-import {Request} from '../../../../../objects/channel/request';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {UPlotOutputView} from './uPlotOutputView';
+import {By} from '@angular/platform-browser';
+import {
+  BasicOptionsImpl
+} from '../../../../../../objects/output/format/uPlot/uPlotPlugin/configuration/options/basicOptionsImpl';
 
-@Directive({
-  selector: 'ajs-angular-view'
-})
-export class AngularViewUpgradeModule extends UpgradeComponent {
-  template = input.required<string>();
-  angularObjects= input.required<AngularObject[]>();
-  requestable = input.required<Request>();
+describe('UPlotOutputView integration test', () => {
+  let fixture: ComponentFixture<UPlotOutputView>;
+  const basicOptions = new BasicOptionsImpl([], [], '', '');
+  const uPlotData = [[1,2],[1,2]];
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(UPlotOutputView);
+    fixture.componentRef.setInput('basicOptions', basicOptions);
+    fixture.componentRef.setInput('graphType', '');
+    fixture.componentRef.setInput('uPlotData', uPlotData);
+    await fixture.whenStable();
+  });
 
-  constructor(
-    @Inject(ElementRef) elementRef: ElementRef,
-    @Inject(Injector) injector: Injector
-  ) {
-    super('angularPluginAjs', elementRef, injector);
-  }
-}
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(fixture.componentInstance).toBeDefined();
+    });
+
+    it('Should have rendered canvas', () => {
+      expect(fixture.debugElement.query(By.css('canvas'))).toBeDefined();
+    });
+  });
+});

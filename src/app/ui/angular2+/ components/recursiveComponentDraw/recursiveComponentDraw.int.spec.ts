@@ -43,13 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {RecursiveComponentDraw} from './recursiveComponentDraw';
 import {Component, computed, signal} from '@angular/core';
-import {ComponentViewStub} from '../../../objects/rendering/componentView/componentViewStub';
+import {ComponentViewStub} from '../../../../objects/rendering/componentView/componentViewStub';
 import {By} from '@angular/platform-browser';
-import {ComponentViewImpl} from '../../../objects/rendering/componentView/componentViewImpl';
+import {ComponentViewImpl} from '../../../../objects/rendering/componentView/componentViewImpl';
 
 describe('RecursiveComponentDraw integration test', () => {
   @Component({

@@ -43,33 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, Signal} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
+import {Directive, ElementRef, Inject, Injector, input} from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+import {AngularObject} from '../../../../../../objects/angularObject/angularObject';
+import {Request} from '../../../../../../objects/channel/request';
 
-@Component({
-  selector: 'output-switcher',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    @if (outputIsSwitchable()) {
-      <div class="btn-group" role="group">
-        @for (button of switcherButtons(); track $index) {
-          @let componentView = button().componentView;
-          <ng-container
-            *ngComponentOutlet="componentView.component(); inputs: componentView.inputs()()">
-          </ng-container>
-        }
-      </div>
-      @if (switchIsPending()) {
-        <div class="spinner-border mx-2 text-primary" role="status"></div>
-      }
-    }
-  `
+@Directive({
+  selector: 'ajs-angular-view'
 })
-export class OutputSwitcherView {
-  switcherButtons = input.required<Signal<RenderNode>[]>();
-  switchIsPending= input.required<boolean>();
-  outputIsSwitchable= input.required<boolean>();
+export class AngularViewUpgradeModule extends UpgradeComponent {
+  template = input.required<string>();
+  angularObjects= input.required<AngularObject[]>();
+  requestable = input.required<Request>();
+
+  constructor(
+    @Inject(ElementRef) elementRef: ElementRef,
+    @Inject(Injector) injector: Injector
+  ) {
+    super('angularPluginAjs', elementRef, injector);
+  }
 }
