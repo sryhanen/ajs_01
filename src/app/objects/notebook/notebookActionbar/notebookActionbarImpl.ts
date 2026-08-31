@@ -43,21 +43,39 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
+import {NotebookActionbar} from './notebookActionbar';
+import {computed, signal, Signal} from '@angular/core';
+import {ComponentView} from '../../rendering/componentView/componentView';
+import {Channel} from '../../channel/channel';
+import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
+import {NotebookActionbarView} from '../../../ui/angular2+/notebook/notebookActionbar/notebookActionbarView';
+import {NotebookRevisions} from '../notebookRevisions/notebookRevisions';
+import {NotebookRevisionsImpl} from '../notebookRevisions/notebookRevisionsImpl';
 
-@Component({
-  selector: 'notebook',
-  imports: [
-    NgComponentOutlet
-  ],
-  template: `
-    <ng-container *ngComponentOutlet="notebookActionbar().component(); inputs: notebookActionbar().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
-  `
-})
-export class NotebookView {
-  notebookActionbar = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class NotebookActionbarImpl implements NotebookActionbar {
+  private readonly _channel:Channel;
+  private readonly _componentView:ComponentView;
+  private readonly _printSignal:Signal<ComponentView>;
+  private readonly _notebookRevisions: NotebookRevisions;
+
+  constructor(channel:Channel) {
+    this._channel = channel;
+    this._notebookRevisions = new NotebookRevisionsImpl(this);
+    this._componentView = new ComponentViewImpl(NotebookActionbarView, computed(() => ({
+      notebookRevisions:this._notebookRevisions.print()()
+    })));
+    this._printSignal = signal(this._componentView);
+  }
+
+  print(): Signal<ComponentView> {
+    return this._printSignal;
+  }
+
+  request(json: object): void {
+    this._channel.request(json);
+  }
+
+  response(json: object): void {
+    this._notebookRevisions.response(json);
+  }
 }

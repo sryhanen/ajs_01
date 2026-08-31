@@ -44,20 +44,18 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
+import {ComponentView} from '../../../../objects/rendering/componentView/componentView';
 import {NgComponentOutlet} from '@angular/common';
-import {ComponentView} from '../../../objects/rendering/componentView/componentView';
 
 @Component({
-  selector: 'notebook',
+  selector: 'notebook-actionbar',
   imports: [
     NgComponentOutlet
   ],
   template: `
-    <ng-container *ngComponentOutlet="notebookActionbar().component(); inputs: notebookActionbar().inputs()()"></ng-container>
-    <ng-container *ngComponentOutlet="paragraphCollection().component(); inputs: paragraphCollection().inputs()()"></ng-container>
+    <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
   `
 })
-export class NotebookView {
-  notebookActionbar = input.required<ComponentView>();
-  paragraphCollection = input.required<ComponentView>();
+export class NotebookActionbarView {
+  notebookRevisions = input.required<ComponentView>();
 }

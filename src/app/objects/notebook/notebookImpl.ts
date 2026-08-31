@@ -66,30 +66,30 @@ import {
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
 import {NotebookView} from '../../ui/angular2+/notebook/notebookView';
-import {NotebookRevisions} from './notebookRevisions/notebookRevisions';
-import {NotebookRevisionsImpl} from './notebookRevisions/notebookRevisionsImpl';
+import {NotebookActionbar} from './notebookActionbar/notebookActionbar';
+import {NotebookActionbarImpl} from './notebookActionbar/notebookActionbarImpl';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
   private readonly _notebook: SafeJson;
   private readonly _paragraphCollection: ParagraphCollection;
-  private readonly _notebookRevisions: NotebookRevisions;
   private readonly _componentView:ComponentView;
   private readonly _responseRegister:ResponseRegister;
   private readonly _requestRegister:RequestRegister;
+  private readonly _notebookActionbar:NotebookActionbar;
 
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
     this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
-    this._notebookRevisions = new NotebookRevisionsImpl(this);
+    this._notebookActionbar = new NotebookActionbarImpl(this);
     this._componentView = new ComponentViewImpl(NotebookView, computed(() => ({
       paragraphCollection: this._paragraphCollection.print()(),
-      notebookRevisions: this._notebookRevisions.print()()
+      notebookActionbar:this._notebookActionbar.print()(),
     })));
     const defaultResponseList = [
-      this._notebookRevisions,
-      this._paragraphCollection
+      this._paragraphCollection,
+      this._notebookActionbar
     ];
     this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), defaultResponseList),{name:'noteId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'noteId', value:this.id()});
