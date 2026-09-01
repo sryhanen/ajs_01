@@ -52,31 +52,29 @@ import {FormsModule, NgModel} from '@angular/forms';
     FormsModule
   ],
   template: `
-    @if (!isEditing()) {
-      <button class="bg-transparent border-0 p-0" (click)="startEditing()">
-        <p [class]="textClassName()">
-          {{ text() }}
-        </p>
-      </button>
-    }
-    @else {
-      <div class="input-group flex-nowrap position-relative">
-        <input class="me-2" type="text" [(ngModel)]="text" #textModel="ngModel" [required]="required()" pattern=".*\\S.*" />
-        <button class="bg-transparent border-0 p-0 me-2" (click)="commitTextChange()" type="submit"
-                aria-label="Save changes">
-          <i class="fas fa-check fa-lg"></i>
-        </button>
-        <button class="bg-transparent border-0 p-0" (click)="cancelChanges(textModel)" type="reset"
-                aria-label="Revert changes">
-          <i class="fas fa-times fa-lg"></i>
-        </button>
-        @if (required() && textModel.invalid) {
-          <div class="absolute-validation-text">
-            Value is required.
-          </div>
-        }
-      </div>
-    }
+   @if (!isEditing()) {
+     <span (click)="startEditing()" [class]="textClassName()">
+       {{ text() }}
+     </span>
+   }
+   @else {
+     <div class="input-group flex-nowrap position-relative">
+       <input class="me-2" type="text" [(ngModel)]="text" #textModel="ngModel" [required]="required()" pattern=".*\\S.*" />
+       <button class="bg-transparent border-0 p-0 me-2" (click)="commitTextChange()" type="submit"
+               aria-label="Save changes">
+         <i class="fas fa-check fa-lg"></i>
+       </button>
+       <button class="bg-transparent border-0 p-0" (click)="cancelChanges(textModel)" type="reset"
+               aria-label="Revert changes">
+         <i class="fas fa-times fa-lg"></i>
+       </button>
+       @if (required() && textModel.invalid) {
+         <div class="absolute-validation-text">
+           Value is required.
+         </div>
+       }
+     </div>
+   }
   `,
   styles:`
     .absolute-validation-text {
