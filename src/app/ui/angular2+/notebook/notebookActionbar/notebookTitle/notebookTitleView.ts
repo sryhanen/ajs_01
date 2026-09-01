@@ -54,12 +54,14 @@ import {EditableTextView} from '../../../editableText/editableTextView';
     EditableTextView
   ],
   template: `
-    <editable-text [text]="title()" (newText)="updateTitleText($event)" textClassName="form-control_title"></editable-text>
+    <editable-text [text]="title()" (newText)="updateTitleText($event)" textClassName="form-control_title" [required]="true"></editable-text>
   `
 })
 export class NotebookTitleView{
   requestable = input.required<Requestable>();
   title = input.required<string>();
 
-  updateTitleText(newText:string):void{}
+  updateTitleText(newText:string):void{
+
+  }
 }

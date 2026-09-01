@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, model, output, signal} from '@angular/core';
+import {Component, input, model, output, signal, ViewChild} from '@angular/core';
 import {FormsModule, NgModel} from '@angular/forms';
 
 @Component({
@@ -58,32 +58,52 @@ import {FormsModule, NgModel} from '@angular/forms';
           {{ text() }}
         </p>
       </button>
-    } @else {
-      <div class="input-group flex-nowrap">
-        <input class="me-2 mb-2" type="text" [(ngModel)]="text" #titleModel="ngModel"/>
+    }
+    @else {
+      <div class="input-group flex-nowrap position-relative">
+        <input class="me-2" type="text" [(ngModel)]="text" #textModel="ngModel" [required]="required()" pattern=".*\\S.*" />
         <button class="bg-transparent border-0 p-0 me-2" (click)="commitTextChange()" type="submit"
                 aria-label="Save changes">
           <i class="fas fa-check fa-lg"></i>
         </button>
-        <button class="bg-transparent border-0 p-0" (click)="cancelChanges(titleModel)" type="reset"
+        <button class="bg-transparent border-0 p-0" (click)="cancelChanges(textModel)" type="reset"
                 aria-label="Revert changes">
           <i class="fas fa-times fa-lg"></i>
         </button>
+        @if (required() && textModel.invalid) {
+          <div class="absolute-validation-text">
+            Value is required.
+          </div>
+        }
       </div>
+    }
+  `,
+  styles:`
+    .absolute-validation-text {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      color: #dc3545;
+      font-size: 0.875em;
     }
   `
 })
 export class EditableTextView {
   text = model.required<string>();
-  textClassName = input();
+  required = input<boolean>();
+  textClassName = input<string>();
   newText = output<string>();
+
+  @ViewChild('textModel') textForm:NgModel;
 
   protected originalText:string;
   protected isEditing = signal(false);
 
   protected commitTextChange(): void {
-    this.newText.emit(this.text());
-    this.stopEditing();
+    if(this.textForm.valid){
+      this.newText.emit(this.text());
+      this.stopEditing();
+    }
   }
 
   protected startEditing(): void  {
