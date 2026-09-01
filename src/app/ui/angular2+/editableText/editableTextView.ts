@@ -43,39 +43,39 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, model, output, signal, ViewChild} from '@angular/core';
-import {FormsModule, NgModel} from '@angular/forms';
+import {AfterViewInit, Component, input, model, output, signal} from '@angular/core';
+import {FormControl, FormsModule,ReactiveFormsModule, Validators} from '@angular/forms';
 
 @Component({
   selector: 'editable-text',
   imports: [
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   template: `
-   @if (!isEditing()) {
-     <span (click)="startEditing()" [class]="textClassName()">
+    @if (!isEditing()) {
+      <span (click)="startEditing()" [class]="textClassName()">
        {{ text() }}
      </span>
-   }
-   @else {
-     <div class="input-group flex-nowrap position-relative">
-       <input class="me-2" type="text" [(ngModel)]="text" #textModel="ngModel" [required]="required()" pattern=".*\\S.*" />
-       @let disabled = required()&&textModel.invalid;
-       <button class="bg-transparent border-0 p-0 me-2" (click)="commitTextChange()" type="submit"
-               aria-label="Save changes" [disabled]="disabled" >
-         <i class="fas fa-check fa-lg" [class]="disabled ? 'overwrite-note-action':''"></i>
-       </button>
-       <button class="bg-transparent border-0 p-0" (click)="cancelChanges(textModel)" type="reset"
-               aria-label="Revert changes">
-         <i class="fas fa-times fa-lg"></i>
-       </button>
-       @if (required() && textModel.invalid) {
-         <div class="absolute-validation-text">
-           Value is required.
-         </div>
-       }
-     </div>
-   }
+    } @else {
+      @let textValueIsInvalid = required()&&textValueControl.invalid;
+      <div class="input-group flex-nowrap position-relative">
+        <input class="me-2" type="text" [formControl]="textValueControl" [required]="required()"/>
+        <button class="bg-transparent border-0 p-0 me-2" (click)="commitTextChange()" type="submit"
+                aria-label="Save changes" [disabled]="textValueIsInvalid">
+          <i class="fas fa-check fa-lg" [class]="textValueIsInvalid ? 'overwrite-note-action':''"></i>
+        </button>
+        <button class="bg-transparent border-0 p-0" (click)="cancelChanges()" type="reset"
+                aria-label="Revert changes">
+          <i class="fas fa-times fa-lg"></i>
+        </button>
+        @if (textValueIsInvalid) {
+          <div class="absolute-validation-text">
+            Value is required.
+          </div>
+        }
+      </div>
+    }
   `,
   styles:`
     .absolute-validation-text {
@@ -85,15 +85,25 @@ import {FormsModule, NgModel} from '@angular/forms';
       color: #dc3545;
       font-size: 0.875em;
     }
+    .overwrite-note-action {
+      color: var(--primary-300) !important;
+      cursor: default !important;
+    }
   `
 })
-export class EditableTextView {
+export class EditableTextView implements AfterViewInit {
   text = model.required<string>();
   required = input<boolean>(false);
   textClassName = input<string>();
   newText = output<string>();
+  textValueControl:FormControl<string>;
 
-  @ViewChild('textModel') textForm:NgModel;
+  ngAfterViewInit() {
+    this.textValueControl = new FormControl(this.text(), [
+      Validators.required,
+      Validators.pattern(/.*\S.*/)
+    ]);
+  }
 
   protected originalText:string;
   protected isEditing = signal(false);
@@ -112,8 +122,8 @@ export class EditableTextView {
     this.isEditing.set(false);
   }
 
-  protected cancelChanges(model: NgModel): void {
-    model.reset(this.originalText);
+  protected cancelChanges(): void {
+    this.textValueControl.reset(this.originalText);
     this.stopEditing();
   }
 }
