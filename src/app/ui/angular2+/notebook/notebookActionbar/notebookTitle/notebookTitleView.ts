@@ -44,41 +44,22 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
-import {ComponentView} from '../../../../objects/rendering/componentView/componentView';
-import {NgComponentOutlet} from '@angular/common';
-import {NotebookTitleView} from './notebookTitle/notebookTitleView';
-import {Requestable} from '../../../../objects/channel/requestable';
+import {Requestable} from '../../../../../objects/channel/requestable';
+import {EditableTextView} from '../../../editableText/editableTextView';
+
 
 @Component({
-  selector: 'notebook-actionbar',
+  selector: 'notebook-title',
   imports: [
-    NgComponentOutlet,
-    NotebookTitleView
+    EditableTextView
   ],
   template: `
-    <div class="note-action">
-      <nav class="navbar navbar-expand-xl note-action-container collapse show" id="noteActionCollapse">
-        <div class="container-fluid px-5">
-            <notebook-title [requestable]="requestable()" [title]="notebookTitle()"></notebook-title>
-            <div class="container-fluid px-5">
-              <ng-container
-                *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-            </div>
-        </div>
-      </nav>
-      <div class="collapse-button container-fluid px-5 position-relative text-end">
-        <button class="btn btn-collapse"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#noteActionCollapse"
-                aria-expanded="true">
-        </button>
-      </div>
-    </div>
+    <editable-text [text]="title()" (newText)="updateTitleText($event)" textClassName="form-control_title"></editable-text>
   `
 })
-export class NotebookActionbarView {
+export class NotebookTitleView{
   requestable = input.required<Requestable>();
-  notebookTitle = input.required<string>();
-  notebookRevisions = input.required<ComponentView>();
+  title = input.required<string>();
+
+  updateTitleText(newText:string):void{}
 }

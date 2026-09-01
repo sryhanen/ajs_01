@@ -58,11 +58,13 @@ export class NotebookActionbarImpl implements NotebookActionbar {
   private readonly _printSignal:Signal<ComponentView>;
   private readonly _notebookRevisions: NotebookRevisions;
 
-  constructor(channel:Channel) {
+  constructor(channel:Channel, notebookTitle:string) {
     this._channel = channel;
     this._notebookRevisions = new NotebookRevisionsImpl(this);
     this._componentView = new ComponentViewImpl(NotebookActionbarView, computed(() => ({
-      notebookRevisions:this._notebookRevisions.print()()
+      requestable:this,
+      notebookRevisions:this._notebookRevisions.print()(),
+      notebookTitle:notebookTitle,
     })));
     this._printSignal = signal(this._componentView);
   }
