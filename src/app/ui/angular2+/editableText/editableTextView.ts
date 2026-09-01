@@ -61,7 +61,7 @@ import {FormsModule, NgModel} from '@angular/forms';
      <div class="input-group flex-nowrap position-relative">
        <input class="me-2" type="text" [(ngModel)]="text" #textModel="ngModel" [required]="required()" pattern=".*\\S.*" />
        <button class="bg-transparent border-0 p-0 me-2" (click)="commitTextChange()" type="submit"
-               aria-label="Save changes">
+               aria-label="Save changes" [disabled]="required()&&textModel.invalid">
          <i class="fas fa-check fa-lg"></i>
        </button>
        <button class="bg-transparent border-0 p-0" (click)="cancelChanges(textModel)" type="reset"
@@ -98,16 +98,8 @@ export class EditableTextView {
   protected isEditing = signal(false);
 
   protected commitTextChange(): void {
-    if(this.required()){
-      if(this.textForm.valid){
-        this.newText.emit(this.text());
-        this.stopEditing();
-      }
-    }
-    else{
-      this.newText.emit(this.text());
-      this.stopEditing();
-    }
+    this.newText.emit(this.text());
+    this.stopEditing();
   }
 
   protected startEditing(): void  {

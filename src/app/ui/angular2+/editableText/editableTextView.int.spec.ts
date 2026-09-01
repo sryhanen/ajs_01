@@ -43,24 +43,56 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {render, screen} from '@testing-library/angular';
+import {fireEvent, render, screen} from '@testing-library/angular';
 import {EditableTextView} from './editableTextView';
+import {ComponentFixture} from '@angular/core/testing';
 
 describe('EditableTextView integration test', () => {
+  let fixture:ComponentFixture<EditableTextView>;
   const defaultText = 'some default text';
   const textClass = 'some-text-class';
 
   beforeEach(async () => {
-    await render(EditableTextView, {
+    const renderResult = await render(EditableTextView, {
       inputs:{
         text: defaultText,
         textClassName: textClass
       }
     });
+    fixture = renderResult.fixture;
   });
 
-  it('Text should have given class name', () =>{
-    const text = screen.getByText(defaultText);
-    expect(text).toHaveClass(textClass);
+  describe('Class name input', () => {
+    it('Text should have given class name', () =>{
+      const text = screen.getByText(defaultText);
+      expect(text).toHaveClass(textClass);
+    });
+  });
+
+  describe('Validation', () => {
+    describe('Required is true', () => {
+      let textInput:HTMLElement;
+      beforeEach(() => {
+        fixture.componentRef.setInput('required', true);
+        fixture.detectChanges();
+        fireEvent.click(screen.getByText(defaultText));
+        textInput = screen.getByRole('textbox');
+        fireEvent.input(textInput, {target:{value:''}});
+      });
+
+      it('Should display validation text', () => {
+        expect(screen.getByText('Value is required.')).toBeDefined();
+      });
+
+      it('Should disable commit button if form is invalid', () => {
+        expect(screen.getByLabelText('Save changes')).toBeDisabled();
+      });
+
+      it('Should enable commit button if form is valid', () => {
+        const newValue = 'new text';
+        fireEvent.input(textInput, {target:{value:newValue}});
+        expect(screen.getByLabelText('Save changes')).toBeEnabled();
+      });
+    });
   });
 });
