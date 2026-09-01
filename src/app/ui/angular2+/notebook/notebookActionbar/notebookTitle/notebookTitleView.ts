@@ -47,7 +47,6 @@ import {Component, input} from '@angular/core';
 import {Requestable} from '../../../../../objects/channel/requestable';
 import {EditableTextView} from '../../../editableText/editableTextView';
 
-
 @Component({
   selector: 'notebook-title',
   imports: [

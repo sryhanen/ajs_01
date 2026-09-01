@@ -60,9 +60,10 @@ import {FormsModule, NgModel} from '@angular/forms';
    @else {
      <div class="input-group flex-nowrap position-relative">
        <input class="me-2" type="text" [(ngModel)]="text" #textModel="ngModel" [required]="required()" pattern=".*\\S.*" />
+       @let disabled = required()&&textModel.invalid;
        <button class="bg-transparent border-0 p-0 me-2" (click)="commitTextChange()" type="submit"
-               aria-label="Save changes" [disabled]="required()&&textModel.invalid">
-         <i class="fas fa-check fa-lg"></i>
+               aria-label="Save changes" [disabled]="disabled" >
+         <i class="fas fa-check fa-lg" [class]="disabled ? 'overwrite-note-action':''"></i>
        </button>
        <button class="bg-transparent border-0 p-0" (click)="cancelChanges(textModel)" type="reset"
                aria-label="Revert changes">
