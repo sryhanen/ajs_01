@@ -88,7 +88,7 @@ import {FormsModule, NgModel} from '@angular/forms';
 })
 export class EditableTextView {
   text = model.required<string>();
-  required = input<boolean>();
+  required = input<boolean>(false);
   textClassName = input<string>();
   newText = output<string>();
 
@@ -98,7 +98,13 @@ export class EditableTextView {
   protected isEditing = signal(false);
 
   protected commitTextChange(): void {
-    if(this.textForm.valid){
+    if(this.required()){
+      if(this.textForm.valid){
+        this.newText.emit(this.text());
+        this.stopEditing();
+      }
+    }
+    else{
       this.newText.emit(this.text());
       this.stopEditing();
     }
