@@ -43,71 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, model, OnInit, signal} from '@angular/core';
-import {FormsModule, NgModel} from '@angular/forms';
+import {Component, computed, input} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import {CommitParagraphRequest} from '../../../../objects/requests/commitParagraph/commitParagraphRequest';
 import {Requestable} from '../../../../objects/channel/requestable';
+import {EditableTextView} from '../../editableText/editableTextView';
 
 @Component({
   selector: 'paragraph-title',
   imports: [
-    FormsModule
+    FormsModule,
+    EditableTextView
   ],
   template: `
-    @if(!isEditing()) {
-      <button class="bg-transparent border-0 p-0" (click)="startEditing()">
-        <div class="paragraph-title-inactive">
-          {{titleText()}}
-        </div>
-      </button>
-    }
-    @else {
-      <div>
-        <input class="me-2 mb-2" type="text" [(ngModel)]="titleText" #titleModel="ngModel" />
-        <button class="bg-transparent border-0 p-0 me-2" (click)="commitParagraphRequest()" type="submit" aria-label="Save changes">
-          <i class="paragraph-control fas fa-check fa-lg"></i>
-        </button>
-        <button class="bg-transparent border-0 p-0" (click)="cancelChanges(titleModel)" type="reset" aria-label="Revert changes">
-          <i class="paragraph-control fas fa-times fa-lg"></i>
-        </button>
-      </div>
-    }
+    <editable-text [text]="titleText()" (newText)="commitParagraphRequest($event)" textClassName="paragraph-title-inactive"></editable-text>
   `
 })
-export class ParagraphTitleView implements OnInit {
+export class ParagraphTitleView {
   requestable = input.required<Requestable>();
   paragraphData = input.required<object>();
-  isEditing = signal(false);
-  protected titleText = model('Untitled');
-  private originalTitle:string;
+  protected titleText = computed(() => {
+    const title = this.paragraphData()['title'];
+    return title ? title : 'Untitled';
+  });
 
-  ngOnInit() {
-    const paragraphTitle = this.paragraphData()['title'];
-    if(paragraphTitle){
-      this.titleText.set(paragraphTitle);
-    }
-  }
-
-  protected startEditing()  {
-    this.originalTitle = this.titleText();
-    this.isEditing.set(true);
-  }
-
-  protected stopEditing() {
-    this.isEditing.set(false);
-  }
-
-  protected cancelChanges(model: NgModel): void {
-    model.reset(this.originalTitle);
-    this.stopEditing();
-  }
-
-  protected commitParagraphRequest():void {
+  protected commitParagraphRequest(newTitle:string):void {
     const commitParagraphRequest = new CommitParagraphRequest(this.requestable(), {
       ...this.paragraphData(),
-      title:this.titleText()
+      title:newTitle
     });
     commitParagraphRequest.send();
-    this.stopEditing();
   }
 }
