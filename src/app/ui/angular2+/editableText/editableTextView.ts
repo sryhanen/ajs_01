@@ -109,7 +109,8 @@ export class EditableTextView implements AfterViewInit {
   protected isEditing = signal(false);
 
   protected commitTextChange(): void {
-    this.newText.emit(this.text());
+    this.newText.emit(this.textValueControl.value);
+    this.text.set(this.textValueControl.value);
     this.stopEditing();
   }
 
