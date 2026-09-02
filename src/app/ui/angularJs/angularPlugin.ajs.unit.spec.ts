@@ -115,17 +115,47 @@ describe('AngularPluginAjs', () => {
 
   describe('Public functions', () => {
     let spy:Mock;
+    const name = 'name';
+    const value = 'value';
+    const paragraphId = 'paragraphId';
+
     beforeEach(() => {
       spy = vi.spyOn(requestable, 'request');
     });
 
     it('RunParagraph function', () => {
-      const paragraphId = 'paragraphId';
       angularPluginAjs.$scope['z']['runParagraph'](paragraphId);
       const expectedRequest = {
         op:'EXECUTE_PARAGRAPH',
         data:{
           paragraphId:paragraphId
+        }
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+
+    it('AngularBind function', () => {
+      angularPluginAjs.$scope['z']['angularBind'](name, value, paragraphId);
+      const expectedRequest = {
+        op: 'ANGULAR_OBJECT_CLIENT_BIND',
+        data:{
+          noteId: '',
+          name: name,
+          value: value,
+          paragraphId: paragraphId
+        }
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+
+    it('AngularUnbind function', () => {
+      angularPluginAjs.$scope['z']['angularUnbind'](name, paragraphId);
+      const expectedRequest = {
+        op: 'ANGULAR_OBJECT_CLIENT_UNBIND',
+        data:{
+          noteId: '',
+          name: name,
+          paragraphId: paragraphId
         }
       };
       expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
