@@ -43,41 +43,25 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
-import {Requestable} from '../../../../../objects/channel/requestable';
-import {EditableTextView} from '../../../editableText/editableTextView';
-import {FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors} from '@angular/forms';
-import {NoteRenameRequest} from '../../../../../objects/requests/noteRename/noteRenameRequest';
+import {RequestMessage} from '../requestMessage';
+import {Requestable} from '../../channel/requestable';
 
-@Component({
-  selector: 'notebook-title',
-  imports: [
-    EditableTextView
-  ],
-  template: `
-    <editable-text (newText)="noteRenameRequest($event)"
-                   textClassName="form-control_title"
-                   [textValueControl]="textValueControl()"></editable-text>
-  `
-})
-export class NotebookTitleView{
-  requestable = input.required<Requestable>();
-  title = input.required<string>();
-  textValueControl = computed(() => new FormControl(this.title(), [
-    this.notebookNameValidator(),
-    Validators.maxLength(90),
-  ]));
+export class NoteRenameRequest implements RequestMessage {
+  private readonly _requestable: Requestable;
+  private readonly _noteName: string;
 
-  noteRenameRequest(newText:string):void{
-    const noteRenameRequest = new NoteRenameRequest(this.requestable(), newText);
-    noteRenameRequest.send();
+  constructor(requestable: Requestable, noteName: string) {
+    this._requestable = requestable;
+    this._noteName = noteName;
   }
 
-  notebookNameValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const hasValidPattern = /^([/a-z_\-0-9.]+)+([^/|\s])$/.test(control.value);
-      const customErrorText = 'The name for the note is invalid. Please, use only letters, numbers and symbols "/", "-", and "_". The name can not end with whitespace or "/".';
-      return !hasValidPattern ? { customError: customErrorText } : null;
-    };
+  send(): void {
+    this._requestable.request({
+      op: 'NOTE_RENAME',
+      data: {
+        id: '',
+        name: this._noteName,
+      }
+    });
   }
 }

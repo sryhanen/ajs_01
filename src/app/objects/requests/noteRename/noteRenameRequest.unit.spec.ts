@@ -43,41 +43,25 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
-import {Requestable} from '../../../../../objects/channel/requestable';
-import {EditableTextView} from '../../../editableText/editableTextView';
-import {FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors} from '@angular/forms';
-import {NoteRenameRequest} from '../../../../../objects/requests/noteRename/noteRenameRequest';
+import {Requestable} from '../../channel/requestable';
+import {FakeChannel} from '../../channel/fakeChannel';
+import {NoteRenameRequest} from './noteRenameRequest';
 
-@Component({
-  selector: 'notebook-title',
-  imports: [
-    EditableTextView
-  ],
-  template: `
-    <editable-text (newText)="noteRenameRequest($event)"
-                   textClassName="form-control_title"
-                   [textValueControl]="textValueControl()"></editable-text>
-  `
-})
-export class NotebookTitleView{
-  requestable = input.required<Requestable>();
-  title = input.required<string>();
-  textValueControl = computed(() => new FormControl(this.title(), [
-    this.notebookNameValidator(),
-    Validators.maxLength(90),
-  ]));
+describe('Note Rename Request', () => {
+  const requestable:Requestable = new FakeChannel();
+  const noteName = 'note name';
+  const noteRenameRequest = new NoteRenameRequest(requestable, noteName);
+  const spy = vi.spyOn(requestable, 'request');
 
-  noteRenameRequest(newText:string):void{
-    const noteRenameRequest = new NoteRenameRequest(this.requestable(), newText);
+  it('Should send expected request', () => {
     noteRenameRequest.send();
-  }
-
-  notebookNameValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const hasValidPattern = /^([/a-z_\-0-9.]+)+([^/|\s])$/.test(control.value);
-      const customErrorText = 'The name for the note is invalid. Please, use only letters, numbers and symbols "/", "-", and "_". The name can not end with whitespace or "/".';
-      return !hasValidPattern ? { customError: customErrorText } : null;
+    const expectedRequest = {
+      op: 'NOTE_RENAME',
+      data: {
+        id: '',
+        name: noteName,
+      }
     };
-  }
-}
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
+});
