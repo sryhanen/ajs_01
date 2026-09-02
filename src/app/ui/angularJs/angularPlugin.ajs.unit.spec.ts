@@ -46,6 +46,9 @@
 import {AngularPluginAjs} from './angularPlugin.ajs';
 import {FakeChannel} from '../../objects/channel/fakeChannel';
 import {AngularObjectImpl} from '../../objects/angularObject/angularObjectImpl';
+import {channel} from 'node:diagnostics_channel';
+import {Requestable} from '../../objects/channel/requestable';
+import {Mock} from 'vitest';
 
 describe('AngularPluginAjs', () => {
   const $element = [
@@ -58,7 +61,7 @@ describe('AngularPluginAjs', () => {
   let watchSpy;
   let watchCollectionSpy;
   let $scope;
-
+  let requestable:Requestable;
   let angularPluginAjs: AngularPluginAjs;
   beforeEach(() => {
     $compile  = vi.fn().mockReturnValue(mockLinkFunction);
@@ -68,7 +71,9 @@ describe('AngularPluginAjs', () => {
       $watch: watchSpy,
       $watchCollection: watchCollectionSpy,
     };
+    requestable = new FakeChannel();
     angularPluginAjs = new AngularPluginAjs($compile,$scope,$element);
+    angularPluginAjs.requestable = requestable;
   });
 
   describe('Birth', () => {
@@ -84,9 +89,6 @@ describe('AngularPluginAjs', () => {
     const angularObject2 =  new AngularObjectImpl(channel, {name: 'SomeVariable2', object: 'test data2',}, '');
     beforeEach(() => {
       angularPluginAjs.template = template;
-      angularPluginAjs.requestable = {
-        request(data: object) {}
-      };
       angularPluginAjs.angularObjects = [
         angularObject1,
         angularObject2,
@@ -108,6 +110,25 @@ describe('AngularPluginAjs', () => {
 
     it('Should have compiled', () => {
       expect($compile).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Public functions', () => {
+    let spy:Mock;
+    beforeEach(() => {
+      spy = vi.spyOn(requestable, 'request');
+    });
+
+    it('RunParagraph function', () => {
+      const paragraphId = 'paragraphId';
+      angularPluginAjs.$scope['z']['runParagraph'](paragraphId);
+      const expectedRequest = {
+        op:'EXECUTE_PARAGRAPH',
+        data:{
+          paragraphId:paragraphId
+        }
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
     });
   });
 });

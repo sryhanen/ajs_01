@@ -46,6 +46,7 @@
 import angular, {IPostLink, IScope} from 'angular';
 import {AngularObject} from '../../objects/angularObject/angularObject';
 import {Requestable} from '../../objects/channel/requestable';
+import {ExecuteParagraphRequest} from '../../objects/requests/executeParagraph/executeParagraphRequest';
 
 export class AngularPluginAjs implements IPostLink{
   static $inject = ['$compile', '$scope', '$element'];
@@ -72,16 +73,8 @@ export class AngularPluginAjs implements IPostLink{
   };
 
   private runParagraph(paragraphId:string) {
-    const runParagraphMessage = {
-      op: 'RUN_PARAGRAPH',
-      data: {
-        id: paragraphId,
-        paragraph: '',
-        config: {},
-        params: {}
-      },
-    };
-    this.requestable.request(runParagraphMessage);
+    const executeParagraphRequest = new ExecuteParagraphRequest(this.requestable, paragraphId);
+    executeParagraphRequest.send();
   }
 
   private angularBind(name:string, value:string, paragraphId:string) {
