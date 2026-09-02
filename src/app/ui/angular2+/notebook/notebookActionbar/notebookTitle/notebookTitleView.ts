@@ -46,7 +46,7 @@
 import {Component, computed, input} from '@angular/core';
 import {Requestable} from '../../../../../objects/channel/requestable';
 import {EditableTextView} from '../../../editableText/editableTextView';
-import {FormControl, Validators} from '@angular/forms';
+import {FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors} from '@angular/forms';
 
 @Component({
   selector: 'notebook-title',
@@ -63,11 +63,19 @@ export class NotebookTitleView{
   requestable = input.required<Requestable>();
   title = input.required<string>();
   textValueControl = computed(() => new FormControl(this.title(), [
-    Validators.required,
-    Validators.pattern( /^([/a-z_\-0-9.]+)+([^/|\s])$/),
+    this.notebookNameValidator(),
+    Validators.maxLength(90),
   ]));
 
   updateTitleText(newText:string):void{
 
+  }
+
+  notebookNameValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const hasValidPattern = /^([/a-z_\-0-9.]+)+([^/|\s])$/.test(control.value);
+      const customErrorText = 'The name for the note is invalid. Please, use only letters, numbers and symbols "/", "-", and "_". The name can not end with whitespace or "/".';
+      return !hasValidPattern ? { customError: customErrorText } : null;
+    };
   }
 }
