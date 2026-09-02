@@ -59,10 +59,12 @@ import {Requestable} from '../../../../objects/channel/requestable';
     <div class="note-action">
       <nav class="navbar navbar-expand-xl note-action-container collapse show" id="noteActionCollapse">
         <div class="container-fluid px-5">
-            <notebook-title [requestable]="requestable()" [title]="notebookTitle()"></notebook-title>
+          <notebook-title class="me-3" [requestable]="requestable()" [title]="notebookTitle()"></notebook-title>
+          <div class="btn-group me-2" role="group" aria-label="button group">
+
+          </div>
             <div class="container-fluid px-5">
-              <ng-container
-                *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
+              <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
             </div>
         </div>
       </nav>
