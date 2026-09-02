@@ -64,7 +64,7 @@ export class NotebookTitleView{
   title = input.required<string>();
   textValueControl = computed(() => new FormControl(this.title(), [
     Validators.required,
-    Validators.pattern(/.*\S.*/),
+    Validators.pattern( /^([/a-z_\-0-9.]+)+([^/|\s])$/),
   ]));
 
   updateTitleText(newText:string):void{
