@@ -71,7 +71,7 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
         </button>
         <div class="absolute-validation-text container rounded">
           @for(validationError of validationErrors(textValueControl()); track $index){
-            <div class="row mx-1 mb-1">
+            <div class="row mx-1 mb-1" role="alert">
               {{validationError}}
             </div>
           }
