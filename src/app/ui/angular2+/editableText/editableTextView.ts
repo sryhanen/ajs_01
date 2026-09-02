@@ -55,8 +55,8 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
   template: `
     @if (!isEditing()) {
       <span (click)="startEditing()" [class]="textClassName()">
-       {{ textValueControl().value }}
-     </span>
+       {{ displayText(textValueControl()) }}
+      </span>
     } @else {
       @let textValueIsInvalid = textValueControl().invalid;
       <div class="input-group flex-nowrap position-relative">
@@ -92,13 +92,26 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
   `
 })
 export class EditableTextView {
-  textClassName = input<string>();
-  newText = output<string>();
   textValueControl = input.required<FormControl<string>>();
+  textClassName = input<string>();
+  placeholderText = input<string>();
+  newText = output<string>();
+
   private errorTexts = new Map([
     ['required', 'Value is required.'],
     ['pattern', 'Value is invalid.'],
   ]);
+
+  protected displayText(formControl:FormControl):string{
+    let displayText:string;
+    if(formControl.value === '' && this.placeholderText()){
+      displayText = this.placeholderText();
+    }
+    else {
+      displayText = formControl.value;
+    }
+    return displayText;
+  }
 
   protected validationErrors(formControl:FormControl): string[]{
     const validationErrors: string[] = [];

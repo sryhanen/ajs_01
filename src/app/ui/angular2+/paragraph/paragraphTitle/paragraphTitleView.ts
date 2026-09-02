@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
+import {AfterViewInit, Component, computed, input, model, OnInit, Signal, WritableSignal} from '@angular/core';
 import {FormControl, FormsModule} from '@angular/forms';
 import {CommitParagraphRequest} from '../../../../objects/requests/commitParagraph/commitParagraphRequest';
 import {Requestable} from '../../../../objects/channel/requestable';
@@ -57,18 +57,21 @@ import {EditableTextView} from '../../editableText/editableTextView';
   ],
   template: `
     <editable-text (newText)="commitParagraphRequest($event)"
+                   placeholderText="Untitled"
                    textClassName="paragraph-title-inactive"
                    [textValueControl]="textValueControl()"></editable-text>
   `
 })
-export class ParagraphTitleView {
+export class ParagraphTitleView implements AfterViewInit {
   requestable = input.required<Requestable>();
   paragraphData = input.required<object>();
-  protected titleText = computed(() => {
-    const title = this.paragraphData()['title'];
-    return title ? title : 'Untitled';
-  });
-  textValueControl = computed(() => new FormControl(this.titleText()));
+  protected titleText = model('');
+  textValueControl= computed(() => new FormControl(this.titleText()));
+
+  ngAfterViewInit() {
+    const titleText = this.paragraphData()['title'] ? this.paragraphData()['title'] : '';
+    this.titleText.set(titleText);
+  }
 
   protected commitParagraphRequest(newTitle:string):void {
     const commitParagraphRequest = new CommitParagraphRequest(this.requestable(), {

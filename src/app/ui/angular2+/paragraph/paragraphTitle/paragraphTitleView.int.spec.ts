@@ -48,7 +48,6 @@ import {ParagraphTitleView} from './paragraphTitleView';
 import {fireEvent, render, screen} from '@testing-library/angular';
 import {FakeChannel} from '../../../../objects/channel/fakeChannel';
 import {FormsModule} from '@angular/forms';
-import {ComponentFixture} from '@angular/core/testing';
 
 describe('ParagraphTitleView integration test', () => {
   let requestable:Requestable;

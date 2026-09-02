@@ -119,22 +119,40 @@ describe('EditableTextView integration test', () => {
         expect(screen.getByLabelText('Save changes')).toBeEnabled();
       });
     });
+  });
 
-    describe('Component output', () => {
-      it('Should emit output on commit', () => {
-        const newValue = 'new text value';
-        fireEvent.click(screen.getByText(defaultText));
-        fireEvent.input(screen.getByRole('textbox'), {target:{value:newValue}});
-        let receivedOutput = '';
-        const receivedOutputCallback = (value) => {
-          receivedOutput = value;
-        };
-        fixture.componentInstance.newText.subscribe((newText) => {
-          receivedOutputCallback(newText);
-        });
-        fireEvent.click(screen.getByLabelText('Save changes'));
-        expect(receivedOutput).toEqual(newValue);
+  describe('Component output', () => {
+    it('Should emit output on commit', () => {
+      const newValue = 'new text value';
+      fireEvent.click(screen.getByText(defaultText));
+      fireEvent.input(screen.getByRole('textbox'), {target:{value:newValue}});
+      let receivedOutput = '';
+      const receivedOutputCallback = (value) => {
+        receivedOutput = value;
+      };
+      fixture.componentInstance.newText.subscribe((newText) => {
+        receivedOutputCallback(newText);
       });
+      fireEvent.click(screen.getByLabelText('Save changes'));
+      expect(receivedOutput).toEqual(newValue);
+    });
+  });
+
+  describe('Placeholder text', () => {
+    it('Should display placeholder text', () => {
+      const placeholderText = 'some placeholder text';
+      fixture.componentRef.setInput('textValueControl', new FormControl(''));
+      fixture.componentRef.setInput('placeholderText', placeholderText);
+      fixture.detectChanges();
+      expect(screen.getByText(placeholderText)).toBeDefined();
+    });
+
+    it('Should not display placeholder text', () => {
+      const placeholderText = 'some placeholder text';
+      fixture.componentRef.setInput('textValueControl', new FormControl(defaultText));
+      fixture.componentRef.setInput('placeholderText', placeholderText);
+      fixture.detectChanges();
+      expect(screen.getByText(defaultText)).toBeDefined();
     });
   });
 });
