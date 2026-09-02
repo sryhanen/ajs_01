@@ -98,8 +98,10 @@ export class EditableTextView {
   newText = output<string>();
 
   private errorTexts = new Map([
-    ['required', 'Value is required.'],
-    ['pattern', 'Value is invalid.'],
+    ['required',() =>  'Value is required.'],
+    ['pattern', () => 'Value is invalid.'],
+    ['minlength', (value:object) => `Must be at least ${value['requiredLength']} characters.`],
+    ['maxlength', (value:object) => `Must be at most ${value['requiredLength']} characters.`],
   ]);
 
   protected displayText(formControl:FormControl):string{
@@ -117,8 +119,13 @@ export class EditableTextView {
     const validationErrors: string[] = [];
     const errors = formControl.errors;
     if(errors){
-      Object.keys(errors).forEach(error => {
-        validationErrors.push(this.errorTexts.get(error));
+      Object.entries(errors).forEach(([key, value]) => {
+        if(key === 'customError'){
+          validationErrors.push(value);
+        }
+        else{
+          validationErrors.push(this.errorTexts.get(key)(value));
+        }
       });
     }
     return validationErrors;

@@ -46,20 +46,22 @@
 import {fireEvent, render, screen} from '@testing-library/angular';
 import {EditableTextView} from './editableTextView';
 import {ComponentFixture} from '@angular/core/testing';
-import {FormControl, Validators} from '@angular/forms';
+import {AbstractControl, FormControl, ValidatorFn, Validators} from '@angular/forms';
 
 describe('EditableTextView integration test', () => {
   let fixture:ComponentFixture<EditableTextView>;
   const defaultText = 'some default text';
   const textClass = 'some-text-class';
+  const customValidationErrorText = 'custom validation error text';
+  const customValidationErrorEvoke = 'EVOKE_CUSTOM_ERROR';
+  const customValidator:ValidatorFn = (control: AbstractControl) => {
+    return control.value === customValidationErrorEvoke ? {customError: customValidationErrorText} : null;
+  };
 
   beforeEach(async () => {
     const renderResult = await render(EditableTextView, {
       inputs:{
-        textValueControl: new FormControl(defaultText, [
-          Validators.required,
-          Validators.pattern(/.*\S.*/),
-        ]),
+        textValueControl: new FormControl(defaultText),
         textClassName: textClass
       }
     });
@@ -74,9 +76,10 @@ describe('EditableTextView integration test', () => {
   });
 
   describe('Validation', () => {
-    describe('Required validator', () => {
+    describe('Basic validation flow', () => {
       let textInput:HTMLElement;
       beforeEach(() => {
+        fixture.componentRef.setInput('textValueControl', new FormControl(defaultText, [Validators.required]));
         fireEvent.click(screen.getByText(defaultText));
         textInput = screen.getByRole('textbox');
         fireEvent.input(textInput, {target:{value:''}});
@@ -97,26 +100,41 @@ describe('EditableTextView integration test', () => {
       });
     });
 
-    describe('Pattern validator', () => {
-      let textInput:HTMLElement;
+    describe('Validation texts', () => {
       beforeEach(() => {
         fireEvent.click(screen.getByText(defaultText));
-        textInput = screen.getByRole('textbox');
-        fireEvent.input(textInput, {target:{value:'   '}});
       });
 
-      it('Should display validation text', () => {
+      it('Should evoke custom error', () => {
+        fixture.componentRef.setInput('textValueControl', new FormControl(defaultText, [customValidator]));
+        fixture.detectChanges();
+        const textInput = screen.getByRole('textbox');
+        fireEvent.input(textInput, {target:{value:customValidationErrorEvoke}});
+        expect(screen.getByText(customValidationErrorText));
+      });
+
+      it('Should evoke pattern error', () => {
+        fixture.componentRef.setInput('textValueControl', new FormControl(defaultText, [Validators.pattern(/.*\S.*/)]));
+        fixture.detectChanges();
+        const textInput = screen.getByRole('textbox');
+        fireEvent.input(textInput, {target:{value:'   '}});
         expect(screen.getByText('Value is invalid.')).toBeDefined();
       });
 
-      it('Should disable commit button if form is invalid', () => {
-        expect(screen.getByLabelText('Save changes')).toBeDisabled();
+      it('Should evoke maxLength error', () => {
+        fixture.componentRef.setInput('textValueControl', new FormControl(defaultText, [Validators.maxLength(3)]));
+        fixture.detectChanges();
+        const textInput = screen.getByRole('textbox');
+        fireEvent.input(textInput, {target:{value:'aaaa'}});
+        expect(screen.getByText('Must be at most 3 characters.')).toBeDefined();
       });
 
-      it('Should enable commit button if form is valid', () => {
-        const newValue = 'new text';
-        fireEvent.input(textInput, {target:{value:newValue}});
-        expect(screen.getByLabelText('Save changes')).toBeEnabled();
+      it('Should evoke minLength error', () => {
+        fixture.componentRef.setInput('textValueControl', new FormControl(defaultText, [Validators.minLength(2)]));
+        fixture.detectChanges();
+        const textInput = screen.getByRole('textbox');
+        fireEvent.input(textInput, {target:{value:'a'}});
+        expect(screen.getByText('Must be at least 2 characters.')).toBeDefined();
       });
     });
   });
