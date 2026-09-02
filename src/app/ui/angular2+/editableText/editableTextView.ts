@@ -69,11 +69,14 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
                 aria-label="Revert changes">
           <i class="fas fa-times fa-lg"></i>
         </button>
-        @for(validationError of validationErrors(textValueControl()); track $index){
-          <div class="absolute-validation-text">
-            {{validationError}}
-          </div>
-        }
+        <div class="absolute-validation-text container rounded">
+          @for(validationError of validationErrors(textValueControl()); track $index){
+            <div class="row mx-1 mb-1">
+              {{validationError}}
+            </div>
+          }
+        </div>
+
       </div>
     }
   `,
@@ -84,6 +87,7 @@ import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
       left: 0;
       color: #dc3545;
       font-size: 0.875em;
+      background-color: white;
     }
     .overwrite-note-action {
       color: var(--primary-300) !important;
