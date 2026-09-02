@@ -43,9 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {Requestable} from '../../../../../objects/channel/requestable';
 import {EditableTextView} from '../../../editableText/editableTextView';
+import {FormControl, Validators} from '@angular/forms';
 
 @Component({
   selector: 'notebook-title',
@@ -53,12 +54,18 @@ import {EditableTextView} from '../../../editableText/editableTextView';
     EditableTextView
   ],
   template: `
-    <editable-text [text]="title()" (newText)="updateTitleText($event)" textClassName="form-control_title" [required]="true"></editable-text>
+    <editable-text (newText)="updateTitleText($event)"
+                   textClassName="form-control_title"
+                   [textValueControl]="textValueControl()"></editable-text>
   `
 })
 export class NotebookTitleView{
   requestable = input.required<Requestable>();
   title = input.required<string>();
+  textValueControl = computed(() => new FormControl(this.title(), [
+    Validators.required,
+    Validators.pattern(/.*\S.*/),
+  ]));
 
   updateTitleText(newText:string):void{
 

@@ -43,8 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, input, model, output, signal} from '@angular/core';
-import {FormControl, FormsModule,ReactiveFormsModule, Validators} from '@angular/forms';
+import {Component, input, output, signal} from '@angular/core';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'editable-text',
@@ -55,12 +55,12 @@ import {FormControl, FormsModule,ReactiveFormsModule, Validators} from '@angular
   template: `
     @if (!isEditing()) {
       <span (click)="startEditing()" [class]="textClassName()">
-       {{ text() }}
+       {{ textValueControl().value }}
      </span>
     } @else {
-      @let textValueIsInvalid = required()&&textValueControl.invalid;
+      @let textValueIsInvalid = textValueControl().invalid;
       <div class="input-group flex-nowrap position-relative">
-        <input class="me-2" type="text" [formControl]="textValueControl" [required]="required()"/>
+        <input class="me-2" type="text" [formControl]="textValueControl()"/>
         <button class="bg-transparent border-0 p-0 me-2" (click)="commitTextChange()" type="submit"
                 aria-label="Save changes" [disabled]="textValueIsInvalid">
           <i class="fas fa-check fa-lg" [class]="textValueIsInvalid ? 'overwrite-note-action':''"></i>
@@ -69,9 +69,9 @@ import {FormControl, FormsModule,ReactiveFormsModule, Validators} from '@angular
                 aria-label="Revert changes">
           <i class="fas fa-times fa-lg"></i>
         </button>
-        @if (textValueIsInvalid) {
+        @for(validationError of validationErrors(textValueControl()); track $index){
           <div class="absolute-validation-text">
-            Value is required.
+            {{validationError}}
           </div>
         }
       </div>
@@ -91,31 +91,36 @@ import {FormControl, FormsModule,ReactiveFormsModule, Validators} from '@angular
     }
   `
 })
-export class EditableTextView implements AfterViewInit {
-  text = model.required<string>();
-  required = input<boolean>(false);
+export class EditableTextView {
   textClassName = input<string>();
   newText = output<string>();
-  textValueControl:FormControl<string>;
+  textValueControl = input.required<FormControl<string>>();
+  private errorTexts = new Map([
+    ['required', 'Value is required.'],
+    ['pattern', 'Value is invalid.'],
+  ]);
 
-  ngAfterViewInit() {
-    this.textValueControl = new FormControl(this.text(), [
-      Validators.required,
-      Validators.pattern(/.*\S.*/)
-    ]);
+  protected validationErrors(formControl:FormControl): string[]{
+    const validationErrors: string[] = [];
+    const errors = formControl.errors;
+    if(errors){
+      Object.keys(errors).forEach(error => {
+        validationErrors.push(this.errorTexts.get(error));
+      });
+    }
+    return validationErrors;
   }
 
   protected originalText:string;
   protected isEditing = signal(false);
 
   protected commitTextChange(): void {
-    this.newText.emit(this.textValueControl.value);
-    this.text.set(this.textValueControl.value);
+    this.newText.emit(this.textValueControl().value);
     this.stopEditing();
   }
 
   protected startEditing(): void  {
-    this.originalText = this.text();
+    this.originalText = this.textValueControl().value;
     this.isEditing.set(true);
   }
 
@@ -124,7 +129,7 @@ export class EditableTextView implements AfterViewInit {
   }
 
   protected cancelChanges(): void {
-    this.textValueControl.reset(this.originalText);
+    this.textValueControl().reset(this.originalText);
     this.stopEditing();
   }
 }

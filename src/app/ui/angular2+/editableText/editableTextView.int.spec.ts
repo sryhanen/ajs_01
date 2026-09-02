@@ -46,6 +46,7 @@
 import {fireEvent, render, screen} from '@testing-library/angular';
 import {EditableTextView} from './editableTextView';
 import {ComponentFixture} from '@angular/core/testing';
+import {FormControl, Validators} from '@angular/forms';
 
 describe('EditableTextView integration test', () => {
   let fixture:ComponentFixture<EditableTextView>;
@@ -55,7 +56,10 @@ describe('EditableTextView integration test', () => {
   beforeEach(async () => {
     const renderResult = await render(EditableTextView, {
       inputs:{
-        text: defaultText,
+        textValueControl: new FormControl(defaultText, [
+          Validators.required,
+          Validators.pattern(/.*\S.*/),
+        ]),
         textClassName: textClass
       }
     });
@@ -70,11 +74,9 @@ describe('EditableTextView integration test', () => {
   });
 
   describe('Validation', () => {
-    describe('Required is true', () => {
+    describe('Required validator', () => {
       let textInput:HTMLElement;
       beforeEach(() => {
-        fixture.componentRef.setInput('required', true);
-        fixture.detectChanges();
         fireEvent.click(screen.getByText(defaultText));
         textInput = screen.getByRole('textbox');
         fireEvent.input(textInput, {target:{value:''}});
@@ -92,6 +94,46 @@ describe('EditableTextView integration test', () => {
         const newValue = 'new text';
         fireEvent.input(textInput, {target:{value:newValue}});
         expect(screen.getByLabelText('Save changes')).toBeEnabled();
+      });
+    });
+
+    describe('Pattern validator', () => {
+      let textInput:HTMLElement;
+      beforeEach(() => {
+        fireEvent.click(screen.getByText(defaultText));
+        textInput = screen.getByRole('textbox');
+        fireEvent.input(textInput, {target:{value:'   '}});
+      });
+
+      it('Should display validation text', () => {
+        expect(screen.getByText('Value is invalid.')).toBeDefined();
+      });
+
+      it('Should disable commit button if form is invalid', () => {
+        expect(screen.getByLabelText('Save changes')).toBeDisabled();
+      });
+
+      it('Should enable commit button if form is valid', () => {
+        const newValue = 'new text';
+        fireEvent.input(textInput, {target:{value:newValue}});
+        expect(screen.getByLabelText('Save changes')).toBeEnabled();
+      });
+    });
+
+    describe('Component output', () => {
+      it('Should emit output on commit', () => {
+        const newValue = 'new text value';
+        fireEvent.click(screen.getByText(defaultText));
+        fireEvent.input(screen.getByRole('textbox'), {target:{value:newValue}});
+        let receivedOutput = '';
+        const receivedOutputCallback = (value) => {
+          receivedOutput = value;
+        };
+        fixture.componentInstance.newText.subscribe((newText) => {
+          receivedOutputCallback(newText);
+        });
+        fireEvent.click(screen.getByLabelText('Save changes'));
+        expect(receivedOutput).toEqual(newValue);
       });
     });
   });

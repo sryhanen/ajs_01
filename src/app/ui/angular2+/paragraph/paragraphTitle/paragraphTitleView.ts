@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Component, computed, input} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {FormControl, FormsModule} from '@angular/forms';
 import {CommitParagraphRequest} from '../../../../objects/requests/commitParagraph/commitParagraphRequest';
 import {Requestable} from '../../../../objects/channel/requestable';
 import {EditableTextView} from '../../editableText/editableTextView';
@@ -56,7 +56,9 @@ import {EditableTextView} from '../../editableText/editableTextView';
     EditableTextView
   ],
   template: `
-    <editable-text [text]="titleText()" (newText)="commitParagraphRequest($event)" textClassName="paragraph-title-inactive"></editable-text>
+    <editable-text (newText)="commitParagraphRequest($event)"
+                   textClassName="paragraph-title-inactive"
+                   [textValueControl]="textValueControl()"></editable-text>
   `
 })
 export class ParagraphTitleView {
@@ -66,6 +68,7 @@ export class ParagraphTitleView {
     const title = this.paragraphData()['title'];
     return title ? title : 'Untitled';
   });
+  textValueControl = computed(() => new FormControl(this.titleText()));
 
   protected commitParagraphRequest(newTitle:string):void {
     const commitParagraphRequest = new CommitParagraphRequest(this.requestable(), {

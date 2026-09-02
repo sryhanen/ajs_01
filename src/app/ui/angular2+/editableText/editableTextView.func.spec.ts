@@ -46,6 +46,7 @@
 import {EditableTextView} from './editableTextView';
 import {fireEvent, render, screen} from '@testing-library/angular';
 import {Mock} from 'vitest';
+import {FormControl} from '@angular/forms';
 
 describe('EditableTextView functional test', () => {
   const defaultText = 'default text';
@@ -54,7 +55,7 @@ describe('EditableTextView functional test', () => {
   beforeEach(async () => {
     const renderResult = await render(EditableTextView, {
       inputs:{
-        text: defaultText,
+        textValueControl: new FormControl(defaultText),
       }
     });
     newTextSpy = vi.fn();
