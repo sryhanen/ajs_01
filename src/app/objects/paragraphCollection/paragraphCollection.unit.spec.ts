@@ -50,9 +50,19 @@ import {Channel} from '../channel/channel';
 
 describe('ParagraphCollection unit test', () => {
   let channel: Channel;
-  const initialparagraphData: object[] = [
-    {id:'para1'},
-    {id:'para2'},
+  const initialparagraphData = [
+    {
+      id:'para1',
+      text: 'para1',
+      config:{},
+      settings:{},
+    },
+    {
+      id:'para2',
+      text: 'para2',
+      config:{},
+      settings:{},
+    },
   ];
   let paragraphCollection: ParagraphCollection;
   beforeEach(() => {
@@ -81,40 +91,6 @@ describe('ParagraphCollection unit test', () => {
       };
       paragraphCollection.request(request);
       expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
-
-    it('Should decorate RUN_PARAGRAPH request', () => {
-      const paragraphId = 'para1';
-      const paragraphText = 'paragraph text';
-      const paragraphConfig = {test1:'test1'};
-      const paragraphSettings = {params:{test2:'test2'}};
-      paragraphCollection = new ParagraphCollectionImpl(channel, [{
-        id:paragraphId,
-        text:paragraphText,
-        config:paragraphConfig,
-        settings:paragraphSettings,
-      }]);
-      const runParagraphRequest = {
-        op:'RUN_PARAGRAPH',
-        data:{
-          id:paragraphId,
-          paragraph:'',
-          config:{},
-          params:{}
-        }
-      };
-      const spy = vi.spyOn(channel, 'request');
-      paragraphCollection.request(runParagraphRequest);
-      const expectedRequest = {
-        op:'RUN_PARAGRAPH',
-        data:{
-          id:paragraphId,
-          paragraph:paragraphText,
-          config:paragraphConfig,
-          params:paragraphSettings.params
-        }
-      };
-      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
     });
   });
 

@@ -45,7 +45,6 @@
  */
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
-import {RunParagraphRequest} from './runParagraphRequest/runParagraphRequest';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
@@ -61,6 +60,7 @@ import {ParagraphAddedMessageImpl} from '../message/paragraphAddedMessage/paragr
 import {ParagraphRemovedMessageImpl} from '../message/paragraphRemovedMessage/paragraphRemovedMessageImpl';
 import {RequestRegister} from '../register/requestRegister/requestRegister';
 import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterImpl';
+import {RunParagraphRequest} from '../requests/runParagraph/runParagraphRequest';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _channel: Channel;
@@ -79,13 +79,20 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     this._responseRegister.register('PARAGRAPH_ADDED', (json) => this.paragraphAddedResponse(json));
     this._responseRegister.register('PARAGRAPH_REMOVED', (json) => this.paragraphRemovedResponse(json));
     this._requestRegister = new RequestRegisterImpl(this._channel);
-    this._requestRegister.register('RUN_PARAGRAPH', (json) => this.runParagraphRequest(json));
+    this._requestRegister.register('EXECUTE_PARAGRAPH', (json) => this.executeParagraphRequest(json));
     this._componentView = new ComponentViewStub();
   }
 
-  private runParagraphRequest(json:object):void {
-    const runParagraphRequest = new RunParagraphRequest(this._channel, this._decoratorParagraphs);
-    runParagraphRequest.request(json);
+  private executeParagraphRequest(json:object):void {
+    const paragraphId = json['data']['paragraphId'];
+    const decoratorParagraph = this._paragraphs().get(paragraphId);
+    const runParagraphRequest = new RunParagraphRequest(decoratorParagraph, {
+      id:paragraphId,
+      paragraph:'',
+      config:{},
+      params:{},
+    });
+    runParagraphRequest.send();
   }
 
   private paragraphResponse(json:object):void{
