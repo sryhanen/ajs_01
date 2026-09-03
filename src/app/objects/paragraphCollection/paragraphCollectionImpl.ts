@@ -65,7 +65,6 @@ import {RunParagraphRequest} from '../requests/runParagraph/runParagraphRequest'
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _channel: Channel;
   private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
-  private readonly _decoratorParagraphs:Map<string,  object>;
   private readonly _responseRegister:ResponseRegister;
   private readonly _requestRegister:RequestRegister;
   private readonly _componentView: ComponentView;
@@ -73,7 +72,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   constructor(channel: Channel, initialParagraphData: object[]) {
     this._channel = channel;
     this._paragraphs = this.initializedParagraphs(initialParagraphData);
-    this._decoratorParagraphs = this.initializedDecoratorParagraphs(initialParagraphData);
     this._responseRegister = new ResponseRegisterImpl();
     this._responseRegister.register('PARAGRAPH', (json) => this.paragraphResponse(json));
     this._responseRegister.register('PARAGRAPH_ADDED', (json) => this.paragraphAddedResponse(json));
@@ -102,7 +100,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       paragraphs.set(paragraph.id(), paragraph);
       return paragraphs;
     });
-    this._decoratorParagraphs.set(paragraph.id(), paragraphMessage.data());
   }
 
   private paragraphAddedResponse(json:object):void{
@@ -114,13 +111,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       paragraphsAsArray.splice(index, 0, [paragraph.id(), paragraph]);
       return new Map(paragraphsAsArray);
     });
-
-    const decoratorParagraphsAsArray = Array.from(this._decoratorParagraphs);
-    decoratorParagraphsAsArray.splice(index, 0, [paragraph.id(), paragraphAddedMessage.data()]);
-    this._decoratorParagraphs.clear();
-    for(const decoratorParagraph of decoratorParagraphsAsArray) {
-      this._decoratorParagraphs.set(decoratorParagraph[0], decoratorParagraph[1]);
-    }
   }
 
   private paragraphRemovedResponse(json:object):void{
@@ -130,16 +120,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       paragraphs.delete(paragraphId);
       return paragraphs;
     });
-    this._decoratorParagraphs.delete(paragraphId);
-  }
-
-  private initializedDecoratorParagraphs(initialParagraphData: object[]): Map<string,  object>{
-    const paragraphMap = new Map<string, object>();
-    initialParagraphData.forEach(paragraphData => {
-      const paragraph = new ParagraphImpl(this, paragraphData);
-      paragraphMap.set(paragraph.id(), paragraphData);
-    });
-    return paragraphMap;
   }
 
   private initializedParagraphs(initialParagraphData: object[]): WritableSignal<Map<string,  Paragraph>> {
