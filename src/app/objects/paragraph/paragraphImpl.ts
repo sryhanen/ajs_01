@@ -67,6 +67,7 @@ import {
   RequestRegisterWithPropertyDecorator
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 import {ParagraphOutputMessageFactoryImpl} from './paragraphOutputMessageFactory/paragraphOutputMessageFactoryImpl';
+import {RunParagraphRequest} from '../requests/runParagraph/runParagraphRequest';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
@@ -83,6 +84,7 @@ export class ParagraphImpl implements Paragraph {
     this._componentView = new ComponentViewStub();
     this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer]), {name:'paragraphId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
+    this._requestRegister.register('RUN_PARAGRAPH', () => this.decorateRunParagraphRequest());
   }
 
   private initializedOutputContainer(paragraph: object): OutputContainer {
@@ -93,6 +95,16 @@ export class ParagraphImpl implements Paragraph {
       outputContainer.response(paragraphOutputMessage.print());
     }
     return outputContainer;
+  }
+
+  private decorateRunParagraphRequest(): void {
+    const runParagraphRequest = new RunParagraphRequest(this._channel, {
+      id: this.id(),
+      paragraph:this._paragraph.getProperty('text', 'string'),
+      config:this._paragraph.getProperty('config', 'object'),
+      params:this._paragraph.getProperty('settings', 'object'),
+    });
+    runParagraphRequest.send();
   }
 
   print(): Signal<RenderNode> {

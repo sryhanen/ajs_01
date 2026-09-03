@@ -112,5 +112,24 @@ describe('Paragraph', () => {
       paragraph.request(request);
       expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
     });
+
+    it('Should decorate run paragraph request', () => {
+      const runParagraphRequest = {
+        op:'RUN_PARAGRAPH',
+        data:{}
+      };
+      const spy = vi.spyOn(channel, 'request');
+      paragraph.request(runParagraphRequest);
+      const expectedRequest = {
+        op:'RUN_PARAGRAPH',
+        data:{
+          id:paragraphId,
+          paragraph: paragraphText,
+          config: paragraphConfig,
+          params: paragraphData.settings
+        }
+      };
+      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
   });
 });
