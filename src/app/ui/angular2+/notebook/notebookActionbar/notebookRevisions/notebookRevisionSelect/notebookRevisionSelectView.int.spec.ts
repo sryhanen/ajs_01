@@ -44,16 +44,16 @@
  * a licensee so wish it.
  */
 
-import {Requestable} from '../../../../../objects/channel/requestable';
-import {RevisionCommit} from '../../../../../objects/revisionCommit/revisionCommit';
-import {ComponentView} from '../../../../../objects/rendering/componentView/componentView';
-import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
-import {ComponentViewStub} from '../../../../../objects/rendering/componentView/componentViewStub';
+import {Requestable} from '../../../../../../objects/channel/requestable';
+import {RevisionCommit} from '../../../../../../objects/revisionCommit/revisionCommit';
+import {ComponentView} from '../../../../../../objects/rendering/componentView/componentView';
+import {FakeChannel} from '../../../../../../objects/channel/fakeChannel';
+import {ComponentViewStub} from '../../../../../../objects/rendering/componentView/componentViewStub';
 import {ComponentFixture} from '@angular/core/testing';
 import {NotebookRevisionSelectView} from './notebookRevisionSelectView';
 import {fireEvent, render, screen} from '@testing-library/angular';
 import {Component, signal} from '@angular/core';
-import {ComponentViewImpl} from '../../../../../objects/rendering/componentView/componentViewImpl';
+import {ComponentViewImpl} from '../../../../../../objects/rendering/componentView/componentViewImpl';
 import {By} from '@angular/platform-browser';
 
 describe('NotebookRevisionSelectView integration test', () => {

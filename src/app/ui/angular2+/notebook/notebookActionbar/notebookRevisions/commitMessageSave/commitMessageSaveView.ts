@@ -45,9 +45,9 @@
  */
 import {Component, ElementRef, input, model, ViewChild} from '@angular/core';
 import {FormsModule, NgModel} from '@angular/forms';
-import {CheckpointNoteRequest} from '../../../../../objects/requests/checkpointNote/checkpointNoteRequest';
-import {Requestable} from '../../../../../objects/channel/requestable';
-import {CustomDropdownDirective} from '../../../customDropdown/customDropdownDirective';
+import {CheckpointNoteRequest} from '../../../../../../objects/requests/checkpointNote/checkpointNoteRequest';
+import {Requestable} from '../../../../../../objects/channel/requestable';
+import {CustomDropdownDirective} from '../../../../customDropdown/customDropdownDirective';
 
 @Component({
   selector: 'commit-message-save',

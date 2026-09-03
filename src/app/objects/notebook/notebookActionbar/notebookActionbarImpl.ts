@@ -49,8 +49,8 @@ import {ComponentView} from '../../rendering/componentView/componentView';
 import {Channel} from '../../channel/channel';
 import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
 import {NotebookActionbarView} from '../../../ui/angular2+/notebook/notebookActionbar/notebookActionbarView';
-import {NotebookRevisions} from '../notebookRevisions/notebookRevisions';
-import {NotebookRevisionsImpl} from '../notebookRevisions/notebookRevisionsImpl';
+import {NotebookRevisions} from './notebookRevisions/notebookRevisions';
+import {NotebookRevisionsImpl} from './notebookRevisions/notebookRevisionsImpl';
 
 export class NotebookActionbarImpl implements NotebookActionbar {
   private readonly _channel:Channel;

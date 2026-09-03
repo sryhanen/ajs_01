@@ -44,14 +44,14 @@
  * a licensee so wish it.
  */
 import {Component, ElementRef, input, ViewChild} from '@angular/core';
-import {Requestable} from '../../../../../objects/channel/requestable';
-import {RevisionCommit} from '../../../../../objects/revisionCommit/revisionCommit';
+import {Requestable} from '../../../../../../objects/channel/requestable';
+import {RevisionCommit} from '../../../../../../objects/revisionCommit/revisionCommit';
 import moment from 'moment';
-import {ComponentView} from '../../../../../objects/rendering/componentView/componentView';
+import {ComponentView} from '../../../../../../objects/rendering/componentView/componentView';
 import {NgComponentOutlet} from '@angular/common';
-import {CustomDropdownDirective} from '../../../customDropdown/customDropdownDirective';
+import {CustomDropdownDirective} from '../../../../customDropdown/customDropdownDirective';
 import * as Bootstrap from 'bootstrap';
-import {SetNoteRevisionRequest} from '../../../../../objects/requests/setNoteRevision/setNoteRevisionRequest';
+import {SetNoteRevisionRequest} from '../../../../../../objects/requests/setNoteRevision/setNoteRevisionRequest';
 
 @Component({
   selector: 'revision-select',

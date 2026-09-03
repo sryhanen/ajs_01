@@ -43,10 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Requestable} from '../../../../../objects/channel/requestable';
+import {Requestable} from '../../../../../../objects/channel/requestable';
 import {CommitMessageSaveView} from './commitMessageSaveView';
 import {render, screen, fireEvent} from '@testing-library/angular';
-import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
+import {FakeChannel} from '../../../../../../objects/channel/fakeChannel';
 
 describe('Commit message save view integration test', () => {
   let requestable: Requestable;

@@ -46,4 +46,4 @@
 import {Printable} from '../../../rendering/printable/printable';
 import {Channel} from '../../../channel/channel';
 
-export interface NotebookRevisionSelect extends Channel, Printable {}
+export interface NotebookRevisions extends Channel, Printable{}

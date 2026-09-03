@@ -50,12 +50,12 @@ import {
   input,
   OnInit, Renderer2, ViewChild,
 } from '@angular/core';
-import {RevisionCommit} from '../../../../../objects/revisionCommit/revisionCommit';
-import {Requestable} from '../../../../../objects/channel/requestable';
+import {RevisionCommit} from '../../../../../../objects/revisionCommit/revisionCommit';
+import {Requestable} from '../../../../../../objects/channel/requestable';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {
   NoteRevisionForCompareRequest
-} from '../../../../../objects/requests/noteRevisionForCompare/noteRevisionForCompareRequest';
+} from '../../../../../../objects/requests/noteRevisionForCompare/noteRevisionForCompareRequest';
 import {ParagraphComparerView} from './paragraphComparer/paragraphComparerView';
 
 @Component({

@@ -45,18 +45,18 @@
  */
 import {NotebookRevisionSelect} from './notebookRevisionSelect';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {ComponentView} from '../../../rendering/componentView/componentView';
-import {Channel} from '../../../channel/channel';
-import {ResponseRegister} from '../../../register/responseRegister/responseRegister';
-import {ResponseRegisterImpl} from '../../../register/responseRegister/responseRegisterImpl';
-import {RevisionCommit} from '../../../revisionCommit/revisionCommit';
-import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
-import {NotebookRevisionSelectView} from '../../../../ui/angular2+/notebook/notebookRevisions/notebookRevisionSelect/notebookRevisionSelectView';
-import {NoteRevisionMessageImpl} from '../../../message/noteRevisionMessage/noteRevisionMessageImpl';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {MessageImpl} from '../../../message/messageImpl';
-import {RevisionNotebook} from '../../../revisions/notebook/revisionNotebook';
-import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
+import {ComponentView} from '../../../../rendering/componentView/componentView';
+import {Channel} from '../../../../channel/channel';
+import {ResponseRegister} from '../../../../register/responseRegister/responseRegister';
+import {ResponseRegisterImpl} from '../../../../register/responseRegister/responseRegisterImpl';
+import {RevisionCommit} from '../../../../revisionCommit/revisionCommit';
+import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
+import {NotebookRevisionSelectView} from '../../../../../ui/angular2+/notebook/notebookActionbar/notebookRevisions/notebookRevisionSelect/notebookRevisionSelectView';
+import {NoteRevisionMessageImpl} from '../../../../message/noteRevisionMessage/noteRevisionMessageImpl';
+import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';
+import {MessageImpl} from '../../../../message/messageImpl';
+import {RevisionNotebook} from '../../../../revisions/notebook/revisionNotebook';
+import {ComponentViewStub} from '../../../../rendering/componentView/componentViewStub';
 
 export class NotebookRevisionSelectImpl implements NotebookRevisionSelect {
   private readonly _channel: Channel;

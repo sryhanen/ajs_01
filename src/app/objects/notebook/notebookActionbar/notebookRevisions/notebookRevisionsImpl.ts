@@ -45,21 +45,21 @@
  */
 import {NotebookRevisions} from './notebookRevisions';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {ComponentView} from '../../rendering/componentView/componentView';
-import {Channel} from '../../channel/channel';
-import {ResponseRegister} from '../../register/responseRegister/responseRegister';
-import {ResponseRegisterImpl} from '../../register/responseRegister/responseRegisterImpl';
+import {ComponentView} from '../../../rendering/componentView/componentView';
+import {Channel} from '../../../channel/channel';
+import {ResponseRegister} from '../../../register/responseRegister/responseRegister';
+import {ResponseRegisterImpl} from '../../../register/responseRegister/responseRegisterImpl';
 import {NotebookRevisionsComparer} from './notebookRevisionsComparer/notebookRevisionsComparer';
 import {NotebookRevisionsComparerImpl} from './notebookRevisionsComparer/notebookRevisionsComparerImpl';
-import {ListRevisionHistoryMessageImpl} from '../../message/listRevisionHistory/listRevisionHistoryMessageImpl';
-import {MessageImpl} from '../../message/messageImpl';
-import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
+import {ListRevisionHistoryMessageImpl} from '../../../message/listRevisionHistory/listRevisionHistoryMessageImpl';
+import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {
   ResponseRegisterWithDefaultResponseList
-} from '../../register/responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
-import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
-import {NotebookRevisionsView} from '../../../ui/angular2+/notebook/notebookRevisions/notebookRevisionsView';
-import {RevisionCommit} from '../../revisionCommit/revisionCommit';
+} from '../../../register/responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
+import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import {NotebookRevisionsView} from '../../../../ui/angular2+/notebook/notebookActionbar/notebookRevisions/notebookRevisionsView';
+import {RevisionCommit} from '../../../revisionCommit/revisionCommit';
 import {NotebookRevisionSelect} from './notebookRevisionSelect/notebookRevisionSelect';
 import {NotebookRevisionSelectImpl} from './notebookRevisionSelect/notebookRevisionSelectImpl';
 

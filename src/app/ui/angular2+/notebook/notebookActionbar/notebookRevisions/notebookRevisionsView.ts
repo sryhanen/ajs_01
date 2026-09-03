@@ -43,7 +43,36 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
-import {Printable} from '../../../rendering/printable/printable';
+import {Component, input} from '@angular/core';
+import {Requestable} from '../../../../../objects/channel/requestable';
+import {FormsModule} from '@angular/forms';
+import {CommitMessageSaveView} from './commitMessageSave/commitMessageSaveView';
+import {RevisionCommit} from '../../../../../objects/revisionCommit/revisionCommit';
+import {NgComponentOutlet} from '@angular/common';
+import {ComponentView} from '../../../../../objects/rendering/componentView/componentView';
 
-export interface NotebookRevisionsComparer extends Printable, Channel {}
+@Component({
+  selector: 'notebook-revisions',
+  imports: [
+    FormsModule,
+    CommitMessageSaveView,
+    NgComponentOutlet,
+  ],
+  template: `
+    <div class="btn-group me-2"
+         role="group"
+         aria-label="version control">
+      <commit-message-save [requestable]="requestable()"></commit-message-save>
+      @if (revisionCommits().length > 0) {
+        <ng-container *ngComponentOutlet="notebookRevisionsComparer().component(); inputs: notebookRevisionsComparer().inputs()()"></ng-container>
+        <ng-container *ngComponentOutlet="notebookRevisionSelect().component(); inputs: notebookRevisionSelect().inputs()()"></ng-container>
+      }
+    </div>
+  `
+})
+export class NotebookRevisionsView {
+  requestable = input.required<Requestable>();
+  revisionCommits = input.required<RevisionCommit[]>();
+  notebookRevisionSelect = input.required<ComponentView>();
+  notebookRevisionsComparer = input.required<ComponentView>();
+}

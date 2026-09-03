@@ -45,16 +45,16 @@
  */
 import {NotebookRevisions} from '../notebookRevisions';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {ComponentView} from '../../../rendering/componentView/componentView';
-import {Channel} from '../../../channel/channel';
-import {ResponseRegisterImpl} from '../../../register/responseRegister/responseRegisterImpl';
-import {ResponseRegister} from '../../../register/responseRegister/responseRegister';
-import {RevisionCommit} from '../../../revisionCommit/revisionCommit';
-import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
-import {NotebookRevisionsComparerView} from '../../../../ui/angular2+/notebook/notebookRevisions/notebookRevisisionsComparer/notebookRevisionsComparerView';
-import {NoteRevisionForCompareMessageImpl} from '../../../message/noteRevisionForCompare/noteRevisionForCompareMessageImpl';
-import {MessageImpl} from '../../../message/messageImpl';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {ComponentView} from '../../../../rendering/componentView/componentView';
+import {Channel} from '../../../../channel/channel';
+import {ResponseRegisterImpl} from '../../../../register/responseRegister/responseRegisterImpl';
+import {ResponseRegister} from '../../../../register/responseRegister/responseRegister';
+import {RevisionCommit} from '../../../../revisionCommit/revisionCommit';
+import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
+import {NotebookRevisionsComparerView} from '../../../../../ui/angular2+/notebook/notebookActionbar/notebookRevisions/notebookRevisisionsComparer/notebookRevisionsComparerView';
+import {NoteRevisionForCompareMessageImpl} from '../../../../message/noteRevisionForCompare/noteRevisionForCompareMessageImpl';
+import {MessageImpl} from '../../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../../safeJson/safeJsonImpl';
 
 export class NotebookRevisionsComparerImpl implements NotebookRevisions {
   private readonly _channel: Channel;
