@@ -48,12 +48,20 @@ import {ComponentView} from '../../../../objects/rendering/componentView/compone
 import {NgComponentOutlet} from '@angular/common';
 import {NotebookTitleView} from './notebookTitle/notebookTitleView';
 import {Requestable} from '../../../../objects/channel/requestable';
+import {RunAllParagraphsButton} from './runAllParagraphs/runAllParagraphsButton';
+import {ClearOutputsButton} from './clearOutputs/clearOutputsButton';
+import {CloneNotebookButton} from './cloneNotebook/cloneNotebookButton';
+import {ExportNotebookButton} from './exportNotebook/exportNotebookButton';
 
 @Component({
   selector: 'notebook-actionbar',
   imports: [
     NgComponentOutlet,
-    NotebookTitleView
+    NotebookTitleView,
+    RunAllParagraphsButton,
+    ClearOutputsButton,
+    CloneNotebookButton,
+    ExportNotebookButton
   ],
   template: `
     <div class="note-action">
@@ -61,7 +69,10 @@ import {Requestable} from '../../../../objects/channel/requestable';
         <div class="container-fluid px-5">
           <notebook-title class="me-3" [requestable]="requestable()" [title]="notebookTitle()"></notebook-title>
           <div class="btn-group me-2" role="group" aria-label="button group">
-
+            <run-all-paragraphs-button class="btn-group" [requestable]="requestable()"></run-all-paragraphs-button>
+            <clear-outputs-button class="btn-group" [requestable]="requestable()"></clear-outputs-button>
+            <clone-notebook-button class="btn-group"></clone-notebook-button>
+            <export-notebook-button class="btn-group"></export-notebook-button>
           </div>
             <div class="container-fluid px-5">
               <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
