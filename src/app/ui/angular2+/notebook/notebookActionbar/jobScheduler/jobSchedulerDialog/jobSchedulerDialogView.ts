@@ -84,7 +84,7 @@ import parser from 'cron-parser';
       <div class="btn-group">
         @for (cronOption of cronOptions; track $index) {
           <button class="btn btn-sm btn-secondary"
-                  type="button">
+                  type="button" (click)="setCronOption(cronOption[0])">
             {{ cronOption[0] }}
           </button>
         }
@@ -104,18 +104,24 @@ export class JobSchedulerDialogView {
   cronInput = input<string>('');
   protected cronOptions = new Map([
     ['None', ''],
-    ['1h', ''],
-    ['3h', ''],
-    ['6h', ''],
-    ['12h', ''],
-    ['1D', '']
+    ['1h', '0 0 0/1 * * ?'],
+    ['3h', '0 0 0/3 * * ?'],
+    ['6h', '0 0 0/6 * * ?'],
+    ['12h', '0 0 0/12 * * ?'],
+    ['1D', '0 0 0 * * ?']
   ]);
+
   cronInputFormControl = computed(() => new FormControl(
     this.cronInput(),
     [
       this.cronValidator()
     ]
   ));
+
+  protected setCronOption(cronOptionId:string):void{
+    const cronValue = this.cronOptions.get(cronOptionId);
+    this.cronInputFormControl().setValue(cronValue);
+  }
 
   private cronValidator():ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
