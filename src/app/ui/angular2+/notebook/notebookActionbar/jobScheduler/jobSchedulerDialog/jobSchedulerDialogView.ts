@@ -69,7 +69,7 @@ import parser from 'cron-parser';
                    class="form-control form-control-sm"
                    placeholder="Write a cron expression"
                    [formControl]="cronInputFormControl()"/>
-            <button class=" btn btn-sm btn-secondary" type="button">
+            <button class="btn btn-sm btn-secondary" type="button" [disabled]="cronInputFormControl().invalid">
               Set
             </button>
           </div>
@@ -77,6 +77,11 @@ import parser from 'cron-parser';
         @if(cronInputFormControl().hasError('cronError')){
           <div class="mt-3 alert alert-warning">
             {{cronInputFormControl().getError('cronError')}}
+          </div>
+        }
+        @if(cronInputFormControl().hasError('intervalError')){
+          <div class="mt-3 alert alert-warning">
+            {{cronInputFormControl().getError('intervalError')}}
           </div>
         }
       </div>
@@ -114,13 +119,38 @@ export class JobSchedulerDialogView {
   cronInputFormControl = computed(() => new FormControl(
     this.cronInput(),
     [
-      this.cronValidator()
+      this.cronValidator(),
+      this.intervalValidator()
     ]
   ));
 
   protected setCronOption(cronOptionId:string):void{
     const cronValue = this.cronOptions.get(cronOptionId);
     this.cronInputFormControl().setValue(cronValue);
+  }
+
+  private minInterval= 3600000;
+
+  private intervalValidator():ValidatorFn{
+    return (control: AbstractControl): ValidationErrors | null => {
+      let validationErrors: ValidationErrors | null = null;
+      try{
+        const currentValue = control.value;
+        if(currentValue !== ''){
+          const expression = parser.parseExpression(control.value);
+          const date1 = new Date(expression.next().toDate());
+          const date2 = new Date(expression.next().toDate());
+          const diff = Math.abs(date2.getTime() - date1.getTime());
+          if(diff < this.minInterval){
+            validationErrors = {intervalError: 'The intervals in this cron expression are dangerously short. Please extend intervals.'};
+          }
+        }
+      }
+      catch{
+        validationErrors = null;
+      }
+      return validationErrors;
+    };
   }
 
   private cronValidator():ValidatorFn {
