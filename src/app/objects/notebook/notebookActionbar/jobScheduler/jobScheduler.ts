@@ -43,30 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {JobSchedulerDialogView} from './jobSchedulerDialog/jobSchedulerDialogView';
-import {CustomDropdownDirective} from '../../../customDropdown/customDropdownDirective';
-import {Requestable} from '../../../../../objects/channel/requestable';
+import {Printable} from '../../../rendering/printable/printable';
+import {Requestable} from '../../../channel/requestable';
 
-@Component({
-  selector: 'job-scheduler',
-  imports: [
-    JobSchedulerDialogView,
-    CustomDropdownDirective,
-  ],
-  template: `
-    <button class="btn btn-secondary dropdown-toggle"
-            title="Open notebook job scheduler"
-            customDropdown
-            [dropdownContent]="dropdownContent">
-      <i class="fas fa-clock"></i>
-    </button>
-    <ng-template #dropdownContent>
-      <job-scheduler-dialog-content></job-scheduler-dialog-content>
-    </ng-template>
-  `
-})
-export class JobSchedulerView {
-  requestable = input.required<Requestable>();
-  cronInput = input<string>('');
-}
+export interface JobScheduler extends Printable, Requestable {}

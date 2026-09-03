@@ -51,26 +51,29 @@ import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl
 import {NotebookActionbarView} from '../../../ui/angular2+/notebook/notebookActionbar/notebookActionbarView';
 import {NotebookRevisions} from './notebookRevisions/notebookRevisions';
 import {NotebookRevisionsImpl} from './notebookRevisions/notebookRevisionsImpl';
+import {JobScheduler} from './jobScheduler/jobScheduler';
+import {JobSchedulerImpl} from './jobScheduler/jobSchedulerImpl';
 
 export class NotebookActionbarImpl implements NotebookActionbar {
   private readonly _channel:Channel;
-  private readonly _componentView:ComponentView;
-  private readonly _printSignal:Signal<ComponentView>;
+  private readonly _componentView:Signal<ComponentView>;
   private readonly _notebookRevisions: NotebookRevisions;
+  private readonly _jobScheduler:JobScheduler;
 
-  constructor(channel:Channel, notebookTitle:string) {
+  constructor(channel:Channel, notebookData:object) {
     this._channel = channel;
     this._notebookRevisions = new NotebookRevisionsImpl(this);
-    this._componentView = new ComponentViewImpl(NotebookActionbarView, computed(() => ({
+    this._jobScheduler = new JobSchedulerImpl(this, notebookData['config']);
+    this._componentView = signal(new ComponentViewImpl(NotebookActionbarView, computed(() => ({
       requestable:this,
+      notebookTitle:notebookData['title'],
       notebookRevisions:this._notebookRevisions.print()(),
-      notebookTitle:notebookTitle,
-    })));
-    this._printSignal = signal(this._componentView);
+      jobScheduler:this._jobScheduler.print()(),
+    }))));
   }
 
   print(): Signal<ComponentView> {
-    return this._printSignal;
+    return this._componentView;
   }
 
   request(json: object): void {

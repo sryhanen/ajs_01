@@ -43,30 +43,50 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {JobSchedulerDialogView} from './jobSchedulerDialog/jobSchedulerDialogView';
-import {CustomDropdownDirective} from '../../../customDropdown/customDropdownDirective';
-import {Requestable} from '../../../../../objects/channel/requestable';
+import {JobScheduler} from './jobScheduler';
+import {computed, Signal} from '@angular/core';
+import {ComponentView} from '../../../rendering/componentView/componentView';
+import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
+import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import {JobSchedulerView} from '../../../../ui/angular2+/notebook/notebookActionbar/jobScheduler/jobSchedulerView';
+import {Requestable} from '../../../channel/requestable';
 
-@Component({
-  selector: 'job-scheduler',
-  imports: [
-    JobSchedulerDialogView,
-    CustomDropdownDirective,
-  ],
-  template: `
-    <button class="btn btn-secondary dropdown-toggle"
-            title="Open notebook job scheduler"
-            customDropdown
-            [dropdownContent]="dropdownContent">
-      <i class="fas fa-clock"></i>
-    </button>
-    <ng-template #dropdownContent>
-      <job-scheduler-dialog-content></job-scheduler-dialog-content>
-    </ng-template>
-  `
-})
-export class JobSchedulerView {
-  requestable = input.required<Requestable>();
-  cronInput = input<string>('');
+export class JobSchedulerImpl implements JobScheduler {
+  private readonly _requestable: Requestable;
+  private readonly _jobInfo: {
+    cronInput:string,
+    isZeppelinNotebookCronEnable:boolean
+  };
+  private readonly _componentView: Signal<ComponentView>;
+
+  constructor(requestable: Requestable, notebookConfig:object) {
+    this._requestable = requestable;
+    this._jobInfo = {
+      cronInput:notebookConfig['cronInput'] ? notebookConfig['cronInput'] : '',
+      isZeppelinNotebookCronEnable:notebookConfig['isZeppelinNotebookCronEnable']
+    };
+    this._componentView = computed(() => {
+      let componentView = new ComponentViewStub();
+      if(this._jobInfo.isZeppelinNotebookCronEnable) {
+        componentView = new ComponentViewImpl(JobSchedulerView, computed(() => {
+          const inputs = {
+            requestable :this,
+          };
+          if(this._jobInfo.cronInput) {
+            inputs['cronInput'] = this._jobInfo.cronInput;
+          }
+          return inputs;
+        }));
+      }
+      return componentView;
+    });
+  }
+
+  print(): Signal<ComponentView> {
+    return this._componentView;
+  }
+
+  request(json: object): void {
+    this._requestable.request(json);
+  }
 }

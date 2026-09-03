@@ -52,7 +52,6 @@ import {RunAllParagraphsButton} from './runAllParagraphs/runAllParagraphsButton'
 import {ClearOutputsButton} from './clearOutputs/clearOutputsButton';
 import {CloneNotebookButton} from './cloneNotebook/cloneNotebookButton';
 import {ExportNotebookButton} from './exportNotebook/exportNotebookButton';
-import {JobSchedulerView} from './jobScheduler/jobSchedulerView';
 
 @Component({
   selector: 'notebook-actionbar',
@@ -63,7 +62,6 @@ import {JobSchedulerView} from './jobScheduler/jobSchedulerView';
     ClearOutputsButton,
     CloneNotebookButton,
     ExportNotebookButton,
-    JobSchedulerView
   ],
   template: `
     <div class="note-action">
@@ -78,7 +76,9 @@ import {JobSchedulerView} from './jobScheduler/jobSchedulerView';
           </div>
           <div class="container-fluid px-5">
             <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-            <job-scheduler></job-scheduler>
+            @if(!jobScheduler().isStub()){
+              <ng-container *ngComponentOutlet="jobScheduler().component(); inputs: jobScheduler().inputs()()"></ng-container>
+            }
           </div>
         </div>
       </nav>
@@ -97,4 +97,5 @@ export class NotebookActionbarView {
   requestable = input.required<Requestable>();
   notebookTitle = input.required<string>();
   notebookRevisions = input.required<ComponentView>();
+  jobScheduler = input.required<ComponentView>();
 }

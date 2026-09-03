@@ -43,30 +43,57 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {JobSchedulerDialogView} from './jobSchedulerDialog/jobSchedulerDialogView';
-import {CustomDropdownDirective} from '../../../customDropdown/customDropdownDirective';
-import {Requestable} from '../../../../../objects/channel/requestable';
+import {Requestable} from '../../../channel/requestable';
+import {JobScheduler} from './jobScheduler';
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {JobSchedulerImpl} from './jobSchedulerImpl';
 
-@Component({
-  selector: 'job-scheduler',
-  imports: [
-    JobSchedulerDialogView,
-    CustomDropdownDirective,
-  ],
-  template: `
-    <button class="btn btn-secondary dropdown-toggle"
-            title="Open notebook job scheduler"
-            customDropdown
-            [dropdownContent]="dropdownContent">
-      <i class="fas fa-clock"></i>
-    </button>
-    <ng-template #dropdownContent>
-      <job-scheduler-dialog-content></job-scheduler-dialog-content>
-    </ng-template>
-  `
-})
-export class JobSchedulerView {
-  requestable = input.required<Requestable>();
-  cronInput = input<string>('');
-}
+describe('JobScheduler integration test', () => {
+  let requestable: Requestable;
+  let notebookConfig:{
+    cronInput:string,
+    isZeppelinNotebookCronEnable:boolean
+  };
+  let jobScheduler: JobScheduler;
+
+  beforeEach(() => {
+    requestable = new FakeChannel();
+  });
+
+  describe('Initialization', () => {
+    it('With isZeppelinNotebookCronEnable set to true', () => {
+      notebookConfig = {
+        cronInput:'',
+        isZeppelinNotebookCronEnable:true,
+      };
+      jobScheduler = new JobSchedulerImpl(requestable, notebookConfig);
+      expect(jobScheduler.print()().isStub()).toBe(false);
+    });
+
+    it('With isZeppelinNotebookCronEnable set to false', () => {
+      notebookConfig = {
+        cronInput:'',
+        isZeppelinNotebookCronEnable:false,
+      };
+      jobScheduler = new JobSchedulerImpl(requestable, notebookConfig);
+      expect(jobScheduler.print()().isStub()).toBe(true);
+    });
+  });
+
+  describe('Request', () => {
+    it('Should request channel', () => {
+      notebookConfig = {
+        cronInput:'',
+        isZeppelinNotebookCronEnable:false,
+      };
+      jobScheduler = new JobSchedulerImpl(requestable, notebookConfig);
+      const request = {
+        op:'',
+        data:{}
+      };
+      const spy = vi.spyOn(requestable, 'request');
+      jobScheduler.request(request);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+  });
+});

@@ -82,7 +82,7 @@ export class NotebookImpl implements Notebook {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
     this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
-    this._notebookActionbar = new NotebookActionbarImpl(this, notebook['name']);
+    this._notebookActionbar = new NotebookActionbarImpl(this, notebook);
     this._componentView = new ComponentViewImpl(NotebookView, computed(() => ({
       paragraphCollection: this._paragraphCollection.print()(),
       notebookActionbar:this._notebookActionbar.print()(),
