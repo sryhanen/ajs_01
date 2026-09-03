@@ -52,6 +52,7 @@ import {RunAllParagraphsButton} from './runAllParagraphs/runAllParagraphsButton'
 import {ClearOutputsButton} from './clearOutputs/clearOutputsButton';
 import {CloneNotebookButton} from './cloneNotebook/cloneNotebookButton';
 import {ExportNotebookButton} from './exportNotebook/exportNotebookButton';
+import {JobSchedulerView} from './jobScheduler/jobSchedulerView';
 
 @Component({
   selector: 'notebook-actionbar',
@@ -61,7 +62,8 @@ import {ExportNotebookButton} from './exportNotebook/exportNotebookButton';
     RunAllParagraphsButton,
     ClearOutputsButton,
     CloneNotebookButton,
-    ExportNotebookButton
+    ExportNotebookButton,
+    JobSchedulerView
   ],
   template: `
     <div class="note-action">
@@ -74,9 +76,10 @@ import {ExportNotebookButton} from './exportNotebook/exportNotebookButton';
             <clone-notebook-button class="btn-group"></clone-notebook-button>
             <export-notebook-button class="btn-group"></export-notebook-button>
           </div>
-            <div class="container-fluid px-5">
-              <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
-            </div>
+          <div class="container-fluid px-5">
+            <ng-container *ngComponentOutlet="notebookRevisions().component(); inputs: notebookRevisions().inputs()()"></ng-container>
+            <job-scheduler></job-scheduler>
+          </div>
         </div>
       </nav>
       <div class="collapse-button container-fluid px-5 position-relative text-end">
