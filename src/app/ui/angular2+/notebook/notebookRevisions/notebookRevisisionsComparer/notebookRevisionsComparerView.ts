@@ -44,10 +44,11 @@
  * a licensee so wish it.
  */
 import {
+  AfterViewInit,
   Component,
-  computed,
+  computed, DOCUMENT, ElementRef, inject,
   input,
-  OnInit,
+  OnInit, Renderer2, ViewChild,
 } from '@angular/core';
 import {RevisionCommit} from '../../../../../objects/revisionCommit/revisionCommit';
 import {Requestable} from '../../../../../objects/channel/requestable';
@@ -138,7 +139,7 @@ import {ParagraphComparerView} from './paragraphComparer/paragraphComparerView';
     }
   `
 })
-export class NotebookRevisionsComparerView implements OnInit {
+export class NotebookRevisionsComparerView implements OnInit, AfterViewInit {
   requestable = input.required<Requestable>();
   revisionCommits = input.required<RevisionCommit[]>();
   revisionsToCompare= input.required<Map<string, object>>();
@@ -180,6 +181,14 @@ export class NotebookRevisionsComparerView implements OnInit {
         paragraphControl.disable({ emitEvent: false });
       }
     });
+  }
+
+  @ViewChild('compareRevisionsDialog') modalElement!: ElementRef;
+  private renderer = inject(Renderer2);
+  private document = inject(DOCUMENT);
+
+  ngAfterViewInit():void {
+    this.renderer.appendChild(this.document.body, this.modalElement.nativeElement);
   }
 
   private noteRevisionRequest(revisionCommitId:string, position:string):void{
