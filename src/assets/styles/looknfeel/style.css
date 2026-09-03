@@ -2478,7 +2478,6 @@ div.dtsp-panesContainer div.dtsp-searchPane div.dtsp-topRow button {
   border: 1px solid #eaeaea;
   padding: 12px;
   width: max-content;
-  min-width: 100%;
   height: auto;
 }
 .notebook-mt {
