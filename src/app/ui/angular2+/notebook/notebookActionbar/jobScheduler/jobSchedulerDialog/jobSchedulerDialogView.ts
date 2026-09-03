@@ -43,41 +43,51 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
+import {
+  AbstractControl,
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+} from '@angular/forms';
+import parser from 'cron-parser';
 
 @Component({
   selector: 'job-scheduler-dialog-content',
+  imports: [
+    FormsModule,
+    ReactiveFormsModule
+  ],
   template: `
     <div class="cron-preset-container px-4 py-2">
       <div class="mb-3">
-        <div class="input-group">
-          <input type="text"
-                 class="form-control form-control-sm"
-                 maxlength="60"
-                 placeholder="Write a cron expression" />
-          <button class="btn btn-sm btn-secondary"
-                  type="button">
-            Set
-          </button>
+        <div class="row">
+          <div class="input-group">
+            <input type="text"
+                   class="form-control form-control-sm"
+                   placeholder="Write a cron expression"
+                   [formControl]="cronInputFormControl()"/>
+            <button class=" btn btn-sm btn-secondary" type="button">
+              Set
+            </button>
+          </div>
         </div>
-        <div class="form-text">
-          Length:
-        </div>
+        @if(cronInputFormControl().hasError('cronError')){
+          <div class="mt-3 alert alert-warning">
+            {{cronInputFormControl().getError('cronError')}}
+          </div>
+        }
       </div>
       <hr>
       <div class="btn-group">
-        <button class="btn btn-sm btn-secondary"
-                type="button">
-          None
-        </button>
-        <button class="btn btn-sm btn-secondary"
-                type="button">
-          1h
-        </button>
-        <button class="btn btn-sm btn-secondary"
-                type="button">
-          3h
-        </button>
+        @for (cronOption of cronOptions; track $index) {
+          <button class="btn btn-sm btn-secondary"
+                  type="button">
+            {{ cronOption[0] }}
+          </button>
+        }
       </div>
       <hr>
       <div class="form-text">
@@ -91,5 +101,33 @@ import {Component} from '@angular/core';
   `
 })
 export class JobSchedulerDialogView {
+  cronInput = input<string>('');
+  protected cronOptions = new Map([
+    ['None', ''],
+    ['1h', ''],
+    ['3h', ''],
+    ['6h', ''],
+    ['12h', ''],
+    ['1D', '']
+  ]);
+  cronInputFormControl = computed(() => new FormControl(
+    this.cronInput(),
+    [
+      this.cronValidator()
+    ]
+  ));
 
+  private cronValidator():ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      let validationErrors = null;
+      const currentValue = control.value;
+      try{
+        parser.parseExpression(currentValue);
+      }
+      catch(err){
+        validationErrors = {cronError: err};
+      }
+      return validationErrors;
+    };
+  }
 }
