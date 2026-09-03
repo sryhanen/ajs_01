@@ -44,44 +44,26 @@
  * a licensee so wish it.
  */
 import {Requestable} from '../../channel/requestable';
-import {Channel} from '../../channel/channel';
-import {MessageImpl} from '../../message/messageImpl';
-import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {Message} from '../../message/message';
+import {FakeChannel} from '../../channel/fakeChannel';
+import {RunParagraphRequest} from './runParagraphRequest';
 
-export class RunParagraphRequest implements Requestable {
-  private readonly _channel: Channel;
-  private readonly _decoratorParagraphs:Map<string,  object>;
+describe('RunParagraphRequest unit test', () => {
+  const requestable: Requestable = new FakeChannel();
+  const paragraphData = {
+    id:'paragraphId',
+    paragraph:'paragraph text',
+    config:{},
+    params:{}
+  };
+  const runParagraphRequest = new RunParagraphRequest(requestable, paragraphData);
 
-  constructor(channel: Channel, decoratorParagraphs:Map<string,  object>){
-    this._channel = channel;
-    this._decoratorParagraphs = decoratorParagraphs;
-  }
-
-  request(data: object) {
-    const message = new MessageImpl(new SafeJsonImpl(data));
-    if(message.operation() === 'RUN_PARAGRAPH'){
-      const runParagraphData = new SafeJsonImpl(message.data());
-      const paragraphId:string = runParagraphData.getProperty('id', 'string');
-      const paragraphData = this._decoratorParagraphs.get(paragraphId);
-      if(paragraphData === undefined){
-        throw new Error(`Failed to decorate run paragraph request: paragraph "${paragraphId}" not found in collection`);
-      }
-      this._channel.request(this.decoratedMessage(message, paragraphData));
-    }
-  }
-
-  private decoratedMessage(message:Message, paragraphData:object):object {
-    const data = message.data();
-    const decoratorData = new SafeJsonImpl(paragraphData);
-    data['paragraph'] = decoratorData.getProperty<string>('text', 'string');
-    data['config'] = decoratorData.getProperty<object>('config', 'object');
-    const settings = decoratorData.getProperty<object>('settings', 'object');
-    data['params'] = new SafeJsonImpl(settings).getProperty<object>('params', 'object');
-    return {
-      op: message.operation(),
-      data: data
+  it('Should send expected request', () => {
+    const spy = vi.spyOn(requestable, 'request');
+    runParagraphRequest.send();
+    const expectedRequest = {
+      op:'RUN_PARAGRAPH',
+      data:paragraphData
     };
-  }
-}
-
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
+});

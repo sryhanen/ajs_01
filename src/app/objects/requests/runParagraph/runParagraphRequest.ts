@@ -43,67 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {RunParagraphRequest} from './runParagraphRequest';
-import {FakeChannel} from '../../channel/fakeChannel';
-import {Channel} from '../../channel/channel';
+import {RequestMessage} from '../requestMessage';
+import {Requestable} from '../../channel/requestable';
 
-describe('RunParagraphRequest', () => {
-  let channel: Channel;
-  let paragraphs: Map<string, object>;
-  const paragraphId = 'paragraphId';
-  const paragraphText = 'some text';
-  const paragraphConfig = {
-    prop:'config prop'
-  };
-  const paragraphSettings = {
-    params:{
-      prop:'config prop'
-    }
-  };
-  const defaultParagraphData = {
-    id: paragraphId,
-    text:paragraphText,
-    config: paragraphConfig,
-    settings: paragraphSettings
-  };
-  let runParagraphRequest: RunParagraphRequest;
+type ParagraphData = {
+  id:string,
+  paragraph:string,
+  config:object,
+  params:object,
+};
 
-  beforeEach(() => {
-    channel = new FakeChannel();
-    paragraphs = new Map([[defaultParagraphData.id, defaultParagraphData]]);
-    runParagraphRequest = new RunParagraphRequest(channel, paragraphs);
-  });
+export class RunParagraphRequest implements RequestMessage{
+  private readonly _requestable: Requestable;
+  private readonly _paragraphData: ParagraphData;
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(runParagraphRequest).toBeInstanceOf(RunParagraphRequest);
+  constructor(requestable: Requestable, paragraphData:ParagraphData) {
+    this._requestable = requestable;
+    this._paragraphData = paragraphData;
+  }
+
+  send(): void {
+    this._requestable.request({
+      op: 'RUN_PARAGRAPH',
+      data: this._paragraphData
     });
-  });
-
-  describe('Request', () => {
-    const initialRequest = {
-      op:'RUN_PARAGRAPH',
-      data:{
-        id:paragraphId,
-        paragraph:'',
-        config:{},
-        params:{}
-      }
-    };
-
-    it('Should decorate request', () => {
-      const expectedRequest = {
-        op:'RUN_PARAGRAPH',
-        data:{
-          id:paragraphId,
-          paragraph:paragraphText,
-          config:paragraphConfig,
-          params:paragraphSettings.params
-        }
-      };
-      const channelSpy = vi.spyOn(channel, 'request');
-      runParagraphRequest.request(initialRequest);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
-    });
-  });
-});
+  }
+}
