@@ -63,7 +63,7 @@ import {ComponentView} from '../../../../objects/rendering/componentView/compone
          role="group"
          aria-label="version control">
       <commit-message-save [requestable]="requestable()"></commit-message-save>
-      @if (revisionCommits().length > 1) {
+      @if (revisionCommits().length > 0) {
         <ng-container *ngComponentOutlet="notebookRevisionsComparer().component(); inputs: notebookRevisionsComparer().inputs()()"></ng-container>
         <ng-container *ngComponentOutlet="notebookRevisionSelect().component(); inputs: notebookRevisionSelect().inputs()()"></ng-container>
       }
