@@ -43,16 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {JobSchedulerDialogView} from './jobSchedulerDialog/jobSchedulerDialogView';
+import {Component, computed, input} from '@angular/core';
 import {CustomDropdownDirective} from '../../../customDropdown/customDropdownDirective';
 import {Requestable} from '../../../../../objects/channel/requestable';
+import {
+  AbstractControl,
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn
+} from '@angular/forms';
+import {NoteUpdateRequest} from '../../../../../objects/requests/noteUpdate/noteUpdateRequest';
+import parser from 'cron-parser';
 
 @Component({
   selector: 'job-scheduler',
   imports: [
-    JobSchedulerDialogView,
     CustomDropdownDirective,
+    FormsModule,
+    ReactiveFormsModule,
   ],
   template: `
     <button class="btn btn-secondary dropdown-toggle"
@@ -62,7 +72,48 @@ import {Requestable} from '../../../../../objects/channel/requestable';
       <i class="fas fa-clock"></i>
     </button>
     <ng-template #dropdownContent>
-      <job-scheduler-dialog-content [requestable]="requestable()" [notebookState]="notebookState()"></job-scheduler-dialog-content>
+      <div>
+        <div class="mb-3">
+          <div class="row">
+            <div class="input-group">
+              <input type="text"
+                     class="form-control form-control-sm"
+                     placeholder="Write a cron expression"
+                     [formControl]="cronInputFormControl()"/>
+              <button class="btn btn-sm btn-secondary" type="button" [disabled]="cronInputFormControl().invalid" (click)="setJobSchedule()">
+                Set
+              </button>
+            </div>
+          </div>
+          @if(cronInputFormControl().hasError('cronError')){
+            <div class="mt-3 alert alert-warning">
+              {{cronInputFormControl().getError('cronError')}}
+            </div>
+          }
+          @if(cronInputFormControl().hasError('intervalError')){
+            <div class="mt-3 alert alert-warning">
+              {{cronInputFormControl().getError('intervalError')}}
+            </div>
+          }
+        </div>
+        <hr>
+        <div class="btn-group">
+          @for (cronOption of cronOptions; track $index) {
+            <button class="btn btn-sm btn-secondary"
+                    type="button" (click)="setCronOption(cronOption[0])">
+              {{ cronOption[0] }}
+            </button>
+          }
+        </div>
+        <hr>
+        <div class="form-text">
+          Write your own
+          <a href="https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/tutorial-lesson-06.html"
+             target="_blank">
+            cron expression.
+          </a>
+        </div>
+      </div>
     </ng-template>
   `
 })
@@ -70,4 +121,76 @@ export class JobSchedulerView {
   requestable = input.required<Requestable>();
   notebookState = input.required<object>();
   cronInput = input<string>('');
+
+  protected cronOptions = new Map([
+    ['None', ''],
+    ['1h', '0 0 0/1 * * ?'],
+    ['3h', '0 0 0/3 * * ?'],
+    ['6h', '0 0 0/6 * * ?'],
+    ['12h', '0 0 0/12 * * ?'],
+    ['1D', '0 0 0 * * ?']
+  ]);
+
+  cronInputFormControl = computed(() => new FormControl(
+    this.cronInput(),
+    [
+      this.cronValidator(),
+      this.intervalValidator()
+    ]
+  ));
+
+  protected setJobSchedule():void{
+    if(this.cronInputFormControl().valid){
+      const notebookConfig = {
+        ...this.notebookState()['config'],
+        cron:this.cronInputFormControl().value,
+      };
+      const notebookName = this.notebookState()['title'];
+      const noteUpdateRequest = new NoteUpdateRequest(this.requestable(), notebookConfig, notebookName);
+      noteUpdateRequest.send();
+    }
+  }
+
+  protected setCronOption(cronOptionId:string):void{
+    const cronValue = this.cronOptions.get(cronOptionId);
+    this.cronInputFormControl().setValue(cronValue);
+  }
+
+  private minInterval= 3600000;
+
+  private intervalValidator():ValidatorFn{
+    return (control: AbstractControl): ValidationErrors | null => {
+      let validationErrors: ValidationErrors | null = null;
+      try{
+        const currentValue = control.value;
+        if(currentValue !== ''){
+          const expression = parser.parseExpression(control.value);
+          const date1 = new Date(expression.next().toDate());
+          const date2 = new Date(expression.next().toDate());
+          const diff = Math.abs(date2.getTime() - date1.getTime());
+          if(diff < this.minInterval){
+            validationErrors = {intervalError: 'The intervals in this cron expression are dangerously short. Please extend intervals.'};
+          }
+        }
+      }
+      catch{
+        validationErrors = null;
+      }
+      return validationErrors;
+    };
+  }
+
+  private cronValidator():ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      let validationErrors = null;
+      const currentValue = control.value;
+      try{
+        parser.parseExpression(currentValue);
+      }
+      catch(err){
+        validationErrors = {cronError: err};
+      }
+      return validationErrors;
+    };
+  }
 }
