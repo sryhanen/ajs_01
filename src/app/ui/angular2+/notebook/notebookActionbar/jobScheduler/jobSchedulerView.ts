@@ -65,8 +65,9 @@ import parser from 'cron-parser';
     ReactiveFormsModule,
   ],
   template: `
-    <button class="btn btn-secondary dropdown-toggle"
+    <button class="btn dropdown-toggle"
             title="Open notebook job scheduler"
+            [class]="dropdownButtonClass()"
             customDropdown
             [dropdownContent]="dropdownContent">
       <i class="fas fa-clock"></i>
@@ -121,6 +122,9 @@ export class JobSchedulerView {
   requestable = input.required<Requestable>();
   notebookState = input.required<object>();
   cronInput = input<string>('');
+  dropdownButtonClass = computed(() =>
+    this.cronInput() !== '' ? 'btn-info' : 'btn-secondary'
+  );
 
   protected cronOptions = new Map([
     ['None', ''],
