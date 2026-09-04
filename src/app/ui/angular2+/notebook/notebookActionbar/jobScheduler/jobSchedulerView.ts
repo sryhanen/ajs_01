@@ -73,7 +73,7 @@ import parser from 'cron-parser';
       <i class="fas fa-clock"></i>
     </button>
     <ng-template #dropdownContent>
-      <div>
+      <div role="menu">
         <div class="mb-3">
           <div class="row">
             <div class="input-group">
@@ -81,18 +81,18 @@ import parser from 'cron-parser';
                      class="form-control form-control-sm"
                      placeholder="Write a cron expression"
                      [formControl]="cronInputFormControl()"/>
-              <button class="btn btn-sm btn-secondary" type="button" [disabled]="cronInputFormControl().invalid" (click)="setJobSchedule()">
+              <button class="btn btn-sm btn-secondary" type="submit" aria-label="submit-job-schedule" [disabled]="cronInputFormControl().invalid" (click)="setJobSchedule()">
                 Set
               </button>
             </div>
           </div>
           @if(cronInputFormControl().hasError('cronError')){
-            <div class="mt-3 alert alert-warning">
+            <div class="mt-3 alert alert-warning" role="alert">
               {{cronInputFormControl().getError('cronError')}}
             </div>
           }
           @if(cronInputFormControl().hasError('intervalError')){
-            <div class="mt-3 alert alert-warning">
+            <div class="mt-3 alert alert-warning" role="alert">
               {{cronInputFormControl().getError('intervalError')}}
             </div>
           }
@@ -126,7 +126,7 @@ export class JobSchedulerView {
     this.cronInput() !== '' ? 'btn-info' : 'btn-secondary'
   );
 
-  protected cronOptions = new Map([
+  protected readonly cronOptions = new Map([
     ['None', ''],
     ['1h', '0 0 0/1 * * ?'],
     ['3h', '0 0 0/3 * * ?'],
@@ -160,7 +160,8 @@ export class JobSchedulerView {
     this.cronInputFormControl().setValue(cronValue);
   }
 
-  private minInterval= 3600000;
+  private readonly minInterval= 3600000;
+  private readonly intervalErrorText = 'The intervals in this cron expression are dangerously short. Please extend intervals.';
 
   private intervalValidator():ValidatorFn{
     return (control: AbstractControl): ValidationErrors | null => {
@@ -173,7 +174,7 @@ export class JobSchedulerView {
           const date2 = new Date(expression.next().toDate());
           const diff = Math.abs(date2.getTime() - date1.getTime());
           if(diff < this.minInterval){
-            validationErrors = {intervalError: 'The intervals in this cron expression are dangerously short. Please extend intervals.'};
+            validationErrors = {intervalError: this.intervalErrorText};
           }
         }
       }
