@@ -123,7 +123,7 @@ export class JobSchedulerView {
   notebookState = input.required<object>();
   cronInput = input<string>('');
   dropdownButtonClass = computed(() =>
-    this.cronInput() !== '' ? 'btn-info' : 'btn-secondary'
+    this.cronInput() !== '' && this.cronInputFormControl().valid ? 'btn-info' : 'btn-secondary'
   );
 
   protected readonly cronOptions = new Map([
