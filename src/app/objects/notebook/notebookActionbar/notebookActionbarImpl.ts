@@ -63,7 +63,7 @@ export class NotebookActionbarImpl implements NotebookActionbar {
   constructor(channel:Channel, notebookData:object) {
     this._channel = channel;
     this._notebookRevisions = new NotebookRevisionsImpl(this);
-    this._jobScheduler = new JobSchedulerImpl(this, notebookData['config']);
+    this._jobScheduler = new JobSchedulerImpl(this, notebookData);
     this._componentView = signal(new ComponentViewImpl(NotebookActionbarView, computed(() => ({
       requestable:this,
       notebookTitle:notebookData['title'],

@@ -62,11 +62,12 @@ import {Requestable} from '../../../../../objects/channel/requestable';
       <i class="fas fa-clock"></i>
     </button>
     <ng-template #dropdownContent>
-      <job-scheduler-dialog-content></job-scheduler-dialog-content>
+      <job-scheduler-dialog-content [requestable]="requestable()" [notebookState]="notebookState()"></job-scheduler-dialog-content>
     </ng-template>
   `
 })
 export class JobSchedulerView {
   requestable = input.required<Requestable>();
+  notebookState = input.required<object>();
   cronInput = input<string>('');
 }

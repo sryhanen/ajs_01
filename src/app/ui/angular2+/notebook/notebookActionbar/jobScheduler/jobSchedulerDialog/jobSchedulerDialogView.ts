@@ -53,6 +53,8 @@ import {
   ValidatorFn,
 } from '@angular/forms';
 import parser from 'cron-parser';
+import {Requestable} from '../../../../../../objects/channel/requestable';
+import {NoteUpdateRequest} from '../../../../../../objects/requests/noteUpdate/noteUpdateRequest';
 
 @Component({
   selector: 'job-scheduler-dialog-content',
@@ -69,7 +71,7 @@ import parser from 'cron-parser';
                    class="form-control form-control-sm"
                    placeholder="Write a cron expression"
                    [formControl]="cronInputFormControl()"/>
-            <button class="btn btn-sm btn-secondary" type="button" [disabled]="cronInputFormControl().invalid">
+            <button class="btn btn-sm btn-secondary" type="button" [disabled]="cronInputFormControl().invalid" (click)="setJobSchedule()">
               Set
             </button>
           </div>
@@ -106,6 +108,8 @@ import parser from 'cron-parser';
   `
 })
 export class JobSchedulerDialogView {
+  requestable = input.required<Requestable>();
+  notebookState = input.required<object>();
   cronInput = input<string>('');
   protected cronOptions = new Map([
     ['None', ''],
@@ -123,6 +127,18 @@ export class JobSchedulerDialogView {
       this.intervalValidator()
     ]
   ));
+
+  protected setJobSchedule():void{
+    if(this.cronInputFormControl().valid){
+      const notebookConfig = {
+        ...this.notebookState()['config'],
+        cron:this.cronInputFormControl().value,
+      };
+      const notebookName = this.notebookState()['title'];
+      const noteUpdateRequest = new NoteUpdateRequest(this.requestable(), notebookConfig, notebookName);
+      noteUpdateRequest.send();
+    }
+  }
 
   protected setCronOption(cronOptionId:string):void{
     const cronValue = this.cronOptions.get(cronOptionId);

@@ -43,52 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {JobScheduler} from './jobScheduler';
-import {computed, Signal} from '@angular/core';
-import {ComponentView} from '../../../rendering/componentView/componentView';
-import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
-import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
-import {JobSchedulerView} from '../../../../ui/angular2+/notebook/notebookActionbar/jobScheduler/jobSchedulerView';
-import {Requestable} from '../../../channel/requestable';
+import {RequestMessage} from '../requestMessage';
+import {Requestable} from '../../channel/requestable';
 
-export class JobSchedulerImpl implements JobScheduler {
+export class NoteUpdateRequest implements RequestMessage{
   private readonly _requestable: Requestable;
-  private readonly _jobInfo: {
-    cronInput:string,
-    isZeppelinNotebookCronEnable:boolean
-  };
-  private readonly _componentView: Signal<ComponentView>;
+  private readonly _notebookConfig: object;
+  private readonly _notebookName: string;
 
-  constructor(requestable: Requestable, notebookState:object) {
+  constructor(requestable: Requestable, notebookConfig: object, notebookName: string) {
     this._requestable = requestable;
-    const notebookConfig = notebookState['config'];
-    this._jobInfo = {
-      cronInput:notebookConfig['cronInput'] ? notebookConfig['cronInput'] : '',
-      isZeppelinNotebookCronEnable:notebookConfig['isZeppelinNotebookCronEnable']
-    };
-    this._componentView = computed(() => {
-      let componentView = new ComponentViewStub();
-      if(this._jobInfo.isZeppelinNotebookCronEnable) {
-        componentView = new ComponentViewImpl(JobSchedulerView, computed(() => {
-          const inputs = {
-            requestable:this,
-            notebookState: notebookState
-          };
-          if(this._jobInfo.cronInput) {
-            inputs['cronInput'] = this._jobInfo.cronInput;
-          }
-          return inputs;
-        }));
+    this._notebookConfig = notebookConfig;
+    this._notebookName = notebookName;
+  }
+
+  send():void{
+    this._requestable.request({
+      op: 'NOTE_UPDATE',
+      data: {
+        noteId: '',
+        name: this._notebookName,
+        config: this._notebookConfig
       }
-      return componentView;
     });
-  }
-
-  print(): Signal<ComponentView> {
-    return this._componentView;
-  }
-
-  request(json: object): void {
-    this._requestable.request(json);
   }
 }
