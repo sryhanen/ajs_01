@@ -43,9 +43,65 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export type Interpreter = {
-  class: string
-  defaultInterpreter: boolean
-  editor: object
-  name: string
-};
+import {Channel} from '../../../channel/channel';
+import {InterpreterBindings} from './interpreterBindings';
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {InterpreterBindingsImpl} from './interpreterBindingsImpl';
+import {InterpreterBinding} from './interpreterBinding/interpreterBinding';
+import {ComponentView} from '../../../rendering/componentView/componentView';
+import {Signal} from '@angular/core';
+
+describe('InterpreterBindings unit test', () => {
+  let channel:Channel;
+  let interpreterBindings:InterpreterBindings;
+  let printSignal: Signal<ComponentView>;
+
+  beforeEach(() => {
+    channel = new FakeChannel();
+    interpreterBindings = new InterpreterBindingsImpl(channel);
+    printSignal = interpreterBindings.print();
+  });
+
+  it('Request should request channel', () => {
+    const spy = vi.spyOn(channel, 'request');
+    const request = {
+      some:'request'
+    };
+    interpreterBindings.request(request);
+    expect(spy).toHaveBeenCalledExactlyOnceWith(request);
+  });
+
+  it('Printed initial state', () => {
+    expect(printSignal().isStub()).toBe(false);
+    expect(printSignal().inputs()()['interpreterBindings']).toEqual([]);
+  });
+
+  describe('Interpreter bindings response', () => {
+    const interpreterBindingsList: InterpreterBinding[] = [
+      {
+        id: 'interpreter1',
+        interpreters: [],
+        name: 'interpreter1',
+        selected: true,
+      },
+      {
+        id: 'interpreter2',
+        interpreters: [],
+        name: 'interpreter2',
+        selected: false,
+      }
+    ];
+    beforeEach(() => {
+      interpreterBindings.response({
+        op:'INTERPRETER_BINDINGS',
+        data:{
+          interpreterBindings: interpreterBindingsList
+        }
+      });
+    });
+
+    it('Should update printed signal', () => {
+      expect(printSignal().inputs()()['interpreterBindings']).toEqual(interpreterBindingsList);
+    });
+  });
+});

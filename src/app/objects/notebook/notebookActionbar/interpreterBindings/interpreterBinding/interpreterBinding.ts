@@ -46,9 +46,9 @@
 import {Interpreter} from './interpreter';
 
 export type InterpreterBinding = {
-id: string,
-interpreters: Interpreter[]
-name: string
-selected: boolean
+  id: string,
+  interpreters: Interpreter[]
+  name: string
+  selected: boolean
 };
 
