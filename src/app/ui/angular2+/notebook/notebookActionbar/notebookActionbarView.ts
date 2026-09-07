@@ -80,6 +80,9 @@ import {ExportNotebookButton} from './exportNotebook/exportNotebookButton';
               <ng-container *ngComponentOutlet="jobScheduler().component(); inputs: jobScheduler().inputs()()"></ng-container>
             }
           </div>
+          <div class="ml-auto">
+            <ng-container *ngComponentOutlet="interpreterBindings().component(); inputs: interpreterBindings().inputs()()"></ng-container>
+          </div>
         </div>
       </nav>
       <div class="collapse-button container-fluid px-5 position-relative text-end">
@@ -98,4 +101,5 @@ export class NotebookActionbarView {
   notebookTitle = input.required<string>();
   notebookRevisions = input.required<ComponentView>();
   jobScheduler = input.required<ComponentView>();
+  interpreterBindings = input.required<ComponentView>();
 }

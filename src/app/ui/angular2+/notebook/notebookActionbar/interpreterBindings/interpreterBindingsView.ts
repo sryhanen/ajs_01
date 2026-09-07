@@ -49,7 +49,14 @@ import {InterpreterBinding} from '../../../../../objects/notebook/notebookAction
 @Component({
   selector: 'interpreter-bindings',
   template: `
-
+    <button class="btn btn-secondary dropdown-toggle"
+            type="button"
+            title="Interpreter restart">
+      <i class="fas fa-rotate"></i>
+      <span>
+        Booting Spark...
+      </span>
+    </button>
   `
 })
 export class InterpreterBindingsView {

@@ -53,22 +53,27 @@ import {NotebookRevisions} from './notebookRevisions/notebookRevisions';
 import {NotebookRevisionsImpl} from './notebookRevisions/notebookRevisionsImpl';
 import {JobScheduler} from './jobScheduler/jobScheduler';
 import {JobSchedulerImpl} from './jobScheduler/jobSchedulerImpl';
+import {InterpreterBindings} from './interpreterBindings/interpreterBindings';
+import {InterpreterBindingsImpl} from './interpreterBindings/interpreterBindingsImpl';
 
 export class NotebookActionbarImpl implements NotebookActionbar {
   private readonly _channel:Channel;
   private readonly _componentView:Signal<ComponentView>;
   private readonly _notebookRevisions: NotebookRevisions;
   private readonly _jobScheduler:JobScheduler;
+  private readonly _interpreterBindings: InterpreterBindings;
 
   constructor(channel:Channel, notebookData:object) {
     this._channel = channel;
     this._notebookRevisions = new NotebookRevisionsImpl(this);
     this._jobScheduler = new JobSchedulerImpl(this, notebookData);
+    this._interpreterBindings = new InterpreterBindingsImpl(this);
     this._componentView = signal(new ComponentViewImpl(NotebookActionbarView, computed(() => ({
       requestable:this,
       notebookTitle:notebookData['title'],
       notebookRevisions:this._notebookRevisions.print()(),
       jobScheduler:this._jobScheduler.print()(),
+      interpreterBindings: this._interpreterBindings.print()()
     }))));
   }
 
