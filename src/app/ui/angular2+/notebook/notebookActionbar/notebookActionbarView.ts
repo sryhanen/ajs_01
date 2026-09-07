@@ -52,6 +52,7 @@ import {RunAllParagraphsButton} from './runAllParagraphs/runAllParagraphsButton'
 import {ClearOutputsButton} from './clearOutputs/clearOutputsButton';
 import {CloneNotebookButton} from './cloneNotebook/cloneNotebookButton';
 import {ExportNotebookButton} from './exportNotebook/exportNotebookButton';
+import {NotebookPermissionsView} from './notebookPermissions/notebookPermissionsView';
 
 @Component({
   selector: 'notebook-actionbar',
@@ -62,6 +63,7 @@ import {ExportNotebookButton} from './exportNotebook/exportNotebookButton';
     ClearOutputsButton,
     CloneNotebookButton,
     ExportNotebookButton,
+    NotebookPermissionsView,
   ],
   template: `
     <div class="note-action">
@@ -80,9 +82,10 @@ import {ExportNotebookButton} from './exportNotebook/exportNotebookButton';
               <ng-container *ngComponentOutlet="jobScheduler().component(); inputs: jobScheduler().inputs()()"></ng-container>
             }
           </div>
-          <div class="ml-auto">
+          <div class="ml-auto me-2">
             <ng-container *ngComponentOutlet="interpreterBindings().component(); inputs: interpreterBindings().inputs()()"></ng-container>
           </div>
+          <notebook-permissions></notebook-permissions>
         </div>
       </nav>
       <div class="collapse-button container-fluid px-5 position-relative text-end">
