@@ -109,6 +109,6 @@ export class InterpreterBindingsView {
   }
 
   protected restartInterpreterBinding(interpreterBinding:InterpreterBinding):void{
-    this.httpClient.put(`/interpreter/setting/restart/${interpreterBinding.id}`, {}).subscribe();
+    this.httpClient.put(`api/interpreter/setting/restart/${interpreterBinding.id}`, {}).subscribe();
   }
 }
