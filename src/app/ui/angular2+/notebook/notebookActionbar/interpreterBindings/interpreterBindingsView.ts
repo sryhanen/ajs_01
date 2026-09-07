@@ -43,13 +43,14 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {InterpreterBinding} from '../../../../../objects/notebook/notebookActionbar/interpreterBindings/interpreterBinding/interpreterBinding';
 import {CustomDropdownDirective} from '../../../customDropdown/customDropdownDirective';
 import {Requestable} from '../../../../../objects/channel/requestable';
 import {
   SaveInterpreterBindingsRequest
 } from '../../../../../objects/requests/saveInterpreterBindings/saveInterpreterBindingsRequest';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'interpreter-bindings',
@@ -73,25 +74,24 @@ import {
           <hr/>
           <div class="d-flex mb-2">
             <div class="w-75">
-              {{interpreterBinding.name}}
-               @if(interpreterBinding.selected){
-                 (default)
-               }
+              {{ interpreterBinding.name }}
+              @if (interpreterBinding.selected) {
+                (default)
+              }
               <small class="text-muted">
-                @for(interpreter of interpreterBinding.interpreters; track $index){
-                  {{interpreter.name}}
+                @for (interpreter of interpreterBinding.interpreters; track $index) {
+                  {{ interpreter.name }}
                 }
               </small>
             </div>
-              <div class="ms-auto">
-                <i title="Make this interpreter the default"
-                   class="fa-solid me-2"
-                   [class]="interpreterBinding.selected ? 'fa-circle-dot': 'fa-circle'"
-                   (click)="setSelectedInterpreterBinding(interpreterBinding)">
-                </i>
-                <i title="Restart"
-                   class="fa-solid fa-rotate"></i>
-              </div>
+            <div class="ms-auto">
+              <i title="Make this interpreter the default"
+                 class="fa-solid me-2"
+                 [class]="interpreterBinding.selected ? 'fa-circle-dot': 'fa-circle'"
+                 (click)="setSelectedInterpreterBinding(interpreterBinding)">
+              </i>
+              <i title="Restart" class="fa-solid fa-rotate" (click)="restartInterpreterBinding(interpreterBinding)"></i>
+            </div>
           </div>
         }
       </div>
@@ -101,13 +101,14 @@ import {
 export class InterpreterBindingsView {
   interpreterBindings = input.required<InterpreterBinding[]>();
   requestable = input.required<Requestable>();
+  private httpClient = inject(HttpClient);
 
   protected setSelectedInterpreterBinding(interpreterBinding:InterpreterBinding):void{
     const saveInterpreterBindingsRequest = new SaveInterpreterBindingsRequest(this.requestable(), interpreterBinding.id);
     saveInterpreterBindingsRequest.send();
   }
 
-  protected restartInterpreter():void{
-
+  protected restartInterpreterBinding(interpreterBinding:InterpreterBinding):void{
+    this.httpClient.put(`/interpreter/setting/restart/${interpreterBinding.id}`, {}).subscribe();
   }
 }
