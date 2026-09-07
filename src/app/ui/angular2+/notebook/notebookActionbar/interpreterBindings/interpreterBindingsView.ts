@@ -45,21 +45,69 @@
  */
 import {Component, input} from '@angular/core';
 import {InterpreterBinding} from '../../../../../objects/notebook/notebookActionbar/interpreterBindings/interpreterBinding/interpreterBinding';
+import {CustomDropdownDirective} from '../../../customDropdown/customDropdownDirective';
+import {Requestable} from '../../../../../objects/channel/requestable';
+import {
+  SaveInterpreterBindingsRequest
+} from '../../../../../objects/requests/saveInterpreterBindings/saveInterpreterBindingsRequest';
 
 @Component({
   selector: 'interpreter-bindings',
+  imports: [
+    CustomDropdownDirective
+  ],
   template: `
     <button class="btn btn-secondary dropdown-toggle"
             type="button"
-            title="Interpreter restart">
+            title="Interpreter restart"
+            customDropdown [dropdownContent]="dropdownContent">
       <i class="fas fa-rotate"></i>
-      <span>
-        Booting Spark...
-      </span>
+      Restart interpreter
     </button>
+    <ng-template #dropdownContent>
+      <div class="mr-2">
+        <h2 class="dropdown-header mt-0">
+          Interpreter restart
+        </h2>
+        @for (interpreterBinding of interpreterBindings(); track $index) {
+          <hr/>
+          <div class="d-flex mb-2">
+            <div class="w-75">
+              {{interpreterBinding.name}}
+               @if(interpreterBinding.selected){
+                 (default)
+               }
+              <small class="text-muted">
+                @for(interpreter of interpreterBinding.interpreters; track $index){
+                  {{interpreter.name}}
+                }
+              </small>
+            </div>
+              <div class="ms-auto">
+                <i title="Make this interpreter the default"
+                   class="fa-solid me-2"
+                   [class]="interpreterBinding.selected ? 'fa-circle-dot': 'fa-circle'"
+                   (click)="setSelectedInterpreterBinding(interpreterBinding)">
+                </i>
+                <i title="Restart"
+                   class="fa-solid fa-rotate"></i>
+              </div>
+          </div>
+        }
+      </div>
+    </ng-template>
   `
 })
 export class InterpreterBindingsView {
   interpreterBindings = input.required<InterpreterBinding[]>();
+  requestable = input.required<Requestable>();
 
+  protected setSelectedInterpreterBinding(interpreterBinding:InterpreterBinding):void{
+    const saveInterpreterBindingsRequest = new SaveInterpreterBindingsRequest(this.requestable(), interpreterBinding.id);
+    saveInterpreterBindingsRequest.send();
+  }
+
+  protected restartInterpreter():void{
+
+  }
 }

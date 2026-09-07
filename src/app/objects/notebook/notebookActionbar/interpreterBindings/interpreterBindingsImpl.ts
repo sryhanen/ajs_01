@@ -69,6 +69,7 @@ export class InterpreterBindingsImpl implements InterpreterBindings {
     this._interpreterBindings = signal([]);
     this._componentView = signal(new ComponentViewImpl(InterpreterBindingsView, computed(() => ({
       interpreterBindings:this._interpreterBindings(),
+      requestable:this,
     }))));
   }
 
