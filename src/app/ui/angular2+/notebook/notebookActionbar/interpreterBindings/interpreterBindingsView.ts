@@ -43,19 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, inject, input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {InterpreterBinding} from '../../../../../objects/notebook/notebookActionbar/interpreterBindings/interpreterBinding/interpreterBinding';
 import {CustomDropdownDirective} from '../../../customDropdown/customDropdownDirective';
 import {Requestable} from '../../../../../objects/channel/requestable';
 import {
   SaveInterpreterBindingsRequest
 } from '../../../../../objects/requests/saveInterpreterBindings/saveInterpreterBindingsRequest';
-import {HttpClient} from '@angular/common/http';
+import {RestartInterpreterView} from './restartInterpreter/restartInterpreterView';
 
 @Component({
   selector: 'interpreter-bindings',
   imports: [
-    CustomDropdownDirective
+    CustomDropdownDirective,
+    RestartInterpreterView
   ],
   template: `
     <button class="btn btn-secondary dropdown-toggle"
@@ -90,7 +91,7 @@ import {HttpClient} from '@angular/common/http';
                  [class]="interpreterBinding.selected ? 'fa-circle-dot': 'fa-circle'"
                  (click)="setSelectedInterpreterBinding(interpreterBinding)">
               </i>
-              <i title="Restart" class="fa-solid fa-rotate" (click)="restartInterpreterBinding(interpreterBinding)"></i>
+              <restart-interpreter-view [interpreterBindingId]="interpreterBinding.id"></restart-interpreter-view>
             </div>
           </div>
         }
@@ -101,14 +102,9 @@ import {HttpClient} from '@angular/common/http';
 export class InterpreterBindingsView {
   interpreterBindings = input.required<InterpreterBinding[]>();
   requestable = input.required<Requestable>();
-  private httpClient = inject(HttpClient);
 
   protected setSelectedInterpreterBinding(interpreterBinding:InterpreterBinding):void{
     const saveInterpreterBindingsRequest = new SaveInterpreterBindingsRequest(this.requestable(), interpreterBinding.id);
     saveInterpreterBindingsRequest.send();
-  }
-
-  protected restartInterpreterBinding(interpreterBinding:InterpreterBinding):void{
-    this.httpClient.put(`api/interpreter/setting/restart/${interpreterBinding.id}`, {}).subscribe();
   }
 }
