@@ -66,10 +66,27 @@ export default class RouterFactory {
   }
 
   initialized(){
+    this.notebookPermissions();
     this.securityTicket();
     this.login();
     this.version();
     return this._router;
+  }
+
+  private notebookPermissions(){
+    this._router.get('/api/notebook/:noteId/permissions', this.isAuthenticated, (req: Request, res: Response) => {
+      const response = {
+        status: 'OK',
+        message: '',
+        body: {
+          owners:['basicUser', 'adminUser'],
+          readers:['basicUser', 'adminUser'],
+          writers:['basicUser', 'adminUser'],
+          runners:['basicUser', 'adminUser']
+        },
+      };
+      res.status(200).json(response);
+    });
   }
 
   private securityTicket(){

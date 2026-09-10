@@ -77,3 +77,13 @@ export const ToasterProvider = {
   useFactory: ToasterFactory,
   deps: ['$injector']
 };
+
+export function RouteParamsFactory(i) {
+  return i.get('$routeParams');
+}
+
+export const RouteParamsProvider = {
+  provide: RouteParamsFactory,
+  useFactory: RouteParamsFactory,
+  deps: ['$injector']
+};
