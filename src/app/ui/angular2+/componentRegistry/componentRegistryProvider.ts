@@ -43,43 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {DoBootstrap, NgModule, provideAppInitializer, inject, provideZonelessChangeDetection} from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { UpgradeModule } from '@angular/upgrade/static';
-import './ajs-imports';
-import './downgraded-components';
-import {wsMessageListenerProvider, WebsocketMessageProvider, ToasterProvider} from './upgraded-providers';
-import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
-import { provideHttpClient } from '@angular/common/http';
-import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {webAppRoot} from './objects/webAppRoot/webAppRootImpl';
-import {ComponentRegistryProvider} from './ui/angular2+/componentRegistry/componentRegistryProvider';
+import {Provider} from '@angular/core';
+import {COMPONENT_REGISTRY} from './componentRegistry';
 
-@NgModule({
-  declarations: [],
-  imports: [
-    BrowserModule,
-    UpgradeModule,
-  ],
-  providers: [
-    provideZonelessChangeDetection(),
-    provideHttpClient(),
-    AuthenticationServiceImpl,
-    provideAppInitializer(() => {
-      webAppRoot.initialize(inject(WebSocketServiceImpl));
-      const authService = inject(AuthenticationServiceImpl);
-      return authService.requestTicket();
-    }),
-    wsMessageListenerProvider,
-    WebsocketMessageProvider,
-    ToasterProvider,
-    ComponentRegistryProvider
-  ]
-})
-export class AppModule implements DoBootstrap {
-  private upgrade = inject(UpgradeModule);
+export const ComponentRegistryProvider: Provider = {
+  provide: COMPONENT_REGISTRY,
+  useValue: new Map([
 
-  ngDoBootstrap() {
-    this.upgrade.bootstrap(document.body, ['zeppelinWebApp'], {strictDi: true});
-  }
-}
+  ])
+};
