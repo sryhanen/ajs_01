@@ -43,44 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import { Injectable, inject } from '@angular/core';
-import {HttpClient, HttpResponse} from '@angular/common/http';
-import {lastValueFrom} from 'rxjs';
-import {Ticket} from '../../../../shared/types/securityTicket';
-import {AuthenticationImpl} from '../../../../shared/objects/security/authenticationImpl';
-import {AuthenticationStub} from '../../../../shared/objects/security/authenticationStub';
-import {Authentication} from '../../../../shared/objects/security/authentication';
-import {AuthenticationService} from './authenticationService';
-import {BaseUrlImpl} from '../../../../objects/baseUrl/baseUrlImpl';
-
-@Injectable({ providedIn: 'root' })
-export class AuthenticationServiceImpl implements AuthenticationService {
-  private _http = inject(HttpClient);
-  private _authentication: Authentication = new AuthenticationStub();
-
-  async requestTicket(): Promise<HttpResponse<Ticket> | void> {
-    const urlBase = new BaseUrlImpl().baseUrl();
-    const url = new URL('api/security/ticket', urlBase).toString();
-    const request = this._http.get<HttpResponse<Ticket>>(
-        url,
-        {
-          responseType: 'json',
-          withCredentials: true,
-        }
-    );
-    return await lastValueFrom(request).then(
-      (response) => {
-        this._authentication = new AuthenticationImpl(response.body);
-        this._authentication.redirect();
-      },
-      (reason) => {
-        console.error(`Unauthorized user: ${JSON.stringify(reason)}`);
-        this._authentication = new AuthenticationStub();
-      }
-    );
-  }
-
-  authentication(): Authentication {
-    return this._authentication;
-  }
+export interface BaseUrl {
+  baseUrl():string;
 }
