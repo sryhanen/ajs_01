@@ -56,7 +56,7 @@ import {DataTablesPlugin} from '../../../../../objects/output/outputFormats/data
 import {Api} from 'datatables.net-bs5';
 
 @Component({
-  selector: 'dataTablesView',
+  selector: 'dataTables-output',
   template: `
     <table #table class="table table-bordered table-striped"></table>
   `

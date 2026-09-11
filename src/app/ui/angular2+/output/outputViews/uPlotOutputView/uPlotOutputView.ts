@@ -53,7 +53,7 @@ import {ResizeListenerImpl} from '../../../../../objects/output/outputFormats/uP
 import {UPlotOptions} from '../../../../../objects/output/outputFormats/uPlot/uPlotPlugin/configuration/options/uPlotOptions';
 
 @Component({
-  selector: 'uPlotOutputView',
+  selector: 'uPlot-output',
   template: `
     <div #anchor></div>
   `

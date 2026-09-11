@@ -47,7 +47,7 @@ import {Component, computed, ElementRef, input, OnInit, ViewChild} from '@angula
 import {AnsiUp} from 'ansi_up';
 
 @Component({
-  selector: 'textOutputView',
+  selector: 'textOutput-output',
   template: `
     <div #anchor class="plain-text" [innerHTML]="textContent()"></div>
   `
