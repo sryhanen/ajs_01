@@ -52,7 +52,7 @@ import {
   OnDestroy,
   ViewChild
 } from '@angular/core';
-import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
+import {DataTablesPlugin} from '../../../../../objects/output/outputFormats/dataTables/dataTablesPlugin/dataTablesPlugin';
 import {Api} from 'datatables.net-bs5';
 
 @Component({
