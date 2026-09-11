@@ -65,12 +65,8 @@ export class OutputSwitcherImpl implements OutputSwitcher {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      children:computed(() => []),
-      componentView: new ComponentViewImpl(OutputSwitcherView, computed(() => ({
-        switcherButtons: this._switcherButtons,
-        switchIsPending: this._switchIsPending(),
-        outputIsSwitchable: this._outputIsSwitchable(),
-      })))
+      componentView: undefined,
+      inputs: undefined,
     }));
   }
 

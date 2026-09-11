@@ -64,9 +64,8 @@ export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      paragraphId:this._paragraphId,
-      children: computed(() => []),
-      componentView: this._componentView()
+      componentView: undefined,
+      inputs: undefined,
     }));
   }
 

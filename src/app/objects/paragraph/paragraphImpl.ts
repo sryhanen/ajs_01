@@ -97,8 +97,8 @@ export class ParagraphImpl implements Paragraph {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      children:computed(() => [this._outputContainer.print()()]),
-      componentView: this._componentView
+      componentView: undefined,
+      inputs: undefined,
     }));
   }
 

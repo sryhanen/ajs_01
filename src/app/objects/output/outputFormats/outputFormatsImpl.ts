@@ -88,16 +88,8 @@ export class OutputFormatsImpl implements OutputFormats {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      componentView: this._componentView,
-      children: computed(() => {
-        const renderableList: RenderNode[] = [
-          this._outputSwitcher.print()()
-        ];
-        this._outputFormats.forEach(outputFormat => {
-          renderableList.push(outputFormat.print()());
-        });
-        return renderableList;
-      }),
+      componentView: undefined,
+      inputs: undefined,
     }));
   }
 

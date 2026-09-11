@@ -146,14 +146,8 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      componentView: this._componentView,
-      children: computed(() => {
-        const children:RenderNode[] = [];
-        this._paragraphs().forEach(paragraph => {
-          children.push(paragraph.print()());
-        });
-        return children;
-      }),
+      componentView: undefined,
+      inputs: undefined,
     }));
   }
 

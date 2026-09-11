@@ -105,8 +105,8 @@ export class UPlotFormatImpl implements UPlotFormat {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      componentView: this._componentView(),
-      children: computed(() => [])
+      componentView: undefined,
+      inputs: undefined,
     }));
   }
 

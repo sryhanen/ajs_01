@@ -49,7 +49,7 @@ import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {SafeJson} from '../safeJson/safeJson';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
-import {computed, Signal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
@@ -66,6 +66,7 @@ import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterIm
 import {
   RequestRegisterWithPropertyDecorator
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
@@ -86,12 +87,8 @@ export class NotebookImpl implements Notebook {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      componentView: this._componentView,
-      children: computed(() => {
-        const children:RenderNode[] = [];
-        children.push(this._paragraphCollection.print()());
-        return children;
-      }),
+      componentView: signal(RegisteredComponents.NOTEBOOK_VIEW),
+      inputs: signal({}),
     }));
   }
 

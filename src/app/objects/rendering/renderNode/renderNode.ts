@@ -44,10 +44,9 @@
  * a licensee so wish it.
  */
 import {Signal} from '@angular/core';
-import {ComponentView} from '../componentView/componentView';
 
 export interface RenderNode {
   paragraphId?:string;
-  componentView: ComponentView;
-  children: Signal<RenderNode[]>;
+  componentView: Signal<string>;
+  inputs: Signal<Record<string, unknown>>;
 }

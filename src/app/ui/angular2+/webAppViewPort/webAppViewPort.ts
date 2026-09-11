@@ -43,20 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
-import {RecursiveComponentDraw} from '../recursiveComponentDraw/recursiveComponentDraw';
+import {COMPONENT_REGISTRY} from '../componentRegistry/componentRegistry';
+import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
 
 @Component({
   selector: 'web-app-view-port',
   imports: [
-    RecursiveComponentDraw
+    RenderNodeHostView
   ],
   template: `
-    <recursive-component-draw [renderNode]="renderNode()" [containerId]="containerId()"></recursive-component-draw>
+    <render-node-host [renderNode]="renderNode()"></render-node-host>
   `
 })
 export class WebAppViewPort {
   containerId= input.required<string>();
+  protected component = computed(() => this.componentRegistry.get(this.renderNode().componentView()));
+  protected inputs = computed(() => this.renderNode().inputs());
+  private readonly componentRegistry = inject(COMPONENT_REGISTRY);
   protected renderNode = computed(() => webAppRoot.print()());
 }

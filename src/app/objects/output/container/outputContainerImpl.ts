@@ -80,15 +80,9 @@ export class OutputContainerImpl implements OutputContainer{
   }
 
   print(): Signal<RenderNode> {
-    return computed(() =>
-      ({
-        paragraphId:this._paragraphId,
-        componentView: this._componentView,
-        children: computed(() => [
-          this._outputFormats.print()(),
-          this._interpreterErrorListener.print()()
-        ]),
-      })
-    );
+    return  computed(() => ({
+      componentView: undefined,
+      inputs: undefined,
+    }));
   }
 }

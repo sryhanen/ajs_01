@@ -91,8 +91,8 @@ export class AngularFormatImpl implements AngularFormat {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      componentView: this._componentView(),
-      children: computed(() => [])
+      componentView: undefined,
+      inputs: undefined,
     }));
   }
 

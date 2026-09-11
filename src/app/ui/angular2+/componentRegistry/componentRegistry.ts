@@ -45,4 +45,4 @@
  */
 import { Type, InjectionToken } from '@angular/core';
 
-export const COMPONENT_REGISTRY = new InjectionToken<Record<string, Type<unknown>>>('Component Registry');
+export const COMPONENT_REGISTRY = new InjectionToken<Map<string, Type<unknown>>>('Component Registry');

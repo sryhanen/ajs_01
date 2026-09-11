@@ -66,14 +66,8 @@ export class uPlotSwitcherButton implements Printable {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      componentView: new ComponentViewImpl(OutputSwitcherButtonView, computed(() => ({
-        title: this._title,
-        icon: this._icon,
-        requestFormatSwitch:() => {
-          this._request.request(this.outputSwitchRequestData());
-        }
-      }))),
-      children:computed(() => [])
+      componentView: undefined,
+      inputs: undefined,
     }));
   }
 

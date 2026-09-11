@@ -48,8 +48,6 @@ import {Printable} from '../../../../rendering/printable/printable';
 import {Request} from '../../../../channel/request';
 import {computed, Signal} from '@angular/core';
 import { RenderNode } from '../../../../rendering/renderNode/renderNode';
-import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
-import {OutputSwitcherButtonView} from '../../../../../ui/angular2+/output/switcher/switcherButton/outputSwitcherButtonView';
 
 export class DataTableSwitcherButton implements Printable {
   private readonly _type: string = OutputType.dataTables;
@@ -61,14 +59,8 @@ export class DataTableSwitcherButton implements Printable {
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      componentView: new ComponentViewImpl(OutputSwitcherButtonView, computed(() => ({
-        title: 'Table',
-        icon: 'fas fa-table',
-        requestFormatSwitch:() => {
-          this._request.request(this.outputSwitchRequestData());
-        }
-      }))),
-      children:computed(() => [])
+      componentView: undefined,
+      inputs: undefined,
     }));
   }
 
