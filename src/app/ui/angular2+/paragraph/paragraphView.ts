@@ -43,12 +43,19 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component} from '@angular/core';
+import {Component, input} from '@angular/core';
+import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
 
 @Component({
   selector: 'paragraph',
+  imports: [
+    RenderNodeHostView
+  ],
   template: `
+    <render-node-host [renderNode]="output()"></render-node-host>
   `
 })
 export class ParagraphView {
+  output = input.required<RenderNode>();
 }

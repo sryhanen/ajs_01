@@ -58,6 +58,7 @@ import {NotebookCollectionView} from '../notebookCollection/notebookCollectionVi
 import {NotebookView} from '../notebook/notebookView';
 import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
 import {ParagraphView} from '../paragraph/paragraphView';
+import {OutputView} from '../output/outputView';
 
 export const ComponentRegistryProvider: Provider = {
   provide: COMPONENT_REGISTRY,
@@ -74,5 +75,6 @@ export const ComponentRegistryProvider: Provider = {
     [RegisteredComponents.NOTEBOOK_VIEW, NotebookView],
     [RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, ParagraphCollectionView],
     [RegisteredComponents.PARAGRAPH_VIEW, ParagraphView],
+    [RegisteredComponents.OUTPUT_VIEW, OutputView],
   ])
 };
