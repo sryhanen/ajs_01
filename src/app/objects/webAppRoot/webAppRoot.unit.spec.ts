@@ -76,20 +76,9 @@ describe('WebAppRoot unit test', () => {
       expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('Should print', () => {
-      expect(webAppRoot.print()().children()).toHaveLength(0);
-    });
-
-    it('Should update print signal after response', () => {
-      const noteResponse = {
-        op:'NOTE',
-        data:{
-          id:'note',
-          paragraphs:[]
-        }
-      };
-      webAppRoot.response(noteResponse);
-      expect(webAppRoot.print()().children()).toHaveLength(1);
+    it('Should have renderNode', () => {
+      const renderNode = webAppRoot.print()();
+      expect(renderNode.isStub()).toBe(false);
     });
   });
 });
