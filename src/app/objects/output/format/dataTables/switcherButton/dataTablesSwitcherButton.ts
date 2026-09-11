@@ -48,6 +48,7 @@ import {Printable} from '../../../../rendering/printable/printable';
 import {Request} from '../../../../channel/request';
 import {computed, Signal} from '@angular/core';
 import { RenderNode } from '../../../../rendering/renderNode/renderNode';
+import {RenderNodeStub} from '../../../../rendering/renderNode/renderNodeStub';
 
 export class DataTableSwitcherButton implements Printable {
   private readonly _type: string = OutputType.dataTables;
@@ -58,10 +59,7 @@ export class DataTableSwitcherButton implements Printable {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   private outputSwitchRequestData(): object {

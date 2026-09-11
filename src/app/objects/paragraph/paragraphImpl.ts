@@ -67,6 +67,7 @@ import {
   RequestRegisterWithPropertyDecorator
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 import {ParagraphOutputMessageFactoryImpl} from './paragraphOutputMessageFactory/paragraphOutputMessageFactoryImpl';
+import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
@@ -96,10 +97,7 @@ export class ParagraphImpl implements Paragraph {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   id(): string {

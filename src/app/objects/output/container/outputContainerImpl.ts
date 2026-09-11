@@ -54,6 +54,7 @@ import {InterpreterErrorListener} from '../../interpreterErrorListener/interpret
 import {InterpreterErrorListenerImpl} from '../../interpreterErrorListener/interpreterErrorListenerImpl';
 import {OutputFormats} from '../outputFormats/outputFormats';
 import {OutputFormatsImpl} from '../outputFormats/outputFormatsImpl';
+import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 
 export class OutputContainerImpl implements OutputContainer{
   private readonly _channel:Channel;
@@ -80,9 +81,6 @@ export class OutputContainerImpl implements OutputContainer{
   }
 
   print(): Signal<RenderNode> {
-    return  computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 }

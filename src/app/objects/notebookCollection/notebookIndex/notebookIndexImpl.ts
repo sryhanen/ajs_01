@@ -50,6 +50,7 @@ import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {ComponentView} from '../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
 import {NotebookIndex} from './notebookIndex';
+import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 
 export class NotebookIndexImpl implements NotebookIndex {
   private readonly _notebookIndexData:SafeJson;
@@ -65,9 +66,6 @@ export class NotebookIndexImpl implements NotebookIndex {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 }

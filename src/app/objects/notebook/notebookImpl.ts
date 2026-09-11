@@ -67,6 +67,7 @@ import {
   RequestRegisterWithPropertyDecorator
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
@@ -86,10 +87,7 @@ export class NotebookImpl implements Notebook {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: signal(RegisteredComponents.NOTEBOOK_VIEW),
-      inputs: signal({}),
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   id(): string {

@@ -60,6 +60,7 @@ import {DataTablesPluginStub} from './dataTablesPlugin/dataTablesPluginStub';
 import {DataTablesOutputView} from '../../../../ui/angular2+/output/outputViews/dataTablesOutputView/dataTablesOutputView';
 import {Printable} from '../../../rendering/printable/printable';
 import {DataTablesFormat} from './dataTablesFormat';
+import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 
 export class DataTablesFormatImpl implements DataTablesFormat {
   private readonly _channel: Channel;
@@ -79,10 +80,7 @@ export class DataTablesFormatImpl implements DataTablesFormat {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   response(json: object): void {

@@ -79,7 +79,7 @@ export class NotebookCollectionImpl implements NotebookCollection{
       this._currentNotebook().isStub() ? new RenderNodeStub() : this._currentNotebook().print()()
     );
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_COLLECTION_VIEW, computed(() => ({
-      currentNotebook:this._currentNotebookRenderNode
+      currentNotebook:this._currentNotebookRenderNode()
     }))));
   }
 

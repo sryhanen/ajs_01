@@ -51,6 +51,7 @@ import { RenderNode } from '../../rendering/renderNode/renderNode';
 import {ComponentViewImpl} from '../../rendering/componentView/componentViewImpl';
 import {OutputSwitcherView} from '../../../ui/angular2+/output/switcher/outputSwitcherView';
 import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
+import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 
 export class OutputSwitcherImpl implements OutputSwitcher {
   private readonly _outputIsSwitchable:WritableSignal<boolean>;
@@ -64,10 +65,7 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   request(json: object) {

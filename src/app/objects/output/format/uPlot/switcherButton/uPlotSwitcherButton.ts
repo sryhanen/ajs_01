@@ -50,6 +50,7 @@ import { RenderNode } from '../../../../rendering/renderNode/renderNode';
 import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
 import {OutputSwitcherButtonView} from '../../../../../ui/angular2+/output/switcher/switcherButton/outputSwitcherButtonView';
 import {Request} from '../../../../channel/request';
+import {RenderNodeStub} from '../../../../rendering/renderNode/renderNodeStub';
 
 export class uPlotSwitcherButton implements Printable {
   private readonly _request: Request;
@@ -65,10 +66,7 @@ export class uPlotSwitcherButton implements Printable {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   private outputSwitchRequestData():object {

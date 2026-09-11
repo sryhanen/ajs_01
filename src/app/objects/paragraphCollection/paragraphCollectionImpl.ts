@@ -61,6 +61,7 @@ import {ParagraphAddedMessageImpl} from '../message/paragraphAddedMessage/paragr
 import {ParagraphRemovedMessageImpl} from '../message/paragraphRemovedMessage/paragraphRemovedMessageImpl';
 import {RequestRegister} from '../register/requestRegister/requestRegister';
 import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterImpl';
+import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _channel: Channel;
@@ -145,10 +146,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   request(data: object): void {

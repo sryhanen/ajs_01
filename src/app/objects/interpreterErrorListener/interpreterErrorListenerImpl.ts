@@ -52,6 +52,7 @@ import {ComponentView} from '../rendering/componentView/componentView';
 import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
 import {InterpreterErrorView} from '../../ui/angular2+/interpreterError/interpreterErrorView';
+import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
   private readonly _paragraphId:string;
@@ -63,10 +64,7 @@ export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   response(data: object): void {

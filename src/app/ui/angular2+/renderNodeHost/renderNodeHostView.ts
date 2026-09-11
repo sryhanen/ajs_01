@@ -46,7 +46,7 @@
 import {
   Component,
   inject,
-  input, Type,
+  input, OnInit, Type,
 } from '@angular/core';
 import {COMPONENT_REGISTRY} from '../componentRegistry/componentRegistry';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';

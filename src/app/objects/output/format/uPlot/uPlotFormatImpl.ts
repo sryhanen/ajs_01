@@ -60,6 +60,7 @@ import {Printable} from '../../../rendering/printable/printable';
 import {UPlotFormat} from './uPlotFormat';
 import uPlot from 'uplot';
 import {BasicOptionsImpl} from './uPlotPlugin/configuration/options/basicOptionsImpl';
+import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 
 export class UPlotFormatImpl implements UPlotFormat {
   private readonly _channel: Channel;
@@ -104,10 +105,7 @@ export class UPlotFormatImpl implements UPlotFormat {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   switcherButtons(): Signal<RenderNode>[] {

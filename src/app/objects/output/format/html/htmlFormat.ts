@@ -54,6 +54,7 @@ import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 import {HtmlOutputView} from '../../../../ui/angular2+/output/outputViews/htmlOutputView/htmlOutputView';
+import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 
 export class HTMLFormat implements OutputFormat{
   private readonly _componentViewStub: ComponentView;
@@ -80,10 +81,7 @@ export class HTMLFormat implements OutputFormat{
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   switcherButtons(): Signal<RenderNode>[] {

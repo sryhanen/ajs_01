@@ -63,6 +63,7 @@ import {ParagraphOutputRequestStub} from './paragraphOutputRequest/paragraphOutp
 import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
 import {ComponentView} from '../../rendering/componentView/componentView';
 import {OutputFormats} from './outputFormats';
+import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 
 export class OutputFormatsImpl implements OutputFormats {
   private readonly _channel: Channel;
@@ -87,10 +88,7 @@ export class OutputFormatsImpl implements OutputFormats {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: undefined,
-      inputs: undefined,
-    }));
+    return computed(() => new RenderNodeStub());
   }
 
   request(json: object) {
