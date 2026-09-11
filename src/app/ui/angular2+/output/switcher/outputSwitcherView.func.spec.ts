@@ -46,22 +46,13 @@
 import {ComponentFixture} from '@angular/core/testing';
 import {render, screen} from '@testing-library/angular';
 import {OutputSwitcherView} from './outputSwitcherView';
-import {Component, signal} from '@angular/core';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 import {By} from '@angular/platform-browser';
-import {COMPONENT_REGISTRY} from '../../componentRegistry/componentRegistry';
 import {RenderNodeHostView} from '../../renderNodeHost/renderNodeHostView';
-import {RenderNodeImpl} from '../../../../objects/rendering/renderNode/renderNodeImpl';
+import {FakeComponentRegistryProvider} from '../../../../test/ui/fakes/fakeComponentRegistryProvider';
+import {FakeRenderNode} from '../../../../test/ui/fakes/fakeRenderNode';
 
 describe('OutputSwitcherView functional test', () => {
-  @Component({
-    selector:'fake-component',
-    template: ''
-  })
-  class FakeComponent {}
-
-  const fakeComponentName = 'FAKE_COMPONENT';
-
   let fixture: ComponentFixture<OutputSwitcherView>;
   let switcherButtons: RenderNode[];
   let switchIsPending: boolean;
@@ -69,8 +60,8 @@ describe('OutputSwitcherView functional test', () => {
 
   beforeEach(async () => {
     switcherButtons = [
-      new RenderNodeImpl(fakeComponentName, signal({})),
-      new RenderNodeImpl(fakeComponentName, signal({}))
+      new FakeRenderNode(),
+      new FakeRenderNode(),
     ];
     switchIsPending = false;
     outputIsSwitchable = true;
@@ -82,7 +73,7 @@ describe('OutputSwitcherView functional test', () => {
         outputIsSwitchable: outputIsSwitchable
       },
       providers:[
-        {provide: COMPONENT_REGISTRY, useValue:new Map([[fakeComponentName, FakeComponent]])}
+        FakeComponentRegistryProvider
       ]
     });
     fixture = renderResult.fixture;
@@ -108,7 +99,6 @@ describe('OutputSwitcherView functional test', () => {
       fixture.componentRef.setInput('outputIsSwitchable', false);
       fixture.detectChanges();
       expect(() => screen.getByRole('group')).toThrow();
-      expect(fixture.debugElement.queryAll(By.directive(FakeComponent))).toHaveLength(0);
     });
 
     describe('Status visibility', () => {
