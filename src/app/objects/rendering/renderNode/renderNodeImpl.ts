@@ -43,11 +43,33 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {RenderNode} from './renderNode';
 import {Signal} from '@angular/core';
-import Stubable from '../../stubable/stubable';
 
-export interface RenderNode extends Stubable{
-  paragraphId():string;
-  componentView(): string;
-  inputs(): Signal<Record<string, unknown>>;
+export class RenderNodeImpl implements RenderNode {
+  private readonly _componentView: string;
+  private readonly _inputs: Signal<Record<string, unknown>>;
+  private readonly _paragraphId: string;
+
+  constructor(componentView: string, inputs:Signal<Record<string, unknown>>, paragraphId: string = '') {
+    this._componentView = componentView;
+    this._inputs = inputs;
+    this._paragraphId = paragraphId;
+  }
+
+  componentView(): string {
+    return this._componentView;
+  }
+
+  inputs(): Signal<Record<string, unknown>> {
+    return this._inputs;
+  }
+
+  paragraphId(): string {
+    return this._paragraphId;
+  }
+
+  isStub():boolean{
+    return false;
+  }
 }

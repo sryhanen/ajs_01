@@ -43,11 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {RenderNode} from './renderNode';
 import {Signal} from '@angular/core';
-import Stubable from '../../stubable/stubable';
 
-export interface RenderNode extends Stubable{
-  paragraphId():string;
-  componentView(): string;
-  inputs(): Signal<Record<string, unknown>>;
+export class RenderNodeStub implements RenderNode {
+  isStub():boolean{
+    return true;
+  }
+
+  componentView(): string {
+    throw new Error('RenderNodeStub: Method not implemented.');
+  }
+
+  inputs(): Signal<Record<string, unknown>> {
+    throw new Error('RenderNodeStub: Method not implemented.');
+  }
+
+  paragraphId(): string {
+    throw new Error('RenderNodeStub: Method not implemented.');
+  }
 }
