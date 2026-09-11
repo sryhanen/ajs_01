@@ -45,28 +45,27 @@
  */
 import {OutputType} from '../../../outputType';
 import {Printable} from '../../../../rendering/printable/printable';
-import {computed, Signal} from '@angular/core';
+import {signal, Signal} from '@angular/core';
 import { RenderNode } from '../../../../rendering/renderNode/renderNode';
-import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
-import {OutputSwitcherButtonView} from '../../../../../ui/angular2+/output/switcher/switcherButton/outputSwitcherButtonView';
 import {Request} from '../../../../channel/request';
-import {RenderNodeStub} from '../../../../rendering/renderNode/renderNodeStub';
+import {RenderNodeImpl} from '../../../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class uPlotSwitcherButton implements Printable {
-  private readonly _request: Request;
-  private readonly _title: string;
-  private readonly _icon: string;
   private readonly _graphType: string;
+  private readonly _renderNode: Signal<RenderNode>;
 
   constructor(request: Request, title: string, icon: string, graphType: string) {
-    this._request = request;
-    this._title = title;
-    this._icon = icon;
     this._graphType = graphType;
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.OUTPUT_SWITCHER_BUTTON_VIEW, signal({
+      requestFormatSwitch: () => request.request(this.outputSwitchRequestData()),
+      title:title,
+      icon:icon,
+    })));
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => new RenderNodeStub());
+    return this._renderNode;
   }
 
   private outputSwitchRequestData():object {
