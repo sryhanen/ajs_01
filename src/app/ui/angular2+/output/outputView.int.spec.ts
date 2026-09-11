@@ -43,35 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
-import {FakeWebSocketService} from '../../../objects/webSocket/service/fakeWebSocketService';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {WebAppViewPort} from './webAppViewPort';
+import {FakeRenderNode} from '../../../test/ui/fakes/fakeRenderNode';
+import {OutputView} from './outputView';
+import {render} from '@testing-library/angular';
 import {By} from '@angular/platform-browser';
-import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
-import {ComponentRegistryProvider} from '../componentRegistry/componentRegistryProvider';
+import {FakeComponent} from '../../../test/ui/fakes/fakeComponent';
+import {ComponentFixture} from '@angular/core/testing';
+import {FakeComponentRegistryProvider} from '../../../test/ui/fakes/fakeComponentRegistryProvider';
 
-describe('WebAppViewPort integration test', () => {
-  const containerId = 'containerId';
-  let fixture: ComponentFixture<WebAppViewPort>;
+describe('OutputView integration test', () => {
+  const interpreterErrorListener = new FakeRenderNode();
+  const outputSwitcher = new FakeRenderNode();
+  const outputFormats = [new FakeRenderNode(), new FakeRenderNode(), new FakeRenderNode()];
+  let fixture: ComponentFixture<OutputView>;
 
   beforeEach(async () => {
-    webAppRoot.initialize(new FakeWebSocketService());
-    TestBed.configureTestingModule({providers: [
-        ComponentRegistryProvider
-      ]});
-    fixture = TestBed.createComponent(WebAppViewPort);
-    fixture.componentRef.setInput('containerId', containerId);
-    await fixture.whenStable();
+    const renderResult = await render(OutputView,{
+      inputs:{
+        interpreterErrorListener:interpreterErrorListener,
+        outputSwitcher:outputSwitcher,
+        outputFormats:outputFormats,
+      },
+      providers:[
+        FakeComponentRegistryProvider
+      ]
+    });
+    fixture = renderResult.fixture;
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(fixture.componentInstance).toBeDefined();
-    });
-
-    it('Should have rendered RenderNodeHostView', () =>  {
-      expect(fixture.debugElement.query(By.directive(RenderNodeHostView))).toBeDefined();
-    });
+  it('Should have rendered renderNodes', () => {
+    expect(fixture.debugElement.queryAll(By.directive(FakeComponent))).toHaveLength(5);
   });
 });

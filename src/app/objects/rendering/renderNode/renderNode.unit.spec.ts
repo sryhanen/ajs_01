@@ -43,35 +43,38 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
-import {FakeWebSocketService} from '../../../objects/webSocket/service/fakeWebSocketService';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {WebAppViewPort} from './webAppViewPort';
-import {By} from '@angular/platform-browser';
-import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
-import {ComponentRegistryProvider} from '../componentRegistry/componentRegistryProvider';
+import {RenderNode} from './renderNode';
+import {RenderNodeImpl} from './renderNodeImpl';
+import {signal} from '@angular/core';
 
-describe('WebAppViewPort integration test', () => {
-  const containerId = 'containerId';
-  let fixture: ComponentFixture<WebAppViewPort>;
+describe('RenderNode unit test', () => {
+  let renderNode: RenderNode;
+  const componentView = 'componentView';
+  const inputs = signal({test:'test'});
 
-  beforeEach(async () => {
-    webAppRoot.initialize(new FakeWebSocketService());
-    TestBed.configureTestingModule({providers: [
-        ComponentRegistryProvider
-      ]});
-    fixture = TestBed.createComponent(WebAppViewPort);
-    fixture.componentRef.setInput('containerId', containerId);
-    await fixture.whenStable();
+  beforeEach(() => {
+    renderNode = new RenderNodeImpl(componentView, inputs);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(fixture.componentInstance).toBeDefined();
-    });
+  it('Should not be a stub', () => {
+    expect(renderNode.isStub()).toBe(false);
+  });
 
-    it('Should have rendered RenderNodeHostView', () =>  {
-      expect(fixture.debugElement.query(By.directive(RenderNodeHostView))).toBeDefined();
-    });
+  it('Should have componentView', () => {
+    expect(renderNode.componentView()).toEqual(componentView);
+  });
+
+  it('Should have inputs', () => {
+    expect(renderNode.inputs()()).toEqual(inputs());
+  });
+
+  it('Should have empty string as paragraphId', () => {
+    expect(renderNode.paragraphId()).toEqual('');
+  });
+
+  it('Should paragraphId if given', () => {
+    const paragraphId = 'paragraphId';
+    renderNode = new RenderNodeImpl(componentView, inputs, paragraphId);
+    expect(renderNode.paragraphId()).toEqual(paragraphId);
   });
 });
