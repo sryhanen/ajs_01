@@ -47,6 +47,7 @@ import {Channel} from '../channel/channel';
 import {NotebookCollection} from './notebookCollection';
 import {FakeChannel} from '../channel/fakeChannel';
 import {NotebookCollectionImpl} from './notebookCollectionImpl';
+import {RenderNode} from '../rendering/renderNode/renderNode';
 
 describe('NotebookCollection', () => {
   let channel: Channel;
@@ -62,11 +63,10 @@ describe('NotebookCollection', () => {
       expect(notebookCollection).toBeInstanceOf(NotebookCollectionImpl);
     });
 
-    it('Should print', () => {
-      const notebookCollectionPrinted = notebookCollection.print()();
-      expect(notebookCollectionPrinted).toBeDefined();
-      expect(notebookCollectionPrinted.children()).toHaveLength(0);
-      expect(notebookCollectionPrinted.componentView.isStub()).toBe(true);
+    it('Should have renderNode', () => {
+      const renderNode = notebookCollection.print()();
+      expect(renderNode.isStub()).toBe(false);
+      expect((renderNode.inputs()()['currentNotebook'] as RenderNode).isStub()).toBe(true);
     });
   });
 
@@ -92,8 +92,8 @@ describe('NotebookCollection', () => {
         }
       };
       notebookCollection.response(response);
-      const notebookCollectionPrinted = notebookCollection.print()();
-      expect(notebookCollectionPrinted.children()).toHaveLength(1);
+      const renderNode = notebookCollection.print()();
+      expect((renderNode.inputs()()['currentNotebook'] as RenderNode).isStub()).toBe(false);
     });
   });
 });

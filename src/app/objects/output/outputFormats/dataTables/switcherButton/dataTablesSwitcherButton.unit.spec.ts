@@ -45,24 +45,19 @@
  */
 import {DataTableSwitcherButton} from './dataTablesSwitcherButton';
 import {FakeChannel} from '../../../../channel/fakeChannel';
+import {RegisteredComponents} from '../../../../../ui/angular2+/componentRegistry/registeredComponents';
 
 describe('DataTables SwitcherButton unit test', () => {
   const request = new FakeChannel();
   const dataTablesSwitcherButton = new DataTableSwitcherButton(request);
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(dataTablesSwitcherButton).toBeDefined();
-    });
-
-    it('Should print', () => {
-      const dataTableSwitcherButtonPrinted = dataTablesSwitcherButton.print()();
-      const componentView = dataTableSwitcherButtonPrinted.componentView;
-      expect(dataTableSwitcherButtonPrinted.children()).toHaveLength(0);
-      expect(componentView.isStub()).toBe(false);
-      expect(componentView.inputs()()['title']).toBeDefined();
-      expect(componentView.inputs()()['icon']).toBeDefined();
-      expect(componentView.inputs()()['requestFormatSwitch']).toBeDefined();
-    });
+  it('Should print', () => {
+    const renderNode = dataTablesSwitcherButton.print()();
+    const inputs = renderNode.inputs()();
+    expect(renderNode.isStub()).toBe(false);
+    expect(renderNode.componentView()).toEqual(RegisteredComponents.OUTPUT_SWITCHER_BUTTON_VIEW);
+    expect(inputs['title']).toBeDefined();
+    expect(inputs['icon']).toBeDefined();
+    expect(inputs['requestFormatSwitch']).toBeDefined();
   });
 });

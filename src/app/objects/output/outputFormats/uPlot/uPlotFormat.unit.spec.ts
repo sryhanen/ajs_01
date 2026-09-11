@@ -66,10 +66,9 @@ describe('uPlotFormat unit test', () => {
       expect(switcherButtons).toHaveLength(4);
     });
 
-    it('Should print', () => {
-      const uPlotFormatPrinted = uPlotFormat.print()();
-      expect(uPlotFormatPrinted.componentView.isStub()).toBe(true);
-      expect(uPlotFormatPrinted.children()).toHaveLength(0);
+    it('Should have renderNode stub', () => {
+      const renderNode = uPlotFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
     });
   });
 
@@ -104,19 +103,20 @@ describe('uPlotFormat unit test', () => {
       uPlotFormat.response(outputResponse);
     });
 
-    it('Should have componentView', () => {
-      const componentView = uPlotFormat.print()().componentView;
-      expect(componentView.isStub()).toBe(false);
-      expect(componentView.inputs()()['basicOptions']).toBeDefined();
-      expect(componentView.inputs()()['graphType']).toBeDefined();
-      expect(componentView.inputs()()['uPlotData']).toBeDefined();
+    it('Should have renderNode', () => {
+      const renderNode = uPlotFormat.print()();
+      const inputs = renderNode.inputs()();
+      expect(renderNode.isStub()).toBe(false);
+      expect(inputs['basicOptions']).toBeDefined();
+      expect(inputs['graphType']).toBeDefined();
+      expect(inputs['uPlotData']).toBeDefined();
     });
 
     it('Should not have component view after output type change', () => {
       outputResponse.data.output.type = '';
       uPlotFormat.response(outputResponse);
-      const componentView = uPlotFormat.print()().componentView;
-      expect(componentView.isStub()).toBe(true);
+      const renderNode = uPlotFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
     });
   });
 });

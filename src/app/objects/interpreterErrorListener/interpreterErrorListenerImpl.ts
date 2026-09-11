@@ -48,21 +48,19 @@ import {MessageImpl} from '../message/messageImpl';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
-import {ComponentView} from '../rendering/componentView/componentView';
-import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
-import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
-import {InterpreterErrorView} from '../../ui/angular2+/interpreterError/interpreterErrorView';
 import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
-  private readonly _componentView:WritableSignal<ComponentView>;
+  private readonly _renderNode:WritableSignal<RenderNode>;
 
   constructor() {
-    this._componentView = signal(new ComponentViewStub());
+    this._renderNode = signal(new RenderNodeStub());
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => new RenderNodeStub());
+    return this._renderNode;
   }
 
   response(data: object): void {
@@ -70,7 +68,7 @@ export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
     if(message.operation() === 'INTERPRETER_ERROR'){
       const errorData = new SafeJsonImpl(message.data());
       const errorMessage = errorData.getProperty('message', 'string');
-      this._componentView.set(new ComponentViewImpl(InterpreterErrorView, signal({errorMessage: {errorMessage:errorMessage}})));
+      this._renderNode.set(new RenderNodeImpl(RegisteredComponents.INTERPRETER_ERROR_VIEW, signal({errorMessage: {errorMessage:errorMessage}})));
     }
   }
 }

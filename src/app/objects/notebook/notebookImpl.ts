@@ -49,10 +49,8 @@ import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
 import {SafeJson} from '../safeJson/safeJson';
 import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
-import {computed, signal, Signal} from '@angular/core';
+import {signal, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
-import {ComponentView} from '../rendering/componentView/componentView';
-import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
 import {

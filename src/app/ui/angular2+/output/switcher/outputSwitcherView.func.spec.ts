@@ -46,10 +46,12 @@
 import {ComponentFixture} from '@angular/core/testing';
 import {render, screen} from '@testing-library/angular';
 import {OutputSwitcherView} from './outputSwitcherView';
-import {Component, signal, Signal} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
-import {ComponentViewImpl} from '../../../../objects/rendering/componentView/componentViewImpl';
 import {By} from '@angular/platform-browser';
+import {COMPONENT_REGISTRY} from '../../componentRegistry/componentRegistry';
+import {RenderNodeHostView} from '../../renderNodeHost/renderNodeHostView';
+import {RenderNodeImpl} from '../../../../objects/rendering/renderNode/renderNodeImpl';
 
 describe('OutputSwitcherView functional test', () => {
   @Component({
@@ -58,21 +60,17 @@ describe('OutputSwitcherView functional test', () => {
   })
   class FakeComponent {}
 
+  const fakeComponentName = 'FAKE_COMPONENT';
+
   let fixture: ComponentFixture<OutputSwitcherView>;
-  let switcherButtons: Signal<RenderNode>[];
+  let switcherButtons: RenderNode[];
   let switchIsPending: boolean;
   let outputIsSwitchable: boolean;
 
   beforeEach(async () => {
     switcherButtons = [
-      signal({
-        componentView: new ComponentViewImpl(FakeComponent, signal({test:''})),
-        children:signal([])
-      }),
-      signal({
-        componentView: new ComponentViewImpl(FakeComponent, signal({test:''})),
-        children:signal([])
-      })
+      new RenderNodeImpl(fakeComponentName, signal({})),
+      new RenderNodeImpl(fakeComponentName, signal({}))
     ];
     switchIsPending = false;
     outputIsSwitchable = true;
@@ -82,7 +80,10 @@ describe('OutputSwitcherView functional test', () => {
         switcherButtons: switcherButtons,
         switchIsPending: switchIsPending,
         outputIsSwitchable: outputIsSwitchable
-      }
+      },
+      providers:[
+        {provide: COMPONENT_REGISTRY, useValue:new Map([[fakeComponentName, FakeComponent]])}
+      ]
     });
     fixture = renderResult.fixture;
   });
@@ -97,7 +98,8 @@ describe('OutputSwitcherView functional test', () => {
     });
 
     it('Should render elements in the group', () => {
-      expect(fixture.debugElement.queryAll(By.directive(FakeComponent))).toHaveLength(2);
+      const hostViews = fixture.debugElement.queryAll(By.directive(RenderNodeHostView));
+      expect(hostViews).toHaveLength(2);
     });
   });
 

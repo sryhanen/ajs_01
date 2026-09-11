@@ -64,10 +64,9 @@ describe('AngularFormat unit test', () => {
       expect(angularFormat.switcherButtons()).toEqual([]);
     });
 
-    it('Should print', () => {
-      const angularFormatPrinted = angularFormat.print()();
-      expect(angularFormatPrinted.componentView.isStub()).toBe(true);
-      expect(angularFormatPrinted.children()).toHaveLength(0);
+    it('Should have renderNode stub', () => {
+      const renderNode = angularFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
     });
   });
 
@@ -100,15 +99,16 @@ describe('AngularFormat unit test', () => {
 
     it('Should have component view', () => {
       angularFormat.response(outputResponse);
-      const componentView = angularFormat.print()().componentView;
-      expect(componentView.isStub()).toBe(false);
-      expect(componentView.inputs()()['template']).toEqual(template);
+      const renderNode = angularFormat.print()();
+      expect(renderNode.isStub()).toBe(false);
+      expect(renderNode.inputs()()['template']).toEqual(template);
     });
 
     it('Should have not have component view after output type change', () => {
       outputResponse.data.output.type = '';
       angularFormat.response(outputResponse);
-      expect(angularFormat.print()().componentView.isStub()).toBe(true);
+      const renderNode = angularFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
     });
   });
 });

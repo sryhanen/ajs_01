@@ -67,10 +67,9 @@ describe('DataTablesFormat unit test', () => {
       expect(buttons).toHaveLength(1);
     });
 
-    it('Should print', () => {
-      const dataTablesFormatPrinted = dataTablesFormat.print()();
-      expect(dataTablesFormatPrinted.componentView.isStub()).toBe(true);
-      expect(dataTablesFormatPrinted.children()).toHaveLength(0);
+    it('Should print have renderNode stub', () => {
+      const renderNode = dataTablesFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
     });
   });
 
@@ -100,14 +99,15 @@ describe('DataTablesFormat unit test', () => {
       dataTablesFormat.response(outputResponse);
     });
 
-    it('Should have componentView', () => {
-      const componentView = dataTablesFormat.print()().componentView;
-      expect(componentView.isStub()).toBe(false);
-      expect(componentView.inputs()()['dataTablesPlugin']).toBeDefined();
+    it('Should have renderNode', () => {
+      const renderNode = dataTablesFormat.print()();
+      expect(renderNode.isStub()).toBe(false);
+      expect(renderNode.inputs()()['dataTablesPlugin']).toBeDefined();
     });
 
     it('Should respond plugin on consequential output responses', () => {
-      const plugin = dataTablesFormat.print()().componentView.inputs()()['dataTablesPlugin'] as Channel;
+      const renderNode = dataTablesFormat.print()();
+      const plugin = renderNode.inputs()()['dataTablesPlugin'] as Channel;
       const spy = vi.spyOn(plugin, 'response');
       dataTablesFormat.response(outputResponse);
       dataTablesFormat.response(outputResponse);
@@ -118,8 +118,8 @@ describe('DataTablesFormat unit test', () => {
     it('Should not have component view after output type change', () => {
       outputResponse.data.output.type = '';
       dataTablesFormat.response(outputResponse);
-      const componentView = dataTablesFormat.print()().componentView;
-      expect(componentView.isStub()).toBe(true);
+      const renderNode = dataTablesFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
     });
   });
 });

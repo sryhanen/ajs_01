@@ -76,11 +76,11 @@ describe('Notebook unit test', () => {
       expect(notebook.id()).toEqual(notebookId);
     });
 
-    it('Should print', () => {
+    it('Should have renderNode', () => {
       notebook = new NotebookImpl(channel, notebookData);
-      const notebookPrinted = notebook.print()();
-      expect(notebookPrinted.componentView.isStub()).toBe(true);
-      expect(notebookPrinted.children()).toHaveLength(1);
+      const renderNode = notebook.print()();
+      expect(renderNode.isStub()).toBe(false);
+      expect(renderNode.inputs()()['paragraphCollection']).toBeDefined();
     });
   });
 

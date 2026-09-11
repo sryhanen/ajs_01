@@ -87,10 +87,12 @@ describe('Paragraph', () => {
       expect(paragraph.id()).toEqual(paragraphId);
     });
 
-    it('Should print', () => {
-      const paragraphPrinted = paragraph.print()();
-      expect(paragraphPrinted.componentView.isStub()).toBe(true);
-      expect(paragraphPrinted.children()).toHaveLength(1);
+    it('Should have renderNode', () => {
+      const renderNode = paragraph.print()();
+      const inputs = renderNode.inputs()();
+      expect(renderNode.isStub()).toBe(false);
+      expect(inputs['output']).toBeDefined();
+      expect(inputs['paragraphId']).toBeDefined();
     });
   });
 
