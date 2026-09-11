@@ -55,11 +55,9 @@ import {InterpreterErrorView} from '../../ui/angular2+/interpreterError/interpre
 import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
-  private readonly _paragraphId:string;
   private readonly _componentView:WritableSignal<ComponentView>;
 
-  constructor(paragraphId:string) {
-    this._paragraphId = paragraphId;
+  constructor() {
     this._componentView = signal(new ComponentViewStub());
   }
 

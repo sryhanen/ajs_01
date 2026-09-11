@@ -54,7 +54,7 @@ import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
     RenderNodeHostView
   ],
   template: `
-    <render-node-host [renderNode]="renderNode()"></render-node-host>
+    <render-node-host [renderNode]="renderNode()" [containerId]="containerId()"></render-node-host>
   `
 })
 export class WebAppViewPort {

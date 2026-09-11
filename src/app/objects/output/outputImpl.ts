@@ -83,7 +83,7 @@ export class OutputImpl implements Output {
   private readonly _interpreterErrorListener:InterpreterErrorListener;
   private readonly _renderNode:Signal<RenderNode>;
 
-  constructor(channel:Channel, paragraphId:string) {
+  constructor(channel:Channel) {
     this._channel = channel;
     this._outputFormats = [
       new DataTablesFormatImpl(this),
@@ -95,7 +95,7 @@ export class OutputImpl implements Output {
     const buttons = this._outputFormats.map(format => format.switcherButtons());
     this._outputSwitcher = new OutputSwitcherImpl(buttons.flat());
     this._previousParagraphOutputRequest = new ParagraphOutputRequestStub();
-    this._interpreterErrorListener = new InterpreterErrorListenerImpl(paragraphId);
+    this._interpreterErrorListener = new InterpreterErrorListenerImpl();
     this._responseRegister = new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(),[this._interpreterErrorListener]);
     this._responseRegister.register('PARAGRAPH_OUTPUT', (json) => this.paragraphOutputResponse(json));
     this._requestRegister = new RequestRegisterImpl(this._channel);
@@ -104,7 +104,7 @@ export class OutputImpl implements Output {
       interpreterErrorListener: this._interpreterErrorListener.print()(),
       outputSwitcher: this._outputSwitcher.print()(),
       outputFormats: this._outputFormats.map(outputFormat => outputFormat.print()()),
-    }), {equal: () => false}), paragraphId));
+    }), {equal: () => false})));
   }
 
   print(): Signal<RenderNode> {

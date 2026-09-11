@@ -44,9 +44,10 @@
  * a licensee so wish it.
  */
 import {
-  Component,
+  Component, computed,
   inject,
-  input, OnInit, Type,
+  input,
+  Type,
 } from '@angular/core';
 import {COMPONENT_REGISTRY} from '../componentRegistry/componentRegistry';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
@@ -58,14 +59,36 @@ import {NgComponentOutlet} from '@angular/common';
     NgComponentOutlet
   ],
   template: `
-    @if(!renderNode().isStub()){
+    @if(!renderNode().isStub() && containerContextIsCorrect()){
       @let component = componentReference(renderNode().componentView());
-      <ng-container *ngComponentOutlet="component; inputs: renderNode().inputs()();"></ng-container>
+      <ng-container *ngComponentOutlet="component; inputs: componentInputs();"></ng-container>
     }
   `
 })
 export class RenderNodeHostView {
   renderNode = input.required<RenderNode>();
+  containerId = input<string>('');
+  containerContextIsCorrect = computed(() => {
+    let containerContextIsCorrect = true;
+    const paragraphId = this.renderNode().paragraphId();
+    if(paragraphId !== ''){
+      containerContextIsCorrect = paragraphId === this.containerId();
+    }
+    return containerContextIsCorrect;
+  });
+  componentInputs = computed(() => {
+    let componentInputs = {};
+    if(!this.renderNode().isStub()){
+      componentInputs = {
+        ...this.renderNode().inputs()(),
+      };
+    }
+    if(this.containerId() !== ''){
+      componentInputs['containerId'] = this.containerId();
+    }
+    return componentInputs;
+  });
+
   private readonly componentRegistry = inject(COMPONENT_REGISTRY);
 
   protected componentReference(componentId:string):Type<unknown>{

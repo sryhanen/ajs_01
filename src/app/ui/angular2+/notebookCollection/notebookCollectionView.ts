@@ -53,9 +53,10 @@ import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
     RenderNodeHostView
   ],
   template: `
-    <render-node-host [renderNode]="currentNotebook()"></render-node-host>
+    <render-node-host [renderNode]="currentNotebook()" [containerId]="containerId()"></render-node-host>
   `
 })
 export class NotebookCollectionView {
+  containerId = input.required<string>();
   currentNotebook = input.required<RenderNode>();
 }
