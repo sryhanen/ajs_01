@@ -45,7 +45,7 @@
  */
 import {Channel} from '../channel/channel';
 import {Printable} from '../rendering/printable/printable';
-import Stubable from '../../shared/interfaces/stubable';
+import Stubable from '../stubable/stubable';
 
 export interface Notebook extends Channel, Printable, Stubable{
   id(): string;

@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import Stubable from '../../interfaces/stubable';
+import Stubable from '../../../objects/stubable/stubable';
 
 export interface Authentication extends Stubable {
   ticket(): {

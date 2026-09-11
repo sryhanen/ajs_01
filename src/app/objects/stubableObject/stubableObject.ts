@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import Stubable from '../../shared/interfaces/stubable';
+import Stubable from '../stubable/stubable';
 
 export interface StubableObject extends Stubable {
   value():object;

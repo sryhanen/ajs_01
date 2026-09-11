@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Message} from '../../../message/message';
-import Stubable from '../../../../shared/interfaces/stubable';
+import Stubable from '../../../stubable/stubable';
 
 export interface ParagraphOutputRequest extends Message, Stubable {
   type():string;
