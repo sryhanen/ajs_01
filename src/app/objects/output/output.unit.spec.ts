@@ -43,45 +43,40 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputFormat} from '../outputFormat';
-import {OutputType} from '../../outputType';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {MessageImpl} from '../../../message/messageImpl';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
-import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
+import {FakeChannel} from '../channel/fakeChannel';
+import {Channel} from '../channel/channel';
+import {OutputImpl} from './outputImpl';
+import {Output} from './output';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {Mock} from 'vitest';
 
-export class TextFormat implements OutputFormat {
-  private readonly _renderNode: WritableSignal<RenderNode>;
-  private readonly _renderNodeStub: RenderNode;
+describe('Output unit test', () => {
+  let channel:Channel;
+  let output:Output;
+  let requestSpy:Mock;
 
-  constructor() {
-    this._renderNodeStub = new RenderNodeStub();
-    this._renderNode = signal(this._renderNodeStub);
-  }
+  beforeEach(() => {
+    channel = new FakeChannel();
+    output = new OutputImpl(channel);
+    requestSpy = vi.spyOn(channel, 'request');
+  });
 
-  response(json: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.type() !== OutputType.text) {
-        this._renderNode.set(this._renderNodeStub);
-      }
-      else{
-        const textOutput:string = paragraphOutputMessage.outputData('string');
-        this._renderNode.set(new RenderNodeImpl(RegisteredComponents.TEXT_OUTPUT_VIEW, signal({textOutput: textOutput})));
-      }
-    }
-  }
+  it('Should print', () => {
+    const printed = output.print()();
+    const inputs = printed.inputs()();
+    expect(printed.isStub()).toBe(false);
+    expect(printed.componentView()).toEqual(RegisteredComponents.OUTPUT_VIEW);
+    expect(inputs['interpreterErrorListener']).toBeDefined();
+    expect(inputs['outputSwitcher']).toBeDefined();
+    expect(inputs['outputFormats']).toBeDefined();
+  });
 
-  print(): Signal<RenderNode> {
-    return this._renderNode;
-  }
-
-  switcherButtons(): RenderNode[] {
-    return [];
-  }
-}
+  it('Should request channel', () => {
+    const request = {
+      op:'op',
+      data:{}
+    };
+    output.request(request);
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
+});
