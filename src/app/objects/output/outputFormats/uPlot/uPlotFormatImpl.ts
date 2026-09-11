@@ -43,39 +43,63 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputFormat} from '../outputFormat';
-import {OutputType} from '../../outputType';
+import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
+import {GraphType} from './graphType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {OutputType} from '../../outputType';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
+import {Channel} from '../../../channel/channel';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {ComponentView} from '../../../rendering/componentView/componentView';
 import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
 import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
-import {HtmlOutputView} from '../../../../ui/angular2+/output/outputViews/htmlOutputView/htmlOutputView';
+import {UPlotOutputView} from '../../../../ui/angular2+/output/outputViews/uPlotOutputView/uPlotOutputView';
+import {Printable} from '../../../rendering/printable/printable';
+import {UPlotFormat} from './uPlotFormat';
+import uPlot from 'uplot';
+import {BasicOptionsImpl} from './uPlotPlugin/configuration/options/basicOptionsImpl';
 import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 
-export class HTMLFormat implements OutputFormat{
+export class UPlotFormatImpl implements UPlotFormat {
+  private readonly _channel: Channel;
+  private readonly _switcherButtons: Printable[];
   private readonly _componentViewStub: ComponentView;
   private readonly _componentView: WritableSignal<ComponentView>;
 
-  constructor() {
+  constructor(channel: Channel) {
+    this._channel = channel;
+    this._switcherButtons = [
+      new uPlotSwitcherButton(this,'Line Chart', 'fas fa-chart-line', GraphType.line),
+      new uPlotSwitcherButton(this,'Area Chart', 'fas fa-chart-area', GraphType.area),
+      new uPlotSwitcherButton(this,'Bar Chart', 'fas fa-chart-bar', GraphType.bar),
+      new uPlotSwitcherButton(this,'Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
+    ];
     this._componentViewStub = new ComponentViewStub();
     this._componentView = signal(this._componentViewStub);
   }
 
+  request(json: object): void {
+    this._channel.request(json);
+  }
+
   response(json: object): void {
     const message = new MessageImpl(new SafeJsonImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT'){
+    if(message.operation() === 'PARAGRAPH_OUTPUT') {
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.type() !== OutputType.html) {
+      if(paragraphOutputMessage.type() !== OutputType.uPlot){
         this._componentView.set(this._componentViewStub);
       }
       else{
-        const htmlTemplate:string = paragraphOutputMessage.outputData('string');
-        const componentView = new ComponentViewImpl(HtmlOutputView, signal({htmlTemplate: htmlTemplate}));
-        this._componentView.set(componentView);
+        const uPlotData:uPlot.AlignedData = paragraphOutputMessage.outputData('object');
+        const safeOutputOptions = new SafeJsonImpl(paragraphOutputMessage.options().value());
+        const labels = safeOutputOptions.getProperty<string[]>('labels', 'object');
+        const series = safeOutputOptions.getProperty<string[]>('series', 'object');
+        const xAxisLabel = safeOutputOptions.getProperty<string>('xAxisLabel', 'string');
+        const graphType = safeOutputOptions.getProperty<string>('graphType', 'string');
+        const basicOptions = new BasicOptionsImpl(labels, series, xAxisLabel, graphType);
+        this._componentView.set(new ComponentViewImpl(UPlotOutputView, signal({graphType: graphType, basicOptions: basicOptions, uPlotData: uPlotData})));
       }
     }
   }
@@ -84,7 +108,7 @@ export class HTMLFormat implements OutputFormat{
     return computed(() => new RenderNodeStub());
   }
 
-  switcherButtons(): Signal<RenderNode>[] {
-    return [];
+  switcherButtons(): RenderNode[] {
+    return this._switcherButtons.map(switcherButton => switcherButton.print()());
   }
 }
