@@ -48,7 +48,7 @@ import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
 
 @Component({
-  selector: 'output',
+  selector: 'output-container',
   imports: [
     RenderNodeHostView
   ],
