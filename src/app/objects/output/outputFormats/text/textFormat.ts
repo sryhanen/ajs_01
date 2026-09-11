@@ -48,21 +48,19 @@ import {OutputType} from '../../outputType';
 import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
-import {ComponentView} from '../../../rendering/componentView/componentView';
-import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
 import {MessageImpl} from '../../../message/messageImpl';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {TextOutputView} from '../../../../ui/angular2+/output/outputViews/textOutputView/textOutputView';
 import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
+import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class TextFormat implements OutputFormat {
-  private readonly _componentViewStub: ComponentView;
-  private readonly _componentView: WritableSignal<ComponentView>;
+  private readonly _renderNode: WritableSignal<RenderNode>;
+  private readonly _renderNodeStub: RenderNode;
 
   constructor() {
-    this._componentViewStub = new ComponentViewStub();
-    this._componentView = signal(this._componentViewStub);
+    this._renderNodeStub = new RenderNodeStub();
+    this._renderNode = signal(this._renderNodeStub);
   }
 
   response(json: object): void {
@@ -70,18 +68,17 @@ export class TextFormat implements OutputFormat {
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
       if(paragraphOutputMessage.type() !== OutputType.text) {
-        this._componentView.set(this._componentViewStub);
+        this._renderNode.set(this._renderNodeStub);
       }
       else{
         const textOutput:string = paragraphOutputMessage.outputData('string');
-        const componentView = new ComponentViewImpl(TextOutputView, signal({textOutput: textOutput}));
-        this._componentView.set(componentView);
+        this._renderNode.set(new RenderNodeImpl(RegisteredComponents.TEXT_OUTPUT_VIEW, signal({textOutput: textOutput})));
       }
     }
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => new RenderNodeStub());
+    return this._renderNode;
   }
 
   switcherButtons(): RenderNode[] {

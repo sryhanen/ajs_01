@@ -104,7 +104,7 @@ export class OutputImpl implements Output {
       interpreterErrorListener: this._interpreterErrorListener.print()(),
       outputSwitcher: this._outputSwitcher.print()(),
       outputFormats: this._outputFormats.map(outputFormat => outputFormat.print()()),
-    })), paragraphId));
+    }), {equal: () => false}), paragraphId));
   }
 
   print(): Signal<RenderNode> {
