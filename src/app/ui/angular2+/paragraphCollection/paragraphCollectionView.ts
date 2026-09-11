@@ -43,25 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {computed, Signal} from '@angular/core';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {SafeJson} from '../../safeJson/safeJson';
-import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {NotebookIndex} from './notebookIndex';
-import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
+import {Component, input} from '@angular/core';
+import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
+import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
 
-export class NotebookIndexImpl implements NotebookIndex {
-  private readonly _notebookIndexData:SafeJson;
-
-  constructor(notebookIndexData:object) {
-      this._notebookIndexData = new SafeJsonImpl(notebookIndexData);
-  }
-
-  id():string {
-    return this._notebookIndexData.getProperty('id', 'string');
-  }
-
-  print(): Signal<RenderNode> {
-    return computed(() => new RenderNodeStub());
-  }
+@Component({
+  selector: 'paragraph-collection',
+  imports: [
+    RenderNodeHostView
+  ],
+  template: `
+    @for (paragraph of paragraphs(); track $index){
+      <render-node-host [renderNode]="paragraph"></render-node-host>
+    }
+  `
+})
+export class ParagraphCollectionView{
+  paragraphs = input.required<RenderNode[]>();
 }

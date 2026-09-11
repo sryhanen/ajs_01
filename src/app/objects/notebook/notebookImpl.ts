@@ -67,27 +67,29 @@ import {
   RequestRegisterWithPropertyDecorator
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
   private readonly _notebook: SafeJson;
   private readonly _paragraphCollection: ParagraphCollection;
-  private readonly _componentView:ComponentView;
   private readonly _responseRegister:ResponseRegister;
   private readonly _requestRegister:RequestRegister;
+  private readonly _renderNode: Signal<RenderNode>;
 
   constructor(channel: Channel, notebook: object) {
     this._channel = channel;
     this._notebook = new SafeJsonImpl(notebook);
     this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.getProperty('paragraphs', 'object'));
-    this._componentView = new ComponentViewStub();
     this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._paragraphCollection]),{name:'noteId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'noteId', value:this.id()});
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, signal({
+      paragraphCollection: this._paragraphCollection.print()(),
+    })));
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => new RenderNodeStub());
+    return this._renderNode;
   }
 
   id(): string {

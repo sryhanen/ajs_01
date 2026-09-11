@@ -43,25 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {computed, Signal} from '@angular/core';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {SafeJson} from '../../safeJson/safeJson';
-import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {NotebookIndex} from './notebookIndex';
-import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
+import {Component} from '@angular/core';
 
-export class NotebookIndexImpl implements NotebookIndex {
-  private readonly _notebookIndexData:SafeJson;
-
-  constructor(notebookIndexData:object) {
-      this._notebookIndexData = new SafeJsonImpl(notebookIndexData);
-  }
-
-  id():string {
-    return this._notebookIndexData.getProperty('id', 'string');
-  }
-
-  print(): Signal<RenderNode> {
-    return computed(() => new RenderNodeStub());
-  }
+@Component({
+  selector: 'paragraph',
+  template: `
+  `
+})
+export class ParagraphView {
 }
