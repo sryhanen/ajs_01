@@ -57,12 +57,15 @@ import {NotesInfoMessageImpl} from '../message/notesInfoMessage/notesInfoMessage
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;
   private readonly _responseRegister:ResponseRegister;
   private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
   private readonly _currentNotebook: WritableSignal<Notebook>;
+  private readonly _currentNotebookRenderNode: Signal<RenderNode>;
   private readonly _renderNode: Signal<RenderNode>;
 
   constructor(channel:Channel) {
@@ -72,10 +75,12 @@ export class NotebookCollectionImpl implements NotebookCollection{
     this._responseRegister.register('NOTE', (json) => this.noteResponse(json));
     this._notebookIndices = signal(new Map());
     this._currentNotebook = signal(new NotebookStub());
-    this._renderNode = computed(() => ({
-      componentView: signal(RegisteredComponents.NOTEBOOK_COLLECTION_VIEW),
-      inputs: signal({}),
-    }));
+    this._currentNotebookRenderNode = computed(() =>
+      this._currentNotebook().isStub() ? new RenderNodeStub() : this._currentNotebook().print()()
+    );
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_COLLECTION_VIEW, computed(() => ({
+      currentNotebook:this._currentNotebookRenderNode
+    }))));
   }
 
   private notesInfoResponse(json:object):void{
