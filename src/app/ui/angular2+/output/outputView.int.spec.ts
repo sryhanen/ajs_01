@@ -43,13 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {FakeRenderNode} from '../../../test/ui/fakes/fakeRenderNode';
+import {FakeRenderNode} from '../../../../test/ui/fakes/fakeRenderNode';
 import {OutputView} from './outputView';
 import {render} from '@testing-library/angular';
 import {By} from '@angular/platform-browser';
-import {FakeComponent} from '../../../test/ui/fakes/fakeComponent';
+import {FakeComponent} from '../../../../test/ui/fakes/fakeComponent';
 import {ComponentFixture} from '@angular/core/testing';
-import {FakeComponentRegistryProvider} from '../../../test/ui/fakes/fakeComponentRegistryProvider';
+import {FakeComponentRegistryProvider} from '../../../../test/ui/fakes/fakeComponentRegistryProvider';
 
 describe('OutputView integration test', () => {
   const interpreterErrorListener = new FakeRenderNode();

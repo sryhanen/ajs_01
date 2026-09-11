@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {RenderNodeImpl} from '../../../objects/rendering/renderNode/renderNodeImpl';
+import {RenderNodeImpl} from '../../../app/objects/rendering/renderNode/renderNodeImpl';
 import {signal} from '@angular/core';
 import {FakeComponentRegistry} from './fakeComponentRegistry';
 
