@@ -45,13 +45,12 @@
  */
 import {Message} from '../message';
 import Stubable from '../../../shared/interfaces/stubable';
-import {StubableObject} from '../../stubableObject/stubableObject';
 
 export interface ParagraphOutputMessage extends Message, Stubable {
   isAggregated(): boolean;
   type(): string;
   outputData<T>(type:string): T;
-  options():StubableObject;
+  options(): object;
   print(): {
     op:string,
     data:object

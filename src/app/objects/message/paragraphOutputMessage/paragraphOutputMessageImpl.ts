@@ -47,10 +47,7 @@ import {ParagraphOutputMessage} from './paragraphOutputMessage';
 import {Message} from '../message';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
 import {SafeJson} from '../../safeJson/safeJson';
-import { StubableObject } from '../../stubableObject/stubableObject';
 import {TypedMessage} from '../typedMessage/typedMessage';
-import {StubableObjectImpl} from '../../stubableObject/stubableObjectImpl';
-import {StubableObjectStub} from '../../stubableObject/stubableObjectStub';
 
 export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
   private readonly _message: Message;
@@ -78,16 +75,9 @@ export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
     return this.output().getProperty('data', type);
   }
 
-  options(): StubableObject {
-    let options: StubableObject;
+  options(): object {
     const output = this.output();
-    if(output.propertyExists('options')){
-      options = new StubableObjectImpl(output.getProperty('options', 'object'));
-    }
-    else{
-      options = new StubableObjectStub();
-    }
-    return options;
+    return output.getProperty('options', 'object');
   }
 
   private output(): SafeJson {

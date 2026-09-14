@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import { StubableObject } from '../../stubableObject/stubableObject';
 import {ParagraphOutputMessage} from './paragraphOutputMessage';
 
 export class ParagraphOutputMessageStub implements ParagraphOutputMessage {
@@ -62,7 +61,7 @@ export class ParagraphOutputMessageStub implements ParagraphOutputMessage {
   outputData<T>(type: string): T {
     throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
-  options(): StubableObject {
+  options(): object {
     throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
   data(): object {

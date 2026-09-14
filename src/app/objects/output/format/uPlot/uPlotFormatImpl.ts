@@ -92,7 +92,7 @@ export class UPlotFormatImpl implements UPlotFormat {
       }
       else{
         const uPlotData:uPlot.AlignedData = paragraphOutputMessage.outputData('object');
-        const safeOutputOptions = new SafeJsonImpl(paragraphOutputMessage.options().value());
+        const safeOutputOptions = new SafeJsonImpl(paragraphOutputMessage.options());
         const labels = safeOutputOptions.getProperty<string[]>('labels', 'object');
         const series = safeOutputOptions.getProperty<string[]>('series', 'object');
         const xAxisLabel = safeOutputOptions.getProperty<string>('xAxisLabel', 'string');

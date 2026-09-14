@@ -126,13 +126,13 @@ describe('ParagraphOutputMessage unit test', () => {
 
     describe('options', () => {
       it('Should have options', () => {
-        expect(paragraphOutputMessage.options().isStub()).toBe(false);
+        expect(paragraphOutputMessage.options()).toEqual(paragraphOutputMessageData.data.output.options);
       });
 
-      it('Should have options stub', () => {
+      it('Options should throw', () => {
         delete paragraphOutputMessageData.data.output.options;
         paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new SafeJsonImpl(paragraphOutputMessageData)));
-        expect(paragraphOutputMessage.options().isStub()).toBe(true);
+        expect(() => paragraphOutputMessage.options()).toThrow();
       });
     });
 

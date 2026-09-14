@@ -100,7 +100,7 @@ export class DataTablesFormatImpl implements DataTablesFormat {
         }
         else{
           const dataTablesOptions = paragraphOutputMessage.options();
-          this._plugin.set(new DataTablesPluginImpl(this, dataTablesData, dataTablesOptions.value()));
+          this._plugin.set(new DataTablesPluginImpl(this, dataTablesData, dataTablesOptions));
           this._componentView.set(new ComponentViewImpl(DataTablesOutputView, signal({dataTablesPlugin: this._plugin()})));
         }
       }
