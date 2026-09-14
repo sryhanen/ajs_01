@@ -79,15 +79,14 @@ export class ParagraphImpl implements Paragraph {
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
     this._paragraph = new SafeJsonImpl(paragraph);
-    this._outputContainer = this.initializedOutputContainer(paragraph);
-    this._componentView = new ComponentViewStub();
-    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer]), {name:'paragraphId', type:'string'}, this.id());
+    this._output = this.initializedOutput(paragraph);
+    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._output]), {name:'paragraphId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({output:this._output.print()(), paragraphId:this.id()})));
   }
 
-  private initializedOutputContainer(paragraph: object): OutputContainer {
-    const outputContainer = new OutputContainerImpl(this, this.id());
+  private initializedOutput(paragraph: object): Output {
+    const outputContainer = new OutputImpl(this);
     const paragraphOutputMessageFactory = new ParagraphOutputMessageFactoryImpl(paragraph);
     const paragraphOutputMessage = paragraphOutputMessageFactory.paragraphOutputMessage();
     if(!paragraphOutputMessage.isStub()){

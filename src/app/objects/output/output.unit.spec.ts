@@ -43,39 +43,40 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputContainer} from './outputContainer';
-import {Channel} from '../../channel/channel';
-import {FakeChannel} from '../../channel/fakeChannel';
-import {OutputContainerImpl} from './outputContainerImpl';
+import {FakeChannel} from '../channel/fakeChannel';
+import {Channel} from '../channel/channel';
+import {OutputImpl} from './outputImpl';
+import {Output} from './output';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {Mock} from 'vitest';
 
-describe('OutputContainer', () => {
+describe('Output unit test', () => {
   let channel:Channel;
-  let outputContainer:OutputContainer;
+  let output:Output;
+  let requestSpy:Mock;
 
   beforeEach(() => {
     channel = new FakeChannel();
-    outputContainer = new OutputContainerImpl(channel, 'paragraphId');
+    output = new OutputImpl(channel);
+    requestSpy = vi.spyOn(channel, 'request');
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(outputContainer).toBeInstanceOf(OutputContainerImpl);
-    });
-
-    it('Should print', () => {
-      const outputContainerPrinted = outputContainer.print()();
-      expect(outputContainerPrinted.children()).toHaveLength(2);
-      expect(outputContainerPrinted.componentView.isStub()).toBe(true);
-      expect(outputContainerPrinted.paragraphId).toEqual('paragraphId');
-    });
+  it('Should print', () => {
+    const printed = output.print()();
+    const inputs = printed.inputs()();
+    expect(printed.isStub()).toBe(false);
+    expect(printed.componentView()).toEqual(RegisteredComponents.OUTPUT_VIEW);
+    expect(inputs['interpreterErrorListener']).toBeDefined();
+    expect(inputs['outputSwitcher']).toBeDefined();
+    expect(inputs['outputFormats']).toBeDefined();
   });
 
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const channelSpy = vi.spyOn(channel, 'request');
-      const request = {test:'test'};
-      outputContainer.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
+  it('Should request channel', () => {
+    const request = {
+      op:'op',
+      data:{}
+    };
+    output.request(request);
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
   });
 });

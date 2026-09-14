@@ -43,7 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
 import {Printable} from '../../rendering/printable/printable';
+import {Response} from '../../channel/response';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
 
-export interface OutputContainer extends Channel, Printable{}
+export interface OutputFormat extends Response, Printable {
+  switcherButtons(): RenderNode[];
+}
