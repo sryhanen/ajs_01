@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
-import {Printable} from '../../rendering/printable/printable';
+import { Type, InjectionToken } from '@angular/core';
 
-export interface OutputFormats extends  Channel, Printable {}
+export const COMPONENT_REGISTRY = new InjectionToken<Map<string, Type<unknown>>>('Component Registry');
