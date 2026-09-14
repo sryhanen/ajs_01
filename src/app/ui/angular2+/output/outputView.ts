@@ -43,32 +43,25 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {UPlotOutputView} from './uPlotOutputView';
-import {By} from '@angular/platform-browser';
-import {
-  BasicOptionsImpl
-} from '../../../../../objects/output/outputFormats/uPlot/uPlotPlugin/configuration/options/basicOptionsImpl';
+import {Component, input} from '@angular/core';
+import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
 
-describe('UPlotOutputView integration test', () => {
-  let fixture: ComponentFixture<UPlotOutputView>;
-  const basicOptions = new BasicOptionsImpl([], [], '', '');
-  const uPlotData = [[1,2],[1,2]];
-  beforeEach(async () => {
-    fixture = TestBed.createComponent(UPlotOutputView);
-    fixture.componentRef.setInput('basicOptions', basicOptions);
-    fixture.componentRef.setInput('graphType', '');
-    fixture.componentRef.setInput('uPlotData', uPlotData);
-    await fixture.whenStable();
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(fixture.componentInstance).toBeDefined();
-    });
-
-    it('Should have rendered canvas', () => {
-      expect(fixture.debugElement.query(By.css('canvas'))).toBeDefined();
-    });
-  });
-});
+@Component({
+  selector: 'output-container',
+  imports: [
+    RenderNodeHostView
+  ],
+  template: `
+    <render-node-host [renderNode]="interpreterErrorListener()"></render-node-host>
+    <render-node-host [renderNode]="outputSwitcher()"></render-node-host>
+    @for(outputFormat of outputFormats(); track $index){
+      <render-node-host [renderNode]="outputFormat"></render-node-host>
+    }
+  `
+})
+export class OutputView{
+  interpreterErrorListener = input.required<RenderNode>();
+  outputSwitcher = input.required<RenderNode>();
+  outputFormats = input.required<RenderNode[]>();
+}

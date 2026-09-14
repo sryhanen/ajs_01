@@ -43,32 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {UPlotOutputView} from './uPlotOutputView';
+import {FakeRenderNode} from '../../../../test/ui/fakes/fakeRenderNode';
+import {OutputView} from './outputView';
+import {render} from '@testing-library/angular';
 import {By} from '@angular/platform-browser';
-import {
-  BasicOptionsImpl
-} from '../../../../../objects/output/outputFormats/uPlot/uPlotPlugin/configuration/options/basicOptionsImpl';
+import {FakeComponent} from '../../../../test/ui/fakes/fakeComponent';
+import {ComponentFixture} from '@angular/core/testing';
+import {FakeComponentRegistryProvider} from '../../../../test/ui/fakes/fakeComponentRegistryProvider';
 
-describe('UPlotOutputView integration test', () => {
-  let fixture: ComponentFixture<UPlotOutputView>;
-  const basicOptions = new BasicOptionsImpl([], [], '', '');
-  const uPlotData = [[1,2],[1,2]];
+describe('OutputView integration test', () => {
+  const interpreterErrorListener = new FakeRenderNode();
+  const outputSwitcher = new FakeRenderNode();
+  const outputFormats = [new FakeRenderNode(), new FakeRenderNode(), new FakeRenderNode()];
+  let fixture: ComponentFixture<OutputView>;
+
   beforeEach(async () => {
-    fixture = TestBed.createComponent(UPlotOutputView);
-    fixture.componentRef.setInput('basicOptions', basicOptions);
-    fixture.componentRef.setInput('graphType', '');
-    fixture.componentRef.setInput('uPlotData', uPlotData);
-    await fixture.whenStable();
+    const renderResult = await render(OutputView,{
+      inputs:{
+        interpreterErrorListener:interpreterErrorListener,
+        outputSwitcher:outputSwitcher,
+        outputFormats:outputFormats,
+      },
+      providers:[
+        FakeComponentRegistryProvider
+      ]
+    });
+    fixture = renderResult.fixture;
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(fixture.componentInstance).toBeDefined();
-    });
-
-    it('Should have rendered canvas', () => {
-      expect(fixture.debugElement.query(By.css('canvas'))).toBeDefined();
-    });
+  it('Should have rendered renderNodes', () => {
+    expect(fixture.debugElement.queryAll(By.directive(FakeComponent))).toHaveLength(5);
   });
 });

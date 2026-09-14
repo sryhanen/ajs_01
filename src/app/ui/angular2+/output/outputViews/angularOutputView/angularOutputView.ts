@@ -49,7 +49,7 @@ import {AngularObject} from '../../../../../objects/angularObject/angularObject'
 import {Request} from '../../../../../objects/channel/request';
 
 @Component({
-  selector: 'angular-view',
+  selector: 'angular-output',
   imports: [
     AngularViewUpgradeModule
   ],

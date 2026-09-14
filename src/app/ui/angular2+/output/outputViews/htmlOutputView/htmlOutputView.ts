@@ -47,7 +47,7 @@ import {Component, computed, ElementRef, inject, input, ViewChild} from '@angula
 import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
-  selector: 'htmlView',
+  selector: 'html-output',
   template: `
     <div #anchor [innerHTML]="htmlContent()"></div>
   `

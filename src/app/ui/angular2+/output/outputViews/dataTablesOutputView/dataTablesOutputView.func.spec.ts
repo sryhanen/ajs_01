@@ -46,8 +46,8 @@
 import {ComponentFixture} from '@angular/core/testing';
 import {render, screen} from '@testing-library/angular';
 import {DataTablesOutputView} from './dataTablesOutputView';
-import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
-import {DataTablesPluginImpl} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPluginImpl';
+import {DataTablesPlugin} from '../../../../../objects/output/outputFormats/dataTables/dataTablesPlugin/dataTablesPlugin';
+import {DataTablesPluginImpl} from '../../../../../objects/output/outputFormats/dataTables/dataTablesPlugin/dataTablesPluginImpl';
 import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
 
 describe('DataTablesOutputView functional test', () => {
