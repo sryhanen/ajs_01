@@ -43,10 +43,45 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Message} from '../../../message/message';
-import Stubable from '../../../../shared/interfaces/stubable';
+import {OutputFormat} from '../outputFormat';
+import {OutputType} from '../../outputType';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {RenderNode} from '../../../rendering/renderNode/renderNode';
+import {MessageImpl} from '../../../message/messageImpl';
+import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
+import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
+import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 
-export interface ParagraphOutputRequest extends Message, Stubable {
-  type():string;
-  request():object;
+export class HTMLFormat implements OutputFormat{
+  private readonly _renderNode: WritableSignal<RenderNode>;
+  private readonly _renderNodeStub: RenderNode;
+
+  constructor() {
+    this._renderNodeStub = new RenderNodeStub();
+    this._renderNode = signal(this._renderNodeStub);
+  }
+
+  response(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    if(message.operation() === 'PARAGRAPH_OUTPUT'){
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
+      if(paragraphOutputMessage.type() !== OutputType.html) {
+        this._renderNode.set(this._renderNodeStub);
+      }
+      else{
+        const htmlTemplate:string = paragraphOutputMessage.outputData('string');
+        this._renderNode.set(new RenderNodeImpl(RegisteredComponents.HTML_OUTPUT_VIEW, signal({htmlTemplate: htmlTemplate})));
+      }
+    }
+  }
+
+  print(): Signal<RenderNode> {
+    return this._renderNode;
+  }
+
+  switcherButtons(): RenderNode[] {
+    return [];
+  }
 }

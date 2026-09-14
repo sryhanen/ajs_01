@@ -43,43 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {UPlotFormatImpl} from './uPlotFormatImpl';
-import {Channel} from '../../../channel/channel';
-import {FakeChannel} from '../../../channel/fakeChannel';
+import {TextFormat} from './textFormat';
 import {OutputType} from '../../outputType';
 
-describe('uPlotFormat unit test', () => {
-  let channel:Channel;
-  let uPlotFormat: UPlotFormatImpl;
+describe('TextFormat unit test', () => {
+  let textFormat: TextFormat;
+
   beforeEach(() => {
-    channel = new FakeChannel();
-    uPlotFormat = new UPlotFormatImpl(channel);
+    textFormat = new TextFormat();
   });
 
-  describe('Birth', ()=> {
+  describe('Birth', () => {
     it('Should be initialized', () => {
-      expect(uPlotFormat).toBeDefined();
+      expect(textFormat).toBeInstanceOf(TextFormat);
     });
 
-    it('Should have switcher buttons', () => {
-      const switcherButtons = uPlotFormat.switcherButtons();
-      expect(switcherButtons).toHaveLength(4);
+    it('Should not have switcherButtons', () => {
+      expect(textFormat.switcherButtons()).toEqual([]);
     });
 
-    it('Should print', () => {
-      const uPlotFormatPrinted = uPlotFormat.print()();
-      expect(uPlotFormatPrinted.componentView.isStub()).toBe(true);
-      expect(uPlotFormatPrinted.children()).toHaveLength(0);
-    });
-  });
-
-  describe('Request', () => {
-    it('Should request channel', () =>{
-      const requestData= {test:'test'};
-      const channelSpy = vi.spyOn(channel, 'request');
-      uPlotFormat.request(requestData);
-      expect(channelSpy).toHaveBeenCalledTimes(1);
-      expect(channelSpy).toHaveBeenCalledWith(requestData);
+    it('Should have renderNode stub', () => {
+      const renderNode = textFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
     });
   });
 
@@ -90,33 +75,25 @@ describe('uPlotFormat unit test', () => {
         op:'PARAGRAPH_OUTPUT',
         data:{
           output:{
-            type:OutputType.uPlot,
-            data:{},
-            options:{
-              labels:[],
-              series:[],
-              xAxisLabel:'',
-              graphType:''
-            }
+            type:OutputType.text,
+            data:'',
           }
         }
       };
-      uPlotFormat.response(outputResponse);
+      textFormat.response(outputResponse);
     });
 
-    it('Should have componentView', () => {
-      const componentView = uPlotFormat.print()().componentView;
-      expect(componentView.isStub()).toBe(false);
-      expect(componentView.inputs()()['basicOptions']).toBeDefined();
-      expect(componentView.inputs()()['graphType']).toBeDefined();
-      expect(componentView.inputs()()['uPlotData']).toBeDefined();
+    it('Should have rendernNode', () => {
+      const renderNode = textFormat.print()();
+      expect(renderNode.isStub()).toBe(false);
+      expect(renderNode.inputs()()['textOutput']).toBeDefined();
     });
 
-    it('Should not have component view after output type change', () => {
+    it('Should not have componentView after output type change', () => {
       outputResponse.data.output.type = '';
-      uPlotFormat.response(outputResponse);
-      const componentView = uPlotFormat.print()().componentView;
-      expect(componentView.isStub()).toBe(true);
+      textFormat.response(outputResponse);
+      const renderNode = textFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
     });
   });
 });

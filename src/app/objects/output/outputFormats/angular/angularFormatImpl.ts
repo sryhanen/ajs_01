@@ -43,50 +43,56 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputFormat} from '../outputFormat';
-import {OutputType} from '../../outputType';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {Channel} from '../../../channel/channel';
+import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
-import {ComponentView} from '../../../rendering/componentView/componentView';
-import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
+import { RenderNode } from '../../../rendering/renderNode/renderNode';
+import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
 import {MessageImpl} from '../../../message/messageImpl';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
 import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {TextOutputView} from '../../../../ui/angular2+/output/outputViews/textOutputView/textOutputView';
+import {OutputType} from '../../outputType';
+import {AngularFormat} from './angularFormat';
+import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
+import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 
-export class TextFormat implements OutputFormat {
-  private readonly _componentViewStub: ComponentView;
-  private readonly _componentView: WritableSignal<ComponentView>;
+export class AngularFormatImpl implements AngularFormat {
+  private readonly _channel: Channel;
+  private readonly _angularObjectCollection: AngularObjectCollection;
+  private readonly _renderNode: WritableSignal<RenderNode>;
+  private readonly _renderNodeStub: RenderNode;
 
-  constructor() {
-    this._componentViewStub = new ComponentViewStub();
-    this._componentView = signal(this._componentViewStub);
+  constructor(channel: Channel) {
+    this._channel = channel;
+    this._angularObjectCollection = new AngularObjectCollectionImpl(this);
+    this._renderNodeStub = new RenderNodeStub();
+    this._renderNode = signal(this._renderNodeStub);
+  }
+
+  request(json: object): void {
+    this._channel.request(json);
   }
 
   response(json: object): void {
     const message = new MessageImpl(new SafeJsonImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.type() !== OutputType.text) {
-        this._componentView.set(this._componentViewStub);
+      if(paragraphOutputMessage.type() !== OutputType.angular){
+        this._renderNode.set(this._renderNodeStub);
       }
       else{
-        const textOutput:string = paragraphOutputMessage.outputData('string');
-        const componentView = new ComponentViewImpl(TextOutputView, signal({textOutput: textOutput}));
-        this._componentView.set(componentView);
+        const template:string = paragraphOutputMessage.outputData('string');
+        this._renderNode.set(new RenderNodeImpl(RegisteredComponents.ANGULAR_OUTPUT_VIEW, signal({template:template, angularObjects: this._angularObjectCollection.angularObjects(), requestable:this})));
       }
     }
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView(),
-      children: computed(() => []),
-    }));
+    return this._renderNode;
   }
 
-  switcherButtons(): Signal<RenderNode>[] {
+  switcherButtons(): RenderNode[] {
     return [];
   }
 }

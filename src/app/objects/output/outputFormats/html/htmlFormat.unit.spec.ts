@@ -43,42 +43,57 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {webAppRoot} from './webAppRootImpl';
-import {WebSocketService} from '../webSocket/service/webSocketService';
-import {FakeWebSocketService} from '../webSocket/service/fakeWebSocketService';
+import {HTMLFormat} from './htmlFormat';
+import {OutputType} from '../../outputType';
 
-describe('WebAppRoot unit test', () => {
-  const webSocketService: WebSocketService = new FakeWebSocketService();
+describe('HTMLFormat unit test', () => {
+  let htmlFormat: HTMLFormat;
 
-  describe('Before initialization', () => {
-    it('request() method throws error if singleton has not been initialized.', () => {
-      expect(() => webAppRoot.request({})).toThrow();
+  beforeEach(() => {
+    htmlFormat = new HTMLFormat();
+  });
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(htmlFormat).toBeInstanceOf(HTMLFormat);
     });
 
-    it('response() method throws error if singleton has not been initialized.', () => {
-      expect(() => webAppRoot.response({})).toThrow();
+    it('Should not have switcherButtons', () => {
+      expect(htmlFormat.switcherButtons()).toEqual([]);
     });
 
-    it('print() method throws error if singleton has not been initialized.', () => {
-      expect(() => webAppRoot.print()).toThrow();
+    it('Should have renderNode stub', () => {
+      const renderNode = htmlFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
     });
   });
 
-  describe('After initialization', () => {
+  describe('ComponentView updates', () => {
+    let outputResponse;
     beforeEach(() => {
-      webAppRoot.initialize(webSocketService);
+      outputResponse = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{
+            type:OutputType.html,
+            data:'',
+          }
+        }
+      };
+      htmlFormat.response(outputResponse);
     });
 
-    it('request() should evoke websocket request', () => {
-      const spy = vi.spyOn(webSocketService, 'sendNewEvent');
-      expect(spy).toHaveBeenCalledTimes(0);
-      webAppRoot.request({op:'', data:{}});
-      expect(spy).toHaveBeenCalledTimes(1);
-    });
-
-    it('Should have renderNode', () => {
-      const renderNode = webAppRoot.print()();
+    it('Should have componentView', () => {
+      const renderNode = htmlFormat.print()();
       expect(renderNode.isStub()).toBe(false);
+      expect(renderNode.inputs()()['htmlTemplate']).toBeDefined();
+    });
+
+    it('Should not have componentView after output type change', () => {
+      outputResponse.data.output.type = '';
+      htmlFormat.response(outputResponse);
+      const renderNode = htmlFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
     });
   });
 });

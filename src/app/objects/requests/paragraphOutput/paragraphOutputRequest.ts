@@ -43,57 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {TextFormat} from './textFormat';
-import {OutputType} from '../../outputType';
+import {Message} from '../../message/message';
+import Stubable from '../../stubable/stubable';
 
-describe('TextFormat unit test', () => {
-  let textFormat: TextFormat;
-
-  beforeEach(() => {
-    textFormat = new TextFormat();
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(textFormat).toBeInstanceOf(TextFormat);
-    });
-
-    it('Should not have switcherButtons', () => {
-      expect(textFormat.switcherButtons()).toEqual([]);
-    });
-
-    it('Should print', () => {
-      const textFormatPrinted = textFormat.print()();
-      expect(textFormatPrinted.componentView.isStub()).toBe(true);
-      expect(textFormatPrinted.children()).toHaveLength(0);
-    });
-  });
-
-  describe('ComponentView updates', () => {
-    let outputResponse;
-    beforeEach(() => {
-      outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.text,
-            data:'',
-          }
-        }
-      };
-      textFormat.response(outputResponse);
-    });
-
-    it('Should have OutputView', () => {
-      const componentView = textFormat.print()().componentView;
-      expect(componentView.isStub()).toBe(false);
-      expect(componentView.inputs()()['textOutput']).toBeDefined();
-    });
-
-    it('Should not have componentView after output type change', () => {
-      outputResponse.data.output.type = '';
-      textFormat.response(outputResponse);
-      expect(textFormat.print()().componentView.isStub()).toBe(true);
-    });
-  });
-});
+export interface ParagraphOutputRequest extends Message, Stubable {
+  type():string;
+  request():object;
+}

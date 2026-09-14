@@ -65,10 +65,11 @@ describe('ParagraphCollection unit test', () => {
       expect(paragraphCollection).toBeInstanceOf(ParagraphCollectionImpl);
     });
 
-    it('Should print', () => {
-      const paragraphCollectionPrinted = paragraphCollection.print()();
-      expect(paragraphCollectionPrinted.componentView.isStub()).toBe(true);
-      expect(paragraphCollectionPrinted.children()).toHaveLength(2);
+    it('Should have renderNode', () => {
+      const renderNode = paragraphCollection.print()();
+      const inputs = renderNode.inputs()();
+      expect(renderNode.isStub()).toBe(false);
+      expect(inputs['paragraphs']).toHaveLength(2);
     });
   });
 
@@ -130,7 +131,9 @@ describe('ParagraphCollection unit test', () => {
         }
       };
       paragraphCollection.response(paragraphAddedResponse);
-      expect(paragraphCollection.print()().children()).toHaveLength(3);
+      const renderNode = paragraphCollection.print()();
+      const inputs = renderNode.inputs()();
+      expect(inputs['paragraphs']).toHaveLength(3);
     });
 
     it('Should set paragraph', () => {
@@ -141,7 +144,9 @@ describe('ParagraphCollection unit test', () => {
         }
       };
       paragraphCollection.response(paragraphResponse);
-      expect(paragraphCollection.print()().children()).toHaveLength(3);
+      const renderNode = paragraphCollection.print()();
+      const inputs = renderNode.inputs()();
+      expect(inputs['paragraphs']).toHaveLength(3);
     });
 
     it('Should remove paragraph', () => {
@@ -152,7 +157,9 @@ describe('ParagraphCollection unit test', () => {
         }
       };
       paragraphCollection.response(paragraphRemovedResponse);
-      expect(paragraphCollection.print()().children()).toHaveLength(1);
+      const renderNode = paragraphCollection.print()();
+      const inputs = renderNode.inputs()();
+      expect(inputs['paragraphs']).toHaveLength(1);
     });
   });
 });

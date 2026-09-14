@@ -43,50 +43,72 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputFormat} from '../outputFormat';
+import {FakeChannel} from '../../../channel/fakeChannel';
+import {AngularFormatImpl} from './angularFormatImpl';
 import {OutputType} from '../../outputType';
-import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {MessageImpl} from '../../../message/messageImpl';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {ComponentView} from '../../../rendering/componentView/componentView';
-import {ComponentViewStub} from '../../../rendering/componentView/componentViewStub';
-import {ComponentViewImpl} from '../../../rendering/componentView/componentViewImpl';
-import {HtmlOutputView} from '../../../../ui/angular2+/output/outputViews/htmlOutputView/htmlOutputView';
 
-export class HTMLFormat implements OutputFormat{
-  private readonly _componentViewStub: ComponentView;
-  private readonly _componentView: WritableSignal<ComponentView>;
+describe('AngularFormat unit test', () => {
+  const channel = new FakeChannel();
+  let angularFormat: AngularFormatImpl;
 
-  constructor() {
-    this._componentViewStub = new ComponentViewStub();
-    this._componentView = signal(this._componentViewStub);
-  }
+  beforeEach(() => {
+    angularFormat = new AngularFormatImpl(channel);
+  });
 
-  response(json: object): void {
-    const message = new MessageImpl(new SafeJsonImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.type() !== OutputType.html) {
-        this._componentView.set(this._componentViewStub);
-      }
-      else{
-        const htmlTemplate:string = paragraphOutputMessage.outputData('string');
-        const componentView = new ComponentViewImpl(HtmlOutputView, signal({htmlTemplate: htmlTemplate}));
-        this._componentView.set(componentView);
-      }
-    }
-  }
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(angularFormat).toBeInstanceOf(AngularFormatImpl);
+    });
 
-  print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView(),
-      children: computed(() => []),
-    }));
-  }
+    it('Should not have switcherButtons', () => {
+      expect(angularFormat.switcherButtons()).toEqual([]);
+    });
 
-  switcherButtons(): Signal<RenderNode>[] {
-    return [];
-  }
-}
+    it('Should have renderNode stub', () => {
+      const renderNode = angularFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
+    });
+  });
+
+  describe('Request', () => {
+    it('Should request channel', () => {
+      const spy = vi.spyOn(channel, 'request');
+      const request = {
+        op:'',
+        data:{}
+      };
+      angularFormat.request(request);
+      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
+    });
+  });
+
+  describe('ComponentView updates', () => {
+    let outputResponse;
+    const template = '<h1>template</h1>';
+    beforeEach(() => {
+      outputResponse = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{
+            type:OutputType.angular,
+            data:template,
+          }
+        }
+      };
+    });
+
+    it('Should have component view', () => {
+      angularFormat.response(outputResponse);
+      const renderNode = angularFormat.print()();
+      expect(renderNode.isStub()).toBe(false);
+      expect(renderNode.inputs()()['template']).toEqual(template);
+    });
+
+    it('Should have not have component view after output type change', () => {
+      outputResponse.data.output.type = '';
+      angularFormat.response(outputResponse);
+      const renderNode = angularFormat.print()();
+      expect(renderNode.isStub()).toBe(true);
+    });
+  });
+});

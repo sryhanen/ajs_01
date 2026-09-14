@@ -43,10 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../../channel/channel';
-import Stubable from '../../../../../shared/interfaces/stubable';
-import {Api} from 'datatables.net-bs5';
+import {DataTableSwitcherButton} from './dataTablesSwitcherButton';
+import {FakeChannel} from '../../../../channel/fakeChannel';
+import {RegisteredComponents} from '../../../../../ui/angular2+/componentRegistry/registeredComponents';
 
-export interface DataTablesPlugin extends Channel, Stubable {
-  initializedTable(tableElement: HTMLTableElement): Api<unknown>;
-}
+describe('DataTables SwitcherButton unit test', () => {
+  const request = new FakeChannel();
+  const dataTablesSwitcherButton = new DataTableSwitcherButton(request);
+
+  it('Should print', () => {
+    const renderNode = dataTablesSwitcherButton.print()();
+    const inputs = renderNode.inputs()();
+    expect(renderNode.isStub()).toBe(false);
+    expect(renderNode.componentView()).toEqual(RegisteredComponents.OUTPUT_SWITCHER_BUTTON_VIEW);
+    expect(inputs['title']).toBeDefined();
+    expect(inputs['icon']).toBeDefined();
+    expect(inputs['requestFormatSwitch']).toBeDefined();
+  });
+});

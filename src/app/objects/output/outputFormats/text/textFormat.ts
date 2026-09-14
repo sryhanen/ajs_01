@@ -43,57 +43,45 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {HTMLFormat} from './htmlFormat';
+import {OutputFormat} from '../outputFormat';
 import {OutputType} from '../../outputType';
+import {SafeJsonImpl} from '../../../safeJson/safeJsonImpl';
+import {signal, Signal, WritableSignal} from '@angular/core';
+import {RenderNode} from '../../../rendering/renderNode/renderNode';
+import {MessageImpl} from '../../../message/messageImpl';
+import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
+import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
+import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 
-describe('HTMLFormat unit test', () => {
-  let htmlFormat: HTMLFormat;
+export class TextFormat implements OutputFormat {
+  private readonly _renderNode: WritableSignal<RenderNode>;
+  private readonly _renderNodeStub: RenderNode;
 
-  beforeEach(() => {
-    htmlFormat = new HTMLFormat();
-  });
+  constructor() {
+    this._renderNodeStub = new RenderNodeStub();
+    this._renderNode = signal(this._renderNodeStub);
+  }
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(htmlFormat).toBeInstanceOf(HTMLFormat);
-    });
+  response(json: object): void {
+    const message = new MessageImpl(new SafeJsonImpl(json));
+    if(message.operation() === 'PARAGRAPH_OUTPUT'){
+      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
+      if(paragraphOutputMessage.type() !== OutputType.text) {
+        this._renderNode.set(this._renderNodeStub);
+      }
+      else{
+        const textOutput:string = paragraphOutputMessage.outputData('string');
+        this._renderNode.set(new RenderNodeImpl(RegisteredComponents.TEXT_OUTPUT_VIEW, signal({textOutput: textOutput})));
+      }
+    }
+  }
 
-    it('Should not have switcherButtons', () => {
-      expect(htmlFormat.switcherButtons()).toEqual([]);
-    });
+  print(): Signal<RenderNode> {
+    return this._renderNode;
+  }
 
-    it('Should print', () => {
-      const htmlFormatPrinted = htmlFormat.print()();
-      expect(htmlFormatPrinted.componentView.isStub()).toBe(true);
-      expect(htmlFormatPrinted.children()).toHaveLength(0);
-    });
-  });
-
-  describe('ComponentView updates', () => {
-    let outputResponse;
-    beforeEach(() => {
-      outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.html,
-            data:'',
-          }
-        }
-      };
-      htmlFormat.response(outputResponse);
-    });
-
-    it('Should have componentView', () => {
-      const componentView = htmlFormat.print()().componentView;
-      expect(componentView.isStub()).toBe(false);
-      expect(componentView.inputs()()['htmlTemplate']).toBeDefined();
-    });
-
-    it('Should not have componentView after output type change', () => {
-      outputResponse.data.output.type = '';
-      htmlFormat.response(outputResponse);
-      expect(htmlFormat.print()().componentView.isStub()).toBe(true);
-    });
-  });
-});
+  switcherButtons(): RenderNode[] {
+    return [];
+  }
+}

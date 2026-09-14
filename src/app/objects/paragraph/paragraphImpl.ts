@@ -45,14 +45,10 @@
  */
 import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
-import {OutputContainer} from '../output/container/outputContainer';
-import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {SafeJson} from '../safeJson/safeJson';
 import {SafeJsonImpl} from '../safeJson/safeJsonImpl';
-import {computed, Signal} from '@angular/core';
+import {signal, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
-import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
-import {ComponentView} from '../rendering/componentView/componentView';
 import {ResponseRegister} from '../register/responseRegister/responseRegister';
 import {
   ResponseRegisterWithPropertyFilter
@@ -67,14 +63,18 @@ import {
   RequestRegisterWithPropertyDecorator
 } from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 import {ParagraphOutputMessageFactoryImpl} from './paragraphOutputMessageFactory/paragraphOutputMessageFactoryImpl';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {Output} from '../output/output';
+import {OutputImpl} from '../output/outputImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
-  private readonly _outputContainer: OutputContainer;
+  private readonly _output: Output;
   private readonly _paragraph: SafeJson;
-  private readonly _componentView: ComponentView;
   private readonly _responseRegister:ResponseRegister;
   private readonly _requestRegister:RequestRegister;
+  private readonly _renderNode: Signal<RenderNode>;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
@@ -83,6 +83,7 @@ export class ParagraphImpl implements Paragraph {
     this._componentView = new ComponentViewStub();
     this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._outputContainer]), {name:'paragraphId', type:'string'}, this.id());
     this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({output:this._output.print()(), paragraphId:this.id()})));
   }
 
   private initializedOutputContainer(paragraph: object): OutputContainer {
@@ -96,10 +97,7 @@ export class ParagraphImpl implements Paragraph {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      children:computed(() => [this._outputContainer.print()()]),
-      componentView: this._componentView
-    }));
+    return this._renderNode;
   }
 
   id(): string {

@@ -47,17 +47,14 @@ import {computed, Signal} from '@angular/core';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
 import {SafeJson} from '../../safeJson/safeJson';
 import {SafeJsonImpl} from '../../safeJson/safeJsonImpl';
-import {ComponentView} from '../../rendering/componentView/componentView';
-import {ComponentViewStub} from '../../rendering/componentView/componentViewStub';
 import {NotebookIndex} from './notebookIndex';
+import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 
 export class NotebookIndexImpl implements NotebookIndex {
   private readonly _notebookIndexData:SafeJson;
-  private readonly _componentView:ComponentView;
 
   constructor(notebookIndexData:object) {
       this._notebookIndexData = new SafeJsonImpl(notebookIndexData);
-      this._componentView = new ComponentViewStub();
   }
 
   id():string {
@@ -65,9 +62,6 @@ export class NotebookIndexImpl implements NotebookIndex {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: this._componentView,
-      children: computed(() =>[])
-    }));
+    return computed(() => new RenderNodeStub());
   }
 }
