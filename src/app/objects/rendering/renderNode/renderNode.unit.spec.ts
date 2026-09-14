@@ -43,27 +43,38 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ComponentView} from './componentView';
-import {Signal} from '@angular/core';
+import {RenderNode} from './renderNode';
+import {RenderNodeImpl} from './renderNodeImpl';
+import {signal} from '@angular/core';
 
-export class ComponentViewImpl implements ComponentView {
-  private readonly _component:new () => unknown;
-  private readonly _inputs: Signal<Record<string, unknown>>;
+describe('RenderNode unit test', () => {
+  let renderNode: RenderNode;
+  const componentView = 'componentView';
+  const inputs = signal({test:'test'});
 
-  constructor(component: new () => unknown, inputs: Signal<Record<string, unknown>>) {
-    this._component = component;
-    this._inputs = inputs;
-  }
+  beforeEach(() => {
+    renderNode = new RenderNodeImpl(componentView, inputs);
+  });
 
-  component(): new () => unknown{
-    return this._component;
-  }
+  it('Should not be a stub', () => {
+    expect(renderNode.isStub()).toBe(false);
+  });
 
-  inputs(): Signal<Record<string, unknown>> {
-   return this._inputs;
-  }
+  it('Should have componentView', () => {
+    expect(renderNode.componentView()).toEqual(componentView);
+  });
 
-  isStub(): boolean {
-    return false;
-  }
-}
+  it('Should have inputs', () => {
+    expect(renderNode.inputs()()).toEqual(inputs());
+  });
+
+  it('Should have empty string as paragraphId', () => {
+    expect(renderNode.paragraphId()).toEqual('');
+  });
+
+  it('Should paragraphId if given', () => {
+    const paragraphId = 'paragraphId';
+    renderNode = new RenderNodeImpl(componentView, inputs, paragraphId);
+    expect(renderNode.paragraphId()).toEqual(paragraphId);
+  });
+});

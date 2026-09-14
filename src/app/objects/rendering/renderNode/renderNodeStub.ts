@@ -43,19 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ComponentView} from './componentView';
+import {RenderNode} from './renderNode';
 import {Signal} from '@angular/core';
 
-export class ComponentViewStub implements ComponentView {
-  isStub(): boolean {
+export class RenderNodeStub implements RenderNode {
+  isStub():boolean{
     return true;
   }
 
-  inputs(): Signal<Record<string, unknown>> {
-    throw new Error('ComponentViewStub: method not implemented.');
+  componentView(): string {
+    throw new Error('RenderNodeStub: Method not implemented.');
   }
 
-  component(): new () => unknown {
-    throw new Error('ComponentViewStub: method not implemented.');
+  inputs(): Signal<Record<string, unknown>> {
+    throw new Error('RenderNodeStub: Method not implemented.');
+  }
+
+  paragraphId(): string {
+    throw new Error('RenderNodeStub: Method not implemented.');
   }
 }
