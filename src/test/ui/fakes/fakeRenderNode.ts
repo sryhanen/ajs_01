@@ -43,31 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ComponentViewImpl} from './componentViewImpl';
+import {RenderNodeImpl} from '../../../app/objects/rendering/renderNode/renderNodeImpl';
 import {signal} from '@angular/core';
+import {FakeComponentRegistry} from './fakeComponentRegistry';
 
-describe('ComponentView unit test', () => {
-  class component {
-    someMethod():void{}
+export class FakeRenderNode extends RenderNodeImpl {
+  constructor() {
+    super(FakeComponentRegistry.FAKE_COMPONENT, signal({}));
   }
-  const inputs = signal({input1:'val1', input2:123, input3: {nested: 'nested'}});
-  const componentView = new ComponentViewImpl(component, inputs);
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(componentView).toBeDefined();
-    });
-
-    it('Should not be stub', () => {
-      expect(componentView.isStub()).toBe(false);
-    });
-
-    it('Should component', () => {
-      expect(componentView.component()).toBeTypeOf(typeof component);
-    });
-
-    it('Should have inputs', () => {
-      expect(componentView.inputs()()).toEqual(inputs());
-    });
-  });
-});
+}

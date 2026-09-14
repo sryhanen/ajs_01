@@ -43,10 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import Stubable from '../../../shared/interfaces/stubable';
-import {Signal} from '@angular/core';
+import {Component} from '@angular/core';
 
-export interface ComponentView extends Stubable{
-  component(): new () => unknown;
-  inputs():Signal<Record<string, unknown>>;
-}
+@Component({
+  selector: 'fake-component',
+  template: ''
+})
+export class FakeComponent{}
