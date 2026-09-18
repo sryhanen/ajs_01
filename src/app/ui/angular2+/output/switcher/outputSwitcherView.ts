@@ -69,7 +69,7 @@ import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
   `
 })
 export class OutputSwitcherView {
-  switcherButtons = input.required<Signal<RenderNode>[]>();
+  switcherButtons = input.required<RenderNode[]>();
   switchIsPending= input.required<boolean>();
   outputIsSwitchable= input.required<boolean>();
 }
