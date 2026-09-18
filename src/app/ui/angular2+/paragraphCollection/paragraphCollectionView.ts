@@ -45,12 +45,20 @@
  */
 import {Component, input} from '@angular/core';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
 
 @Component({
-  selector:'paragraph-collection',
+  selector: 'paragraph-collection',
+  imports: [
+    RenderNodeHostView
+  ],
   template: `
+    @for(paragraph of paragraphs(); track $index){
+      <render-node-host [renderNode]="paragraph" [containerId]="containerId()"></render-node-host>
+    }
   `
 })
 export class ParagraphCollectionView {
   paragraphs = input.required<RenderNode[]>();
+  containerId = input.required<string>();
 }

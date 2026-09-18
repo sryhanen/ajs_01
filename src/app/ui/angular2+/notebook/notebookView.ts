@@ -45,13 +45,18 @@
  */
 import {Component, input} from '@angular/core';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
 
 @Component({
   selector: 'notebook',
+  imports: [
+    RenderNodeHostView
+  ],
   template: `
-
+    <render-node-host [renderNode]="paragraphCollection()" [containerId]="containerId()"></render-node-host>
   `
 })
 export class NotebookView {
   paragraphCollection = input.required<RenderNode>();
+  containerId = input.required<string>();
 }

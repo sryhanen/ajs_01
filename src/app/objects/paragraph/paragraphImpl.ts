@@ -74,6 +74,7 @@ export class ParagraphImpl implements Paragraph {
     this._paragraphIdDecorator = new MessagePropertyDecorator('paragraphId', this.id());
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
       output:this._output.print()(),
+      paragraphId:this.id()
     })));
   }
 

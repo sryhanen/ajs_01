@@ -45,13 +45,23 @@
  */
 import {Component, input} from '@angular/core';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
 
 @Component({
-  selector:'paragraph',
-  template:`
+  selector: 'paragraph',
+  imports: [
+    RenderNodeHostView
+  ],
+  template: `
+    @if(containerId() === paragraphId()){
+      <render-node-host [renderNode]="output()"></render-node-host>
+    }
   `
 })
 export class ParagraphView{
   output = input.required<RenderNode>();
+  paragraphId = input.required<string>();
+  containerId = input.required<string>();
+
 
 }

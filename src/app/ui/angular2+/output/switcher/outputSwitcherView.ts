@@ -43,23 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, Signal} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
+import {Component, input} from '@angular/core';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeHostView} from '../../renderNodeHost/renderNodeHostView';
 
 @Component({
   selector: 'output-switcher',
   imports: [
-    NgComponentOutlet
+    RenderNodeHostView
   ],
   template: `
     @if (outputIsSwitchable()) {
       <div class="btn-group" role="group">
         @for (button of switcherButtons(); track $index) {
-          @let componentView = button().componentView;
-          <ng-container
-            *ngComponentOutlet="componentView.component(); inputs: componentView.inputs()()">
-          </ng-container>
+          <render-node-host [renderNode]="button"></render-node-host>
         }
       </div>
       @if (switchIsPending()) {
