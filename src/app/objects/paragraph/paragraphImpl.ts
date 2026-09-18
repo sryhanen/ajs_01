@@ -45,8 +45,6 @@
  */
 import {Paragraph} from './paragraph';
 import {Channel} from '../channel/channel';
-import {OutputContainer} from '../output/container/outputContainer';
-import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {WebSocketPayload} from '../safeJson/webSocketPayload';
 import {WebSocketPayloadImpl} from '../safeJson/webSocketPayloadImpl';
 import {signal, Signal} from '@angular/core';
@@ -57,10 +55,12 @@ import {MessagePropertyDecorator} from '../message/messageDecorator/messagePrope
 import {MessageImpl} from '../message/messageImpl';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {Output} from '../output/output';
+import {OutputImpl} from '../output/outputImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
-  private readonly _outputContainer: OutputContainer;
+  private readonly _output: Output;
   private readonly _paragraphData: WebSocketPayload;
   private readonly _paragraphIdFilter: MessagePropertyEqualsFilter;
   private readonly _paragraphIdDecorator: MessagePropertyDecorator;
@@ -69,17 +69,17 @@ export class ParagraphImpl implements Paragraph {
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
     this._paragraphData = new WebSocketPayloadImpl(paragraph);
-    this._outputContainer = this.initializedOutputContainer(paragraph);
+    this._output = this.initializedOutput(paragraph);
     this._paragraphIdFilter = new MessagePropertyEqualsFilter('paragraphId', this.id());
     this._paragraphIdDecorator = new MessagePropertyDecorator('paragraphId', this.id());
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
-      output:this._outputContainer.print()(),
+      output:this._output.print()(),
     })));
   }
 
 
-  private initializedOutputContainer(paragraph: object): OutputContainer {
-    const outputContainer = new OutputContainerImpl(this, this.id());
+  private initializedOutput(paragraph: object): Output {
+    const outputContainer = new OutputImpl(this);
     const paragraphOutputMessageFactory = new ParagraphOutputMessageFactoryImpl(paragraph);
     const paragraphOutputMessage = paragraphOutputMessageFactory.paragraphOutputMessage();
     if(!paragraphOutputMessage.isStub()){
@@ -106,7 +106,7 @@ export class ParagraphImpl implements Paragraph {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
     const filteredMessage = this._paragraphIdFilter.filteredMessage(message);
     if(!filteredMessage.isStub()) {
-      this._outputContainer.response(filteredMessage.toJson());
+      this._output.response(filteredMessage.toJson());
     }
   }
 }

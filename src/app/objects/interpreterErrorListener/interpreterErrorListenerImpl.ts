@@ -54,17 +54,14 @@ import {ComponentViewImpl} from '../rendering/componentView/componentViewImpl';
 import {InterpreterErrorView} from '../../ui/angular2+/interpreterError/interpreterErrorView';
 
 export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
-  private readonly _paragraphId:string;
   private readonly _componentView:WritableSignal<ComponentView>;
 
-  constructor(paragraphId:string) {
-    this._paragraphId = paragraphId;
+  constructor() {
     this._componentView = signal(new ComponentViewStub());
   }
 
   print(): Signal<RenderNode> {
     return computed(() => ({
-      paragraphId:this._paragraphId,
       children: computed(() => []),
       componentView: this._componentView()
     }));

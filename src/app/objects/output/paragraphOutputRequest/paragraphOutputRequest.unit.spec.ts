@@ -43,9 +43,47 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import Stubable from '../../../../shared/interfaces/stubable';
+import {ParagraphOutputRequest} from './paragraphOutputRequest';
+import {ParagraphOutputRequestImpl} from './paragraphOutputRequestImpl';
+import {WebSocketPayloadImpl} from '../../safeJson/webSocketPayloadImpl';
+import {MessageImpl} from '../../message/messageImpl';
 
-export interface ParagraphOutputRequest extends Stubable {
-  type():string;
-  request():object;
-}
+describe('Paragraph Output Request unit test', () => {
+  const paragraphOutputRequestData = {
+    op:'PARAGRAPH_OUTPUT_REQUEST',
+    data:{
+      type:'type'
+    }
+  };
+  let paragraphOutputRequest: ParagraphOutputRequest;
+  beforeEach(() => {
+    paragraphOutputRequest = new ParagraphOutputRequestImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputRequestData)));
+  });
+
+
+  describe('Birth', () => {
+    it('Should be initialized', () => {
+      expect(paragraphOutputRequest).toBeDefined();
+    });
+
+    it('Should not be stub', () => {
+      expect(paragraphOutputRequest.isStub()).toBe(false);
+    });
+
+    it('Should have type', () => {
+      expect(paragraphOutputRequest.type()).toEqual(paragraphOutputRequestData.data.type);
+    });
+
+    it('Should have request', () => {
+      expect(paragraphOutputRequest.request()).toEqual(paragraphOutputRequestData);
+    });
+  });
+
+  describe('Validation', () => {
+    it('Should throw if operation is not "PARAGRAPH_OUTPUT_REQUEST"', () => {
+      paragraphOutputRequestData.op = '';
+      paragraphOutputRequest = new ParagraphOutputRequestImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputRequestData)));
+      expect(() => paragraphOutputRequest.type()).toThrow();
+    });
+  });
+});

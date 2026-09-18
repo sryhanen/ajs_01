@@ -43,29 +43,16 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphOutputRequest} from './paragraphOutputRequest';
-import {Message} from '../../../message/message';
-import {TypedMessage} from '../../../message/typedMessage/typedMessage';
+import {Component, input} from '@angular/core';
+import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
 
-export class ParagraphOutputRequestImpl implements ParagraphOutputRequest {
-  private readonly _message:Message;
-
-  constructor(message:Message) {
-    this._message = new TypedMessage('PARAGRAPH_OUTPUT_REQUEST', message);
-  }
-
-  request(): object {
-    return {
-      op:this._message.operation(),
-      data:this._message.data(),
-    };
-  }
-
-  type(): string {
-    return this._message.data()['type'];
-  }
-
-  isStub(): boolean {
-    return false;
-  }
+@Component({
+  selector: 'output-container',
+  template: `
+  `
+})
+export class OutputView {
+  interpreterErrorListener = input.required<RenderNode>();
+  outputSwitcher = input.required<RenderNode>();
+  outputFormats = input.required<RenderNode[]>();
 }
