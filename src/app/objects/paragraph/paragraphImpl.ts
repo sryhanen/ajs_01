@@ -49,31 +49,34 @@ import {OutputContainer} from '../output/container/outputContainer';
 import {OutputContainerImpl} from '../output/container/outputContainerImpl';
 import {WebSocketPayload} from '../safeJson/webSocketPayload';
 import {WebSocketPayloadImpl} from '../safeJson/webSocketPayloadImpl';
-import {computed, Signal} from '@angular/core';
-import { RenderNode } from '../rendering/renderNode/renderNode';
-import {ComponentViewStub} from '../rendering/componentView/componentViewStub';
-import {ComponentView} from '../rendering/componentView/componentView';
+import {signal, Signal} from '@angular/core';
+import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ParagraphOutputMessageFactoryImpl} from './paragraphOutputMessageFactory/paragraphOutputMessageFactoryImpl';
 import {MessagePropertyEqualsFilter} from '../message/messageFilter/messagePropertyEqualsFilter';
 import {MessagePropertyDecorator} from '../message/messageDecorator/messagePropertyDecorator';
 import {MessageImpl} from '../message/messageImpl';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _outputContainer: OutputContainer;
   private readonly _paragraphData: WebSocketPayload;
-  private readonly _componentView: ComponentView;
   private readonly _paragraphIdFilter: MessagePropertyEqualsFilter;
   private readonly _paragraphIdDecorator: MessagePropertyDecorator;
+  private readonly _renderNode: Signal<RenderNode>;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
     this._paragraphData = new WebSocketPayloadImpl(paragraph);
     this._outputContainer = this.initializedOutputContainer(paragraph);
-    this._componentView = new ComponentViewStub();
     this._paragraphIdFilter = new MessagePropertyEqualsFilter('paragraphId', this.id());
     this._paragraphIdDecorator = new MessagePropertyDecorator('paragraphId', this.id());
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
+      output:this._outputContainer.print()(),
+    })));
   }
+
 
   private initializedOutputContainer(paragraph: object): OutputContainer {
     const outputContainer = new OutputContainerImpl(this, this.id());
@@ -86,10 +89,7 @@ export class ParagraphImpl implements Paragraph {
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      children:computed(() => [this._outputContainer.print()()]),
-      componentView: this._componentView
-    }));
+    return this._renderNode;
   }
 
   id(): string {
