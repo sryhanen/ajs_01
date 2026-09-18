@@ -46,30 +46,25 @@
 import {OutputType} from '../../../outputType';
 import {Printable} from '../../../../rendering/printable/printable';
 import {Request} from '../../../../channel/request';
-import {computed, Signal} from '@angular/core';
-import { RenderNode } from '../../../../rendering/renderNode/renderNode';
-import {ComponentViewImpl} from '../../../../rendering/componentView/componentViewImpl';
-import {OutputSwitcherButtonView} from '../../../../../ui/angular2+/output/switcher/switcherButton/outputSwitcherButtonView';
+import {signal, Signal} from '@angular/core';
+import {RenderNode} from '../../../../rendering/renderNode/renderNode';
+import {RenderNodeImpl} from '../../../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class DataTableSwitcherButton implements Printable {
   private readonly _type: string = OutputType.dataTables;
-  private readonly _request: Request;
+  private readonly _renderNode: Signal<RenderNode>;
 
   constructor(request: Request) {
-    this._request = request;
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.OUTPUT_SWITCHER_BUTTON_VIEW, signal({
+      requestFormatSwitch: () => request.request(this.outputSwitchRequestData()),
+      title:'Table',
+      icon:'fas fa-table',
+    })));
   }
 
   print(): Signal<RenderNode> {
-    return computed(() => ({
-      componentView: new ComponentViewImpl(OutputSwitcherButtonView, computed(() => ({
-        title: 'Table',
-        icon: 'fas fa-table',
-        requestFormatSwitch:() => {
-          this._request.request(this.outputSwitchRequestData());
-        }
-      }))),
-      children:computed(() => [])
-    }));
+    return this._renderNode;
   }
 
   private outputSwitchRequestData(): object {
