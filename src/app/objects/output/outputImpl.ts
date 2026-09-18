@@ -95,7 +95,7 @@ export class OutputImpl implements Output {
   }
 
   print(): Signal<RenderNode> {
-    return undefined;
+    return this._renderNode;
   }
 
   request(json: object) {
