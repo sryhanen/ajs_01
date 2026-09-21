@@ -49,9 +49,9 @@ import {OutputSwitcherView} from './outputSwitcherView';
 import {Component} from '@angular/core';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 import {By} from '@angular/platform-browser';
-import {FakeRenderNode} from '../../../../../test/fakes/fakeRenderNode';
-import {FakeComponent} from '../../../../../test/fakes/fakeComponent';
-import {FakeComponentRegistryProvider} from '../../../../../test/fakes/fakeComponentRegistryProvider';
+import {FakeRenderNode} from '../../../../../test/fakes/renderNode/fakeRenderNode';
+import {FakeComponent} from '../../../../../test/fakes/fakeComponent/fakeComponent';
+import {FakeComponentRegistryProvider} from '../../../../../test/fakes/componentRegistry/fakeComponentRegistryProvider';
 
 describe('OutputSwitcherView functional test', () => {
   let fixture: ComponentFixture<OutputSwitcherView>;

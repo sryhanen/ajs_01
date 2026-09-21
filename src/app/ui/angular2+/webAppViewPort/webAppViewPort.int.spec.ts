@@ -48,8 +48,8 @@ import {FakeWebSocketService} from '../../../objects/webSocket/service/fakeWebSo
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {WebAppViewPort} from './webAppViewPort';
 import {By} from '@angular/platform-browser';
-import {FakeComponentRegistryProvider} from '../../../../test/fakes/fakeComponentRegistryProvider';
-import {FakeComponent} from '../../../../test/fakes/fakeComponent';
+import {FakeComponentRegistryProvider} from '../../../../test/fakes/componentRegistry/fakeComponentRegistryProvider';
+import {FakeComponent} from '../../../../test/fakes/fakeComponent/fakeComponent';
 
 describe('WebAppViewPort integration test', () => {
   const containerId = 'containerId';

@@ -43,8 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {FakeComponent} from './fakeComponent';
+import {FakeComponent} from '../fakeComponent/fakeComponent';
 import {FakeComponentRegistry} from './fakeComponentRegistry';
-import {COMPONENT_REGISTRY} from '../../app/ui/angular2+/componentRegistry/componentRegistry';
+import {COMPONENT_REGISTRY} from '../../../app/ui/angular2+/componentRegistry/componentRegistry';
 
 export const FakeComponentRegistryProvider = {provide: COMPONENT_REGISTRY, useValue:new Map([[FakeComponentRegistry.FAKE_COMPONENT, FakeComponent]])};

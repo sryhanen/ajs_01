@@ -49,9 +49,9 @@ import {RenderNodeHostView} from './renderNodeHostView';
 import {render} from '@testing-library/angular';
 import {By} from '@angular/platform-browser';
 import {RenderNodeStub} from '../../../objects/rendering/renderNode/renderNodeStub';
-import {FakeRenderNode} from '../../../../test/fakes/fakeRenderNode';
-import {FakeComponentRegistryProvider} from '../../../../test/fakes/fakeComponentRegistryProvider';
-import {FakeComponent} from '../../../../test/fakes/fakeComponent';
+import {FakeRenderNode} from '../../../../test/fakes/renderNode/fakeRenderNode';
+import {FakeComponentRegistryProvider} from '../../../../test/fakes/componentRegistry/fakeComponentRegistryProvider';
+import {FakeComponent} from '../../../../test/fakes/fakeComponent/fakeComponent';
 
 describe('RenderNodeHostView integration test', () => {
   let renderNode:RenderNode;
