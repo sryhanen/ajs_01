@@ -43,34 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphAddedMessage} from './paragraphAddedMessage';
 import {Channel} from '../../channel/channel';
 import {Paragraph} from '../../paragraph/paragraph';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
+import {ResponseMessage} from '../responseMessage';
+import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
 
-export class ParagraphAddedMessageImpl implements ParagraphAddedMessage {
+export class ParagraphAddedMessageImpl implements ResponseMessage<ParagraphCollection>{
   private readonly _message:Message;
 
   constructor(message:Message) {
     this._message = new TypedMessage('PARAGRAPH_ADDED', message);
   }
 
-  paragraph(channel: Channel): Paragraph {
-    const paragraphData = this._message.dataAsWebSocketPayload().objectProperty('paragraph');
-    return new ParagraphImpl(channel, paragraphData);
-  }
-
-  index(): number {
-    return this._message.dataAsWebSocketPayload().numberProperty('index');
-  }
-
-  data(): object {
-    return this._message.data();
-  }
-
-  operation(): string {
-    return this._message.operation();
+  applyTo(paragraphCollection: ParagraphCollection): void {
+    const paragraph = new ParagraphImpl(paragraphCollection, this._message.data());
+    const index = this._message.dataAsWebSocketPayload().numberProperty('index');
+    paragraphCollection.addParagraph(paragraph, index);
   }
 }

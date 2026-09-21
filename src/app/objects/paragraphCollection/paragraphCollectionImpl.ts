@@ -77,34 +77,45 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     }))));
   }
 
-
-  private paragraphResponse(message:Message):void{
-    const paragraphMessage = new ParagraphMessageImpl(message);
-    const paragraph = paragraphMessage.paragraph(this);
+  addParagraph(paragraph: Paragraph, index?:number): void {
     this._paragraphs.update(paragraphs => {
-      paragraphs.set(paragraph.id(), paragraph);
-      return paragraphs;
+      let newParagraphs: Map<string, Paragraph>;
+      if(index){
+        newParagraphs = this.insertParagraph(paragraphs, paragraph, index);
+      }
+      else{
+        paragraphs.set(paragraph.id(), paragraph);
+      }
+      return newParagraphs;
     });
   }
 
-  private paragraphAddedResponse(message:Message):void{
-    const paragraphAddedMessage = new ParagraphAddedMessageImpl(message);
-    const index = paragraphAddedMessage.index();
-    const paragraph = paragraphAddedMessage.paragraph(this);
-    this._paragraphs.update(paragraphs => {
-      const paragraphsAsArray = Array.from(paragraphs);
-      paragraphsAsArray.splice(index, 0, [paragraph.id(), paragraph]);
-      return new Map(paragraphsAsArray);
-    });
+  private insertParagraph(paragraphs: Map<string, Paragraph>, paragraph: Paragraph, index:number): Map<string, Paragraph> {
+    const paragraphsAsArray = Array.from(paragraphs);
+    paragraphsAsArray.splice(index, 0, [paragraph.id(), paragraph]);
+    return new Map(paragraphsAsArray);
   }
 
-  private paragraphRemovedResponse(message:Message):void{
-    const paragraphRemovedMessage = new ParagraphRemovedMessageImpl(message);
-    const paragraphId = paragraphRemovedMessage.paragraphId();
+  removeParagraph(paragraphId: string): void {
     this._paragraphs.update(paragraphs => {
       paragraphs.delete(paragraphId);
       return paragraphs;
     });
+  }
+
+  private paragraphResponse(message:Message):void{
+    const paragraphMessage = new ParagraphMessageImpl(message);
+    paragraphMessage.applyTo(this);
+  }
+
+  private paragraphAddedResponse(message:Message):void{
+    const paragraphAddedMessage = new ParagraphAddedMessageImpl(message);
+    paragraphAddedMessage.applyTo(this);
+  }
+
+  private paragraphRemovedResponse(message:Message):void{
+    const paragraphRemovedMessage = new ParagraphRemovedMessageImpl(message);
+    paragraphRemovedMessage.applyTo(this);
   }
 
   private initializedParagraphs(initialParagraphData: object[]): WritableSignal<Map<string,  Paragraph>> {

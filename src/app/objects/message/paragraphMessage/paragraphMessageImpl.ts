@@ -43,25 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphMessage} from './paragraphMessage';
 import {TypedMessage} from '../typedMessage/typedMessage';
-import {Channel} from '../../channel/channel';
 import {Message} from '../message';
-import {Paragraph} from '../../paragraph/paragraph';
+import {ResponseMessage} from '../responseMessage';
+import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
 
-export class ParagraphMessageImpl implements ParagraphMessage {
+export class ParagraphMessageImpl implements ResponseMessage<ParagraphCollection> {
   private readonly _message:Message;
 
   constructor(message:Message) {
     this._message = new TypedMessage('PARAGRAPH', message);
   }
 
-  data(): object {
-    return this._message.data();
-  }
-
-  paragraph(channel: Channel): Paragraph {
-    return new ParagraphImpl(channel, this._message.data());
+  applyTo(paragraphCollection: ParagraphCollection): void {
+    const paragraph = new ParagraphImpl(paragraphCollection, this._message.data());
+    paragraphCollection.addParagraph(paragraph);
   }
 }

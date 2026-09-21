@@ -43,18 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphRemovedMessage} from './paragraphRemovedMessage';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
+import {ResponseMessage} from '../responseMessage';
+import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
 
-export class ParagraphRemovedMessageImpl implements ParagraphRemovedMessage {
+export class ParagraphRemovedMessageImpl implements ResponseMessage<ParagraphCollection> {
   private readonly _message:Message;
 
   constructor(message:Message) {
     this._message = new TypedMessage('PARAGRAPH_REMOVED', message);
   }
 
-  paragraphId(): string {
-    return this._message.dataAsWebSocketPayload().stringProperty('id');
+  applyTo(paragraphCollection: ParagraphCollection): void {
+    const paragraphId = this._message.dataAsWebSocketPayload().stringProperty('id');
+    paragraphCollection.removeParagraph(paragraphId);
   }
 }
