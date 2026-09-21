@@ -43,27 +43,23 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotesInfoMessage} from './notesInfoMessage';
-import {NotebookIndex} from '../../notebookCollection/notebookIndex/notebookIndex';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
 import {NotebookIndexImpl} from '../../notebookCollection/notebookIndex/notebookIndexImpl';
-import {Channel} from '../../channel/channel';
+import {ResponseMessage} from '../responseMessage';
+import {NotebookCollection} from '../../notebookCollection/notebookCollection';
 
-export class NotesInfoMessageImpl implements NotesInfoMessage {
+export class NotesInfoMessageImpl implements ResponseMessage<NotebookCollection> {
   private readonly _message:Message;
 
   constructor(message:Message) {
     this._message = new TypedMessage('NOTES_INFO', message);
   }
 
-  notebookIndices(channel:Channel): Map<string, NotebookIndex> {
-    const notebookIndices = new Map<string, NotebookIndex>();
+  applyTo(notebookCollection: NotebookCollection): void {
     const notebookIndicesData = this._message.dataAsWebSocketPayload().arrayProperty<object>('notes');
     notebookIndicesData.forEach(notebookIndexData => {
-      const notebookIndex = new NotebookIndexImpl(channel,notebookIndexData);
-      notebookIndices.set(notebookIndex.id(), notebookIndex);
+      notebookCollection.addNotebookIndex(new NotebookIndexImpl(notebookCollection, notebookIndexData));
     });
-    return notebookIndices;
   }
 }

@@ -49,11 +49,11 @@ import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from './notebookIndex/notebookIndex';
 import {MessageImpl} from '../message/messageImpl';
-import {NotesInfoMessageImpl} from '../message/notesInfoMessage/notesInfoMessageImpl';
 import {WebSocketPayloadImpl} from '../safeJson/webSocketPayloadImpl';
 import {Message} from '../message/message';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {NotesInfoMessageImpl} from '../message/notesInfoMessage/notesInfoMessageImpl';
 
 export class NotebookCollectionImpl implements NotebookCollection{
   private readonly _channel:Channel;
@@ -63,7 +63,7 @@ export class NotebookCollectionImpl implements NotebookCollection{
 
   constructor(channel:Channel) {
     this._channel = channel;
-    this._notebookIndices = signal(new Map());
+    this._notebookIndices = signal(new Map(), {equal: () => false});
     this._responseEvents = new Map([
       ['NOTES_INFO', (message) => this.notesInfoResponse(message)],
     ]);
@@ -72,6 +72,12 @@ export class NotebookCollectionImpl implements NotebookCollection{
     }))));
   }
 
+  addNotebookIndex(notebookIndex: NotebookIndex): void {
+    this._notebookIndices.update(notebookIndices => {
+      notebookIndices.set(notebookIndex.id(), notebookIndex);
+      return notebookIndices;
+    });
+  }
 
   print(): Signal<RenderNode> {
     return this._renderNode;
@@ -93,6 +99,7 @@ export class NotebookCollectionImpl implements NotebookCollection{
   }
 
   private notesInfoResponse(message:Message):void{
-    this._notebookIndices.set(new NotesInfoMessageImpl(message).notebookIndices(this));
+    const notesInfoMessage = new NotesInfoMessageImpl(message);
+    notesInfoMessage.applyTo(this);
   }
 }
