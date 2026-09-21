@@ -53,10 +53,12 @@ import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
     RenderNodeHostView
   ],
   template: `
-    <render-node-host [renderNode]="currentNotebook()" [containerId]="containerId()"></render-node-host>
+    @for(notebookIndex of notebookIndices(); track $index){
+      <render-node-host [renderNode]="notebookIndex" [containerId]="containerId()"></render-node-host>
+    }
   `
 })
 export class NotebookCollectionView {
-  currentNotebook = input.required<RenderNode>();
+  notebookIndices = input.required<RenderNode[]>();
   containerId = input.required<string>();
 }

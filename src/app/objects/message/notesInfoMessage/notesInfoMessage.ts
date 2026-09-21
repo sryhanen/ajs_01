@@ -44,7 +44,8 @@
  * a licensee so wish it.
  */
 import {NotebookIndex} from '../../notebookCollection/notebookIndex/notebookIndex';
+import {Channel} from '../../channel/channel';
 
 export interface NotesInfoMessage {
-  notebookIndices(): Map<string, NotebookIndex>;
+  notebookIndices(channel:Channel): Map<string, NotebookIndex>;
 }

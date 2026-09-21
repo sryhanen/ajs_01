@@ -43,21 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NoteMessage} from './noteMessage';
-import {Notebook} from '../../notebook/notebook';
-import {Channel} from '../../channel/channel';
 import {TypedMessage} from '../typedMessage/typedMessage';
 import {Message} from '../message';
+import {ResponseMessage} from '../responseMessage';
+import {NotebookIndex} from '../../notebookCollection/notebookIndex/notebookIndex';
 import {NotebookImpl} from '../../notebook/notebookImpl';
 
-export class NoteMessageImpl implements NoteMessage{
+export class NoteMessageImpl implements ResponseMessage<NotebookIndex>{
   private readonly _message:Message;
 
   constructor(message:Message) {
     this._message = new TypedMessage('NOTE', message);
   }
 
-  notebook(channel: Channel): Notebook {
-    return new NotebookImpl(channel, this._message.data());
+  applyTo(notebookIndex: NotebookIndex): void {
+    const notebook = new NotebookImpl(notebookIndex, this._message.data());
+    notebookIndex.renderNotebook(notebook);
   }
 }

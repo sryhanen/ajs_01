@@ -43,48 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NoteMessage} from './noteMessage';
-import {Message} from '../message';
-import {WebSocketPayloadImpl} from '../../safeJson/webSocketPayloadImpl';
-import {MessageImpl} from '../messageImpl';
-import {NoteMessageImpl} from './noteMessageImpl';
-import {FakeChannel} from '../../channel/fakeChannel';
-import {Channel} from '../../channel/channel';
-
-describe('Note message unit test', () => {
-  let channel: Channel;
-  const messageData ={
-    op:'NOTE',
-    data:{
-      id:'notebook',
-      paragraphs:[]
-    }
-  };
-  let message:Message;
-  let noteMessage:NoteMessage;
-
-  beforeEach(() => {
-    channel = new FakeChannel();
-    message = new MessageImpl(new WebSocketPayloadImpl(messageData));
-    noteMessage = new NoteMessageImpl(message);
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(noteMessage).toBeDefined();
-    });
-
-    it('Should have notebook', () => {
-      expect(noteMessage.notebook(channel)).toBeDefined();
-    });
-  });
-
-  describe('Validation', () => {
-    it('Should throw if message operation is not "NOTE"', () => {
-      messageData.op = '';
-      message = new MessageImpl(new WebSocketPayloadImpl(messageData));
-      noteMessage = new NoteMessageImpl(message);
-      expect(() => noteMessage.notebook(channel)).toThrow();
-    });
-  });
-});
+export interface ResponseMessage<T> {
+  applyTo(node: T): void;
+}

@@ -59,6 +59,7 @@ import {NotebookCollectionView} from '../notebookCollection/notebookCollectionVi
 import {NotebookView} from '../notebook/notebookView';
 import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
 import {ParagraphView} from '../paragraph/paragraphView';
+import {NotebookIndexView} from '../notebookIndex/notebookIndexView';
 
 export const ComponentRegistryProvider: Provider = {
   provide: COMPONENT_REGISTRY,
@@ -73,6 +74,7 @@ export const ComponentRegistryProvider: Provider = {
     [RegisteredComponents.OUTPUT_SWITCHER_BUTTON_VIEW, OutputSwitcherButtonView],
     [RegisteredComponents.NOTEBOOK_COLLECTION_VIEW, NotebookCollectionView],
     [RegisteredComponents.NOTEBOOK_VIEW, NotebookView],
+    [RegisteredComponents.NOTEBOOK_INDEX_VIEW, NotebookIndexView],
     [RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, ParagraphCollectionView],
     [RegisteredComponents.PARAGRAPH_VIEW, ParagraphView],
     [RegisteredComponents.OUTPUT_VIEW, OutputView],
