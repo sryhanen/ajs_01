@@ -44,7 +44,8 @@
  * a licensee so wish it.
  */
 import {
-  Component, computed,
+  Component,
+  computed,
   inject,
   input,
   Type,

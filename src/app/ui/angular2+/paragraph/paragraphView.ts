@@ -62,6 +62,4 @@ export class ParagraphView{
   output = input.required<RenderNode>();
   paragraphId = input.required<string>();
   containerId = input.required<string>();
-
-
 }
