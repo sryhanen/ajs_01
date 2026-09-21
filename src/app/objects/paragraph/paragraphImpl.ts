@@ -99,7 +99,21 @@ export class ParagraphImpl implements Paragraph {
 
   request(json: object): void {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    const decoratedMessage = this._paragraphIdDecorator.decoratedMessage(message);
+    let decoratedMessage: {op:string, data:object};
+    if(message.operation() === 'EXECUTE_PARAGRAPH'){
+      decoratedMessage = {
+        op:'RUN_PARAGRAPH',
+        data: {
+          id: this.id(),
+          paragraph: this._paragraphData.stringProperty('text'),
+          config: this._paragraphData.objectProperty('config'),
+          params: this._paragraphData.objectPropertyAsPayload('settings').objectProperty('params'),
+        },
+      };
+    }
+    else{
+      decoratedMessage = this._paragraphIdDecorator.decoratedMessage(message);
+    }
     this._channel.request(decoratedMessage);
   }
 

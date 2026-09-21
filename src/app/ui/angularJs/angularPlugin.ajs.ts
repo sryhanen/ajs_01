@@ -72,8 +72,8 @@ export class AngularPluginAjs implements IPostLink{
   };
 
   private runParagraph(paragraphId:string) {
-    const runParagraphMessage = {
-      op: 'RUN_PARAGRAPH',
+    const executeParagraphMessage = {
+      op: 'EXECUTE_PARAGRAPH',
       data: {
         id: paragraphId,
         paragraph: '',
@@ -81,7 +81,7 @@ export class AngularPluginAjs implements IPostLink{
         params: {}
       },
     };
-    this.requestable.request(runParagraphMessage);
+    this.requestable.request(executeParagraphMessage);
   }
 
   private angularBind(name:string, value:string, paragraphId:string) {
