@@ -43,23 +43,16 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Message} from '../message';
-import {TypedMessage} from '../typedMessage/typedMessage';
-import {ParagraphImpl} from '../../paragraph/paragraphImpl';
-import {ResponseMessage} from '../responseMessage';
-import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
+import {ParagraphCollection} from '../../../app/objects/paragraphCollection/paragraphCollection';
+import {vi} from 'vitest';
 
-export class ParagraphAddedMessageImpl implements ResponseMessage<ParagraphCollection>{
-  private readonly _message:Message;
-
-  constructor(message:Message) {
-    this._message = new TypedMessage('PARAGRAPH_ADDED', message);
-  }
-
-  applyTo(paragraphCollection: ParagraphCollection): void {
-    const paragraphData = this._message.dataAsWebSocketPayload().objectProperty('paragraph');
-    const paragraph = new ParagraphImpl(paragraphCollection, paragraphData);
-    const index = this._message.dataAsWebSocketPayload().numberProperty('index');
-    paragraphCollection.addParagraph(paragraph, index);
-  }
+export function CreateFakeParagraphCollection():ParagraphCollection {
+  return {
+    addParagraph:vi.fn(),
+    removeParagraph:vi.fn(),
+    request:vi.fn(),
+    response:vi.fn(),
+    print:vi.fn()
+  };
 }
+

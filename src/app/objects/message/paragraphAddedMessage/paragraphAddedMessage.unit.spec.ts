@@ -43,23 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Message} from '../message';
-import {TypedMessage} from '../typedMessage/typedMessage';
-import {ParagraphImpl} from '../../paragraph/paragraphImpl';
-import {ResponseMessage} from '../responseMessage';
-import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
+import {WebSocketPayloadImpl} from '../../safeJson/webSocketPayloadImpl';
+import {MessageImpl} from '../messageImpl';
+import {CreateFakeParagraphCollection} from '../../../../test/fakes/paragraphCollection/fakeParagraphCollectionFactory';
+import {ParagraphAddedMessageImpl} from './paragraphAddedMessageImpl';
 
-export class ParagraphAddedMessageImpl implements ResponseMessage<ParagraphCollection>{
-  private readonly _message:Message;
+describe('ParagraphMessage unit test', () => {
+  const paragraphAddedData = {
+    paragraph: {id:'id'},
+    index: 0
+  };
+  let paragraphAddedMessage = new ParagraphAddedMessageImpl(new MessageImpl(new WebSocketPayloadImpl({
+    op:'PARAGRAPH_ADDED',
+    data:paragraphAddedData
+  })));
+  const paragraphCollection = CreateFakeParagraphCollection();
 
-  constructor(message:Message) {
-    this._message = new TypedMessage('PARAGRAPH_ADDED', message);
-  }
+  it('Should add paragraph to ParagraphCollection', () => {
+    paragraphAddedMessage.applyTo(paragraphCollection);
+    expect(paragraphCollection.addParagraph).toHaveBeenCalledTimes(1);
+  });
 
-  applyTo(paragraphCollection: ParagraphCollection): void {
-    const paragraphData = this._message.dataAsWebSocketPayload().objectProperty('paragraph');
-    const paragraph = new ParagraphImpl(paragraphCollection, paragraphData);
-    const index = this._message.dataAsWebSocketPayload().numberProperty('index');
-    paragraphCollection.addParagraph(paragraph, index);
-  }
-}
+  it('Should throw if operation is invalid', () => {
+    paragraphAddedMessage = new ParagraphAddedMessageImpl(new MessageImpl(new WebSocketPayloadImpl({
+      op:'PARAGRAPH_ADD',
+      data:paragraphAddedData
+    })));
+    expect(() => paragraphAddedMessage.applyTo(paragraphCollection)).toThrow();
+  });
+});

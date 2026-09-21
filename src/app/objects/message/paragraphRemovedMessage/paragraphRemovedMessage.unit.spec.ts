@@ -43,23 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Message} from '../message';
-import {TypedMessage} from '../typedMessage/typedMessage';
-import {ParagraphImpl} from '../../paragraph/paragraphImpl';
-import {ResponseMessage} from '../responseMessage';
-import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
+import {WebSocketPayloadImpl} from '../../safeJson/webSocketPayloadImpl';
+import {MessageImpl} from '../messageImpl';
+import {CreateFakeParagraphCollection} from '../../../../test/fakes/paragraphCollection/fakeParagraphCollectionFactory';
+import {ParagraphRemovedMessageImpl} from './paragraphRemovedMessageImpl';
 
-export class ParagraphAddedMessageImpl implements ResponseMessage<ParagraphCollection>{
-  private readonly _message:Message;
+describe('ParagraphRemovedMessage unit test', () => {
+  const paragraphRemovedData = {
+    id:'id'
+  };
+  let paragraphRemovedMessage = new ParagraphRemovedMessageImpl(new MessageImpl(new WebSocketPayloadImpl({
+    op:'PARAGRAPH_REMOVED',
+    data:paragraphRemovedData
+  })));
+  const paragraphCollection = CreateFakeParagraphCollection();
 
-  constructor(message:Message) {
-    this._message = new TypedMessage('PARAGRAPH_ADDED', message);
-  }
+  it('Should remove paragraph from ParagraphCollection', () => {
+    paragraphRemovedMessage.applyTo(paragraphCollection);
+    expect(paragraphCollection.removeParagraph).toHaveBeenCalledTimes(1);
+  });
 
-  applyTo(paragraphCollection: ParagraphCollection): void {
-    const paragraphData = this._message.dataAsWebSocketPayload().objectProperty('paragraph');
-    const paragraph = new ParagraphImpl(paragraphCollection, paragraphData);
-    const index = this._message.dataAsWebSocketPayload().numberProperty('index');
-    paragraphCollection.addParagraph(paragraph, index);
-  }
-}
+  it('Should throw if operation is invalid', () => {
+    paragraphRemovedMessage = new ParagraphRemovedMessageImpl(new MessageImpl(new WebSocketPayloadImpl({
+      op:'PARAGRAPH_REMOV',
+      data:paragraphRemovedData
+    })));
+    expect(() => paragraphRemovedMessage.applyTo(paragraphCollection)).toThrow();
+  });
+});
