@@ -43,24 +43,21 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../../../channel/channel';
+import {Request} from '../../../../../channel/request';
 import {OutputType} from '../../../../outputType';
 import {DataTablesAjax} from './dataTablesAjax';
 import {WebSocketPayloadImpl} from '../../../../../safeJson/webSocketPayloadImpl';
+import {OutputPayload} from '../../../../outputPayload';
 
 export class DataTablesAjaxImpl implements DataTablesAjax {
-  private readonly _channel: Channel;
+  private readonly _requestable: Request;
   private _callback: (data: object) => void;
 
-  constructor(channel:Channel) {
-    this._channel = channel;
+  constructor(requestable: Request) {
+    this._requestable = requestable;
   }
 
-  request(data: object): void {
-    this._channel.request(data);
-  }
-
-  response(data: object): void {
+  response(data: OutputPayload<object>): void {
     if(this._callback) {
       this._callback(this.validatedData(data));
     }
@@ -95,7 +92,7 @@ export class DataTablesAjaxImpl implements DataTablesAjax {
             requestOptions: data
           }
         };
-        this.request(request);
+        this._requestable.request(request);
       }
     };
   }

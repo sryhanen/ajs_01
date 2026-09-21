@@ -63,6 +63,8 @@ export class DataTablesFormatImpl implements DataTablesFormat {
   constructor(channel: Channel) {
     this._channel = channel;
     this._switcherButton = new DataTableSwitcherButton(this);
+    this._dataTablesOutputData = signal({});
+    this._dataTablesOutputOptions = signal({});
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.DATATABLES_OUTPUT_VIEW, computed(() => ({
       dataTablesOutputData: this._dataTablesOutputData(),
       dataTablesOutputOptions: this._dataTablesOutputOptions(),

@@ -55,6 +55,7 @@ export class TextFormat implements OutputFormat<Pick<OutputPayload<string>, 'dat
   private readonly _textOutputData: WritableSignal<string>;
 
   constructor() {
+    this._textOutputData = signal('');
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.TEXT_OUTPUT_VIEW, computed(() => ({
       textOutput: this._textOutputData()
     }))));

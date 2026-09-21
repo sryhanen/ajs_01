@@ -55,13 +55,11 @@ import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
   template: `
     <render-node-host [renderNode]="interpreterErrorListener()"></render-node-host>
     <render-node-host [renderNode]="outputSwitcher()"></render-node-host>
-    @for(outputFormat of outputFormats(); track $index){
-      <render-node-host [renderNode]="outputFormat"></render-node-host>
-    }
+    <render-node-host [renderNode]="output()"></render-node-host>
   `
 })
 export class OutputView {
   interpreterErrorListener = input.required<RenderNode>();
   outputSwitcher = input.required<RenderNode>();
-  outputFormats = input.required<RenderNode[]>();
+  output = input.required<RenderNode>();
 }

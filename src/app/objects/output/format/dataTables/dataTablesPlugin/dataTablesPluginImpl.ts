@@ -45,27 +45,27 @@
  */
 import DataTable, {Api, Config, ConfigColumnDefs, ConfigColumns} from 'datatables.net-bs5';
 import 'datatables.net-buttons-bs5';
-import {Channel} from '../../../../channel/channel';
+import {Request} from '../../../../channel/request';
 import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
 import {DataTablesAjax} from './ajax/dataTablesAjax';
 import {WebSocketPayloadImpl} from '../../../../safeJson/webSocketPayloadImpl';
 import {DataTablesPlugin} from './dataTablesPlugin';
 
 export class DataTablesPluginImpl implements DataTablesPlugin {
-  private readonly _channel: Channel;
+  private readonly _requestable: Request;
   private readonly _dataTablesAjax: DataTablesAjax;
   private readonly _outputData:object;
   private readonly _outputOptions:object;
 
-  constructor(channel:Channel, outputData:object, outputOptions:object) {
-    this._channel = channel;
+  constructor(requestable: Request, outputData:object, outputOptions:object) {
+    this._requestable = requestable;
     this._outputData = outputData;
     this._outputOptions = outputOptions;
     this._dataTablesAjax = new DataTablesAjaxImpl(this);
   }
 
   request(data: object): void {
-    this._channel.request(data);
+    this._requestable.request(data);
   }
 
   response(data:object): void {

@@ -54,6 +54,10 @@ import {
 } from '@angular/core';
 import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
 import {Api} from 'datatables.net-bs5';
+import {Request} from '../../../../../objects/channel/request';
+import {
+  DataTablesPluginImpl
+} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPluginImpl';
 
 @Component({
   selector: 'dataTablesView',
@@ -62,18 +66,22 @@ import {Api} from 'datatables.net-bs5';
   `
 })
 export class DataTablesOutputView implements AfterViewInit, OnDestroy, OnChanges {
-  dataTablesPlugin = input.required<DataTablesPlugin>();
+  dataTablesOutputData = input.required<object>();
+  dataTablesOutputOptions = input.required<object>();
+  requestable = input.required<Request>();
+  private dataTablesPlugin: DataTablesPlugin;
+
   @ViewChild('table') table: ElementRef;
   private dataTablesInstance:Api<unknown>;
 
   ngAfterViewInit() {
-    this.dataTablesInstance = this.dataTablesPlugin().initializedTable(this.table.nativeElement);
+    this.dataTablesPlugin = new DataTablesPluginImpl(this.requestable(), this.dataTablesOutputData(), this.dataTablesOutputOptions());
+    this.dataTablesInstance = this.dataTablesPlugin.initializedTable(this.table.nativeElement);
   }
 
   ngOnChanges() {
-    if(this.dataTablesInstance){
-      this.dataTablesInstance.destroy();
-      this.dataTablesInstance = this.dataTablesPlugin().initializedTable(this.table.nativeElement);
+    if(this.dataTablesPlugin){
+      this.dataTablesPlugin.response(this.dataTablesOutputData());
     }
   }
 

@@ -130,6 +130,7 @@ export class OutputImpl implements Output {
         return;
       }
       this._outputSwitcher.response(json);
+      paragraphOutputMessage.applyTo(this);
     }
   }
 }

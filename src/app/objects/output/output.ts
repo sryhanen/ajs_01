@@ -48,5 +48,5 @@ import {Printable} from '../rendering/printable/printable';
 import {OutputPayload} from './outputPayload';
 
 export interface Output extends Printable, Channel{
-  render(output:OutputPayload):void;
+  render(output:OutputPayload<unknown>):void;
 }

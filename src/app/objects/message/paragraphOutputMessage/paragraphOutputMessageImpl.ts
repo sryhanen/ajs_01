@@ -47,6 +47,7 @@ import {ParagraphOutputMessage} from './paragraphOutputMessage';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
 import { Output } from '../../output/output';
+import {WebSocketPayload} from '../../safeJson/webSocketPayload';
 
 export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
   private readonly _message: Message;
@@ -56,12 +57,12 @@ export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
   }
 
   isAggregated(): boolean {
-    const output = this._message.dataAsWebSocketPayload().objectProperty('output');
+    const output = this.output();
     return output.propertyExists('isAggregated') && output.booleanProperty('isAggregated');
   }
 
   type():string {
-    return this._message.dataAsWebSocketPayload().stringProperty('type');
+    return this.output().stringProperty('type');
   }
 
   toJson(): object {
@@ -85,5 +86,9 @@ export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
 
   isStub(): boolean {
     return false;
+  }
+
+  private output():WebSocketPayload {
+    return this._message.dataAsWebSocketPayload().objectPropertyAsPayload('output');
   }
 }
