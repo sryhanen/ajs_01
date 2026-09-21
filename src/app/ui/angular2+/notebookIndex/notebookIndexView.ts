@@ -51,12 +51,14 @@ import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
   selector: 'notebook-index',
   imports: [RenderNodeHostView],
   template: `
-    @if(!currentNotebook().isStub()){
-      <render-node-host [renderNode]="currentNotebook()" [containerId]="containerId()"></render-node-host>
+    @if(!currentNotebook().isStub() && notebookId() === containerNoteId()){
+      <render-node-host [renderNode]="currentNotebook()" [containerParagraphId]="containerParagraphId()"></render-node-host>
     }
   `
 })
 export class NotebookIndexView {
   currentNotebook = input.required<RenderNode>();
-  containerId = input.required<string>();
+  notebookId = input.required<string>();
+  containerParagraphId = input.required<string>();
+  containerNoteId = input.required<string>();
 }

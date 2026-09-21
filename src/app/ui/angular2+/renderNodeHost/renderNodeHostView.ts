@@ -68,7 +68,8 @@ import {NgComponentOutlet} from '@angular/common';
 })
 export class RenderNodeHostView {
   renderNode = input.required<RenderNode>();
-  containerId = input<string>('');
+  containerParagraphId = input<string>('');
+  containerNoteId = input<string>('');
 
   protected componentInputs = computed(() => {
     let componentInputs = {};
@@ -76,8 +77,11 @@ export class RenderNodeHostView {
       componentInputs = {
         ...this.renderNode().inputs()(),
       };
-      if(this.containerId() !== ''){
-        componentInputs['containerId'] = this.containerId();
+      if(this.containerParagraphId() !== ''){
+        componentInputs['containerParagraphId'] = this.containerParagraphId();
+      }
+      if(this.containerNoteId() !== ''){
+        componentInputs['containerNoteId'] = this.containerNoteId();
       }
     }
     return componentInputs;

@@ -53,12 +53,15 @@ import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
     RenderNodeHostView
   ],
   template: `
-    @for(notebookIndex of notebookIndices(); track $index){
-      <render-node-host [renderNode]="notebookIndex" [containerId]="containerId()"></render-node-host>
+    @for (notebookIndex of notebookIndices(); track $index) {
+      @if (!notebookIndex.isStub()) {
+        <render-node-host [renderNode]="notebookIndex" [containerParagraphId]="containerParagraphId()" [containerNoteId]="containerNoteId()"></render-node-host>
+      }
     }
   `
 })
 export class NotebookCollectionView {
   notebookIndices = input.required<RenderNode[]>();
-  containerId = input.required<string>();
+  containerParagraphId = input.required<string>();
+  containerNoteId = input.required<string>();
 }

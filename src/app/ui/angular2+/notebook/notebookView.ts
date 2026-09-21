@@ -53,10 +53,10 @@ import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
     RenderNodeHostView
   ],
   template: `
-    <render-node-host [renderNode]="paragraphCollection()" [containerId]="containerId()"></render-node-host>
+    <render-node-host [renderNode]="paragraphCollection()" [containerParagraphId]="containerParagraphId()"></render-node-host>
   `
 })
 export class NotebookView {
   paragraphCollection = input.required<RenderNode>();
-  containerId = input.required<string>();
+  containerParagraphId = input.required<string>();
 }

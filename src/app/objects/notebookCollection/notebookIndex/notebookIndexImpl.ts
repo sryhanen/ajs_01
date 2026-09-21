@@ -69,7 +69,8 @@ export class NotebookIndexImpl implements NotebookIndex {
     this._notebookIndexData = new WebSocketPayloadImpl(notebookIndexData);
     this._notebookToRender = signal(new NotebookStub());
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
-      currentNotebook: this._notebookToRender().isStub() ? new RenderNodeStub() : this._notebookToRender().print()()
+      currentNotebook: this._notebookToRender().isStub() ? new RenderNodeStub() : this._notebookToRender().print()(),
+      notebookId: this.id()
     }))));
   }
 

@@ -53,10 +53,11 @@ import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
     RenderNodeHostView
   ],
   template: `
-    <render-node-host [renderNode]="renderNode()" [containerId]="containerId()"></render-node-host>
+    <render-node-host [renderNode]="renderNode()" [containerParagraphId]="containerParagraphId()" [containerNoteId]="containerNoteId()"></render-node-host>
   `
 })
 export class WebAppViewPort {
-  containerId= input.required<string>();
+  containerParagraphId= input.required<string>();
+  containerNoteId= input.required<string>();
   protected renderNode = computed(() => webAppRoot.print()());
 }
