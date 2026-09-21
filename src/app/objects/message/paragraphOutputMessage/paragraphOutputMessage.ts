@@ -44,15 +44,11 @@
  * a licensee so wish it.
  */
 import Stubable from '../../../shared/interfaces/stubable';
-import {StubableObject} from '../../stubableObject/stubableObject';
+import {ResponseMessage} from '../responseMessage';
+import {Output} from '../../output/output';
 
-export interface ParagraphOutputMessage extends Stubable {
+export interface ParagraphOutputMessage extends Stubable, ResponseMessage<Output>{
+  toJson():object;
+  type():string;
   isAggregated(): boolean;
-  type(): string;
-  outputData(type:string): string | object;
-  options():StubableObject;
-  print(): {
-    op:string,
-    data:object
-  };
 }

@@ -55,6 +55,7 @@ import {BasicOptionsImpl} from './uPlotPlugin/configuration/options/basicOptions
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 import uPlot from 'uplot';
+import {OutputPayload} from '../../outputPayload';
 
 export class UPlotFormatImpl implements UPlotFormat {
   private readonly _channel: Channel;
@@ -82,14 +83,14 @@ export class UPlotFormatImpl implements UPlotFormat {
     }))));
   }
 
-  render(data: object): void {
-    const safeOutputOptions = new WebSocketPayloadImpl(data['options']);
+  render(data: OutputPayload<uPlot.AlignedData>): void {
+    const safeOutputOptions = new WebSocketPayloadImpl(data.options);
     const labels = safeOutputOptions.arrayProperty<string>('labels');
     const series = safeOutputOptions.arrayProperty<string>('series');
     const xAxisLabel = safeOutputOptions.stringProperty('xAxisLabel');
     const graphType = safeOutputOptions.stringProperty('graphType');
     const basicOptions = new BasicOptionsImpl(labels, series, xAxisLabel, graphType);
-    const uPlotOutputData = data['data'];
+    const uPlotOutputData = data.data;
     this._graphType.set(graphType);
     this._uPlotOptions.set(basicOptions);
     this._uPlotOutputData.set(uPlotOutputData);

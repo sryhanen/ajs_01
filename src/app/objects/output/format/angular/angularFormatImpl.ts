@@ -51,6 +51,7 @@ import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angu
 import {AngularFormat} from './angularFormat';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import {OutputPayload} from '../../outputPayload';
 
 export class AngularFormatImpl implements AngularFormat {
   private readonly _channel: Channel;
@@ -69,8 +70,8 @@ export class AngularFormatImpl implements AngularFormat {
     }))));
   }
 
-  render(angularOutputData: string): void {
-    this._angularOutputData.set(angularOutputData);
+  render(angularOutputData: Pick<OutputPayload<string>, 'data'>): void {
+    this._angularOutputData.set(angularOutputData.data);
   }
 
   request(json: object): void {

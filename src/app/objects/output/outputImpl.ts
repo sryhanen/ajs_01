@@ -67,6 +67,7 @@ import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {OutputType} from './outputType';
 import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
+import {OutputPayload} from './outputPayload';
 
 export class OutputImpl implements Output {
   private readonly _channel:Channel;
@@ -101,8 +102,10 @@ export class OutputImpl implements Output {
     }))));
   }
 
-  render(data: object): void {
-    throw new Error('Method not implemented.');
+  render(data:OutputPayload<unknown>): void {
+    const outputToRender = this._outputFormats.get(data.type);
+    outputToRender.render(data);
+    this._currentOutput.set(outputToRender.print()());
   }
 
   print(): Signal<RenderNode> {

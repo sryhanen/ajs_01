@@ -45,5 +45,6 @@
  */
 import {Request} from '../../../channel/request';
 import {OutputFormat} from '../outputFormat';
+import {OutputPayload} from '../../outputPayload';
 
-export interface UPlotFormat extends OutputFormat<object>, Request {}
+export interface UPlotFormat extends OutputFormat<OutputPayload<object>>, Request {}

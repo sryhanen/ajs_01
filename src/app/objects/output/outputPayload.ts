@@ -43,23 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import { Output } from '../../output/output';
-import {ParagraphOutputMessage} from './paragraphOutputMessage';
-
-export class ParagraphOutputMessageStub implements ParagraphOutputMessage {
-  isAggregated(): boolean {
-    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
-  }
-  type():string {
-    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
-  }
-  toJson(): object {
-    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
-  }
-  applyTo(node: Output): void {
-    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
-  }
-  isStub(): boolean {
-    return true;
-  }
+export interface OutputPayload<T> {
+  data:T,
+  type:string,
+  isAggregated:boolean,
+  options?:object
 }

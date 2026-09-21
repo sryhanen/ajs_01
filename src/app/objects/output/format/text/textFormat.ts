@@ -48,8 +48,9 @@ import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
+import {OutputPayload} from '../../outputPayload';
 
-export class TextFormat implements OutputFormat<string> {
+export class TextFormat implements OutputFormat<Pick<OutputPayload<string>, 'data'>> {
   private readonly _renderNode: WritableSignal<RenderNode>;
   private readonly _textOutputData: WritableSignal<string>;
 
@@ -59,8 +60,8 @@ export class TextFormat implements OutputFormat<string> {
     }))));
   }
 
-  render(textOutput: string): void {
-    this._textOutputData.set(textOutput);
+  render(textOutput: Pick<OutputPayload<string>, 'data'>): void {
+    this._textOutputData.set(textOutput.data);
   }
 
   print(): Signal<RenderNode> {

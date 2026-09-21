@@ -45,7 +45,8 @@
  */
 import {Channel} from '../channel/channel';
 import {Printable} from '../rendering/printable/printable';
+import {OutputPayload} from './outputPayload';
 
 export interface Output extends Printable, Channel{
-  render(output:{data:object, type:string, isAggregated:boolean, options?:object}):void;
+  render(output:OutputPayload):void;
 }

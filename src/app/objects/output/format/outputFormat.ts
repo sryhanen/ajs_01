@@ -44,8 +44,9 @@
  * a licensee so wish it.
  */
 import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {Printable} from '../../rendering/printable/printable';
 
-export interface OutputFormat<T> {
+export interface OutputFormat<T> extends Printable{
   render(data:T):void;
   switcherButtons(): RenderNode[];
 }

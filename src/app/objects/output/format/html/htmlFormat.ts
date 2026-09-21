@@ -48,8 +48,9 @@ import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
+import {OutputPayload} from '../../outputPayload';
 
-export class HTMLFormat implements OutputFormat<string>{
+export class HTMLFormat implements OutputFormat<Pick<OutputPayload<string>, 'data'>>{
   private readonly _renderNode: WritableSignal<RenderNode>;
   private readonly _htmlOutputData: WritableSignal<string>;
 
@@ -59,8 +60,8 @@ export class HTMLFormat implements OutputFormat<string>{
     }))));
   }
 
-  render(data: string) {
-    this._htmlOutputData.set(data);
+  render(data: Pick<OutputPayload<string>, 'data'>) {
+    this._htmlOutputData.set(data.data);
   }
 
   print(): Signal<RenderNode> {

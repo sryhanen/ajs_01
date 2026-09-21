@@ -84,7 +84,7 @@ export class ParagraphImpl implements Paragraph {
     const paragraphOutputMessageFactory = new ParagraphOutputMessageFactoryImpl(paragraph);
     const paragraphOutputMessage = paragraphOutputMessageFactory.paragraphOutputMessage();
     if(!paragraphOutputMessage.isStub()){
-      outputContainer.response(paragraphOutputMessage.print());
+      outputContainer.response(paragraphOutputMessage.toJson());
     }
     return outputContainer;
   }

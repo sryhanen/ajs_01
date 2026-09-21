@@ -45,5 +45,6 @@
  */
 import {OutputFormat} from '../outputFormat';
 import {Request} from '../../../channel/request';
+import {OutputPayload} from '../../outputPayload';
 
-export interface AngularFormat extends OutputFormat<string>, Request {}
+export interface AngularFormat extends OutputFormat<Pick<OutputPayload<string>, 'data'>>, Request {}
