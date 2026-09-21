@@ -77,10 +77,6 @@ describe('DataTablesOutput', () => {
     it('Should be initialized', () => {
       expect(dataTablesPlugin).toBeInstanceOf(DataTablesPluginImpl);
     });
-
-    it('Should not be a stub', () => {
-      expect(dataTablesPlugin.isStub()).toBe(false);
-    });
   });
 
   describe('Request', () => {

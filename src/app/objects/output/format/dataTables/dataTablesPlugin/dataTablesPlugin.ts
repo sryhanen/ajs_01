@@ -44,9 +44,8 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../../../channel/channel';
-import Stubable from '../../../../../shared/interfaces/stubable';
 import {Api} from 'datatables.net-bs5';
 
-export interface DataTablesPlugin extends Channel, Stubable {
+export interface DataTablesPlugin extends Channel {
   initializedTable(tableElement: HTMLTableElement): Api<unknown>;
 }

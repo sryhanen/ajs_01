@@ -107,10 +107,6 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
     return new DataTable(tableElement, config);
   }
 
-  isStub(): boolean {
-    return false;
-  }
-
   private transformedColumns(columns:string[]): ConfigColumns[]{
     return columns.map((column) => {
       const escapedColumn = column.replace(/\./g, '\\.');
