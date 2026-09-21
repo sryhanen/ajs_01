@@ -44,6 +44,6 @@
  * a licensee so wish it.
  */
 import {OutputFormat} from '../outputFormat';
-import {Channel} from '../../../channel/channel';
+import {Request} from '../../../channel/request';
 
-export interface AngularFormat extends OutputFormat, Channel {}
+export interface AngularFormat extends OutputFormat<string>, Request {}

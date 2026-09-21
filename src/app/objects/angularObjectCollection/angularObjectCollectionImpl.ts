@@ -44,19 +44,19 @@
  * a licensee so wish it.
  */
 import {AngularObjectCollection} from './angularObjectCollection';
-import {Channel} from '../channel/channel';
+import {Request} from '../channel/request';
 import {Response} from '../channel/response';
 import {AngularObject} from '../angularObject/angularObject';
 import {AngularObjectRemoveResponse} from './responses/angularObjectRemove/angularObjectRemoveResponse';
 import {AngularObjectUpdateResponse} from './responses/angularObjectUpdate/angularObjectUpdateResponse';
 
 export class AngularObjectCollectionImpl implements AngularObjectCollection {
-  private readonly _channel: Channel;
+  private readonly _requestable: Request;
   private readonly _angularObjects: AngularObject[];
   private readonly _responses: Response[];
 
-  constructor(channel: Channel) {
-    this._channel = channel;
+  constructor(requestable: Request) {
+    this._requestable = requestable;
     this._angularObjects = [];
     this._responses = [
       new AngularObjectRemoveResponse(this._angularObjects),
@@ -65,7 +65,7 @@ export class AngularObjectCollectionImpl implements AngularObjectCollection {
   }
 
   request(data: object): void {
-    this._channel.request(data);
+    this._requestable.request(data);
   }
 
   response(data: object): void {

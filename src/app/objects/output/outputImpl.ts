@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Output} from './output';
-import {computed, signal, Signal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {Channel} from '../channel/channel';
 import {InterpreterErrorListenerImpl} from '../interpreterErrorListener/interpreterErrorListenerImpl';
@@ -65,33 +65,44 @@ import {ParagraphOutputRequestImpl} from './paragraphOutputRequest/paragraphOutp
 import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {OutputType} from './outputType';
+import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class OutputImpl implements Output {
   private readonly _channel:Channel;
   private readonly _interpreterErrorListener:InterpreterErrorListener;
-  private readonly _outputFormats: OutputFormat[];
+  private readonly _outputFormats: Map<string, OutputFormat<unknown>>;
   private readonly _outputSwitcher:OutputSwitcher;
   private _previousParagraphOutputRequest: ParagraphOutputRequest;
   private readonly _renderNode: Signal<RenderNode>;
+  private readonly _outputStub:RenderNode;
+  private readonly _currentOutput:WritableSignal<RenderNode>;
 
   constructor(channel:Channel) {
     this._channel = channel;
     this._interpreterErrorListener = new InterpreterErrorListenerImpl();
-    this._outputFormats = [
-      new DataTablesFormatImpl(this),
-      new HTMLFormat(),
-      new UPlotFormatImpl(this),
-      new TextFormat(),
-      new AngularFormatImpl(this),
+    const outputFormats:[string, OutputFormat<unknown>][] = [
+      [OutputType.dataTables, new DataTablesFormatImpl(this)],
+      [OutputType.html, new HTMLFormat()],
+      [OutputType.uPlot, new UPlotFormatImpl(this)],
+      [OutputType.text, new TextFormat()],
+      [OutputType.angular, new AngularFormatImpl(this)]
     ];
-    const buttons = this._outputFormats.map(format => format.switcherButtons());
+    this._outputFormats = new Map(outputFormats);
+    const buttons = Array.from(this._outputFormats.values()).map(format => format.switcherButtons());
     this._outputSwitcher = new OutputSwitcherImpl(buttons.flat());
     this._previousParagraphOutputRequest = new ParagraphOutputRequestStub();
+    this._outputStub = new RenderNodeStub();
+    this._currentOutput = signal(this._outputStub);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.OUTPUT_VIEW, computed(() => ({
       interpreterErrorListener: this._interpreterErrorListener.print()(),
       outputSwitcher: this._outputSwitcher.print()(),
-      outputFormats: this._outputFormats.map(outputFormat => outputFormat.print()()),
+      output: this._currentOutput()
     }))));
+  }
+
+  render(data: object): void {
+    throw new Error('Method not implemented.');
   }
 
   print(): Signal<RenderNode> {
@@ -115,7 +126,6 @@ export class OutputImpl implements Output {
         this._channel.request(this._previousParagraphOutputRequest.request());
         return;
       }
-      this._outputFormats.forEach(format => format.response(json));
       this._outputSwitcher.response(json);
     }
   }

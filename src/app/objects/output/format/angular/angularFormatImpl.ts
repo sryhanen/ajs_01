@@ -48,12 +48,7 @@ import {AngularObjectCollection} from '../../../angularObjectCollection/angularO
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../../../rendering/renderNode/renderNode';
 import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
-import {MessageImpl} from '../../../message/messageImpl';
-import {WebSocketPayloadImpl} from '../../../safeJson/webSocketPayloadImpl';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {OutputType} from '../../outputType';
 import {AngularFormat} from './angularFormat';
-import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 
@@ -61,32 +56,25 @@ export class AngularFormatImpl implements AngularFormat {
   private readonly _channel: Channel;
   private readonly _angularObjectCollection: AngularObjectCollection;
   private readonly _renderNode: WritableSignal<RenderNode>;
-  private readonly _renderNodeStub: RenderNode;
-
+  private readonly _angularOutputData: WritableSignal<string>;
 
   constructor(channel: Channel) {
     this._channel = channel;
     this._angularObjectCollection = new AngularObjectCollectionImpl(this);
-    this._renderNodeStub = new RenderNodeStub();
-    this._renderNode = signal(this._renderNodeStub);
+    this._angularOutputData = signal('');
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.ANGULAR_OUTPUT_VIEW, computed(() => ({
+      template: this._angularOutputData(),
+      angularObjects: this._angularObjectCollection.angularObjects(),
+      requestable:this
+    }))));
+  }
+
+  render(angularOutputData: string): void {
+    this._angularOutputData.set(angularOutputData);
   }
 
   request(json: object): void {
     this._channel.request(json);
-  }
-
-  response(json: object): void {
-    const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.type() !== OutputType.angular){
-        this._renderNode.set(this._renderNodeStub);
-      }
-      else{
-        const template= paragraphOutputMessage.outputData('string');
-        this._renderNode.set(new RenderNodeImpl(RegisteredComponents.ANGULAR_OUTPUT_VIEW, signal({template:template, angularObjects: this._angularObjectCollection.angularObjects(), requestable:this})));
-      }
-    }
   }
 
   print(): Signal<RenderNode> {

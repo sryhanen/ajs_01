@@ -46,25 +46,23 @@
 import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
 import {GraphType} from './graphType';
 import {WebSocketPayloadImpl} from '../../../safeJson/webSocketPayloadImpl';
-import {OutputType} from '../../outputType';
-import {signal, Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {Channel} from '../../../channel/channel';
-import {MessageImpl} from '../../../message/messageImpl';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {Printable} from '../../../rendering/printable/printable';
 import {UPlotFormat} from './uPlotFormat';
-import uPlot from 'uplot';
 import {BasicOptionsImpl} from './uPlotPlugin/configuration/options/basicOptionsImpl';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
-import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import uPlot from 'uplot';
 
 export class UPlotFormatImpl implements UPlotFormat {
   private readonly _channel: Channel;
   private readonly _switcherButtons: Printable[];
   private readonly _renderNode: WritableSignal<RenderNode>;
-  private readonly _renderNodeStub: RenderNode;
+  private readonly _graphType: WritableSignal<string>;
+  private readonly _uPlotOptions: WritableSignal<object>;
+  private readonly _uPlotOutputData:WritableSignal<uPlot.AlignedData>;
 
   constructor(channel: Channel) {
     this._channel = channel;
@@ -74,32 +72,31 @@ export class UPlotFormatImpl implements UPlotFormat {
       new uPlotSwitcherButton(this,'Bar Chart', 'fas fa-chart-bar', GraphType.bar),
       new uPlotSwitcherButton(this,'Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
-    this._renderNodeStub = new RenderNodeStub();
-    this._renderNode = signal(this._renderNodeStub);
+    this._graphType = signal('');
+    this._uPlotOptions = signal({});
+    this._uPlotOutputData = signal([]);
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.UPLOT_OUTPUT_VIEW, computed(() => ({
+      graphType: this._graphType(),
+      basicOptions: this._uPlotOptions(),
+      uPlotData: this._uPlotOutputData(),
+    }))));
+  }
+
+  render(data: object): void {
+    const safeOutputOptions = new WebSocketPayloadImpl(data['options']);
+    const labels = safeOutputOptions.arrayProperty<string>('labels');
+    const series = safeOutputOptions.arrayProperty<string>('series');
+    const xAxisLabel = safeOutputOptions.stringProperty('xAxisLabel');
+    const graphType = safeOutputOptions.stringProperty('graphType');
+    const basicOptions = new BasicOptionsImpl(labels, series, xAxisLabel, graphType);
+    const uPlotOutputData = data['data'];
+    this._graphType.set(graphType);
+    this._uPlotOptions.set(basicOptions);
+    this._uPlotOutputData.set(uPlotOutputData);
   }
 
   request(json: object): void {
     this._channel.request(json);
-  }
-
-  response(json: object): void {
-    const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT') {
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.type() !== OutputType.uPlot){
-        this._renderNode.set(this._renderNodeStub);
-      }
-      else{
-        const uPlotData = paragraphOutputMessage.outputData('object') as uPlot.AlignedData;
-        const safeOutputOptions = new WebSocketPayloadImpl(paragraphOutputMessage.options().value());
-        const labels = safeOutputOptions.arrayProperty<string>('labels');
-        const series = safeOutputOptions.arrayProperty<string>('series');
-        const xAxisLabel = safeOutputOptions.stringProperty('xAxisLabel');
-        const graphType = safeOutputOptions.stringProperty('graphType');
-        const basicOptions = new BasicOptionsImpl(labels, series, xAxisLabel, graphType);
-        this._renderNode.set(new RenderNodeImpl(RegisteredComponents.UPLOT_OUTPUT_VIEW, signal({graphType: graphType, basicOptions: basicOptions, uPlotData: uPlotData})));
-      }
-    }
   }
 
   print(): Signal<RenderNode> {

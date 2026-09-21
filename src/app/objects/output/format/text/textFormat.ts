@@ -44,37 +44,23 @@
  * a licensee so wish it.
  */
 import {OutputFormat} from '../outputFormat';
-import {OutputType} from '../../outputType';
-import {signal, Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {MessageImpl} from '../../../message/messageImpl';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
-import {WebSocketPayloadImpl} from '../../../safeJson/webSocketPayloadImpl';
 
-export class TextFormat implements OutputFormat {
+export class TextFormat implements OutputFormat<string> {
   private readonly _renderNode: WritableSignal<RenderNode>;
-  private readonly _renderNodeStub: RenderNode;
+  private readonly _textOutputData: WritableSignal<string>;
 
   constructor() {
-    this._renderNodeStub = new RenderNodeStub();
-    this._renderNode = signal(this._renderNodeStub);
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.TEXT_OUTPUT_VIEW, computed(() => ({
+      textOutput: this._textOutputData()
+    }))));
   }
 
-  response(json: object): void {
-    const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.type() !== OutputType.text) {
-        this._renderNode.set(this._renderNodeStub);
-      }
-      else{
-        const textOutput = paragraphOutputMessage.outputData('string') as string;
-        this._renderNode.set(new RenderNodeImpl(RegisteredComponents.TEXT_OUTPUT_VIEW, signal({textOutput: textOutput})));
-      }
-    }
+  render(textOutput: string): void {
+    this._textOutputData.set(textOutput);
   }
 
   print(): Signal<RenderNode> {

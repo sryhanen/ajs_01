@@ -44,6 +44,6 @@
  * a licensee so wish it.
  */
 import {OutputFormat} from '../outputFormat';
-import {Channel} from '../../../channel/channel';
+import {Request} from '../../../channel/request';
 
-export interface DataTablesFormat extends OutputFormat, Channel{}
+export interface DataTablesFormat extends OutputFormat<object>, Request{}
