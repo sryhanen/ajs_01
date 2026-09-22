@@ -45,55 +45,39 @@
  */
 import {Channel} from '../channel/channel';
 import {NotebookCollection} from './notebookCollection';
-import {FakeChannel} from '../channel/fakeChannel';
 import {NotebookCollectionImpl} from './notebookCollectionImpl';
-import Stubable from '../../shared/interfaces/stubable';
+import {NotebookIndexImpl} from './notebookIndex/notebookIndexImpl';
+import {CreateFakeChannel} from '../../../test/fakes/fakeChannel/fakeChannelFactory';
 
 describe('NotebookCollection', () => {
   let channel: Channel;
   let notebookCollection: NotebookCollection;
 
   beforeEach(() => {
-    channel = new FakeChannel();
+    channel = CreateFakeChannel();
     notebookCollection = new NotebookCollectionImpl(channel);
   });
 
-  describe('Birth', () => {
-    it('Should have been initialized', () =>{
-      expect(notebookCollection).toBeInstanceOf(NotebookCollectionImpl);
-    });
-
-    it('Should print', () => {
-      const notebookCollectionPrinted = notebookCollection.print()();
-      expect(notebookCollectionPrinted.isStub()).toBe(false);
-      expect((notebookCollectionPrinted.inputs()()['currentNotebook'] as Stubable).isStub()).toBe(true);
-    });
+  it('Should print', () => {
+    const notebookCollectionPrinted = notebookCollection.print()();
+    expect(notebookCollectionPrinted.isStub()).toBe(false);
+    expect(notebookCollectionPrinted.inputs()()['notebookIndices']).toHaveLength(0);
   });
 
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const channelSpy = vi.spyOn(channel, 'request');
-      const request = {
-        op:'test',
-        data:{}
-      };
-      notebookCollection.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
+  it('Should request channel', () => {
+    const channelSpy = vi.spyOn(channel, 'request');
+    const request = {
+      op:'test',
+      data:{}
+    };
+    notebookCollection.request(request);
+    expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
   });
 
-  describe('NOTE response behavior', () => {
-    it('Should have add child to printed collection after note response', () => {
-      const response = {
-        op:'NOTE',
-        data:{
-          id:'note',
-          paragraphs:[]
-        }
-      };
-      notebookCollection.response(response);
-      const notebookCollectionPrinted = notebookCollection.print()();
-      expect((notebookCollectionPrinted.inputs()()['currentNotebook'] as Stubable).isStub()).toBe(false);
-    });
+  it('Should add notebook index', () => {
+    const notebookIndex = new NotebookIndexImpl(channel, {id:'id'});
+    notebookCollection.addNotebookIndex(notebookIndex);
+    const notebookCollectionPrinted = notebookCollection.print()();
+    expect(notebookCollectionPrinted.inputs()()['notebookIndices']).toHaveLength(1);
   });
 });

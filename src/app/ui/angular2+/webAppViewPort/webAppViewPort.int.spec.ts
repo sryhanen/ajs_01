@@ -52,7 +52,8 @@ import {FakeComponentRegistryProvider} from '../../../../test/fakes/componentReg
 import {FakeComponent} from '../../../../test/fakes/fakeComponent/fakeComponent';
 
 describe('WebAppViewPort integration test', () => {
-  const containerId = 'containerId';
+  const containerParagraphId = 'containerParagraphId';
+  const containerNoteId = 'containerNoteId';
   let fixture: ComponentFixture<WebAppViewPort>;
 
   beforeEach(async () => {
@@ -63,7 +64,8 @@ describe('WebAppViewPort integration test', () => {
       ]
     });
     fixture = TestBed.createComponent(WebAppViewPort);
-    fixture.componentRef.setInput('containerId', containerId);
+    fixture.componentRef.setInput('containerNoteId', containerNoteId);
+    fixture.componentRef.setInput('containerParagraphId', containerParagraphId);
     await fixture.whenStable();
   });
 

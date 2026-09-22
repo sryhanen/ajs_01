@@ -46,5 +46,6 @@
 import {Request} from '../../../channel/request';
 import {OutputFormat} from '../outputFormat';
 import {OutputPayload} from '../../outputPayload';
+import uPlot from 'uplot';
 
-export interface UPlotFormat extends OutputFormat<OutputPayload<object>>, Request {}
+export interface UPlotFormat extends OutputFormat< Pick<OutputPayload<uPlot.AlignedData>, 'data' | 'options'>>, Request {}

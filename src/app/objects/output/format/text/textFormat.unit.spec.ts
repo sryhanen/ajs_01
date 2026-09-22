@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {TextFormat} from './textFormat';
-import {OutputType} from '../../outputType';
+import {OutputPayload} from '../../outputPayload';
 
 describe('TextFormat unit test', () => {
   let textFormat: TextFormat;
@@ -53,46 +53,23 @@ describe('TextFormat unit test', () => {
     textFormat = new TextFormat();
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(textFormat).toBeInstanceOf(TextFormat);
-    });
-
-    it('Should not have switcherButtons', () => {
-      expect(textFormat.switcherButtons()).toEqual([]);
-    });
-
-    it('Should print', () => {
-      const textFormatPrinted = textFormat.print()();
-      expect(textFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should not have switcherButtons', () => {
+    expect(textFormat.switcherButtons()).toEqual([]);
   });
 
-  describe('ComponentView updates', () => {
-    let outputResponse;
-    beforeEach(() => {
-      outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.text,
-            data:'',
-          }
-        }
-      };
-      textFormat.response(outputResponse);
-    });
+  it('Should print', () => {
+    const textFormatPrinted = textFormat.print()();
+    expect(textFormatPrinted.isStub()).toBe(false);
+    expect(textFormatPrinted.inputs()()['textOutput']).toEqual('');
+  });
 
-    it('Should have OutputView', () => {
-      const textFormatPrinted = textFormat.print()();
-      expect(textFormatPrinted.isStub()).toBe(false);
-    });
-
-    it('Should not have componentView after output type change', () => {
-      outputResponse.data.output.type = '';
-      textFormat.response(outputResponse);
-      const textFormatPrinted = textFormat.print()();
-      expect(textFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should render', () => {
+    const outputToRender = 'some text output';
+    const textOutputData: Pick<OutputPayload<string>, 'data'> = {
+      data:outputToRender
+    };
+    textFormat.render(textOutputData);
+    const textFormatPrinted = textFormat.print()();
+    expect(textFormatPrinted.inputs()()['textOutput']).toEqual(outputToRender);
   });
 });

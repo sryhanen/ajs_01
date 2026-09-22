@@ -45,79 +45,47 @@
  */
 import {DataTablesFormatImpl} from './dataTablesFormatImpl';
 import {Channel} from '../../../channel/channel';
-import {FakeChannel} from '../../../channel/fakeChannel';
-import {OutputType} from '../../outputType';
+import {CreateFakeChannel} from '../../../../../test/fakes/fakeChannel/fakeChannelFactory';
+import {OutputPayload} from '../../outputPayload';
 
 describe('DataTablesFormat unit test', () => {
   let channel:Channel;
   let dataTablesFormat:DataTablesFormatImpl;
 
   beforeEach(() => {
-    channel = new FakeChannel();
+    channel = CreateFakeChannel();
     dataTablesFormat = new DataTablesFormatImpl(channel);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () =>{
-      expect(dataTablesFormat).toBeInstanceOf(DataTablesFormatImpl);
-    });
-
-    it('Should have a switcher button', () =>{
-      const buttons = dataTablesFormat.switcherButtons();
-      expect(buttons).toHaveLength(1);
-    });
-
-    it('Should print', () => {
-      const dataTablesFormatPrinted = dataTablesFormat.print()();
-      expect(dataTablesFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should have a switcher button', () =>{
+    const buttons = dataTablesFormat.switcherButtons();
+    expect(buttons).toHaveLength(1);
   });
 
-  describe('Request', () => {
-    it('Should request channel', () =>{
-      const requestData= {test:'test'};
-      const channelSpy = vi.spyOn(channel, 'request');
-      dataTablesFormat.request(requestData);
-      expect(channelSpy).toHaveBeenCalledTimes(1);
-      expect(channelSpy).toHaveBeenCalledWith(requestData);
-    });
+  it('Should print', () => {
+    const dataTablesFormatPrinted = dataTablesFormat.print()();
+    const inputs = dataTablesFormatPrinted.inputs()();
+    expect(dataTablesFormatPrinted.isStub()).toBe(false);
+    expect(inputs['dataTablesOutputData']).toEqual({});
+    expect(inputs['dataTablesOutputOptions']).toEqual({});
+    expect(inputs['requestable']).toBeDefined();
   });
 
-  describe('ComponentView updates', () => {
-    let outputResponse;
-    beforeEach(() => {
-      outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.dataTables,
-            data:{},
-            options:{},
-          }
-        }
-      };
-      dataTablesFormat.response(outputResponse);
-    });
+  it('Should request channel', () =>{
+    const requestData= {test:'test'};
+    dataTablesFormat.request(requestData);
+    expect(channel.request).toHaveBeenCalledExactlyOnceWith(requestData);
+  });
 
-    it('Should have componentView', () => {
-      const dataTablesFormatPrinted = dataTablesFormat.print()();
-      expect(dataTablesFormatPrinted.isStub()).toBe(false);
-    });
-
-    it('Should respond plugin on consequential output responses', () => {
-      const plugin = dataTablesFormat.print()().inputs()()['dataTablesPlugin'] as Channel;
-      const spy = vi.spyOn(plugin, 'response');
-      dataTablesFormat.response(outputResponse);
-      dataTablesFormat.response(outputResponse);
-      dataTablesFormat.response(outputResponse);
-      expect(spy).toHaveBeenCalledTimes(3);
-    });
-
-    it('Should not have component view after output type change', () => {
-      outputResponse.data.output.type = '';
-      dataTablesFormat.response(outputResponse);
-      const dataTablesFormatPrinted = dataTablesFormat.print()();
-      expect(dataTablesFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should render', () =>{
+    const dataTablesOutputData: Pick<OutputPayload<object>, 'data' | 'options'> = {
+      data:{testData:'testData'},
+      options:{testOptions:'testOptions'},
+    };
+    dataTablesFormat.render(dataTablesOutputData);
+    const dataTablesFormatPrinted = dataTablesFormat.print()();
+    const inputs = dataTablesFormatPrinted.inputs()();
+    expect(inputs['dataTablesOutputData']).toEqual(dataTablesOutputData.data);
+    expect(inputs['dataTablesOutputOptions']).toEqual(dataTablesOutputData.options);
   });
 });

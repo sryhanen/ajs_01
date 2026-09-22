@@ -45,8 +45,9 @@
  */
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphCollectionImpl} from './paragraphCollectionImpl';
-import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
+import {ParagraphImpl} from '../paragraph/paragraphImpl';
+import {CreateFakeChannel} from '../../../test/fakes/fakeChannel/fakeChannelFactory';
 
 describe('ParagraphCollection unit test', () => {
   let channel: Channel;
@@ -56,103 +57,34 @@ describe('ParagraphCollection unit test', () => {
   ];
   let paragraphCollection: ParagraphCollection;
   beforeEach(() => {
-    channel = new FakeChannel();
+    channel = CreateFakeChannel();
     paragraphCollection = new ParagraphCollectionImpl(channel, initialparagraphData);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', ()=>{
-      expect(paragraphCollection).toBeInstanceOf(ParagraphCollectionImpl);
-    });
-
-    it('Should print', () => {
-      const paragraphCollectionPrinted = paragraphCollection.print()();
-      expect(paragraphCollectionPrinted.isStub()).toBe(false);
-      expect(paragraphCollectionPrinted.inputs()()['paragraphs']).toHaveLength(2);
-    });
+  it('Should print', () => {
+    const paragraphCollectionPrinted = paragraphCollection.print()();
+    expect(paragraphCollectionPrinted.isStub()).toBe(false);
+    expect(paragraphCollectionPrinted.inputs()()['paragraphs']).toHaveLength(2);
   });
 
-  describe('Request', ()=> {
-    it('Should request channel', () => {
-      const requestSpy = vi.spyOn(channel, 'request');
-      const request =  {
-        op:'test',
-        data:'testdata'
-      };
-      paragraphCollection.request(request);
-      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
-
-    it('Should decorate RUN_PARAGRAPH request', () => {
-      const paragraphId = 'para1';
-      const paragraphText = 'paragraph text';
-      const paragraphConfig = {test1:'test1'};
-      const paragraphSettings = {params:{test2:'test2'}};
-      paragraphCollection = new ParagraphCollectionImpl(channel, [{
-        id:paragraphId,
-        text:paragraphText,
-        config:paragraphConfig,
-        settings:paragraphSettings,
-      }]);
-      const runParagraphRequest = {
-        op:'RUN_PARAGRAPH',
-        data:{
-          id:paragraphId,
-          paragraph:'',
-          config:{},
-          params:{}
-        }
-      };
-      const spy = vi.spyOn(channel, 'request');
-      paragraphCollection.request(runParagraphRequest);
-      const expectedRequest = {
-        op:'RUN_PARAGRAPH',
-        data:{
-          id:paragraphId,
-          paragraph:paragraphText,
-          config:paragraphConfig,
-          params:paragraphSettings.params
-        }
-      };
-      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
-    });
+  it('Should request channel', () => {
+    const requestSpy = vi.spyOn(channel, 'request');
+    const request =  {
+      op:'test',
+      data:'testdata'
+    };
+    paragraphCollection.request(request);
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
   });
 
-  describe('Collection updates', () => {
-    it('Should add paragraph', () => {
-      const paragraphAddedResponse = {
-        op:'PARAGRAPH_ADDED',
-        data:{
-          paragraph:{
-            id:'para3',
-          },
-          index:0
-        }
-      };
-      paragraphCollection.response(paragraphAddedResponse);
-      expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(3);
-    });
+  it('Should add paragraph', () => {
+    const newParagraph = new ParagraphImpl(channel, {id:'para3',});
+    paragraphCollection.addParagraph(newParagraph);
+    expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(3);
+  });
 
-    it('Should set paragraph', () => {
-      const paragraphResponse = {
-        op:'PARAGRAPH',
-        data:{
-          id:'para3'
-        }
-      };
-      paragraphCollection.response(paragraphResponse);
-      expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(3);
-    });
-
-    it('Should remove paragraph', () => {
-      const paragraphRemovedResponse = {
-        op:'PARAGRAPH_REMOVED',
-        data:{
-          id:'para1',
-        }
-      };
-      paragraphCollection.response(paragraphRemovedResponse);
-      expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
-    });
+  it('Should remove paragraph', () => {
+    paragraphCollection.removeParagraph('para1');
+    expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
   });
 });

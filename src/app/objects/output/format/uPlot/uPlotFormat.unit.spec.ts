@@ -46,73 +46,61 @@
 import {UPlotFormatImpl} from './uPlotFormatImpl';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../channel/fakeChannel';
-import {OutputType} from '../../outputType';
+import {OutputPayload} from '../../outputPayload';
+import uPlot from 'uplot';
+import {BasicOptionsImpl} from './uPlotPlugin/configuration/options/basicOptionsImpl';
 
 describe('uPlotFormat unit test', () => {
   let channel:Channel;
   let uPlotFormat: UPlotFormatImpl;
+
   beforeEach(() => {
     channel = new FakeChannel();
     uPlotFormat = new UPlotFormatImpl(channel);
   });
 
-  describe('Birth', ()=> {
-    it('Should be initialized', () => {
-      expect(uPlotFormat).toBeDefined();
-    });
 
-    it('Should have switcher buttons', () => {
-      const switcherButtons = uPlotFormat.switcherButtons();
-      expect(switcherButtons).toHaveLength(4);
-    });
-
-    it('Should print', () => {
-      const uPlotFormatPrinted = uPlotFormat.print()();
-      expect(uPlotFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should have switcher buttons', () => {
+    const switcherButtons = uPlotFormat.switcherButtons();
+    expect(switcherButtons).toHaveLength(4);
   });
 
-  describe('Request', () => {
-    it('Should request channel', () =>{
-      const requestData= {test:'test'};
-      const channelSpy = vi.spyOn(channel, 'request');
-      uPlotFormat.request(requestData);
-      expect(channelSpy).toHaveBeenCalledTimes(1);
-      expect(channelSpy).toHaveBeenCalledWith(requestData);
-    });
+  it('Should print', () => {
+    const uPlotFormatPrinted = uPlotFormat.print()();
+    expect(uPlotFormatPrinted.isStub()).toBe(false);
+    expect(uPlotFormatPrinted.inputs()()['graphType']).toEqual('');
+    expect(uPlotFormatPrinted.inputs()()['basicOptions']).toEqual(new BasicOptionsImpl([],[], '', ''));
+    expect(uPlotFormatPrinted.inputs()()['uPlotData']).toEqual([]);
   });
 
-  describe('ComponentView updates', () => {
-    let outputResponse;
-    beforeEach(() => {
-      outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.uPlot,
-            data:{},
-            options:{
-              labels:[],
-              series:[],
-              xAxisLabel:'',
-              graphType:''
-            }
-          }
-        }
-      };
-      uPlotFormat.response(outputResponse);
-    });
+  it('Should request channel', () =>{
+    const requestData= {test:'test'};
+    const channelSpy = vi.spyOn(channel, 'request');
+    uPlotFormat.request(requestData);
+    expect(channelSpy).toHaveBeenCalledTimes(1);
+    expect(channelSpy).toHaveBeenCalledWith(requestData);
+  });
 
-    it('Should have componentView', () => {
-      const uPlotFormatPrinted = uPlotFormat.print()();
-      expect(uPlotFormatPrinted.isStub()).toBe(false);
-    });
-
-    it('Should not have component view after output type change', () => {
-      outputResponse.data.output.type = '';
-      uPlotFormat.response(outputResponse);
-      const uPlotFormatPrinted = uPlotFormat.print()();
-      expect(uPlotFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should render', () => {
+    const labels = ['label1', 'label2'];
+    const series = ['series1', 'series2'];
+    const xAxisLabel = 'xAxisLabel';
+    const graphType = 'graphType';
+    const dataToRender: Pick<OutputPayload<uPlot.AlignedData>, 'data' | 'options'> = {
+      data: [[1,2,3],[1,2,3]],
+      options:{
+        labels:labels,
+        series:series,
+        xAxisLabel:xAxisLabel,
+        graphType:graphType,
+      }
+    };
+    uPlotFormat.render(dataToRender);
+    const uPlotFormatPrinted = uPlotFormat.print()();
+    const expectedOptions = new BasicOptionsImpl(labels, series, xAxisLabel, graphType);
+    expect(uPlotFormatPrinted.isStub()).toBe(false);
+    expect(uPlotFormatPrinted.inputs()()['graphType']).toEqual('graphType');
+    expect(uPlotFormatPrinted.inputs()()['basicOptions']).toEqual(expectedOptions);
+    expect(uPlotFormatPrinted.inputs()()['uPlotData']).toEqual(dataToRender.data);
   });
 });

@@ -72,7 +72,7 @@ export class DataTablesFormatImpl implements DataTablesFormat {
     }))));
   }
 
-  render(data: OutputPayload<object>): void {
+  render(data: Pick<OutputPayload<object>, 'data' | 'options'>): void {
     this._dataTablesOutputData.set(data.data);
     this._dataTablesOutputOptions.set(data.options);
   }

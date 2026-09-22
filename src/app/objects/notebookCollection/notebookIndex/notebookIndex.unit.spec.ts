@@ -45,24 +45,46 @@
  */
 import {NotebookIndex} from './notebookIndex';
 import {NotebookIndexImpl} from './notebookIndexImpl';
+import {CreateFakeChannel} from '../../../../test/fakes/fakeChannel/fakeChannelFactory';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {Channel} from '../../channel/channel';
+import {NotebookImpl} from '../../notebook/notebookImpl';
 
 describe('NotebookIndex', () => {
   let notebookIndex: NotebookIndex;
+  const notebookId = 'notebookId';
+  let channel:Channel;
   beforeEach(() => {
-    notebookIndex = new NotebookIndexImpl({id: 'notebook'});
+    channel = CreateFakeChannel();
+    notebookIndex = new NotebookIndexImpl(channel, {id: notebookId});
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(notebookIndex).toBeDefined();
-    });
+  it('Should have id', () => {
+    expect(notebookIndex.id()).toEqual(notebookId);
+  });
 
-    it('Should have id', () => {
-      expect(notebookIndex.id()).toEqual('notebook');
-    });
+  it('Should print', () => {
+    const printed = notebookIndex.print()();
+    const inputs = printed.inputs()();
+    expect(printed.isStub()).toBe(false);
+    expect(inputs['notebookId']).toEqual(notebookId);
+    expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(true);
+  });
 
-    it('Should print', () => {
-      expect(notebookIndex.print()()).toBeDefined();
-    });
+  it('Should request channel', () => {
+    const request = {
+      op:'test',
+      data:{}
+    };
+    notebookIndex.request(request);
+    expect(channel.request).toHaveBeenCalledExactlyOnceWith(request);
+  });
+
+  it('Should render notebook', () => {
+    const notebook = new NotebookImpl(channel, {id:'', paragraphs:[]});
+    notebookIndex.renderNotebook(notebook);
+    const printed = notebookIndex.print()();
+    const inputs = printed.inputs()();
+    expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(false);
   });
 });

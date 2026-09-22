@@ -55,6 +55,7 @@ export class HTMLFormat implements OutputFormat<Pick<OutputPayload<string>, 'dat
   private readonly _htmlOutputData: WritableSignal<string>;
 
   constructor() {
+    this._htmlOutputData = signal('');
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.HTML_OUTPUT_VIEW, computed(() => ({
       htmlTemplate: this._htmlOutputData(),
     }))));

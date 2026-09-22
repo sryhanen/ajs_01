@@ -56,13 +56,14 @@ import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/r
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 import uPlot from 'uplot';
 import {OutputPayload} from '../../outputPayload';
+import {BasicOptions} from './uPlotPlugin/configuration/options/basicOptions';
 
 export class UPlotFormatImpl implements UPlotFormat {
   private readonly _channel: Channel;
   private readonly _switcherButtons: Printable[];
   private readonly _renderNode: WritableSignal<RenderNode>;
   private readonly _graphType: WritableSignal<string>;
-  private readonly _uPlotOptions: WritableSignal<object>;
+  private readonly _uPlotOptions: WritableSignal<BasicOptions>;
   private readonly _uPlotOutputData:WritableSignal<uPlot.AlignedData>;
 
   constructor(channel: Channel) {
@@ -74,7 +75,7 @@ export class UPlotFormatImpl implements UPlotFormat {
       new uPlotSwitcherButton(this,'Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
     this._graphType = signal('');
-    this._uPlotOptions = signal({});
+    this._uPlotOptions = signal(new BasicOptionsImpl([],[],'',''));
     this._uPlotOutputData = signal([]);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.UPLOT_OUTPUT_VIEW, computed(() => ({
       graphType: this._graphType(),
@@ -83,7 +84,7 @@ export class UPlotFormatImpl implements UPlotFormat {
     }))));
   }
 
-  render(data: OutputPayload<uPlot.AlignedData>): void {
+  render(data: Pick<OutputPayload<uPlot.AlignedData>, 'data' | 'options'>): void {
     const safeOutputOptions = new WebSocketPayloadImpl(data.options);
     const labels = safeOutputOptions.arrayProperty<string>('labels');
     const series = safeOutputOptions.arrayProperty<string>('series');

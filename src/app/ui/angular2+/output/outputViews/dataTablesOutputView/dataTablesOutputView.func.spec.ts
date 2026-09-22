@@ -46,18 +46,20 @@
 import {ComponentFixture} from '@angular/core/testing';
 import {render, screen} from '@testing-library/angular';
 import {DataTablesOutputView} from './dataTablesOutputView';
-import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
-import {DataTablesPluginImpl} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPluginImpl';
-import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
+import {CreateFakeChannel} from '../../../../../../test/fakes/fakeChannel/fakeChannelFactory';
 
 describe('DataTablesOutputView functional test', () => {
-  let dataTablesPlugin: DataTablesPlugin;
   let fixture: ComponentFixture<DataTablesOutputView>;
+
   beforeEach(async () => {
-    dataTablesPlugin = new DataTablesPluginImpl(new FakeChannel(), {data: [{test:'test'}], draw:0, recordsTotal: 1, recordsFiltered: 1}, {headers:['test']});
+    const dataTablesOutputData = {data: [{test:'test'}], draw:0, recordsTotal: 1, recordsFiltered: 1};
+    const dataTablesOutputOptions = {headers:['test']};
+    const requestable = CreateFakeChannel();
     const renderResult = await render(DataTablesOutputView, {
       inputs:{
-        dataTablesPlugin: dataTablesPlugin,
+        dataTablesOutputData:dataTablesOutputData,
+        dataTablesOutputOptions: dataTablesOutputOptions,
+        requestable: requestable
       }
     });
     fixture = renderResult.fixture;

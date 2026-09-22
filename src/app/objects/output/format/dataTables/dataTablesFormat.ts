@@ -47,4 +47,4 @@ import {OutputFormat} from '../outputFormat';
 import {Request} from '../../../channel/request';
 import {OutputPayload} from '../../outputPayload';
 
-export interface DataTablesFormat extends OutputFormat<OutputPayload<object>>, Request{}
+export interface DataTablesFormat extends OutputFormat<Pick<OutputPayload<object>, 'data' | 'options'>>, Request{}

@@ -45,7 +45,7 @@
  */
 import {FakeChannel} from '../../../channel/fakeChannel';
 import {AngularFormatImpl} from './angularFormatImpl';
-import {OutputType} from '../../outputType';
+import {OutputPayload} from '../../outputPayload';
 
 describe('AngularFormat unit test', () => {
   const channel = new FakeChannel();
@@ -55,59 +55,37 @@ describe('AngularFormat unit test', () => {
     angularFormat = new AngularFormatImpl(channel);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(angularFormat).toBeInstanceOf(AngularFormatImpl);
-    });
-
-    it('Should not have switcherButtons', () => {
-      expect(angularFormat.switcherButtons()).toEqual([]);
-    });
-
-    it('Should print', () => {
-      const angularFormatPrinted = angularFormat.print()();
-      expect(angularFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should not have switcherButtons', () => {
+    expect(angularFormat.switcherButtons()).toEqual([]);
   });
 
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const spy = vi.spyOn(channel, 'request');
-      const request = {
-        op:'',
-        data:{}
-      };
-      angularFormat.request(request);
-      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
-    });
+  it('Should print', () => {
+    const angularFormatPrinted = angularFormat.print()();
+    const inputs = angularFormatPrinted.inputs()();
+    expect(angularFormatPrinted.isStub()).toBe(false);
+    expect(inputs['template']).toEqual('');
+    expect(inputs['angularObjects']).toBeDefined();
+    expect(inputs['requestable']).toBeDefined();
   });
 
-  describe('ComponentView updates', () => {
-    let outputResponse;
-    const template = '<h1>template</h1>';
-    beforeEach(() => {
-      outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.angular,
-            data:template,
-          }
-        }
-      };
-    });
+  it('Should request channel', () => {
+    const spy = vi.spyOn(channel, 'request');
+    const request = {
+      op:'',
+      data:{}
+    };
+    angularFormat.request(request);
+    expect(spy).toHaveBeenCalledExactlyOnceWith(request);
+  });
 
-    it('Should have component view', () => {
-      angularFormat.response(outputResponse);
-      const angularFormatPrinted = angularFormat.print()();
-      expect(angularFormatPrinted.isStub()).toBe(false);
-    });
-
-    it('Should have not have component view after output type change', () => {
-      outputResponse.data.output.type = '';
-      angularFormat.response(outputResponse);
-      const angularFormatPrinted = angularFormat.print()();
-      expect(angularFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should render', () => {
+    const angularOutput = 'test';
+    const angularOutputData: Pick<OutputPayload<string>, 'data'> = {
+      data:angularOutput
+    };
+    angularFormat.render(angularOutputData);
+    const angularFormatPrinted = angularFormat.print()();
+    const inputs = angularFormatPrinted.inputs()();
+    expect(inputs['template']).toEqual(angularOutput);
   });
 });
