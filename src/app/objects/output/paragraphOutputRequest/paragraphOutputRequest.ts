@@ -47,5 +47,5 @@ import Stubable from '../../../shared/interfaces/stubable';
 
 export interface ParagraphOutputRequest extends Stubable {
   type():string;
-  request():object;
+  toJson():{op:string, data:object};
 }

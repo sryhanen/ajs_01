@@ -50,7 +50,7 @@ export class ParagraphOutputRequestStub implements ParagraphOutputRequest {
     return true;
   }
 
-  request(): object {
+  toJson(): {op:string, data:object} {
     throw new Error('ParagraphOutputRequestStub: Method not implemented.');
   }
 

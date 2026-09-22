@@ -54,7 +54,7 @@ export class ParagraphOutputRequestImpl implements ParagraphOutputRequest {
     this._message = new TypedMessage('PARAGRAPH_OUTPUT_REQUEST', message);
   }
 
-  request(): object {
+  toJson(): {op:string, data:object} {
     return {
       op:this._message.operation(),
       data:this._message.data(),

@@ -75,7 +75,7 @@ describe('Paragraph Output Request unit test', () => {
     });
 
     it('Should have request', () => {
-      expect(paragraphOutputRequest.request()).toEqual(paragraphOutputRequestData);
+      expect(paragraphOutputRequest.toJson()).toEqual(paragraphOutputRequestData);
     });
   });
 

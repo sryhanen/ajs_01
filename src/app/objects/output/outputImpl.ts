@@ -127,7 +127,7 @@ export class OutputImpl implements Output {
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
       const receivedOutputType = paragraphOutputMessage.outputType();
       if(!this._previousParagraphOutputRequest.isStub() && receivedOutputType !== this._previousParagraphOutputRequest.type()){
-        this._channel.request(this._previousParagraphOutputRequest.request());
+        this._channel.request(this._previousParagraphOutputRequest.toJson());
       }
       else{
         paragraphOutputMessage.updateSwitchingStatus(this._outputSwitcher);
