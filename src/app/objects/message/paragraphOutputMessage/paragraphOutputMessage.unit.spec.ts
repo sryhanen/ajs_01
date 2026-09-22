@@ -51,13 +51,14 @@ import {CreateFakeOutputSwitcher} from '../../../../test/fakes/outputSwitcher/fa
 import {CreateFakeChannel} from '../../../../test/fakes/fakeChannel/fakeChannelFactory';
 
 describe('ParagraphOutputMessage unit test', () => {
+  const outputType = 'outputType';
   const messsagePayload = {
     op:'PARAGRAPH_OUTPUT',
     data:{
       noteId:'',
       paragraphId:'',
       output:{
-        type:'type',
+        type:outputType,
         isAggregated:true,
         data:{
           dataKey:'data'
@@ -72,6 +73,10 @@ describe('ParagraphOutputMessage unit test', () => {
 
   it('Should not be a stub', () => {
     expect(paragraphOutputMessage.isStub()).toBe(false);
+  });
+
+  it('Should have type', () => {
+    expect(paragraphOutputMessage.outputType()).toEqual(outputType);
   });
 
   it('Should render output', () => {

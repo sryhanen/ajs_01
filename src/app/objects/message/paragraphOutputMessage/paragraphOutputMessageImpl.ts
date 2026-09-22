@@ -58,6 +58,10 @@ export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
     this._message = new TypedMessage('PARAGRAPH_OUTPUT', message);
   }
 
+  outputType(): string {
+    return this._message.dataAsWebSocketPayload().objectPropertyAsPayload('output').stringProperty('type');
+  }
+
   isStub(): boolean {
     return false;
   }

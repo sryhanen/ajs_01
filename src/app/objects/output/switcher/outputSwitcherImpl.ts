@@ -44,11 +44,8 @@
  * a licensee so wish it.
  */
 import {OutputSwitcher} from './outputSwitcher';
-import {WebSocketPayloadImpl} from '../../safeJson/webSocketPayloadImpl';
-import {MessageImpl} from '../../message/messageImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../../rendering/renderNode/renderNode';
-import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 
@@ -76,20 +73,5 @@ export class OutputSwitcherImpl implements OutputSwitcher {
 
   print(): Signal<RenderNode> {
     return this._renderNode;
-  }
-
-  request(json: object) {
-    const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT_REQUEST'){
-      this._switchIsPending.set(true);
-    }
-  }
-
-  response(json: object): void {
-    const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      paragraphOutputMessage.updateSwitchingStatus(this);
-    }
   }
 }

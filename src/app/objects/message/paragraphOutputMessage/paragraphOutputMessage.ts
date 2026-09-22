@@ -49,6 +49,7 @@ import {OutputSwitcher} from '../../output/switcher/outputSwitcher';
 import {Response} from '../../channel/response';
 
 export interface ParagraphOutputMessage extends Stubable{
+  outputType():string;
   renderOutput(output: Output):void;
   updateSwitchingStatus(outputSwitcher: OutputSwitcher):void;
   respondTo(response: Response):void;
