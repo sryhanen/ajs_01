@@ -69,6 +69,11 @@ export class OutputSwitcherImpl implements OutputSwitcher {
     }))));
   }
 
+  render(switchIsPending: boolean, canSwitch: boolean): void {
+    this._outputIsSwitchable.set(canSwitch);
+    this._switchIsPending.set(switchIsPending);
+  }
+
   print(): Signal<RenderNode> {
     return this._renderNode;
   }
@@ -84,8 +89,7 @@ export class OutputSwitcherImpl implements OutputSwitcher {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      this._outputIsSwitchable.set(paragraphOutputMessage.isAggregated());
-      this._switchIsPending.set(false);
+      paragraphOutputMessage.updateSwitchingStatus(this);
     }
   }
 }

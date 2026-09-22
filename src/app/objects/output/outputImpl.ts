@@ -125,12 +125,13 @@ export class OutputImpl implements Output {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(!this._previousParagraphOutputRequest.isStub() && paragraphOutputMessage.type() !== this._previousParagraphOutputRequest.type()){
+      const receivedOutputType = message.dataAsWebSocketPayload().objectPropertyAsPayload('output').stringProperty('type');
+      if(!this._previousParagraphOutputRequest.isStub() && receivedOutputType !== this._previousParagraphOutputRequest.type()){
         this._channel.request(this._previousParagraphOutputRequest.request());
         return;
       }
       this._outputSwitcher.response(json);
-      paragraphOutputMessage.applyTo(this);
+      paragraphOutputMessage.renderOutput(this);
     }
   }
 }

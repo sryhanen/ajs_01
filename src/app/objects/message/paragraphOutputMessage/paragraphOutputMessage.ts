@@ -44,11 +44,12 @@
  * a licensee so wish it.
  */
 import Stubable from '../../../shared/interfaces/stubable';
-import {ResponseMessage} from '../responseMessage';
 import {Output} from '../../output/output';
+import {OutputSwitcher} from '../../output/switcher/outputSwitcher';
+import {Response} from '../../channel/response';
 
-export interface ParagraphOutputMessage extends Stubable, ResponseMessage<Output>{
-  toJson():object;
-  type():string;
-  isAggregated(): boolean;
+export interface ParagraphOutputMessage extends Stubable{
+  renderOutput(output: Output):void;
+  updateSwitchingStatus(outputSwitcher: OutputSwitcher):void;
+  respondTo(response: Response):void;
 }

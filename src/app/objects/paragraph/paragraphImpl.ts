@@ -78,15 +78,14 @@ export class ParagraphImpl implements Paragraph {
     })));
   }
 
-
   private initializedOutput(paragraph: object): Output {
-    const outputContainer = new OutputImpl(this);
+    const output = new OutputImpl(this);
     const paragraphOutputMessageFactory = new ParagraphOutputMessageFactoryImpl(paragraph);
     const paragraphOutputMessage = paragraphOutputMessageFactory.paragraphOutputMessage();
     if(!paragraphOutputMessage.isStub()){
-      outputContainer.response(paragraphOutputMessage.toJson());
+      paragraphOutputMessage.respondTo(output);
     }
-    return outputContainer;
+    return output;
   }
 
   print(): Signal<RenderNode> {

@@ -48,6 +48,8 @@ import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
 import { Output } from '../../output/output';
 import {WebSocketPayload} from '../../safeJson/webSocketPayload';
+import {OutputSwitcher} from '../../output/switcher/outputSwitcher';
+import {Response} from '../../channel/response';
 
 export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
   private readonly _message: Message;
@@ -56,23 +58,11 @@ export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
     this._message = new TypedMessage('PARAGRAPH_OUTPUT', message);
   }
 
-  isAggregated(): boolean {
-    const output = this.output();
-    return output.propertyExists('isAggregated') && output.booleanProperty('isAggregated');
+  isStub(): boolean {
+    return false;
   }
 
-  type():string {
-    return this.output().stringProperty('type');
-  }
-
-  toJson(): object {
-    return {
-      op: this._message.operation(),
-      data: this._message.data(),
-    };
-  }
-
-  applyTo(output: Output): void {
+  renderOutput(output: Output): void {
     const renderData: {
       data: object,
       type: string,
@@ -84,8 +74,17 @@ export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
     output.render(renderData);
   }
 
-  isStub(): boolean {
-    return false;
+  updateSwitchingStatus(outputSwitcher: OutputSwitcher): void {
+    const output = this.output();
+    const isAggregated = output.propertyExists('isAggregated') && output.booleanProperty('isAggregated');
+    outputSwitcher.render(false, isAggregated);
+  }
+
+  respondTo(respondable: Response): void {
+    respondable.response({
+      op: this._message.operation(),
+      data: this._message.data()
+    });
   }
 
   private output():WebSocketPayload {

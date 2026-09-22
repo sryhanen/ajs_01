@@ -44,19 +44,18 @@
  * a licensee so wish it.
  */
 import { Output } from '../../output/output';
+import { OutputSwitcher } from '../../output/switcher/outputSwitcher';
+import { Paragraph } from '../../paragraph/paragraph';
 import {ParagraphOutputMessage} from './paragraphOutputMessage';
 
 export class ParagraphOutputMessageStub implements ParagraphOutputMessage {
-  isAggregated(): boolean {
+  renderOutput(output: Output): void {
     throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
-  type():string {
+  updateSwitchingStatus(outputSwitcher: OutputSwitcher): void {
     throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
-  toJson(): object {
-    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
-  }
-  applyTo(node: Output): void {
+  respondTo(paragraph: Paragraph): void {
     throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
   isStub(): boolean {
