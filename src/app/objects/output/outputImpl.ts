@@ -116,7 +116,7 @@ export class OutputImpl implements Output {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT_REQUEST'){
       this._previousParagraphOutputRequest = new ParagraphOutputRequestImpl(message);
-      this._outputSwitcher.request(json);
+      this._outputSwitcher.render(true, true);
     }
     this._channel.request(json);
   }
@@ -128,10 +128,11 @@ export class OutputImpl implements Output {
       const receivedOutputType = message.dataAsWebSocketPayload().objectPropertyAsPayload('output').stringProperty('type');
       if(!this._previousParagraphOutputRequest.isStub() && receivedOutputType !== this._previousParagraphOutputRequest.type()){
         this._channel.request(this._previousParagraphOutputRequest.request());
-        return;
       }
-      this._outputSwitcher.response(json);
-      paragraphOutputMessage.renderOutput(this);
+      else{
+        this._outputSwitcher.response(json);
+        paragraphOutputMessage.renderOutput(this);
+      }
     }
   }
 }
