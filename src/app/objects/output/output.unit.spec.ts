@@ -51,6 +51,7 @@ import {RenderNode} from '../rendering/renderNode/renderNode';
 import {OutputPayload} from './outputPayload';
 import {OutputType} from './outputType';
 import {Signal} from '@angular/core';
+import {render} from '@testing-library/angular';
 
 describe('Output unit test', () => {
   let channel:Channel;
@@ -144,6 +145,56 @@ describe('Output unit test', () => {
       };
       output.render(outputData);
       expect((inputs()['output'] as RenderNode).isStub()).toBe(false);
+    });
+  });
+
+  describe('Output switching', () => {
+    const requestedOutputType = OutputType.text;
+    const paragraphOutputRequest = {
+      op:'PARAGRAPH_OUTPUT_REQUEST',
+      data:{
+        type:requestedOutputType
+      }
+    };
+    beforeEach(() => {
+      output.request(paragraphOutputRequest);
+    });
+
+    it('OutputSwitcher should be pending', () => {
+      const outputSwitchIsPending = (output.print()().inputs()()['outputSwitcher'] as RenderNode).inputs()()['switchIsPending'];
+      expect(outputSwitchIsPending).toBe(true);
+    });
+
+    it('Should render and update switcher status after response', () => {
+      const paragraphOutputResponse = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{
+            type:requestedOutputType
+          },
+        }
+      };
+      const renderSpy = vi.spyOn(output, 'render');
+      output.response(paragraphOutputResponse);
+      const outputSwitchIsPending = (output.print()().inputs()()['outputSwitcher'] as RenderNode).inputs()()['switchIsPending'];
+      expect(renderSpy).toHaveBeenCalledTimes(1);
+      expect(outputSwitchIsPending).toBe(false);
+    });
+
+    it('Should create paragraph output request if received type is not what expected', () => {
+      const paragraphOutputResponse = {
+        op:'PARAGRAPH_OUTPUT',
+        data:{
+          output:{
+            type:OutputType.dataTables
+          },
+        }
+      };
+      output.response(paragraphOutputResponse);
+      expect(channel.request).toHaveBeenCalledTimes(2);
+      expect(channel.request).toHaveBeenCalledWith(paragraphOutputRequest);
+      const outputSwitchIsPending = (output.print()().inputs()()['outputSwitcher'] as RenderNode).inputs()()['switchIsPending'];
+      expect(outputSwitchIsPending).toBe(true);
     });
   });
 });
