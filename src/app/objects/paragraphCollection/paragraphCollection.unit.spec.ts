@@ -87,4 +87,49 @@ describe('ParagraphCollection unit test', () => {
     paragraphCollection.removeParagraph('para1');
     expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
   });
+
+  describe('PARAGRAPH response', () => {
+    it('Should render received paragraph', () => {
+      const paragraphResponse =  {
+        op:'PARAGRAPH',
+        data:{
+          id:'para3',
+        }
+      };
+      paragraphCollection.response(paragraphResponse);
+      const paragraphCollectionPrinted = paragraphCollection.print()();
+      expect(paragraphCollectionPrinted.inputs()()['paragraphs']).toHaveLength(3);
+    });
+  });
+
+  describe('PARAGRAPH_ADDED response', () => {
+    it('Should render received paragraph', () => {
+      const paragraphAddedResponse =  {
+        op:'PARAGRAPH_ADDED',
+        data:{
+          paragraph:{
+            id:'para3',
+          },
+          index:0
+        }
+      };
+      paragraphCollection.response(paragraphAddedResponse);
+      const paragraphCollectionPrinted = paragraphCollection.print()();
+      expect(paragraphCollectionPrinted.inputs()()['paragraphs']).toHaveLength(3);
+    });
+  });
+
+  describe('PARAGRAPH_REMOVED response', () => {
+    it('Should remove paragraph with the matching id', () => {
+      const paragraphRemovedResponse =  {
+        op:'PARAGRAPH_REMOVED',
+        data:{
+          id:'para1',
+        }
+      };
+      paragraphCollection.response(paragraphRemovedResponse);
+      const paragraphCollectionPrinted = paragraphCollection.print()();
+      expect(paragraphCollectionPrinted.inputs()()['paragraphs']).toHaveLength(1);
+    });
+  });
 });

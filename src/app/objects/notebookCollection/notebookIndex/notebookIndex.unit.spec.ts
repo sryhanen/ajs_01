@@ -87,4 +87,20 @@ describe('NotebookIndex unit test', () => {
     const inputs = printed.inputs()();
     expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(false);
   });
+
+  describe('NOTE response', () => {
+    it('Should render received notebook', () => {
+      const noteResponse =  {
+        op:'NOTE',
+        data:{
+          id:'notebookId',
+          paragraphs:[]
+        }
+      };
+      notebookIndex.response(noteResponse);
+      const printed = notebookIndex.print()();
+      const inputs = printed.inputs()();
+      expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(false);
+    });
+  });
 });

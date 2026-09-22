@@ -80,4 +80,23 @@ describe('NotebookCollection', () => {
     const notebookCollectionPrinted = notebookCollection.print()();
     expect(notebookCollectionPrinted.inputs()()['notebookIndices']).toHaveLength(1);
   });
+
+  describe('NOTES_INFO response', () => {
+    it('Should render received notebook indices', () => {
+      const notesInfoResponse =  {
+        op:'NOTES_INFO',
+        data:{
+          notes:[
+            {id:'note1'},
+            {id:'note2'},
+            {id:'note3'},
+          ]
+        }
+      };
+      notebookCollection.response(notesInfoResponse);
+      const printed = notebookCollection.print()();
+      const notebookIndices = printed.inputs()()['notebookIndices'];
+      expect(notebookIndices).toHaveLength(3);
+    });
+  });
 });
