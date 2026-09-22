@@ -51,14 +51,14 @@ import {CreateFakeChannel} from '../../../test/fakes/fakeChannel/fakeChannelFact
 
 describe('ParagraphCollection unit test', () => {
   let channel: Channel;
-  const initialparagraphData: object[] = [
+  const initialParagraphData: object[] = [
     {id:'para1'},
     {id:'para2'},
   ];
   let paragraphCollection: ParagraphCollection;
   beforeEach(() => {
     channel = CreateFakeChannel();
-    paragraphCollection = new ParagraphCollectionImpl(channel, initialparagraphData);
+    paragraphCollection = new ParagraphCollectionImpl(channel, initialParagraphData);
   });
 
   it('Should print', () => {
