@@ -49,6 +49,9 @@ import { Paragraph } from '../../paragraph/paragraph';
 import {ParagraphOutputMessage} from './paragraphOutputMessage';
 
 export class ParagraphOutputMessageStub implements ParagraphOutputMessage {
+  outputType(): string {
+    throw new Error('ParagraphOutputMessageStub: Method not implemented.');
+  }
   renderOutput(output: Output): void {
     throw new Error('ParagraphOutputMessageStub: Method not implemented.');
   }
