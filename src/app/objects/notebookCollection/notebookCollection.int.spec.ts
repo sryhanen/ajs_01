@@ -43,48 +43,43 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookIndex} from './notebookIndex';
-import {NotebookIndexImpl} from './notebookIndexImpl';
-import {CreateFakeChannel} from '../../../../test/fakes/fakeChannel/fakeChannelFactory';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {Channel} from '../../channel/channel';
-import {NotebookImpl} from '../../notebook/notebookImpl';
+import {NotebookCollection} from './notebookCollection';
+import {NotebookCollectionImpl} from './notebookCollectionImpl';
+import {CreateFakeChannel} from '../../../test/fakes/fakeChannel/fakeChannelFactory';
+import {Channel} from '../channel/channel';
 
-describe('NotebookIndex unit test', () => {
-  let notebookIndex: NotebookIndex;
-  const notebookId = 'notebookId';
-  let channel:Channel;
+describe('NotebookCollection integration test', () => {
+  let notebookCollection: NotebookCollection;
+  let channel: Channel;
+
   beforeEach(() => {
     channel = CreateFakeChannel();
-    notebookIndex = new NotebookIndexImpl(channel, {id: notebookId});
+    notebookCollection = new NotebookCollectionImpl(channel);
   });
 
-  it('Should have id', () => {
-    expect(notebookIndex.id()).toEqual(notebookId);
+  describe('NOTES_INFO response', () => {
+    it('Should not have notebook indices initially', () => {
+      const printed = notebookCollection.print()();
+      const notebookIndices = printed.inputs()()['notebookIndices'];
+      expect(notebookIndices).toHaveLength(0);
+    });
+
+    it('Should render received notebook indices', () => {
+      const notesInfoResponse =  {
+        op:'NOTES_INFO',
+        data:{
+          notes:[
+            {id:'note1'},
+            {id:'note2'},
+            {id:'note3'},
+          ]
+        }
+      };
+      notebookCollection.response(notesInfoResponse);
+      const printed = notebookCollection.print()();
+      const notebookIndices = printed.inputs()()['notebookIndices'];
+      expect(notebookIndices).toHaveLength(3);
+    });
   });
 
-  it('Should print', () => {
-    const printed = notebookIndex.print()();
-    const inputs = printed.inputs()();
-    expect(printed.isStub()).toBe(false);
-    expect(inputs['notebookId']).toEqual(notebookId);
-    expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(true);
-  });
-
-  it('Should request channel', () => {
-    const request = {
-      op:'test',
-      data:{}
-    };
-    notebookIndex.request(request);
-    expect(channel.request).toHaveBeenCalledExactlyOnceWith(request);
-  });
-
-  it('Should render notebook', () => {
-    const notebook = new NotebookImpl(channel, {id:'', paragraphs:[]});
-    notebookIndex.renderNotebook(notebook);
-    const printed = notebookIndex.print()();
-    const inputs = printed.inputs()();
-    expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(false);
-  });
 });

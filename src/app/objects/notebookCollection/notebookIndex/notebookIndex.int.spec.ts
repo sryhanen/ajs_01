@@ -44,47 +44,39 @@
  * a licensee so wish it.
  */
 import {NotebookIndex} from './notebookIndex';
-import {NotebookIndexImpl} from './notebookIndexImpl';
-import {CreateFakeChannel} from '../../../../test/fakes/fakeChannel/fakeChannelFactory';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
 import {Channel} from '../../channel/channel';
-import {NotebookImpl} from '../../notebook/notebookImpl';
+import {CreateFakeChannel} from '../../../../test/fakes/fakeChannel/fakeChannelFactory';
+import {NotebookIndexImpl} from './notebookIndexImpl';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
 
-describe('NotebookIndex unit test', () => {
-  let notebookIndex: NotebookIndex;
-  const notebookId = 'notebookId';
+describe('NotebookIndex integration test', () => {
   let channel:Channel;
+  let notebookIndex:NotebookIndex;
+
   beforeEach(() => {
     channel = CreateFakeChannel();
-    notebookIndex = new NotebookIndexImpl(channel, {id: notebookId});
+    notebookIndex = new NotebookIndexImpl(channel, {id: 'notebookId'});
   });
 
-  it('Should have id', () => {
-    expect(notebookIndex.id()).toEqual(notebookId);
-  });
+  describe('NOTE response', () => {
+    it('Should have notebook stub initially', () => {
+      const printed = notebookIndex.print()();
+      const inputs = printed.inputs()();
+      expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(true);
+    });
 
-  it('Should print', () => {
-    const printed = notebookIndex.print()();
-    const inputs = printed.inputs()();
-    expect(printed.isStub()).toBe(false);
-    expect(inputs['notebookId']).toEqual(notebookId);
-    expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(true);
-  });
-
-  it('Should request channel', () => {
-    const request = {
-      op:'test',
-      data:{}
-    };
-    notebookIndex.request(request);
-    expect(channel.request).toHaveBeenCalledExactlyOnceWith(request);
-  });
-
-  it('Should render notebook', () => {
-    const notebook = new NotebookImpl(channel, {id:'', paragraphs:[]});
-    notebookIndex.renderNotebook(notebook);
-    const printed = notebookIndex.print()();
-    const inputs = printed.inputs()();
-    expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(false);
+    it('Should render received notebook', () => {
+      const noteResponse =  {
+        op:'NOTE',
+        data:{
+          id:'notebookId',
+          paragraphs:[]
+        }
+      };
+      notebookIndex.response(noteResponse);
+      const printed = notebookIndex.print()();
+      const inputs = printed.inputs()();
+      expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(false);
+    });
   });
 });
