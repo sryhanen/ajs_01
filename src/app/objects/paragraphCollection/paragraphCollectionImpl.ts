@@ -77,6 +77,17 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     }))));
   }
 
+  private initializedParagraphs(initialParagraphData: object[]): WritableSignal<Map<string,  Paragraph>> {
+    const paragraphMap = new Map<string, Paragraph>();
+    initialParagraphData.forEach(paragraphData => {
+      const paragraph = new ParagraphImpl(this, paragraphData);
+      paragraphMap.set(paragraph.id(), paragraph);
+    });
+    return signal(paragraphMap, {
+      equal: () => false
+    });
+  }
+
   addParagraph(paragraph: Paragraph, index?:number): void {
     this._paragraphs.update(paragraphs => {
       let newParagraphs: Map<string, Paragraph>;
@@ -85,6 +96,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       }
       else{
         paragraphs.set(paragraph.id(), paragraph);
+        newParagraphs = paragraphs;
       }
       return newParagraphs;
     });
@@ -116,17 +128,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   private paragraphRemovedResponse(message:Message):void{
     const paragraphRemovedMessage = new ParagraphRemovedMessageImpl(message);
     paragraphRemovedMessage.applyTo(this);
-  }
-
-  private initializedParagraphs(initialParagraphData: object[]): WritableSignal<Map<string,  Paragraph>> {
-    const paragraphMap = new Map<string, Paragraph>();
-    initialParagraphData.forEach(paragraphData => {
-      const paragraph = new ParagraphImpl(this, paragraphData);
-      paragraphMap.set(paragraph.id(), paragraph);
-    });
-    return signal(paragraphMap, {
-      equal: () => false
-    });
   }
 
   print(): Signal<RenderNode> {
