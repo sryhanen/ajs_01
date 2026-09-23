@@ -49,32 +49,21 @@ import {WebSocketPayload} from '../webSocketPayload/webSocketPayload';
 import {WebSocketPayloadImpl} from '../webSocketPayload/webSocketPayloadImpl';
 import {signal, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
-import {ResponseRegister} from '../register/responseRegister/responseRegister';
-import {
-  ResponseRegisterWithPropertyFilter
-} from '../register/responseRegister/responseRegisterWithPropertyFilter/responseRegisterWithPropertyFilter';
-import {
-  ResponseRegisterWithDefaultResponseList
-} from '../register/responseRegister/responseRegisterWithDefaultResponse/responseRegisterWithDefaultResponseList';
-import {ResponseRegisterImpl} from '../register/responseRegister/responseRegisterImpl';
-import {RequestRegister} from '../register/requestRegister/requestRegister';
-import {RequestRegisterImpl} from '../register/requestRegister/requestRegisterImpl';
-import {
-  RequestRegisterWithPropertyDecorator
-} from '../register/requestRegister/requestRegisterWithPropertyDecorator/requestRegisterWithPropertyDecorator';
 import {ParagraphOutputMessageFactoryImpl} from './paragraphOutputMessageFactory/paragraphOutputMessageFactoryImpl';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {Output} from '../output/output';
 import {OutputImpl} from '../output/outputImpl';
+import {MessagePropertyEqualsFilter} from '../message/messageFilter/messagePropertyEqualsFilter';
+import {MessageImpl} from '../message/messageImpl';
+import {PropertyDecoratedMessage} from '../message/propertyDecoratedMessage/propertyDecoratedMessage';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _output: Output;
   private readonly _paragraph: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
-  private readonly _responseRegister:ResponseRegister;
-  private readonly _requestRegister:RequestRegister;
+  private readonly _paragraphIdFilter: MessagePropertyEqualsFilter;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
@@ -84,8 +73,7 @@ export class ParagraphImpl implements Paragraph {
       output:this._output.print()(),
       paragraphId:this.id()
     })));
-    this._responseRegister = new ResponseRegisterWithPropertyFilter(new ResponseRegisterWithDefaultResponseList(new ResponseRegisterImpl(), [this._output]), {name:'paragraphId', type:'string'}, this.id());
-    this._requestRegister = new RequestRegisterWithPropertyDecorator(new RequestRegisterImpl(this._channel), {name:'paragraphId', value: this.id()});
+    this._paragraphIdFilter = new MessagePropertyEqualsFilter('paragraphId', this.id());
   }
 
   private initializedOutput(paragraph: object): Output {
@@ -107,10 +95,22 @@ export class ParagraphImpl implements Paragraph {
   }
 
   request(json: object): void {
-    this._requestRegister.request(json);
+    const message = new MessageImpl(new WebSocketPayloadImpl(json));
+    const paragraphIdDecoratedMessage = new PropertyDecoratedMessage(message, 'paragraphId', this.id());
+    this._channel.request({
+      op:paragraphIdDecoratedMessage.operation(),
+      data:paragraphIdDecoratedMessage.data()
+    });
   }
 
   response(json: object): void {
-    this._responseRegister.response(json);
+    const message = new MessageImpl(new WebSocketPayloadImpl(json));
+    const filteredMessage = this._paragraphIdFilter.filteredMessage(message);
+    if(!filteredMessage.isStub()) {
+      this._output.response({
+        op:filteredMessage.operation(),
+        data:filteredMessage.data()
+      });
+    }
   }
 }
