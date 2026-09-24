@@ -45,13 +45,13 @@
  */
 import {WebSocket} from 'ws';
 import {Handler} from './handler';
-import {NewNoteMessage as NoteCreatedMessage} from '../../interfaces/sendMessage';
-import {receiveOperation, sendOperation} from '../webSocketOperations';
+import {receiveOperation} from '../webSocketOperations';
 import NoteService from '../../services/noteService';
 import {NewNoteMessage as CreateNoteMessage} from '../../interfaces/receiveMessage';
 import NotebookImpl from '../../data/note/notebookImpl';
 import {SparkPara} from '../../data/paragraph/sparkPara';
 import ParagraphImpl from '../../data/paragraph/paragraphImpl';
+import {NewNoteServerResponse} from '../../../src/test/data/serverWebSocketResponses/newNote/newNoteServerResponse';
 
 export default class NewNoteHandler implements Handler<CreateNoteMessage>{
   private readonly _noteService: NoteService;
@@ -68,11 +68,7 @@ export default class NewNoteHandler implements Handler<CreateNoteMessage>{
     const name = message.data.name;
     const notebook = new NotebookImpl(name, [new ParagraphImpl('READY', undefined,'%dpl'), SparkPara]);
     this._noteService.add(notebook, notebook.id);
-
-    const msg : NoteCreatedMessage = {
-      op: sendOperation.newNote,
-      data:notebook,
-    };
-    client.send(JSON.stringify(msg));
+    const newNoteResponse = new NewNoteServerResponse(notebook);
+    client.send(newNoteResponse.toJson());
   }
 }

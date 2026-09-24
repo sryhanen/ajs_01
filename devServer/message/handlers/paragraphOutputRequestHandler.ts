@@ -45,12 +45,16 @@
  */
 import {WebSocket} from 'ws';
 import {Handler} from './handler';
-import {receiveOperation, sendOperation} from '../webSocketOperations';
+import {receiveOperation} from '../webSocketOperations';
 import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
 import {OutputType} from '../../../src/app/objects/output/outputType';
 import {uPlotResultService} from '../../services/uPlotService/uPlotResultService';
 import {uPlotResultServiceImpl} from '../../services/uPlotService/uPlotResultServiceImpl';
+import {
+  ParagraphOutputServerResponse
+} from '../../../src/test/data/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
+import {WebSocketServerResponse} from '../../../src/test/data/serverWebSocketResponses/webSocketServerResponse';
 
 
 export default class ParagraphOutputRequestHandler implements Handler<object>{
@@ -67,44 +71,21 @@ export default class ParagraphOutputRequestHandler implements Handler<object>{
   }
 
   execute(message: object, client: WebSocket): void  {
-    const result = this.result(message);
-    client.send(JSON.stringify(result));
-  }
-
-  private result(message: object){
     const rawData = this._dataTablesService.rawData(1000);
-    let output;
     const messageData = message['data'];
     const outputType = messageData['type'];
-
+    let paragraphOutputResponse:WebSocketServerResponse;
+    const noteId = messageData.noteId;
+    const paragraphId = messageData.paragraphId;
     if(outputType === OutputType.dataTables){
       const options = messageData.requestOptions as {start:number, length:number, draw:number};
-      const paginated = this._dataTablesService.paginated(rawData, options.start, options.length, options.draw);
-      output = {
-        type: OutputType.dataTables,
-        data: paginated,
-        options: this._dataTablesService.options(rawData),
-        isAggregated:true
-      };
+      const paginatedData = this._dataTablesService.paginated(rawData, options.start, options.length, options.draw);
+      paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, paginatedData, true, this._dataTablesService.options(rawData));
     }
     else if(outputType === OutputType.uPlot){
       const requestOptions = messageData.requestOptions as {graphType: string};
-      output = {
-        type: OutputType.uPlot,
-        data: this._uPlotResultService.outputData(),
-        options: this._uPlotResultService.options(requestOptions.graphType),
-        isAggregated:true
-      };
+      paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.uPlot, this._uPlotResultService.outputData(), true, this._uPlotResultService.options(requestOptions.graphType));
     }
-
-    return {
-      op: sendOperation.paragraphOutput,
-      data: {
-        noteId: messageData.noteId,
-        paragraphId: messageData.paragraphId,
-        output:output,
-      },
-    };
+    client.send(paragraphOutputResponse.toJson());
   }
-
 }

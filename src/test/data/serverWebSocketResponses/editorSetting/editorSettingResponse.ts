@@ -43,31 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WebSocket} from 'ws';
-import {Handler} from './handler';
-import {CompletionMessage} from '../../interfaces/receiveMessage';
-import {receiveOperation} from '../webSocketOperations';
-import {CompletionListResponse} from '../../../src/test/data/serverWebSocketResponses/completionList/completionListResponse';
+import {WebSocketServerResponse} from '../webSocketServerResponse';
 
-export default class CompletionListHandler implements Handler<CompletionMessage>{
-  operation(){
-    return receiveOperation.completion;
-  };
+type EditorSettings = {
+  language:string,
+  editorOnDblClick: boolean,
+  completionKey: string,
+  completionSupport: boolean,
+};
 
-  execute(message:CompletionMessage, client: WebSocket): void {
-    const completions = [
-      {
-        name: 'angular',
-        value: 'angular'
-      },
-      {
-        name: 'angularBind',
-        value: 'angularBind'
-      },
-    ];
-    const completionListResponse = new CompletionListResponse(completions);
-    client.send(completionListResponse.toJson());
+export class EditorSettingResponse implements WebSocketServerResponse {
+  private readonly _editorSettings: EditorSettings;
+  private readonly _paragraphId:string;
+
+  constructor(editorSettings: EditorSettings, paragraphId:string) {
+    this._editorSettings = editorSettings;
+    this._paragraphId = paragraphId;
+  }
+
+  toJson(): string {
+    return JSON.stringify(this.toObject());
+  }
+
+  toObject(): { op: string; data: object } {
+    return {
+      op: 'EDITOR_SETTING',
+      data: {
+        editor:this._editorSettings,
+        paragraphId:this._paragraphId,
+      }
+    };
   }
 }
-
-

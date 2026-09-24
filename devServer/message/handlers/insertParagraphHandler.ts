@@ -50,6 +50,9 @@ import {ParagraphAddedMessage} from '../../interfaces/sendMessage';
 import {receiveOperation, sendOperation} from '../webSocketOperations';
 import NoteService from '../../services/noteService';
 import ParagraphImpl from '../../data/paragraph/paragraphImpl';
+import {
+  ParagraphAddedServerResponse
+} from '../../../src/test/data/serverWebSocketResponses/paragraphAdded/paragraphAddedServerResponse';
 
 export default class InsertParagraphHandler implements Handler<InsertParagraphMessage>{
   private readonly _noteService: NoteService;
@@ -68,13 +71,7 @@ export default class InsertParagraphHandler implements Handler<InsertParagraphMe
     const paragraph = new ParagraphImpl('READY');
     note.paragraphs.splice(message.data.index, 0, paragraph);
     this._noteService.update(note, note.id);
-    const msg : ParagraphAddedMessage = {
-      op: sendOperation.paragraphAdded,
-      data:{
-        paragraph: paragraph,
-        index: message.data.index
-      },
-    };
-    client.send(JSON.stringify(msg));
+    const paragraphAddedResponse = new ParagraphAddedServerResponse(paragraph, message.data.index);
+    client.send(paragraphAddedResponse.toJson());
   }
 }

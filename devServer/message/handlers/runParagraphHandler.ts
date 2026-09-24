@@ -45,14 +45,20 @@
  */
 import {WebSocket} from 'ws';
 import {Handler} from './handler';
-import {ParagraphMessage, ProgressMessage} from '../../interfaces/sendMessage';
 import {RunParagraphMessage} from '../../interfaces/receiveMessage';
-import {receiveOperation, sendOperation} from '../webSocketOperations';
+import {receiveOperation} from '../webSocketOperations';
 import ParagraphImpl from '../../data/paragraph/paragraphImpl';
 import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
 import NoteService from '../../services/noteService';
 import {OutputType} from '../../../src/app/objects/output/outputType';
+import {
+  ParagraphServerResponse
+} from '../../../src/test/data/serverWebSocketResponses/paragraph/paragraphServerResponse';
+import {ProgressServerResponse} from '../../../src/test/data/serverWebSocketResponses/progress/progressServerResponse';
+import {
+  ParagraphOutputServerResponse
+} from '../../../src/test/data/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
 
 export default class RunParagraphHandler implements Handler<RunParagraphMessage>{
   private readonly _noteService: NoteService;
@@ -74,61 +80,41 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
     const paragraphId = message.data.id;
     const title = message.data.title;
     const text = message.data.paragraph;
-    const messageQueue: object[] = [];
+    const messageQueue: string[] = [];
     const paragraph = new ParagraphImpl('PENDING', undefined, text, title, paragraphId);
-    messageQueue.push(this.paraMessage(paragraph));
+    messageQueue.push(new ParagraphServerResponse(paragraph).toJson());
 
     paragraph.status = 'RUNNING';
     paragraph.progress = 0;
-    messageQueue.push(this.paraMessage(paragraph));
+    messageQueue.push(new ParagraphServerResponse(paragraph).toJson());
 
-    for (let i = 1; i < 20; i++) {
-      const progress: ProgressMessage = {
-        op: sendOperation.progress,
-        data:{progress: i*5, id:paragraphId},
-      };
-      messageQueue.push(progress);
+    for (let i = 1; i < 20; i++){
+      messageQueue.push(new ProgressServerResponse(i*5, paragraphId).toJson());
     }
 
+    const noteId = this._noteService.lastNoteId();
+    const options = this._dataTablesService.options(this._baseData);
     const draws = 5;
-
     for (let i = 1; i < draws; i++) {
       const index = messageQueue.length / draws;
-      const updateOutputMessage = {
-        op: sendOperation.paragraphOutput,
-        data: {
-          noteId: this._noteService.lastNoteId(),
-          paragraphId: message.data.id,
-          output:{
-            type: OutputType.dataTables,
-            data: this._dataTablesService.paginated(this._baseData, 0, i*8, i),
-            options: this._dataTablesService.options(this._baseData),
-            isAggregated: true
-          }
-        },
-      };
-
-      messageQueue.splice(i*index,0, updateOutputMessage);
+      const interimOutput = this._dataTablesService.paginated(this._baseData, 0, i*8, i);
+      const paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, interimOutput, true, options);
+      messageQueue.splice(i*index,0, paragraphOutputResponse.toJson());
     }
-    const data2 = this._dataTablesService.paginated(this._baseData, 0, 50, draws);
-    const output2 = {data: data2, options: this._dataTablesService.options(this._baseData), type:OutputType.dataTables, isAggregated:true};
+    const finalOutput = this._dataTablesService.paginated(this._baseData, 0, 50, draws);
+    const paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, finalOutput, true, options);
     paragraph.status = 'FINISHED';
     paragraph.progress = 100;
-    paragraph.output = output2;
-
-    const updateOutputMessage = {
-      op: sendOperation.paragraphOutput,
-      data: {
-        noteId: this._noteService.lastNoteId(),
-        paragraphId: message.data.id,
-        output:{data: data2, options: this._dataTablesService.options(this._baseData), type:OutputType.dataTables, isAggregated:true}
-      },
-    };
-
-    messageQueue.push(updateOutputMessage);
-    messageQueue.push(this.paraMessage(paragraph));
+    paragraph.output = {data: finalOutput, options: this._dataTablesService.options(this._baseData), type:OutputType.dataTables, isAggregated:true};
+    messageQueue.push(paragraphOutputResponse.toJson());
+    messageQueue.push(new ParagraphServerResponse(paragraph).toJson());
     this.updateNotebook(paragraph);
-    this.emitMessageQueue(messageQueue, client);
+    for(let i = 0; i < messageQueue.length; i++) {
+      const timeout =  (i + 1) * 1000;
+      setTimeout(() => {
+        client.send(messageQueue[i]);
+      }, timeout);
+    }
   }
 
   private updateNotebook(paragraph: ParagraphImpl){
@@ -138,21 +124,5 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
     const paragraphIndex = notebook.paragraphs.findIndex(p => p.id === paragraph.id);
     notebook.paragraphs.splice(paragraphIndex,1, paragraph);
     this._noteService.update(notebook, notebook.id);
-  }
-
-  private emitMessageQueue(messageQueue: object[], client: WebSocket) {
-    for(let i = 0; i < messageQueue.length; i++) {
-      const timeout =  (i + 1) * 1000;
-      setTimeout(() => {
-        client.send(JSON.stringify(messageQueue[i]));
-      }, timeout);
-    }
-  }
-
-  private paraMessage(paragraph:ParagraphImpl): ParagraphMessage {
-    return {
-      op: sendOperation.paragraph,
-      data: JSON.parse(JSON.stringify(paragraph)),
-    };
   }
 }

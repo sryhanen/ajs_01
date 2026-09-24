@@ -43,31 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WebSocket} from 'ws';
-import {Handler} from './handler';
-import {CompletionMessage} from '../../interfaces/receiveMessage';
-import {receiveOperation} from '../webSocketOperations';
-import {CompletionListResponse} from '../../../src/test/data/serverWebSocketResponses/completionList/completionListResponse';
-
-export default class CompletionListHandler implements Handler<CompletionMessage>{
-  operation(){
-    return receiveOperation.completion;
-  };
-
-  execute(message:CompletionMessage, client: WebSocket): void {
-    const completions = [
-      {
-        name: 'angular',
-        value: 'angular'
-      },
-      {
-        name: 'angularBind',
-        value: 'angularBind'
-      },
-    ];
-    const completionListResponse = new CompletionListResponse(completions);
-    client.send(completionListResponse.toJson());
-  }
+export interface WebSocketServerResponse {
+  toObject():{op:string, data:object};
+  toJson():string;
 }
-
-

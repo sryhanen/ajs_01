@@ -45,10 +45,10 @@
  */
 import {WebSocket} from 'ws';
 import {Handler} from './handler';
-import {NoteMessage} from '../../interfaces/sendMessage';
-import {receiveOperation, sendOperation} from '../webSocketOperations';
+import {receiveOperation} from '../webSocketOperations';
 import NoteService from '../../services/noteService';
 import {GetNoteMessage} from '../../interfaces/receiveMessage';
+import {NoteServerResponse} from '../../../src/test/data/serverWebSocketResponses/note/noteServerResponse';
 
 export default class NoteHandler implements Handler<GetNoteMessage> {
   private readonly _noteService: NoteService;
@@ -64,10 +64,7 @@ export default class NoteHandler implements Handler<GetNoteMessage> {
   execute(message: GetNoteMessage, client: WebSocket) {
     const noteId= message.data.id;
     const note = this._noteService.find(noteId);
-    const msg: NoteMessage = {
-      op: sendOperation.note,
-      data: note,
-    };
-    client.send(JSON.stringify(msg));
+    const noteResponse = new NoteServerResponse(note);
+    client.send(noteResponse.toJson());
   }
 }

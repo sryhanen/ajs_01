@@ -43,31 +43,25 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WebSocket} from 'ws';
-import {Handler} from './handler';
-import {CompletionMessage} from '../../interfaces/receiveMessage';
-import {receiveOperation} from '../webSocketOperations';
-import {CompletionListResponse} from '../../../src/test/data/serverWebSocketResponses/completionList/completionListResponse';
+import {WebSocketServerResponse} from '../webSocketServerResponse';
 
-export default class CompletionListHandler implements Handler<CompletionMessage>{
-  operation(){
-    return receiveOperation.completion;
-  };
+export class NotesInfoServerResponse implements WebSocketServerResponse {
+  private readonly _notesInfoData:{id:string, isTrash:boolean, name:string, path:string }[];
 
-  execute(message:CompletionMessage, client: WebSocket): void {
-    const completions = [
-      {
-        name: 'angular',
-        value: 'angular'
-      },
-      {
-        name: 'angularBind',
-        value: 'angularBind'
-      },
-    ];
-    const completionListResponse = new CompletionListResponse(completions);
-    client.send(completionListResponse.toJson());
+  constructor(notesInfoData:{id:string, isTrash:boolean, name:string, path:string }[]) {
+    this._notesInfoData = notesInfoData;
+  }
+
+  toJson(): string {
+    return JSON.stringify(this.toObject());
+  }
+
+  toObject(): {op:string, data:object} {
+    return {
+      op:'NOTES_INFO',
+      data:{
+        notes: this._notesInfoData,
+      }
+    };
   }
 }
-
-

@@ -44,10 +44,12 @@
  * a licensee so wish it.
  */
 import {Handler} from './handler';
-import {EditorSettingMessage as sentEditorSettings} from '../../interfaces/sendMessage';
 import {EditorSettingMessage as receivedEditorSettings} from '../../interfaces/receiveMessage';
-import {receiveOperation, sendOperation} from '../webSocketOperations';
+import {receiveOperation} from '../webSocketOperations';
 import {WebSocket} from 'ws';
+import {
+  EditorSettingResponse
+} from '../../../src/test/data/serverWebSocketResponses/editorSetting/editorSettingResponse';
 
 export default class EditorSettingsHandler implements Handler<receivedEditorSettings> {
   private readonly _supportedLanguages: string[] = ['sql', 'scala', 'python'];
@@ -59,19 +61,14 @@ export default class EditorSettingsHandler implements Handler<receivedEditorSett
 
   execute(message: receivedEditorSettings, client: WebSocket): void {
     const language = this.parseLanguage(message.data.paragraphText);
-    const msg: sentEditorSettings = {
-      op:sendOperation.editorSetting,
-      data:{
-        editor:{
-          language:language,
-          editorOnDblClick: false,
-          completionKey: '',
-          completionSupport: true,
-        },
-        paragraphId:message.data.paragraphId
-      },
+    const editorSettings = {
+      language:language,
+      editorOnDblClick: false,
+      completionKey: '',
+      completionSupport: true,
     };
-    client.send(JSON.stringify(msg));
+    const editorSettingResponse = new EditorSettingResponse(editorSettings, message.data.paragraphId);
+    client.send(editorSettingResponse.toJson());
   }
 
   private parseLanguage(text:string):string{
