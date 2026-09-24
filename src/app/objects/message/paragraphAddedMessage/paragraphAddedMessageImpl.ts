@@ -46,17 +46,17 @@
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
-import {ResponseMessage} from '../responseMessage';
 import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
+import {ParagraphAddedMessage} from './paragraphAddedMessage';
 
-export class ParagraphAddedMessageImpl implements ResponseMessage<ParagraphCollection>{
+export class ParagraphAddedMessageImpl implements ParagraphAddedMessage{
   private readonly _message:Message;
 
   constructor(message:Message) {
     this._message = new TypedMessage('PARAGRAPH_ADDED', message);
   }
 
-  applyTo(paragraphCollection: ParagraphCollection): void {
+  addParagraph(paragraphCollection:ParagraphCollection):void {
     const paragraphData = this._message.dataAsWebSocketPayload().objectProperty('paragraph');
     const paragraph = new ParagraphImpl(paragraphCollection, paragraphData);
     const index = this._message.dataAsWebSocketPayload().numberProperty('index');

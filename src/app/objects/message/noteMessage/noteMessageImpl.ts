@@ -45,18 +45,18 @@
  */
 import {TypedMessage} from '../typedMessage/typedMessage';
 import {Message} from '../message';
-import {ResponseMessage} from '../responseMessage';
 import {NotebookIndex} from '../../notebookCollection/notebookIndex/notebookIndex';
 import {NotebookImpl} from '../../notebook/notebookImpl';
+import {NoteMessage} from './noteMessage';
 
-export class NoteMessageImpl implements ResponseMessage<NotebookIndex>{
+export class NoteMessageImpl implements NoteMessage{
   private readonly _message:Message;
 
   constructor(message:Message) {
     this._message = new TypedMessage('NOTE', message);
   }
 
-  applyTo(notebookIndex: NotebookIndex): void {
+  renderNotebook(notebookIndex:NotebookIndex): void {
     const notebook = new NotebookImpl(notebookIndex, this._message.data());
     notebookIndex.renderNotebook(notebook);
   }

@@ -100,6 +100,6 @@ export class NotebookCollectionImpl implements NotebookCollection{
 
   private notesInfoResponse(message:Message):void{
     const notesInfoMessage = new NotesInfoMessageImpl(message);
-    notesInfoMessage.applyTo(this);
+    notesInfoMessage.updateNotebookIndices(this);
   }
 }

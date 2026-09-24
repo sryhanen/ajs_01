@@ -102,6 +102,6 @@ export class NotebookIndexImpl implements NotebookIndex {
 
   private noteResponse(message:Message):void{
     const noteMessage = new NoteMessageImpl(message);
-    noteMessage.applyTo(this);
+    noteMessage.renderNotebook(this);
   }
 }

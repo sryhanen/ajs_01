@@ -59,7 +59,7 @@ describe('ParagraphRemovedMessage unit test', () => {
   const paragraphCollection = CreateFakeParagraphCollection();
 
   it('Should remove paragraph from ParagraphCollection', () => {
-    paragraphRemovedMessage.applyTo(paragraphCollection);
+    paragraphRemovedMessage.removeParagraph(paragraphCollection);
     expect(paragraphCollection.removeParagraph).toHaveBeenCalledTimes(1);
   });
 
@@ -68,6 +68,6 @@ describe('ParagraphRemovedMessage unit test', () => {
       op:'PARAGRAPH_REMOV',
       data:paragraphRemovedData
     })));
-    expect(() => paragraphRemovedMessage.applyTo(paragraphCollection)).toThrow();
+    expect(() => paragraphRemovedMessage.removeParagraph(paragraphCollection)).toThrow();
   });
 });

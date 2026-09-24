@@ -62,7 +62,7 @@ describe('NotesInfoMessage unit test', () => {
   const fakeNotebookCollection = CreateFakeNotebookCollection();
 
   it('Should apply to NotebookCollection', () => {
-    notesInfoMessage.applyTo(fakeNotebookCollection);
+    notesInfoMessage.updateNotebookIndices(fakeNotebookCollection);
     expect(fakeNotebookCollection.addNotebookIndex).toHaveBeenCalledTimes(2);
   });
 
@@ -73,6 +73,6 @@ describe('NotesInfoMessage unit test', () => {
         notes:notes
       }
     })));
-    expect(() => notesInfoMessage.applyTo(fakeNotebookCollection)).toThrow();
+    expect(() => notesInfoMessage.updateNotebookIndices(fakeNotebookCollection)).toThrow();
   });
 });

@@ -43,6 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface ResponseMessage<T> {
-  applyTo(node: T): void;
+import {NotebookCollection} from '../../notebookCollection/notebookCollection';
+
+export interface NotesInfoMessage {
+  updateNotebookIndices(notebookCollection: NotebookCollection):void;
 }

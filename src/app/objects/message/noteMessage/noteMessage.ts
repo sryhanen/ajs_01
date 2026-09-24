@@ -43,23 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Message} from '../message';
-import {TypedMessage} from '../typedMessage/typedMessage';
-import {NotebookIndexImpl} from '../../notebookCollection/notebookIndex/notebookIndexImpl';
-import {NotebookCollection} from '../../notebookCollection/notebookCollection';
-import {NotesInfoMessage} from './notesInfoMessage';
+import {NotebookIndex} from '../../notebookCollection/notebookIndex/notebookIndex';
 
-export class NotesInfoMessageImpl implements NotesInfoMessage {
-  private readonly _message:Message;
-
-  constructor(message:Message) {
-    this._message = new TypedMessage('NOTES_INFO', message);
-  }
-
-  updateNotebookIndices(notebookCollection: NotebookCollection):void {
-    const notebookIndicesData = this._message.dataAsWebSocketPayload().arrayProperty<object>('notes');
-    notebookIndicesData.forEach(notebookIndexData => {
-      notebookCollection.addNotebookIndex(new NotebookIndexImpl(notebookCollection, notebookIndexData));
-    });
-  }
+export interface NoteMessage {
+  renderNotebook(notebookIndex:NotebookIndex):void;
 }

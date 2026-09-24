@@ -117,17 +117,17 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
 
   private paragraphResponse(message:Message):void{
     const paragraphMessage = new ParagraphMessageImpl(message);
-    paragraphMessage.applyTo(this);
+    paragraphMessage.updateParagraph(this);
   }
 
   private paragraphAddedResponse(message:Message):void{
     const paragraphAddedMessage = new ParagraphAddedMessageImpl(message);
-    paragraphAddedMessage.applyTo(this);
+    paragraphAddedMessage.addParagraph(this);
   }
 
   private paragraphRemovedResponse(message:Message):void{
     const paragraphRemovedMessage = new ParagraphRemovedMessageImpl(message);
-    paragraphRemovedMessage.applyTo(this);
+    paragraphRemovedMessage.removeParagraph(this);
   }
 
   print(): Signal<RenderNode> {

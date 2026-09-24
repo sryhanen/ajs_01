@@ -60,7 +60,7 @@ describe('ParagraphMessage unit test', () => {
   const paragraphCollection = CreateFakeParagraphCollection();
 
   it('Should add paragraph to ParagraphCollection', () => {
-    paragraphAddedMessage.applyTo(paragraphCollection);
+    paragraphAddedMessage.addParagraph(paragraphCollection);
     expect(paragraphCollection.addParagraph).toHaveBeenCalledTimes(1);
   });
 
@@ -69,6 +69,6 @@ describe('ParagraphMessage unit test', () => {
       op:'PARAGRAPH_ADD',
       data:paragraphAddedData
     })));
-    expect(() => paragraphAddedMessage.applyTo(paragraphCollection)).toThrow();
+    expect(() => paragraphAddedMessage.addParagraph(paragraphCollection)).toThrow();
   });
 });

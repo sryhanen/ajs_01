@@ -61,7 +61,7 @@ describe('NoteMessage unit test', () => {
   const fakeNotebookIndex = CreateFakeNotebookIndex();
 
   it('Should applyTo notebookIndex', () => {
-    noteMessage.applyTo(fakeNotebookIndex);
+    noteMessage.renderNotebook(fakeNotebookIndex);
     expect(fakeNotebookIndex.renderNotebook).toHaveBeenCalledTimes(1);
   });
 
@@ -70,6 +70,6 @@ describe('NoteMessage unit test', () => {
       op:'NOT',
       data:notebookData
     })));
-    expect(() => noteMessage.applyTo(fakeNotebookIndex)).toThrow();
+    expect(() => noteMessage.renderNotebook(fakeNotebookIndex)).toThrow();
   });
 });
