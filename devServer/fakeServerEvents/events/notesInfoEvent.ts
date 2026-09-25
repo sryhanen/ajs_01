@@ -45,15 +45,15 @@
  */
 import {WebSocket} from 'ws';
 import {FakeServerEvent} from '../fakeServerEvent';
-import NoteService from '../../services/noteService';
+import NoteServiceImpl from '../../services/noteService/noteServiceImpl';
 import {NotesInfoServerResponse} from '../../../src/test/data/serverWebSocketResponses/notesInfo/notesInfoServerResponse';
 
 export default class NotesInfoEvent implements FakeServerEvent{
   private readonly  _webSocket: WebSocket;
   private readonly _eventId: string;
-  private readonly _noteService: NoteService;
+  private readonly _noteService: NoteServiceImpl;
 
-  constructor(webSocket:WebSocket, noteService: NoteService) {
+  constructor(webSocket:WebSocket, noteService: NoteServiceImpl) {
     this._webSocket = webSocket;
     this._noteService = noteService;
     this._eventId = 'LIST_NOTES';

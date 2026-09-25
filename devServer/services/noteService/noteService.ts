@@ -43,80 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import BaseMessage from './baseMessage';
-import {receiveOperation} from '../fakeServerEvents/webSocketOperations';
 
+import {NotebookDTO} from '../../data/note/notebookDTO';
 
-export interface PingMessage extends BaseMessage {
-  op: receiveOperation.ping;
-  data:object
+export interface NoteService {
+  all(): NotebookDTO[];
+  find(id:string): NotebookDTO;
+  add(object:NotebookDTO, id:string): void;
+  update(object:NotebookDTO, id:string): void;
 }
-
-export interface GetNoteMessage extends BaseMessage {
-  op: receiveOperation.getNote;
-  data: {id:string};
-}
-
-export interface GetHomeNoteMessage extends BaseMessage {
-  op: receiveOperation.getHomeNote;
-}
-
-export interface RunParagraphMessage extends BaseMessage {
-  op: receiveOperation.runParagraph;
-  data: {id:string, title:string, paragraph:string};
-}
-
-export interface ParagraphOutputRequest extends BaseMessage {
-  op: receiveOperation.paragraphUpdateResult;
-  data: {
-    noteId: string
-    paragraphId: string
-    type: string
-    requestOptions:unknown
-  };
-}
-
-export interface InsertParagraphMessage extends BaseMessage {
-  op: receiveOperation.insertParagraph;
-  data: {index:number}
-}
-
-export interface ListNotesMessage extends BaseMessage {
-  op: receiveOperation.listNotes;
-}
-
-export interface NewNoteMessage extends BaseMessage {
-  op: receiveOperation.newNote;
-  data: {
-    name: string,
-    defaultInterpreterGroup: string,
-  };
-}
-
-export interface CompletionMessage extends BaseMessage {
-  op: receiveOperation.completion;
-  data: {
-    id:string,
-    buf:string,
-    cursor:number
-  }
-}
-
-export interface EditorSettingMessage extends BaseMessage {
-  op: receiveOperation.editorSetting;
-  data:{
-    paragraphId: string,
-    paragraphText:string,
-  }
-}
-
-export type ReceiveMessage = PingMessage
-  | GetNoteMessage
-  | GetHomeNoteMessage
-  | RunParagraphMessage
-  | ParagraphOutputRequest
-  | InsertParagraphMessage
-  | ListNotesMessage
-  | NewNoteMessage
-  | CompletionMessage
-  | EditorSettingMessage;

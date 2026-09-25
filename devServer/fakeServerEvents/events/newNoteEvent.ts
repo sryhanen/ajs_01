@@ -45,7 +45,7 @@
  */
 import {WebSocket} from 'ws';
 import {FakeServerEvent} from '../fakeServerEvent';
-import NoteService from '../../services/noteService';
+import NoteServiceImpl from '../../services/noteService/noteServiceImpl';
 import NotebookImpl from '../../data/note/notebookImpl';
 import {SparkPara} from '../../data/paragraph/sparkPara';
 import ParagraphImpl from '../../data/paragraph/paragraphImpl';
@@ -55,9 +55,9 @@ import {Message} from '../../../src/app/objects/message/message';
 export default class NewNoteEvent implements FakeServerEvent{
   private readonly  _webSocket: WebSocket;
   private readonly _eventId: string;
-  private readonly _noteService: NoteService;
+  private readonly _noteService: NoteServiceImpl;
 
-  constructor(webSocket:WebSocket, noteService: NoteService) {
+  constructor(webSocket:WebSocket, noteService: NoteServiceImpl) {
     this._webSocket = webSocket;
     this._noteService = noteService;
     this._eventId = 'NEW_NOTE';

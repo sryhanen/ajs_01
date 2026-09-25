@@ -43,9 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import FileService from './fileService';
+import FileServiceImpl from './fileService/fileServiceImpl';
 import {existsSync, mkdirSync} from 'fs';
-import NoteService from './noteService';
+import NoteServiceImpl from './noteService/noteServiceImpl';
 import FakeService from './fakeService';
 
 export default class InitializationService {
@@ -58,11 +58,11 @@ export default class InitializationService {
   initialized(){
     if(!existsSync(this._path)){
       mkdirSync(this._path);
-      const fileService = new FileService(this._path);
-      const noteService = new NoteService(fileService);
+      const fileService = new FileServiceImpl(this._path);
+      const noteService = new NoteServiceImpl(fileService);
       const fakeService = new FakeService(noteService);
       fakeService.seed();
     }
-    return new FileService(this._path);
+    return new FileServiceImpl(this._path);
   }
 }

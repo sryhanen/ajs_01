@@ -44,19 +44,19 @@
  * a licensee so wish it.
  */
 import {WebSocketServer as wss} from 'ws';
-import FileService from './services/fileService';
+import FileServiceImpl from './services/fileService/fileServiceImpl';
 import {FakeServerEventDispatcherImpl} from './fakeServerEventDispatcher/fakeServerEventDispatcherImpl';
 
 export default class WebSocketServer {
   private readonly _server: wss;
 
-  constructor(fileService: FileService) {
+  constructor(fileService: FileServiceImpl) {
     const port = process.env.WEBSOCKET_PORT || 8081;
     this._server = new wss({ port: Number(port) });
     this.configureWss(fileService);
   }
 
-  private configureWss(fileService: FileService): void {
+  private configureWss(fileService: FileServiceImpl): void {
     this._server.on('connection', (client) => {
       const fakeServerEventDispatcher = new FakeServerEventDispatcherImpl(client, fileService);
       console.debug('Client connected');

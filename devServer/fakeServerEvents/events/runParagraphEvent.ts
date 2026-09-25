@@ -46,9 +46,9 @@
 import {WebSocket} from 'ws';
 import {FakeServerEvent} from '../fakeServerEvent';
 import ParagraphImpl from '../../data/paragraph/paragraphImpl';
-import {DataTablesService} from '../../services/dataService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
-import NoteService from '../../services/noteService';
+import {DataTablesService} from '../../services/dataTablesService/dataTablesService';
+import DataTablesServiceImpl from '../../services/dataTablesService/dataTablesServiceImpl';
+import NoteServiceImpl from '../../services/noteService/noteServiceImpl';
 import {OutputType} from '../../../src/app/objects/output/outputType';
 import {
   ParagraphServerResponse
@@ -61,13 +61,13 @@ import { Message } from '../../../src/app/objects/message/message';
 
 export default class RunParagraphEvent implements FakeServerEvent {
   private readonly _webSocket: WebSocket;
-  private readonly _noteService: NoteService;
+  private readonly _noteService: NoteServiceImpl;
   private readonly _eventId:string;
   private readonly _dataTablesService: DataTablesService;
   private readonly _rowCount = 1000;
   private readonly _baseData: object[];
 
-  constructor(webSocket: WebSocket, noteService: NoteService) {
+  constructor(webSocket: WebSocket, noteService: NoteServiceImpl) {
     this._webSocket = webSocket;
     this._noteService = noteService;
     this._eventId = 'RUN_PARAGRAPH';

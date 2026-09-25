@@ -43,59 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {readFileSync, readdirSync, writeFileSync, unlinkSync, existsSync} from 'fs';
-import path from 'path';
-import {IFileService} from '../interfaces/fileService';
+import FileServiceImpl from '../fileService/fileServiceImpl';
+import {NotebookDTO} from '../../data/note/notebookDTO';
+import {NoteService} from './noteService';
 
-export default class FileService implements IFileService{
-  private readonly _path:string;
+export default class NoteServiceImpl implements NoteService{
+  private readonly _fileService: FileServiceImpl;
+  private _lastNoteId: string;
 
-  constructor(filePath:string) {
-    this._path = filePath;
+  constructor(fileService: FileServiceImpl) {
+    this._fileService = fileService;
   }
 
-  write<T>(data: T, fileName: string, overwrite:boolean) {
-    const filePath = path.join(this._path, fileName);
-    this.checkPath(filePath, overwrite);
-    writeFileSync(filePath, JSON.stringify(data));
-    if(overwrite) {
-      console.info(`Updated file: ${filePath.toString()}`);
-    }
-    else{
-      console.info(`Created file: ${filePath.toString()}`);
-    }
+  all(): NotebookDTO[]{
+    return this._fileService.readAll<NotebookDTO>();
   }
 
-  read<T>(fileName: string): T{
-    const filePath = path.join(this._path, fileName);
-    this.checkPath(filePath, true);
-    return JSON.parse(readFileSync(filePath, 'utf8').toString());
+  find(notebookId:string): NotebookDTO{
+    const notebook = this._fileService.read<NotebookDTO>(notebookId);
+    this._lastNoteId = notebookId;
+    return notebook;
   }
 
-  readAll<T>(): T[]{
-    const filePath = path.join(this._path);
-    this.checkPath(filePath, true);
-    const files = readdirSync(filePath);
-    return files.map(f => this.read(f));
+  add(notebook:NotebookDTO, id:string){
+    this._fileService.write<NotebookDTO>(notebook, id, false);
   }
 
-  delete(fileName: string) {
-    const filePath = path.join(this._path, fileName);
-    this.checkPath(filePath, true);
-    unlinkSync(filePath);
-    console.info(`Deleted file: ${filePath.toString()}`);
+  update(notebook:NotebookDTO, id:string){
+    this._fileService.write<NotebookDTO>(notebook, id, true);
   }
 
-  private checkPath(path:string, shouldExist: boolean){
-    const pathExists = existsSync(path);
-    if(pathExists && !shouldExist){
-      console.error(`File ${path} already exists.`);
-      throw new Error(`File ${path} already exists.`);
-    }
-    if(!pathExists && shouldExist){
-      console.error(`File ${path} doesn't exists.`);
-      throw new Error(`File ${path} doesn't exists.`);
-    }
+  lastNoteId(){
+    return this._lastNoteId;
   }
 }
-

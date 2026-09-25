@@ -45,11 +45,11 @@
  */
 import {WebSocket} from 'ws';
 import {FakeServerEvent} from '../fakeServerEvent';
-import {DataTablesService} from '../../services/dataService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
+import {DataTablesService} from '../../services/dataTablesService/dataTablesService';
+import DataTablesServiceImpl from '../../services/dataTablesService/dataTablesServiceImpl';
 import {OutputType} from '../../../src/app/objects/output/outputType';
-import {uPlotResultService} from '../../services/uPlotService/uPlotResultService';
-import {uPlotResultServiceImpl} from '../../services/uPlotService/uPlotResultServiceImpl';
+import {uPlotResultService} from '../../services/uPlotResultService/uPlotResultService';
+import {uPlotResultServiceImpl} from '../../services/uPlotResultService/uPlotResultServiceImpl';
 import {
   ParagraphOutputServerResponse
 } from '../../../src/test/data/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';

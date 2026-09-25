@@ -43,37 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {SerializedDataService} from '../interfaces/common';
-import FileService from './fileService';
-import {NotebookDTO} from '../data/note/notebookDTO';
-
-export default class NoteService implements SerializedDataService<NotebookDTO>{
-  private readonly _fileService: FileService;
-  private _lastNoteId: string;
-
-  constructor(fileService: FileService) {
-    this._fileService = fileService;
-  }
-
-  all(): NotebookDTO[]{
-    return this._fileService.readAll<NotebookDTO>();
-  }
-
-  find(notebookId:string): NotebookDTO{
-    const notebook = this._fileService.read<NotebookDTO>(notebookId);
-    this._lastNoteId = notebookId;
-    return notebook;
-  }
-
-  add(notebook:NotebookDTO, id:string){
-    this._fileService.write<NotebookDTO>(notebook, id, false);
-  }
-
-  update(notebook:NotebookDTO, id:string){
-    this._fileService.write<NotebookDTO>(notebook, id, true);
-  }
-
-  lastNoteId(){
-    return this._lastNoteId;
-  }
+export interface FileService {
+  write<Type>(data:Type, fileName:string, overwrite:boolean): void;
+  read<Type>(fileName:string): Type;
+  readAll<Type>(): Type[];
+  delete(id:string): void;
 }

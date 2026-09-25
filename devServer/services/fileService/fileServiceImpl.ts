@@ -43,22 +43,59 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {readFileSync, readdirSync, writeFileSync, unlinkSync, existsSync} from 'fs';
+import path from 'path';
+import {FileService} from './fileService';
 
-export interface Serializable<Type>{
-  serialized(): Type;
+export default class FileServiceImpl implements FileService{
+  private readonly _path:string;
+
+  constructor(filePath:string) {
+    this._path = filePath;
+  }
+
+  write<T>(data: T, fileName: string, overwrite:boolean) {
+    const filePath = path.join(this._path, fileName);
+    this.checkPath(filePath, overwrite);
+    writeFileSync(filePath, JSON.stringify(data));
+    if(overwrite) {
+      console.info(`Updated file: ${filePath.toString()}`);
+    }
+    else{
+      console.info(`Created file: ${filePath.toString()}`);
+    }
+  }
+
+  read<T>(fileName: string): T{
+    const filePath = path.join(this._path, fileName);
+    this.checkPath(filePath, true);
+    return JSON.parse(readFileSync(filePath, 'utf8').toString());
+  }
+
+  readAll<T>(): T[]{
+    const filePath = path.join(this._path);
+    this.checkPath(filePath, true);
+    const files = readdirSync(filePath);
+    return files.map(f => this.read(f));
+  }
+
+  delete(fileName: string) {
+    const filePath = path.join(this._path, fileName);
+    this.checkPath(filePath, true);
+    unlinkSync(filePath);
+    console.info(`Deleted file: ${filePath.toString()}`);
+  }
+
+  private checkPath(path:string, shouldExist: boolean){
+    const pathExists = existsSync(path);
+    if(pathExists && !shouldExist){
+      console.error(`File ${path} already exists.`);
+      throw new Error(`File ${path} already exists.`);
+    }
+    if(!pathExists && shouldExist){
+      console.error(`File ${path} doesn't exists.`);
+      throw new Error(`File ${path} doesn't exists.`);
+    }
+  }
 }
 
-export interface SerializedDataService<Type> {
-  all(): Type[];
-  find(id:string): Type;
-  add(object:Type, id:string): void;
-  update(object:Type, id:string): void;
-}
-
-export interface Identifiable{
-  id(): string;
-}
-
-export interface Stubable{
-  isStub(): boolean;
-}

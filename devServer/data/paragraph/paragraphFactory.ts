@@ -45,8 +45,8 @@
  */
 import ParagraphImpl from './paragraphImpl';
 import {SparkPara} from './sparkPara';
-import {DataTablesService} from '../../services/dataService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
+import {DataTablesService} from '../../services/dataTablesService/dataTablesService';
+import DataTablesServiceImpl from '../../services/dataTablesService/dataTablesServiceImpl';
 import {OutputType} from '../../../src/app/objects/output/outputType';
 
 export default class ParagraphFactory{

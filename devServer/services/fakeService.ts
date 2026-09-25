@@ -44,13 +44,13 @@
  * a licensee so wish it.
  */
 import NoteFactory from '../data/note/noteFactory';
-import NoteService from './noteService';
+import NoteServiceImpl from './noteService/noteServiceImpl';
 
 export default class FakeService {
-  private readonly _noteService: NoteService;
+  private readonly _noteService: NoteServiceImpl;
   private readonly _noteFactory: NoteFactory;
 
-  constructor(noteService: NoteService) {
+  constructor(noteService: NoteServiceImpl) {
     this._noteService = noteService;
     this._noteFactory = new NoteFactory();
   }
