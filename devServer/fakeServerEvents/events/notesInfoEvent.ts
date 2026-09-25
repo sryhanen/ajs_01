@@ -44,21 +44,33 @@
  * a licensee so wish it.
  */
 import {WebSocket} from 'ws';
-import {Handler} from './handler';
-import {NoteMessage} from '../../interfaces/sendMessage';
-import {receiveOperation, sendOperation} from '../webSocketOperations';
-import {GetHomeNoteMessage} from '../../interfaces/receiveMessage';
+import {FakeServerEvent} from '../fakeServerEvent';
+import NoteService from '../../services/noteService';
+import {NotesInfoServerResponse} from '../../../src/test/data/serverWebSocketResponses/notesInfo/notesInfoServerResponse';
 
-export default class HomeNoteHandler implements Handler<GetHomeNoteMessage>{
-  operation(){
-    return receiveOperation.getHomeNote;
-  };
+export default class NotesInfoEvent implements FakeServerEvent{
+  private readonly  _webSocket: WebSocket;
+  private readonly _eventId: string;
+  private readonly _noteService: NoteService;
 
-  execute(message: GetHomeNoteMessage, client: WebSocket) {
-    const msg: NoteMessage = {
-      op: sendOperation.note,
-      data: {},
-    };
-    client.send(JSON.stringify(msg));
+  constructor(webSocket:WebSocket, noteService: NoteService) {
+    this._webSocket = webSocket;
+    this._noteService = noteService;
+    this._eventId = 'LIST_NOTES';
+  }
+
+  eventId(): string {
+    return this._eventId;
+  }
+
+  handle():void {
+    const notes = this._noteService.all();
+    const data:{id:string, isTrash:boolean, name:string, path:string }[] = [];
+    for (const note of notes){
+      const info = {id:note.id, isTrash:false, name:note.name, path:note.path };
+      data.push(info);
+    }
+    const notesInfoResponse = new NotesInfoServerResponse(data);
+    this._webSocket.send(notesInfoResponse.toJson());
   }
 }

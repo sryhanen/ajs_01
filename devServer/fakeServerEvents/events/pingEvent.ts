@@ -44,52 +44,27 @@
  * a licensee so wish it.
  */
 import {WebSocket} from 'ws';
-import PingHandler from './handlers/pingHandler';
-import ErrorHandler from './handlers/errorHandler';
-import NoteHandler from './handlers/noteHandler';
-import NotesInfoHandler from './handlers/notesInfoHandler';
-import HomeNoteHandler from './handlers/homeNoteHandler';
-import RunParagraphHandler from './handlers/runParagraphHandler';
-import NewNoteHandler from './handlers/newNoteHandler';
-import FileService from '../services/fileService';
-import NoteService from '../services/noteService';
-import ParagraphOutputRequestHandler from './handlers/paragraphOutputRequestHandler';
-import InsertParagraphHandler from './handlers/insertParagraphHandler';
-import {Handler} from './handlers/handler';
-import CompletionListHandler from './handlers/completionListHandler';
-import EditorSettingsHandler from './handlers/editorSettingsHandler';
+import {FakeServerEvent} from '../fakeServerEvent';
+import { Message } from '../../../src/app/objects/message/message';
 
+export default class PingEvent implements FakeServerEvent {
+  private readonly _webSocket: WebSocket;
+  private readonly _eventId: string;
 
-export default class MessageOperator {
-  private readonly _client: WebSocket;
-  private readonly _handlers: Handler<unknown>[];
-  private readonly _errorHandler: ErrorHandler;
-
-  constructor(client: WebSocket, fileService: FileService) {
-    this._client = client;
-    const noteService = new NoteService(fileService);
-    this._handlers = [
-      new PingHandler(),
-      new NoteHandler(noteService),
-      new NotesInfoHandler(noteService),
-      new HomeNoteHandler(),
-      new RunParagraphHandler(noteService),
-      new ParagraphOutputRequestHandler(),
-      new InsertParagraphHandler(noteService),
-      new NewNoteHandler(noteService),
-      new CompletionListHandler(),
-      new EditorSettingsHandler()
-    ];
-    this._errorHandler = new ErrorHandler();
+  constructor(webSocket: WebSocket) {
+    this._webSocket = webSocket;
+    this._eventId = 'PING';
   }
 
-  handleMessage(message: object) {
-    const handler = this._handlers.find(h => h.operation() === message['op']);
-    if(handler !== undefined) {
-      handler.execute(message, this._client);
-    }
-    else{
-      this._errorHandler.execute(message, this._client);
-    }
+  eventId(): string {
+    return this._eventId;
+  }
+
+  handle(requestMessage: Message): void {
+    const pongMessage = {
+      op:'PONG',
+      data: {},
+    };
+    this._webSocket.send(JSON.stringify(pongMessage));
   }
 }

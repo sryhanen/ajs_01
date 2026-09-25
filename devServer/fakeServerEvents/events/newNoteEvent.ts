@@ -44,22 +44,34 @@
  * a licensee so wish it.
  */
 import {WebSocket} from 'ws';
-import {Handler} from './handler';
-import {PongMessage} from '../../interfaces/sendMessage';
-import {PingMessage} from '../../interfaces/receiveMessage';
-import {sendOperation, receiveOperation} from '../webSocketOperations';
+import {FakeServerEvent} from '../fakeServerEvent';
+import NoteService from '../../services/noteService';
+import NotebookImpl from '../../data/note/notebookImpl';
+import {SparkPara} from '../../data/paragraph/sparkPara';
+import ParagraphImpl from '../../data/paragraph/paragraphImpl';
+import {NewNoteServerResponse} from '../../../src/test/data/serverWebSocketResponses/newNote/newNoteServerResponse';
+import {Message} from '../../../src/app/objects/message/message';
 
-export default class PingHandler implements Handler<PingMessage>{
-  operation(){
-    return receiveOperation.ping;
-  };
+export default class NewNoteEvent implements FakeServerEvent{
+  private readonly  _webSocket: WebSocket;
+  private readonly _eventId: string;
+  private readonly _noteService: NoteService;
 
+  constructor(webSocket:WebSocket, noteService: NoteService) {
+    this._webSocket = webSocket;
+    this._noteService = noteService;
+    this._eventId = 'NEW_NOTE';
+  }
 
-  execute(message: PingMessage, client: WebSocket): void {
-    const msg: PongMessage = {
-      op:sendOperation.pong,
-      data: {},
-    };
-    client.send(JSON.stringify(msg));
+  eventId(): string {
+    return this._eventId;
+  }
+
+  handle(requestMessage: Message):void {
+    const name = requestMessage.dataAsWebSocketPayload().stringProperty('name');
+    const notebook = new NotebookImpl(name, [new ParagraphImpl('READY', undefined,'%dpl'), SparkPara]);
+    this._noteService.add(notebook, notebook.id);
+    const newNoteResponse = new NewNoteServerResponse(notebook);
+    this._webSocket.send(newNoteResponse.toJson());
   }
 }

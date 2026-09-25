@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import BaseMessage from './baseMessage';
-import {sendOperation} from '../message/webSocketOperations';
+import {sendOperation} from '../fakeServerEvents/webSocketOperations';
 import {NotebookDTO} from '../data/note/notebookDTO';
 import {ParagraphDTO} from '../data/paragraph/paragraphDTO';
 

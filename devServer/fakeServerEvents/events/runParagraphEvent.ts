@@ -44,9 +44,7 @@
  * a licensee so wish it.
  */
 import {WebSocket} from 'ws';
-import {Handler} from './handler';
-import {RunParagraphMessage} from '../../interfaces/receiveMessage';
-import {receiveOperation} from '../webSocketOperations';
+import {FakeServerEvent} from '../fakeServerEvent';
 import ParagraphImpl from '../../data/paragraph/paragraphImpl';
 import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
@@ -59,27 +57,33 @@ import {ProgressServerResponse} from '../../../src/test/data/serverWebSocketResp
 import {
   ParagraphOutputServerResponse
 } from '../../../src/test/data/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
+import { Message } from '../../../src/app/objects/message/message';
 
-export default class RunParagraphHandler implements Handler<RunParagraphMessage>{
+export default class RunParagraphEvent implements FakeServerEvent {
+  private readonly _webSocket: WebSocket;
   private readonly _noteService: NoteService;
+  private readonly _eventId:string;
   private readonly _dataTablesService: DataTablesService;
-  private readonly _rowCount = 1000; // arbitrary
+  private readonly _rowCount = 1000;
   private readonly _baseData: object[];
 
-  constructor(noteService: NoteService) {
+  constructor(webSocket: WebSocket, noteService: NoteService) {
+    this._webSocket = webSocket;
     this._noteService = noteService;
+    this._eventId = 'RUN_PARAGRAPH';
     this._dataTablesService = new DataTablesServiceImpl();
     this._baseData = this._dataTablesService.rawData(this._rowCount);
   }
 
-  operation(){
-    return receiveOperation.runParagraph;
+  eventId(): string {
+    return this._eventId;
   }
 
-  execute(message: RunParagraphMessage, client: WebSocket): void {
-    const paragraphId = message.data.id;
-    const title = message.data.title;
-    const text = message.data.paragraph;
+  handle(requestMessage: Message): void {
+    const requestMessageData = requestMessage.dataAsWebSocketPayload();
+    const paragraphId = requestMessageData.stringProperty('id');
+    const title = requestMessage.data()['title'];
+    const text = requestMessageData.stringProperty('paragraph');
     const messageQueue: string[] = [];
     const paragraph = new ParagraphImpl('PENDING', undefined, text, title, paragraphId);
     messageQueue.push(new ParagraphServerResponse(paragraph).toJson());
@@ -112,7 +116,7 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
     for(let i = 0; i < messageQueue.length; i++) {
       const timeout =  (i + 1) * 1000;
       setTimeout(() => {
-        client.send(messageQueue[i]);
+        this._webSocket.send(messageQueue[i]);
       }, timeout);
     }
   }
@@ -120,7 +124,6 @@ export default class RunParagraphHandler implements Handler<RunParagraphMessage>
   private updateNotebook(paragraph: ParagraphImpl){
     const noteId = this._noteService.lastNoteId();
     const notebook = this._noteService.find(noteId);
-
     const paragraphIndex = notebook.paragraphs.findIndex(p => p.id === paragraph.id);
     notebook.paragraphs.splice(paragraphIndex,1, paragraph);
     this._noteService.update(notebook, notebook.id);

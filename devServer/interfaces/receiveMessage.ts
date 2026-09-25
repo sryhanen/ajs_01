@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import BaseMessage from './baseMessage';
-import {receiveOperation} from '../message/webSocketOperations';
+import {receiveOperation} from '../fakeServerEvents/webSocketOperations';
 
 
 export interface PingMessage extends BaseMessage {

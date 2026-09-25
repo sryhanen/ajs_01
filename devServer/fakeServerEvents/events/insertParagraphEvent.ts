@@ -44,30 +44,37 @@
  * a licensee so wish it.
  */
 import {WebSocket} from 'ws';
-import {Handler} from './handler';
-import {CompletionMessage} from '../../interfaces/receiveMessage';
-import {receiveOperation} from '../webSocketOperations';
-import {CompletionListResponse} from '../../../src/test/data/serverWebSocketResponses/completionList/completionListResponse';
+import {FakeServerEvent} from '../fakeServerEvent';
+import NoteService from '../../services/noteService';
+import ParagraphImpl from '../../data/paragraph/paragraphImpl';
+import {
+  ParagraphAddedServerResponse
+} from '../../../src/test/data/serverWebSocketResponses/paragraphAdded/paragraphAddedServerResponse';
+import {Message} from '../../../src/app/objects/message/message';
 
-export default class CompletionListHandler implements Handler<CompletionMessage>{
-  operation(){
-    return receiveOperation.completion;
-  };
+export default class InsertParagraphEvent implements FakeServerEvent{
+  private readonly  _webSocket: WebSocket;
+  private readonly _eventId: string;
+  private readonly _noteService: NoteService;
 
-  execute(message:CompletionMessage, client: WebSocket): void {
-    const completions = [
-      {
-        name: 'angular',
-        value: 'angular'
-      },
-      {
-        name: 'angularBind',
-        value: 'angularBind'
-      },
-    ];
-    const completionListResponse = new CompletionListResponse(completions);
-    client.send(completionListResponse.toJson());
+  constructor(webSocket:WebSocket, noteService: NoteService) {
+    this._webSocket = webSocket;
+    this._noteService = noteService;
+    this._eventId = 'INSERT_PARAGRAPH';
+  }
+
+  eventId(): string {
+    return this._eventId;
+  }
+
+  handle(requestMessage: Message):void {
+    const noteId = this._noteService.lastNoteId();
+    const note = this._noteService.find(noteId);
+    const paragraph = new ParagraphImpl('READY');
+    const index = requestMessage.dataAsWebSocketPayload().numberProperty('index');
+    note.paragraphs.splice(index, 0, paragraph);
+    this._noteService.update(note, note.id);
+    const paragraphAddedResponse = new ParagraphAddedServerResponse(paragraph, index);
+    return this._webSocket.send(paragraphAddedResponse.toJson());
   }
 }
-
-

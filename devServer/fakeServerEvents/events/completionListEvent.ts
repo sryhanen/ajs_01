@@ -44,10 +44,36 @@
  * a licensee so wish it.
  */
 import {WebSocket} from 'ws';
+import {FakeServerEvent} from '../fakeServerEvent';
+import {CompletionListResponse} from '../../../src/test/data/serverWebSocketResponses/completionList/completionListResponse';
 
-export interface Handler<T>{
-  operation(): string;
+export default class CompletionListEvent implements FakeServerEvent{
+  private readonly _webSocket:WebSocket;
+  private readonly _eventId:string;
 
-  execute(message: T, client: WebSocket): void;
+  constructor(webSocket:WebSocket) {
+    this._webSocket = webSocket;
+    this._eventId = 'COMPLETION';
+  }
+
+  eventId(): string {
+    return this._eventId;
+  }
+
+  handle(): void {
+    const completions = [
+      {
+        name: 'fakeCompletion1',
+        value: 'fakeCompletion1'
+      },
+      {
+        name: 'fakeCompletion2',
+        value: 'fakeCompletion2'
+      },
+    ];
+    const completionListResponse = new CompletionListResponse(completions);
+    this._webSocket.send(completionListResponse.toJson());
+  }
 }
+
 

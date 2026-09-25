@@ -44,8 +44,7 @@
  * a licensee so wish it.
  */
 import {WebSocket} from 'ws';
-import {Handler} from './handler';
-import {receiveOperation} from '../webSocketOperations';
+import {FakeServerEvent} from '../fakeServerEvent';
 import {DataTablesService} from '../../services/dataService/dataTablesService';
 import DataTablesServiceImpl from '../../services/dataService/dataTablesServiceImpl';
 import {OutputType} from '../../../src/app/objects/output/outputType';
@@ -55,37 +54,44 @@ import {
   ParagraphOutputServerResponse
 } from '../../../src/test/data/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
 import {WebSocketServerResponse} from '../../../src/test/data/serverWebSocketResponses/webSocketServerResponse';
+import { Message } from '../../../src/app/objects/message/message';
 
-
-export default class ParagraphOutputRequestHandler implements Handler<object>{
+export default class ParagraphOutputRequestEvent implements FakeServerEvent {
+  private readonly  _webSocket: WebSocket;
+  private readonly _eventId: string;
   private readonly _dataTablesService: DataTablesService;
   private readonly _uPlotResultService: uPlotResultService;
 
-  constructor() {
+  constructor(webSocket: WebSocket) {
+    this._webSocket = webSocket;
+    this._eventId = 'PARAGRAPH_OUTPUT_REQUEST';
     this._dataTablesService = new DataTablesServiceImpl();
     this._uPlotResultService = new uPlotResultServiceImpl();
   }
 
-  operation(){
-    return receiveOperation.paragraphOutputRequest;
+  eventId(): string {
+    return this._eventId;
   }
 
-  execute(message: object, client: WebSocket): void  {
+  handle(requestMessage: Message): void {
     const rawData = this._dataTablesService.rawData(1000);
-    const messageData = message['data'];
-    const outputType = messageData['type'];
+    const messageData = requestMessage.dataAsWebSocketPayload();
+    const outputType = messageData.stringProperty('type');
     let paragraphOutputResponse:WebSocketServerResponse;
-    const noteId = messageData.noteId;
-    const paragraphId = messageData.paragraphId;
+    const noteId = messageData.stringProperty('noteId');
+    const paragraphId = messageData.stringProperty('paragraphId');
+    const requestOptions = messageData.objectPropertyAsPayload('requestOptions');
     if(outputType === OutputType.dataTables){
-      const options = messageData.requestOptions as {start:number, length:number, draw:number};
-      const paginatedData = this._dataTablesService.paginated(rawData, options.start, options.length, options.draw);
+      const start = requestOptions.numberProperty('start');
+      const length = requestOptions.numberProperty('length');
+      const draw = requestOptions.numberProperty('draw');
+      const paginatedData = this._dataTablesService.paginated(rawData, start, length, draw);
       paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, paginatedData, true, this._dataTablesService.options(rawData));
     }
     else if(outputType === OutputType.uPlot){
-      const requestOptions = messageData.requestOptions as {graphType: string};
-      paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.uPlot, this._uPlotResultService.outputData(), true, this._uPlotResultService.options(requestOptions.graphType));
+      const graphType = requestOptions.stringProperty('graphType');
+      paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.uPlot, this._uPlotResultService.outputData(), true, this._uPlotResultService.options(graphType));
     }
-    client.send(paragraphOutputResponse.toJson());
+    this._webSocket.send(paragraphOutputResponse.toJson());
   }
 }

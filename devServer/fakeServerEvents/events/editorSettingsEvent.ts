@@ -43,32 +43,58 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {FakeServerEvent} from '../fakeServerEvent';
 import {WebSocket} from 'ws';
-import {Handler} from './handler';
-import {receiveOperation} from '../webSocketOperations';
-import NoteService from '../../services/noteService';
-import {NewNoteMessage as CreateNoteMessage} from '../../interfaces/receiveMessage';
-import NotebookImpl from '../../data/note/notebookImpl';
-import {SparkPara} from '../../data/paragraph/sparkPara';
-import ParagraphImpl from '../../data/paragraph/paragraphImpl';
-import {NewNoteServerResponse} from '../../../src/test/data/serverWebSocketResponses/newNote/newNoteServerResponse';
+import {
+  EditorSettingResponse
+} from '../../../src/test/data/serverWebSocketResponses/editorSetting/editorSettingResponse';
+import {Message} from '../../../src/app/objects/message/message';
 
-export default class NewNoteHandler implements Handler<CreateNoteMessage>{
-  private readonly _noteService: NoteService;
+export default class EditorSettingsEvent implements FakeServerEvent {
+  private readonly _webSocket: WebSocket;
+  private readonly _eventId: string;
+  private readonly _supportedLanguages: string[];
+  private readonly _defaultLanguage: string;
 
-  constructor(noteService: NoteService) {
-    this._noteService = noteService;
+  constructor(webSocket: WebSocket) {
+    this._webSocket = webSocket;
+    this._eventId = 'EDITOR_SETTING';
+    this._supportedLanguages = ['text', 'sql', 'scala', 'python'];
+    this._defaultLanguage = this._supportedLanguages[0];
   }
 
-  operation(){
-    return receiveOperation.newNote;
-  };
+  eventId(): string {
+    return this._eventId;
+  }
 
-  execute(message: CreateNoteMessage, client: WebSocket) {
-    const name = message.data.name;
-    const notebook = new NotebookImpl(name, [new ParagraphImpl('READY', undefined,'%dpl'), SparkPara]);
-    this._noteService.add(notebook, notebook.id);
-    const newNoteResponse = new NewNoteServerResponse(notebook);
-    client.send(newNoteResponse.toJson());
+  handle(requestMessage: Message): void {
+    const paragraphText = requestMessage.dataAsWebSocketPayload().stringProperty('paragraphText');
+    const language = this.parseLanguage(paragraphText);
+    const editorSettings = {
+      language:language,
+      editorOnDblClick: false,
+      completionKey: '',
+      completionSupport: true,
+    };
+    const paragraphId = requestMessage.dataAsWebSocketPayload().stringProperty('paragraphId');
+    const editorSettingResponse = new EditorSettingResponse(editorSettings, paragraphId);
+    this._webSocket.send(editorSettingResponse.toJson());
+  }
+
+  private parseLanguage(text:string):string{
+    let found = this._defaultLanguage;
+    try{
+      this._supportedLanguages.some(lan => {
+        const searchedText = '%'+lan;
+        if(text.search(searchedText) === 0) {
+          found = lan;
+          return true;
+        }
+      });
+    }
+    catch(err) {
+      console.error(`Parsing language failed: ${err}`);
+    }
+    return found;
   }
 }

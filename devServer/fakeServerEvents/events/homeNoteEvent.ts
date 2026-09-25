@@ -43,48 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Handler} from './handler';
-import {EditorSettingMessage as receivedEditorSettings} from '../../interfaces/receiveMessage';
-import {receiveOperation} from '../webSocketOperations';
 import {WebSocket} from 'ws';
-import {
-  EditorSettingResponse
-} from '../../../src/test/data/serverWebSocketResponses/editorSetting/editorSettingResponse';
+import {FakeServerEvent} from '../fakeServerEvent';
 
-export default class EditorSettingsHandler implements Handler<receivedEditorSettings> {
-  private readonly _supportedLanguages: string[] = ['sql', 'scala', 'python'];
-  private readonly _defaultLanguage: string = 'text';
+//UI goes to an infinite loop requesting a home note if it doesn't receive response.
+// Delete this after the part of the UI has been refactored to angular2+.
+export default class HomeNoteEvent implements FakeServerEvent {
+  private readonly _webSocket:WebSocket;
+  private readonly _eventId:string;
 
-  operation(){
-    return receiveOperation.editorSetting;
-  };
+  constructor(webSocket:WebSocket) {
+    this._webSocket = webSocket;
+    this._eventId = 'GET_HOME_NOTE';
+  }
 
-  execute(message: receivedEditorSettings, client: WebSocket): void {
-    const language = this.parseLanguage(message.data.paragraphText);
-    const editorSettings = {
-      language:language,
-      editorOnDblClick: false,
-      completionKey: '',
-      completionSupport: true,
+  eventId(): string {
+    return this._eventId;
+  }
+
+  handle(): void {
+    const noteMessage = {
+      op:'NOTE',
+      data:{}
     };
-    const editorSettingResponse = new EditorSettingResponse(editorSettings, message.data.paragraphId);
-    client.send(editorSettingResponse.toJson());
-  }
-
-  private parseLanguage(text:string):string{
-    let found = this._defaultLanguage;
-    try{
-      this._supportedLanguages.some(lan => {
-        const searchedText = '%'+lan;
-        if(text.search(searchedText) === 0) {
-          found = lan;
-          return true;
-        }
-      });
-    }
-    catch(err) {
-      console.error(`Parsing language failed: ${err}`);
-    }
-    return found;
-  }
+    this._webSocket.send(JSON.stringify(noteMessage));  }
 }

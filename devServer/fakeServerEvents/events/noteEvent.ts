@@ -44,20 +44,30 @@
  * a licensee so wish it.
  */
 import {WebSocket} from 'ws';
-import {receiveOperation, sendOperation} from '../webSocketOperations';
-import {Handler} from './handler';
+import {FakeServerEvent} from '../fakeServerEvent';
+import NoteService from '../../services/noteService';
+import {NoteServerResponse} from '../../../src/test/data/serverWebSocketResponses/note/noteServerResponse';
+import {Message} from '../../../src/app/objects/message/message';
 
-export default class ErrorHandler implements Handler<object>{
+export default class NoteEvent implements FakeServerEvent {
+  private readonly  _webSocket: WebSocket;
+  private readonly _eventId: string;
+  private readonly _noteService: NoteService;
 
-  execute(message: object, client: WebSocket): void {
-    const msg = {
-      op: sendOperation.errorInfo,
-      data: {error: 'Unknown operation', op: message['op']},
-    };
-    client.send(JSON.stringify(msg));
+  constructor(webSocket:WebSocket, noteService: NoteService) {
+    this._webSocket = webSocket;
+    this._noteService = noteService;
+    this._eventId = 'GET_NOTE';
   }
 
-  operation(): receiveOperation {
-    throw new Error('Not implemented.');
-  };
+  eventId(): string {
+    return this._eventId;
+  }
+
+  handle(requestMessage: Message):void {
+    const noteId = requestMessage.dataAsWebSocketPayload().stringProperty('id');
+    const note = this._noteService.find(noteId);
+    const noteResponse = new NoteServerResponse(note);
+    this._webSocket.send(noteResponse.toJson());
+  }
 }

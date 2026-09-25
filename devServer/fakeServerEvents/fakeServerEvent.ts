@@ -43,32 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WebSocket} from 'ws';
-import {Handler} from './handler';
-import {ListNotesMessage} from '../../interfaces/receiveMessage';
-import {receiveOperation} from '../webSocketOperations';
-import NoteService from '../../services/noteService';
-import {NotesInfoServerResponse} from '../../../src/test/data/serverWebSocketResponses/notesInfo/notesInfoServerResponse';
+import {Message} from '../../src/app/objects/message/message';
 
-export default class NotesInfoHandler implements Handler<ListNotesMessage>{
-  private readonly _noteService: NoteService;
-
-  constructor(noteService: NoteService) {
-    this._noteService = noteService;
-  }
-
-  operation(){
-    return receiveOperation.listNotes;
-  };
-
-  execute(message: ListNotesMessage, client: WebSocket) {
-    const notes = this._noteService.all();
-    const data:{id:string, isTrash:boolean, name:string, path:string }[] = [];
-    for (const note of notes){
-      const info = {id:note.id, isTrash:false, name:note.name, path:note.path };
-      data.push(info);
-    }
-    const notesInfoResponse = new NotesInfoServerResponse(data);
-    client.send(notesInfoResponse.toJson());
-  }
+export interface FakeServerEvent{
+  eventId(): string;
+  handle(requestMessage:Message) :void;
 }
