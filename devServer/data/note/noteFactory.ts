@@ -54,7 +54,7 @@ export default class NoteFactory{
     this._paragraphFactory = new ParagraphFactory();
   }
 
-  seed(){
+  generatedNotes(){
     const notes:NotebookDTO[] = [];
     const noteCount = 5;
     const paragraphs = this._paragraphFactory.paragraphCollection();

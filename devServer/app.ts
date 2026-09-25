@@ -47,10 +47,13 @@ import express from 'express';
 import session from 'express-session';
 import path from 'path';
 import WebSocketServer from './webSocketServer';
-import InitializationService from './services/initializationService';
 import RouterFactory from './api/routerFactory';
 import {FakeUsers} from './api/user/fakeUsers';
 import SecurityManagerImpl from './api/securityManager/securityManagerImpl';
+import {existsSync, mkdirSync} from 'fs';
+import FileServiceImpl from './services/fileService/fileServiceImpl';
+import NoteServiceImpl from './services/noteService/noteServiceImpl';
+import NoteFactory from './data/note/noteFactory';
 
 const app = express();
 app.use(express.json());
@@ -61,16 +64,29 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(PUBLIC_PATH, 'index.html'));
 });
 
+//Initialize session
 const sessionConfig = session({ secret: 'keyboard cat', cookie: { maxAge: 60000 }});
 app.use(sessionConfig);
 
+//Initialize router and authentication
 const security = new SecurityManagerImpl(FakeUsers);
 const router = new RouterFactory(security);
 app.use(router.initialized());
-
 app.use(express.static(PUBLIC_PATH));
 
+//Seed fake data
+const basePath = './devServer/temp';
+const fileService = new FileServiceImpl(basePath);
+if(!existsSync(basePath)){
+  mkdirSync(basePath);
+  const noteService = new NoteServiceImpl(fileService);
+  const noteFactory = new NoteFactory();
+  const notes = noteFactory.generatedNotes();
+  notes.map((note) => {
+    noteService.add(note, note.id);
+  });
+}
 
-new WebSocketServer(new InitializationService().initialized());
+new WebSocketServer(fileService);
 
 export default app;
