@@ -45,31 +45,36 @@
  */
 import ParagraphImpl from './paragraphImpl';
 import {SparkPara} from './sparkPara';
-import {DataTablesService} from '../../services/dataTablesService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataTablesService/dataTablesServiceImpl';
 import {OutputType} from '../../../src/app/objects/output/outputType';
+import {DataTablesDataFactory} from '../../../src/test/data/output/dataTables/dataTablesDataFactory';
+import {DataTablesDataFactoryImpl} from '../../../src/test/data/output/dataTables/dataTablesDataFactoryImpl';
 
 export default class ParagraphFactory{
-  private readonly _dataTablesService : DataTablesService;
+  private readonly _dataTablesDataFactory: DataTablesDataFactory;
 
   constructor() {
-    this._dataTablesService = new DataTablesServiceImpl();
+    this._dataTablesDataFactory = new DataTablesDataFactoryImpl();
   }
 
   paragraphCollection() {
-    const baseData = this._dataTablesService.rawData(50);
-    const output1 = {
+    const draw = 1;
+    const startIndex = 0;
+    const rowCount = 50;
+    const rawData = this._dataTablesDataFactory.rawData(rowCount);
+    const paginatedData = this._dataTablesDataFactory.paginatedData(rawData, startIndex, rowCount,draw)
+    const options = {headers: Object.keys(paginatedData.data[0])};
+    const dataTablesOutput = {
       type: OutputType.dataTables,
-      data: this._dataTablesService.paginated(baseData, 0, 50,1),
-      options: this._dataTablesService.options(baseData),
+      data: paginatedData,
+      options: options,
       isAggregated: true,
     };
-    const para1 = new ParagraphImpl('FINISHED', output1,'%dpl\n *raw data query*', '');
-    const output2 = {
+    const para1 = new ParagraphImpl('FINISHED', dataTablesOutput,'%dpl\n *raw data output*', '');
+    const textOutput = {
       type: OutputType.text,
-      data: 'Error: 1291kmfv910yht1 g1rj190+2u90',
+      data: 'Some text output',
     };
-    const para2 = new ParagraphImpl('FINISHED', output2,'%dpl\n *raw data query fails*', '');
+    const para2 = new ParagraphImpl('FINISHED', textOutput,'%dpl\n *text data output*', '');
     return [para1, para2, SparkPara];
   }
 }

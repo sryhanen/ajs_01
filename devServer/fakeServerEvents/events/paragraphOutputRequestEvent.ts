@@ -45,8 +45,6 @@
  */
 import {WebSocket} from 'ws';
 import {FakeServerEvent} from '../fakeServerEvent';
-import {DataTablesService} from '../../services/dataTablesService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataTablesService/dataTablesServiceImpl';
 import {OutputType} from '../../../src/app/objects/output/outputType';
 import {uPlotResultService} from '../../services/uPlotResultService/uPlotResultService';
 import {uPlotResultServiceImpl} from '../../services/uPlotResultService/uPlotResultServiceImpl';
@@ -55,17 +53,19 @@ import {
 } from '../../../src/test/data/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
 import {WebSocketServerResponse} from '../../../src/test/data/serverWebSocketResponses/webSocketServerResponse';
 import { Message } from '../../../src/app/objects/message/message';
+import {DataTablesDataFactory} from '../../../src/test/data/output/dataTables/dataTablesDataFactory';
+import {DataTablesDataFactoryImpl} from '../../../src/test/data/output/dataTables/dataTablesDataFactoryImpl';
 
 export default class ParagraphOutputRequestEvent implements FakeServerEvent {
   private readonly  _webSocket: WebSocket;
   private readonly _eventId: string;
-  private readonly _dataTablesService: DataTablesService;
+  private readonly _dataTablesDataFactory: DataTablesDataFactory;
   private readonly _uPlotResultService: uPlotResultService;
 
   constructor(webSocket: WebSocket) {
     this._webSocket = webSocket;
     this._eventId = 'PARAGRAPH_OUTPUT_REQUEST';
-    this._dataTablesService = new DataTablesServiceImpl();
+    this._dataTablesDataFactory = new DataTablesDataFactoryImpl();
     this._uPlotResultService = new uPlotResultServiceImpl();
   }
 
@@ -74,7 +74,6 @@ export default class ParagraphOutputRequestEvent implements FakeServerEvent {
   }
 
   handle(requestMessage: Message): void {
-    const rawData = this._dataTablesService.rawData(1000);
     const messageData = requestMessage.dataAsWebSocketPayload();
     const outputType = messageData.stringProperty('type');
     let paragraphOutputResponse:WebSocketServerResponse;
@@ -85,8 +84,10 @@ export default class ParagraphOutputRequestEvent implements FakeServerEvent {
       const start = requestOptions.numberProperty('start');
       const length = requestOptions.numberProperty('length');
       const draw = requestOptions.numberProperty('draw');
-      const paginatedData = this._dataTablesService.paginated(rawData, start, length, draw);
-      paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, paginatedData, true, this._dataTablesService.options(rawData));
+      const rawData = this._dataTablesDataFactory.rawData(1000);
+      const paginatedData = this._dataTablesDataFactory.paginatedData(rawData, start, length, draw);
+      const outputOptions = {headers:Object.keys(paginatedData.data[0])};
+      paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, paginatedData, true, outputOptions);
     }
     else if(outputType === OutputType.uPlot){
       const graphType = requestOptions.stringProperty('graphType');

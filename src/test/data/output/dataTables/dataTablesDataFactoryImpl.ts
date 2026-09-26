@@ -43,18 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {DataTablesService} from './dataTablesService';
+import {DataTablesDataFactory} from './dataTablesDataFactory';
 
-export default class DataTablesServiceImpl implements DataTablesService {
+export class DataTablesDataFactoryImpl implements DataTablesDataFactory {
   private readonly _people: string[] = ['Bob', 'Alice', 'Mark', 'Elise'];
   private readonly _operation: string[] = ['create', 'read', 'update', 'delete'];
   private readonly _host: string[] = ['example.test', ''];
 
-  options(data:object[]): object {
-    const headers = Object.keys(data[0]);
+  paginatedData(rawData: object[], start: number, length: number, draw: number): {
+    data: object[];
+    recordsTotal: number;
+    recordsFiltered: number;
+    draw: number
+  } {
     return {
-      headers: headers,
+      data: rawData.slice(start, start+length),
+      recordsTotal: rawData.length,
+      recordsFiltered: rawData.length,
+      draw: draw
     };
+
   }
 
   rawData(rowCount: number): object[]{
@@ -64,9 +72,9 @@ export default class DataTablesServiceImpl implements DataTablesService {
       const elapsed = Math.random() * 10 - 5;
       const balance = (Math.random() * 10 - 5) * 200;
       const row = {
-        person: this.randomValue(this._people),
-        operation: this.randomValue(this._operation),
-        host: this.randomValue(this._host),
+        person: this.randomValueFromList(this._people),
+        operation: this.randomValueFromList(this._operation),
+        host: this.randomValueFromList(this._host),
         count: count,
         elapsed: elapsed,
         balance: balance,
@@ -76,18 +84,8 @@ export default class DataTablesServiceImpl implements DataTablesService {
     return rows;
   }
 
-  private randomValue(list:string[]):string {
+  private randomValueFromList(list:string[]):string {
     const index = Math.floor(Math.random() * list.length);
     return list[index];
-  }
-
-  paginated(data: object[], start:number, length:number, draw:number) {
-
-    return {
-      data: data.slice(start, start+length),
-      recordsTotal: data.length,
-      recordsFiltered: data.length,
-      draw: draw
-    };
   }
 }

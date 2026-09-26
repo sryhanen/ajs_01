@@ -46,8 +46,6 @@
 import {WebSocket} from 'ws';
 import {FakeServerEvent} from '../fakeServerEvent';
 import ParagraphImpl from '../../data/paragraph/paragraphImpl';
-import {DataTablesService} from '../../services/dataTablesService/dataTablesService';
-import DataTablesServiceImpl from '../../services/dataTablesService/dataTablesServiceImpl';
 import NoteServiceImpl from '../../services/noteService/noteServiceImpl';
 import {OutputType} from '../../../src/app/objects/output/outputType';
 import {
@@ -58,21 +56,20 @@ import {
   ParagraphOutputServerResponse
 } from '../../../src/test/data/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
 import { Message } from '../../../src/app/objects/message/message';
+import {DataTablesDataFactory} from '../../../src/test/data/output/dataTables/dataTablesDataFactory';
+import {DataTablesDataFactoryImpl} from '../../../src/test/data/output/dataTables/dataTablesDataFactoryImpl';
 
 export default class RunParagraphEvent implements FakeServerEvent {
   private readonly _webSocket: WebSocket;
   private readonly _noteService: NoteServiceImpl;
   private readonly _eventId:string;
-  private readonly _dataTablesService: DataTablesService;
-  private readonly _rowCount = 1000;
-  private readonly _baseData: object[];
+  private readonly _dataTablesDataFactory: DataTablesDataFactory;
 
   constructor(webSocket: WebSocket, noteService: NoteServiceImpl) {
     this._webSocket = webSocket;
     this._noteService = noteService;
     this._eventId = 'RUN_PARAGRAPH';
-    this._dataTablesService = new DataTablesServiceImpl();
-    this._baseData = this._dataTablesService.rawData(this._rowCount);
+    this._dataTablesDataFactory = new DataTablesDataFactoryImpl();
   }
 
   eventId(): string {
@@ -96,20 +93,26 @@ export default class RunParagraphEvent implements FakeServerEvent {
       messageQueue.push(new ProgressServerResponse(i*5, paragraphId).toJson());
     }
 
-    const noteId = this._noteService.lastNoteId();
-    const options = this._dataTablesService.options(this._baseData);
+    const rowCount = 1000;
+    const rawData = this._dataTablesDataFactory.rawData(rowCount);
+    const outputOptions = {headers:Object.keys(rawData[0])};
     const draws = 5;
-    for (let i = 1; i < draws; i++) {
+    const noteId = this._noteService.lastNoteId();
+    const startIndex = 0;
+    for (let draw = 1; draw < draws; draw++) {
       const index = messageQueue.length / draws;
-      const interimOutput = this._dataTablesService.paginated(this._baseData, 0, i*8, i);
-      const paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, interimOutput, true, options);
-      messageQueue.splice(i*index,0, paragraphOutputResponse.toJson());
+      const endIndex = draw*8;
+      const interimOutput = this._dataTablesDataFactory.paginatedData(rawData, startIndex, endIndex, draw);
+      const paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, interimOutput, true, outputOptions);
+      const messageIndex = draw*index;
+      messageQueue.splice(messageIndex,0, paragraphOutputResponse.toJson());
     }
-    const finalOutput = this._dataTablesService.paginated(this._baseData, 0, 50, draws);
-    const paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, finalOutput, true, options);
+    const endIndex = 50;
+    const finalOutput = this._dataTablesDataFactory.paginatedData(rawData, startIndex, endIndex, draws);
+    const paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, finalOutput, true, outputOptions);
     paragraph.status = 'FINISHED';
     paragraph.progress = 100;
-    paragraph.output = {data: finalOutput, options: this._dataTablesService.options(this._baseData), type:OutputType.dataTables, isAggregated:true};
+    paragraph.output = {data: finalOutput, options: outputOptions, type:OutputType.dataTables, isAggregated:true};
     messageQueue.push(paragraphOutputResponse.toJson());
     messageQueue.push(new ParagraphServerResponse(paragraph).toJson());
     this.updateNotebook(paragraph);

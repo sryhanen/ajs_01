@@ -43,9 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+export interface DataTablesDataFactory {
+  rawData(rowCount:number): object[];
 
-export interface DataTablesService {
-  rawData(rowCount: number): object[];
-  paginated(data: object[], start:number, length:number, draw:number): object;
-  options(data:object[]): object;
+  paginatedData(rawData: object[], start:number, length:number, draw:number):{
+    data: object[],
+    recordsTotal: number,
+    recordsFiltered: number,
+    draw: number
+  }
 }
