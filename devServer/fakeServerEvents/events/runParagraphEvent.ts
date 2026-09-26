@@ -50,14 +50,14 @@ import NoteServiceImpl from '../../services/noteService/noteServiceImpl';
 import {OutputType} from '../../../src/app/objects/output/outputType';
 import {
   ParagraphServerResponse
-} from '../../../src/test/data/serverWebSocketResponses/paragraph/paragraphServerResponse';
-import {ProgressServerResponse} from '../../../src/test/data/serverWebSocketResponses/progress/progressServerResponse';
+} from '../../../src/test/fakes/serverWebSocketResponses/paragraph/paragraphServerResponse';
+import {ProgressServerResponse} from '../../../src/test/fakes/serverWebSocketResponses/progress/progressServerResponse';
 import {
   ParagraphOutputServerResponse
-} from '../../../src/test/data/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
+} from '../../../src/test/fakes/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
 import { Message } from '../../../src/app/objects/message/message';
-import {DataTablesDataFactory} from '../../../src/test/data/output/dataTables/dataTablesDataFactory';
-import {DataTablesDataFactoryImpl} from '../../../src/test/data/output/dataTables/dataTablesDataFactoryImpl';
+import {DataTablesDataFactory} from '../../../src/test/fakes/output/dataTables/dataTablesDataFactory';
+import {DataTablesDataFactoryImpl} from '../../../src/test/fakes/output/dataTables/dataTablesDataFactoryImpl';
 
 export default class RunParagraphEvent implements FakeServerEvent {
   private readonly _webSocket: WebSocket;

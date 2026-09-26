@@ -49,7 +49,7 @@ import NoteServiceImpl from '../../services/noteService/noteServiceImpl';
 import ParagraphImpl from '../../data/paragraph/paragraphImpl';
 import {
   ParagraphAddedServerResponse
-} from '../../../src/test/data/serverWebSocketResponses/paragraphAdded/paragraphAddedServerResponse';
+} from '../../../src/test/fakes/serverWebSocketResponses/paragraphAdded/paragraphAddedServerResponse';
 import {Message} from '../../../src/app/objects/message/message';
 
 export default class InsertParagraphEvent implements FakeServerEvent{

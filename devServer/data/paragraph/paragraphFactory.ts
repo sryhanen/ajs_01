@@ -46,8 +46,8 @@
 import ParagraphImpl from './paragraphImpl';
 import {SparkPara} from './sparkPara';
 import {OutputType} from '../../../src/app/objects/output/outputType';
-import {DataTablesDataFactory} from '../../../src/test/data/output/dataTables/dataTablesDataFactory';
-import {DataTablesDataFactoryImpl} from '../../../src/test/data/output/dataTables/dataTablesDataFactoryImpl';
+import {DataTablesDataFactory} from '../../../src/test/fakes/output/dataTables/dataTablesDataFactory';
+import {DataTablesDataFactoryImpl} from '../../../src/test/fakes/output/dataTables/dataTablesDataFactoryImpl';
 
 export default class ParagraphFactory{
   private readonly _dataTablesDataFactory: DataTablesDataFactory;

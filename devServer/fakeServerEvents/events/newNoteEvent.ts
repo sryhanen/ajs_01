@@ -49,7 +49,7 @@ import NoteServiceImpl from '../../services/noteService/noteServiceImpl';
 import NotebookImpl from '../../data/note/notebookImpl';
 import {SparkPara} from '../../data/paragraph/sparkPara';
 import ParagraphImpl from '../../data/paragraph/paragraphImpl';
-import {NewNoteServerResponse} from '../../../src/test/data/serverWebSocketResponses/newNote/newNoteServerResponse';
+import {NewNoteServerResponse} from '../../../src/test/fakes/serverWebSocketResponses/newNote/newNoteServerResponse';
 import {Message} from '../../../src/app/objects/message/message';
 
 export default class NewNoteEvent implements FakeServerEvent{

@@ -46,7 +46,7 @@
 import {WebSocket} from 'ws';
 import {FakeServerEvent} from '../fakeServerEvent';
 import NoteServiceImpl from '../../services/noteService/noteServiceImpl';
-import {NoteServerResponse} from '../../../src/test/data/serverWebSocketResponses/note/noteServerResponse';
+import {NoteServerResponse} from '../../../src/test/fakes/serverWebSocketResponses/note/noteServerResponse';
 import {Message} from '../../../src/app/objects/message/message';
 
 export default class NoteEvent implements FakeServerEvent {

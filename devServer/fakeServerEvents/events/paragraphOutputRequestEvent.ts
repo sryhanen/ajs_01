@@ -48,13 +48,13 @@ import {FakeServerEvent} from '../fakeServerEvent';
 import {OutputType} from '../../../src/app/objects/output/outputType';
 import {
   ParagraphOutputServerResponse
-} from '../../../src/test/data/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
-import {WebSocketServerResponse} from '../../../src/test/data/serverWebSocketResponses/webSocketServerResponse';
+} from '../../../src/test/fakes/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
+import {WebSocketServerResponse} from '../../../src/test/fakes/serverWebSocketResponses/webSocketServerResponse';
 import { Message } from '../../../src/app/objects/message/message';
-import {DataTablesDataFactory} from '../../../src/test/data/output/dataTables/dataTablesDataFactory';
-import {DataTablesDataFactoryImpl} from '../../../src/test/data/output/dataTables/dataTablesDataFactoryImpl';
-import {uPlotDataFactory} from '../../../src/test/data/output/uPlot/uPlotDataFactory';
-import {uPlotDataFactoryImpl} from '../../../src/test/data/output/uPlot/uPlotDataFactoryImpl';
+import {DataTablesDataFactory} from '../../../src/test/fakes/output/dataTables/dataTablesDataFactory';
+import {DataTablesDataFactoryImpl} from '../../../src/test/fakes/output/dataTables/dataTablesDataFactoryImpl';
+import {uPlotDataFactory} from '../../../src/test/fakes/output/uPlot/uPlotDataFactory';
+import {uPlotDataFactoryImpl} from '../../../src/test/fakes/output/uPlot/uPlotDataFactoryImpl';
 import {WebSocketPayload} from '../../../src/app/objects/webSocketPayload/webSocketPayload';
 
 export default class ParagraphOutputRequestEvent implements FakeServerEvent {
