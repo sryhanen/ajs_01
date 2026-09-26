@@ -44,44 +44,18 @@
  * a licensee so wish it.
  */
 import uPlot from 'uplot';
-import {uPlotResultService} from './uPlotResultService';
+import {uPlotDataFactory} from './uPlotDataFactory';
 
-export class uPlotResultServiceImpl implements uPlotResultService {
-  private readonly _seriesLength:number;
-  private readonly _seriesCount:number;
-
-  constructor() {
-    this._seriesLength = 10;
-    this._seriesCount = 4;
-  }
-
-  options(graphType:string): object {
-    const xValues = this.xValues();
-    const series = [];
-    for(let i=0; i< this._seriesCount; i++) {
-      series.push(`series${i + 1}`);
-    }
-    return {
-      labels: xValues.map(v => {return `moment ${v}`;}),
-        series: series,
-        xAxisLabel: 'xAxis',
-        graphType: graphType,
-    };
-  }
-
-  outputData(): uPlot.AlignedData {
-    const xValues = this.xValues();
+export class uPlotDataFactoryImpl implements uPlotDataFactory {
+  uPlotAlignedData(seriesCount: number, seriesLength:number): uPlot.AlignedData {
+    const xValues = Array.from(Array(seriesLength).keys());
     const data = [];
-    for(let i=0; i< this._seriesCount; i++){
-      data.push(xValues.map(i => {
+    for(let i=0; i< seriesCount; i++){
+      data.push(xValues.map(() => {
         return (Math.random() * 10 - 5) * 200;
       }));
     }
     data.unshift(xValues);
     return data as uPlot.AlignedData;
-  }
-
-  private xValues() {
-    return Array.from(Array(this._seriesLength).keys());
   }
 }

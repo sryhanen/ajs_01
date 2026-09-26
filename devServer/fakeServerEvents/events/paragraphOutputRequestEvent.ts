@@ -46,8 +46,6 @@
 import {WebSocket} from 'ws';
 import {FakeServerEvent} from '../fakeServerEvent';
 import {OutputType} from '../../../src/app/objects/output/outputType';
-import {uPlotResultService} from '../../services/uPlotResultService/uPlotResultService';
-import {uPlotResultServiceImpl} from '../../services/uPlotResultService/uPlotResultServiceImpl';
 import {
   ParagraphOutputServerResponse
 } from '../../../src/test/data/serverWebSocketResponses/paragraphOutput/paragraphOutputServerResponse';
@@ -55,18 +53,21 @@ import {WebSocketServerResponse} from '../../../src/test/data/serverWebSocketRes
 import { Message } from '../../../src/app/objects/message/message';
 import {DataTablesDataFactory} from '../../../src/test/data/output/dataTables/dataTablesDataFactory';
 import {DataTablesDataFactoryImpl} from '../../../src/test/data/output/dataTables/dataTablesDataFactoryImpl';
+import {uPlotDataFactory} from '../../../src/test/data/output/uPlot/uPlotDataFactory';
+import {uPlotDataFactoryImpl} from '../../../src/test/data/output/uPlot/uPlotDataFactoryImpl';
+import {WebSocketPayload} from '../../../src/app/objects/webSocketPayload/webSocketPayload';
 
 export default class ParagraphOutputRequestEvent implements FakeServerEvent {
   private readonly  _webSocket: WebSocket;
   private readonly _eventId: string;
   private readonly _dataTablesDataFactory: DataTablesDataFactory;
-  private readonly _uPlotResultService: uPlotResultService;
+  private readonly _uPlotDataFactory: uPlotDataFactory;
 
   constructor(webSocket: WebSocket) {
     this._webSocket = webSocket;
     this._eventId = 'PARAGRAPH_OUTPUT_REQUEST';
     this._dataTablesDataFactory = new DataTablesDataFactoryImpl();
-    this._uPlotResultService = new uPlotResultServiceImpl();
+    this._uPlotDataFactory = new uPlotDataFactoryImpl();
   }
 
   eventId(): string {
@@ -80,19 +81,48 @@ export default class ParagraphOutputRequestEvent implements FakeServerEvent {
     const noteId = messageData.stringProperty('noteId');
     const paragraphId = messageData.stringProperty('paragraphId');
     const requestOptions = messageData.objectPropertyAsPayload('requestOptions');
+    const graphType = requestOptions.stringProperty('graphType');
     if(outputType === OutputType.dataTables){
-      const start = requestOptions.numberProperty('start');
-      const length = requestOptions.numberProperty('length');
-      const draw = requestOptions.numberProperty('draw');
-      const rawData = this._dataTablesDataFactory.rawData(1000);
-      const paginatedData = this._dataTablesDataFactory.paginatedData(rawData, start, length, draw);
-      const outputOptions = {headers:Object.keys(paginatedData.data[0])};
-      paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, paginatedData, true, outputOptions);
+      paragraphOutputResponse = this.dataTablesParagraphOutputResponse(requestOptions, paragraphId, noteId);
     }
     else if(outputType === OutputType.uPlot){
-      const graphType = requestOptions.stringProperty('graphType');
-      paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.uPlot, this._uPlotResultService.outputData(), true, this._uPlotResultService.options(graphType));
+      paragraphOutputResponse = this.uPlotParagraphOutputResponse(graphType, paragraphId, noteId);
+    }
+    else{
+      paragraphOutputResponse = this.notImplementedResultResponse(graphType, paragraphId, noteId);
     }
     this._webSocket.send(paragraphOutputResponse.toJson());
+  }
+
+  private uPlotParagraphOutputResponse(graphType:string, paragraphId:string, noteId:string): ParagraphOutputServerResponse {
+    const seriesCount = 5;
+    const seriesLength = 30;
+    const outputData = this._uPlotDataFactory.uPlotAlignedData(seriesCount, seriesLength);
+    const seriesNames = [];
+    for(let i=0; i< seriesCount; i++) {
+      seriesNames.push(`Series${i + 1}`);
+    }
+    const xAxisLabel = 'xAxisLabel';
+    const outputOptions = {
+      labels: Array(seriesLength).map(v => {return `moment ${v}`;}),
+      series: seriesNames,
+      xAxisLabel: xAxisLabel,
+      graphType: graphType,
+    };
+    return new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.uPlot, outputData, true, outputOptions);
+  }
+
+  private dataTablesParagraphOutputResponse(requestOptions:WebSocketPayload, paragraphId:string, noteId:string):ParagraphOutputServerResponse{
+    const start = requestOptions.numberProperty('start');
+    const length = requestOptions.numberProperty('length');
+    const draw = requestOptions.numberProperty('draw');
+    const rawData = this._dataTablesDataFactory.rawData(1000);
+    const paginatedData = this._dataTablesDataFactory.paginatedData(rawData, start, length, draw);
+    const outputOptions = {headers:Object.keys(paginatedData.data[0])};
+    return new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.dataTables, paginatedData, true, outputOptions);
+  }
+
+  private notImplementedResultResponse(resultType:string, paragraphId:string, noteId:string):ParagraphOutputServerResponse {
+    return new ParagraphOutputServerResponse(paragraphId, noteId, OutputType.text, `Result for type "${resultType}" not implemented.`, true);
   }
 }

@@ -45,7 +45,6 @@
  */
 import uPlot from 'uplot';
 
-export interface uPlotResultService {
-  outputData(): uPlot.AlignedData;
-  options(graphType:string): object;
+export interface uPlotDataFactory {
+  uPlotAlignedData(seriesCount: number, seriesLength:number): uPlot.AlignedData;
 }
