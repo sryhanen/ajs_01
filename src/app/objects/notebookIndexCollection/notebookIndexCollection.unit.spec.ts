@@ -44,22 +44,22 @@
  * a licensee so wish it.
  */
 import {Channel} from '../channel/channel';
-import {NotebookCollection} from './notebookCollection';
+import {NotebookIndexCollection} from './notebookIndexCollection';
 import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
-import {NotebookCollectionImpl} from './notebookCollectionImpl';
+import {NotebookIndexCollectionImpl} from './notebookIndexCollectionImpl';
 
 describe('NotebookCollection', () => {
   let channel: Channel;
-  let notebookCollection: NotebookCollection;
+  let notebookCollection: NotebookIndexCollection;
 
   beforeEach(() => {
     channel = new FakeChannel();
-    notebookCollection = new NotebookCollectionImpl(channel);
+    notebookCollection = new NotebookIndexCollectionImpl(channel);
   });
 
   describe('Birth', () => {
     it('Should have been initialized', () =>{
-      expect(notebookCollection).toBeInstanceOf(NotebookCollectionImpl);
+      expect(notebookCollection).toBeInstanceOf(NotebookIndexCollectionImpl);
     });
 
     it('Should print', () => {

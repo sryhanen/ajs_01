@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookCollection} from './notebookCollection';
+import {NotebookIndexCollection} from './notebookIndexCollection';
 import {Channel} from '../channel/channel';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
@@ -55,7 +55,7 @@ import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {Message} from '../message/message';
 
-export class NotebookCollectionImpl implements NotebookCollection{
+export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
   private readonly _channel:Channel;
   private readonly _responseEvents: Map<string, (message:Message) =>void>;
   private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
@@ -71,6 +71,13 @@ export class NotebookCollectionImpl implements NotebookCollection{
       ['NOTES_INFO', (message) => this.notesInfoResponse(message)],
     ]);
   }
+
+  addNotebookIndex(notebookIndex: NotebookIndex): void {
+        throw new Error('Method not implemented.');
+    }
+    removeAllNotebookIndices(): void {
+        throw new Error('Method not implemented.');
+    }
 
   private notesInfoResponse(message:Message):void{
     this._notebookIndices.set(new NotesInfoMessageImpl(message).notebookIndices(this));
