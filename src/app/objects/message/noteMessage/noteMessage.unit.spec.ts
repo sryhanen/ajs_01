@@ -50,41 +50,33 @@ import {MessageImpl} from '../messageImpl';
 import {NoteMessageImpl} from './noteMessageImpl';
 import {FakeChannel} from '../../../../test/fakes/channel/fakeChannel';
 import {Channel} from '../../channel/channel';
+import {NoteServerResponse} from '../../../../test/fakes/webSocketServerResponses/note/noteServerResponse';
+import {NotebookPayloadFactoryImpl} from '../../../../test/fakes/notebook/notebookPayloadFactoryImpl';
+import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
 
 describe('Note message unit test', () => {
   let channel: Channel;
-  const messageData ={
-    op:'NOTE',
-    data:{
-      id:'notebook',
-      paragraphs:[]
-    }
-  };
   let message:Message;
   let noteMessage:NoteMessage;
+  const notebookPayload = new NotebookPayloadFactoryImpl();
 
   beforeEach(() => {
     channel = new FakeChannel();
-    message = new MessageImpl(new WebSocketPayloadImpl(messageData));
+    message = new MessageImpl(new WebSocketPayloadImpl(new NoteServerResponse(notebookPayload).toObject()));
     noteMessage = new NoteMessageImpl(message);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(noteMessage).toBeDefined();
-    });
-
-    it('Should have notebook', () => {
-      expect(noteMessage.notebook(channel)).toBeDefined();
-    });
+  it('Should render', () => {
+    const notebookIndex = new NotebookIndexImpl(channel, notebookPayload.toPayload());
+    const renderSpy = vi.spyOn(notebookIndex, 'renderNotebook');
+    noteMessage.render(notebookIndex);
+    expect(renderSpy).toHaveBeenCalledTimes(1);
   });
 
-  describe('Validation', () => {
-    it('Should throw if message operation is not "NOTE"', () => {
-      messageData.op = '';
-      message = new MessageImpl(new WebSocketPayloadImpl(messageData));
-      noteMessage = new NoteMessageImpl(message);
-      expect(() => noteMessage.notebook(channel)).toThrow();
-    });
+  it('Should not render', () => {
+    const notebookIndex = new NotebookIndexImpl(channel, {id:'wrong-id'});
+    const renderSpy = vi.spyOn(notebookIndex, 'renderNotebook');
+    noteMessage.render(notebookIndex);
+    expect(renderSpy).toHaveBeenCalledTimes(0);
   });
 });
