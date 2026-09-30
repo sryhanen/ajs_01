@@ -45,7 +45,7 @@
  */
 import {Channel} from '../../../channel/channel';
 import {AngularObject} from '../../../angularObject/angularObject';
-import {FakeChannel} from '../../../channel/fakeChannel';
+import {FakeChannel} from '../../../../../test/fakes/channel/fakeChannel';
 import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
 import {AngularObjectUpdateResponse} from './angularObjectUpdateResponse';
 

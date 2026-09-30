@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../../../channel/channel';
-import {FakeChannel} from '../../../../channel/fakeChannel';
+import {FakeChannel} from '../../../../../../test/fakes/channel/fakeChannel';
 import {DataTablesPluginImpl} from './dataTablesPluginImpl';
 import {DataTablesPlugin} from './dataTablesPlugin';
 

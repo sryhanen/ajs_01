@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {AngularPluginAjs} from './angularPlugin.ajs';
-import {FakeChannel} from '../../objects/channel/fakeChannel';
+import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 import {AngularObjectImpl} from '../../objects/angularObject/angularObjectImpl';
 
 describe('AngularPluginAjs', () => {

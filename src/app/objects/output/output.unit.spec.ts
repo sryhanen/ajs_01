@@ -45,7 +45,7 @@
  */
 import {Output} from './output';
 import {Channel} from '../channel/channel';
-import {FakeChannel} from '../channel/fakeChannel';
+import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 import {OutputImpl} from './outputImpl';
 import {OutputType} from './outputType';
 import {RenderNode} from '../rendering/renderNode/renderNode';

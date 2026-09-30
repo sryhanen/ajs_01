@@ -47,7 +47,7 @@ import {AngularObject} from '../../../angularObject/angularObject';
 import {AngularObjectRemoveResponse} from './angularObjectRemoveResponse';
 import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
 import {Channel} from '../../../channel/channel';
-import {FakeChannel} from '../../../channel/fakeChannel';
+import {FakeChannel} from '../../../../../test/fakes/channel/fakeChannel';
 
 describe('AngularObjectRemoveResponse', () => {
   const defaultAngularObjectData =  {

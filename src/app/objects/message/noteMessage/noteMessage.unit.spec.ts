@@ -48,7 +48,7 @@ import {Message} from '../message';
 import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
 import {MessageImpl} from '../messageImpl';
 import {NoteMessageImpl} from './noteMessageImpl';
-import {FakeChannel} from '../../channel/fakeChannel';
+import {FakeChannel} from '../../../../test/fakes/channel/fakeChannel';
 import {Channel} from '../../channel/channel';
 
 describe('Note message unit test', () => {

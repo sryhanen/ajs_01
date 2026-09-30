@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {RunParagraphRequest} from './runParagraphRequest';
-import {FakeChannel} from '../../channel/fakeChannel';
+import {FakeChannel} from '../../../../test/fakes/channel/fakeChannel';
 import {Channel} from '../../channel/channel';
 
 describe('RunParagraphRequest', () => {

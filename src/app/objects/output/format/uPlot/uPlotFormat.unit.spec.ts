@@ -45,7 +45,7 @@
  */
 import {UPlotFormatImpl} from './uPlotFormatImpl';
 import {Channel} from '../../../channel/channel';
-import {FakeChannel} from '../../../channel/fakeChannel';
+import {FakeChannel} from '../../../../../test/fakes/channel/fakeChannel';
 import {OutputType} from '../../outputType';
 
 describe('uPlotFormat unit test', () => {

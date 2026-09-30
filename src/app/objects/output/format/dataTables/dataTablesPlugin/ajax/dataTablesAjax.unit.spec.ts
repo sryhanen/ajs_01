@@ -45,7 +45,7 @@
  */
 import {Channel} from '../../../../../channel/channel';
 import {DataTablesAjaxImpl} from './dataTablesAjaxImpl';
-import {FakeChannel} from '../../../../../channel/fakeChannel';
+import {FakeChannel} from '../../../../../../../test/fakes/channel/fakeChannel';
 import {DataTablesAjax} from './dataTablesAjax';
 
 describe('Ajax', () => {

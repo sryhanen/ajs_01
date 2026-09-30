@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {FakeChannel} from '../channel/fakeChannel';
+import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 import {AngularObjectCollection} from './angularObjectCollection';
 import {AngularObjectCollectionImpl} from './angularObjectCollectionImpl';
 import {AngularObject} from '../angularObject/angularObject';

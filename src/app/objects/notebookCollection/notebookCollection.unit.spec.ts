@@ -45,7 +45,7 @@
  */
 import {Channel} from '../channel/channel';
 import {NotebookCollection} from './notebookCollection';
-import {FakeChannel} from '../channel/fakeChannel';
+import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 import {NotebookCollectionImpl} from './notebookCollectionImpl';
 import Stubable from '../../shared/interfaces/stubable';
 
