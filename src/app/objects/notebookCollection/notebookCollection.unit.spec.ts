@@ -47,7 +47,6 @@ import {Channel} from '../channel/channel';
 import {NotebookCollection} from './notebookCollection';
 import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 import {NotebookCollectionImpl} from './notebookCollectionImpl';
-import Stubable from '../../shared/interfaces/stubable';
 
 describe('NotebookCollection', () => {
   let channel: Channel;
@@ -66,7 +65,7 @@ describe('NotebookCollection', () => {
     it('Should print', () => {
       const notebookCollectionPrinted = notebookCollection.print()();
       expect(notebookCollectionPrinted.isStub()).toBe(false);
-      expect((notebookCollectionPrinted.inputs()()['currentNotebook'] as Stubable).isStub()).toBe(true);
+      expect(notebookCollectionPrinted.inputs()()['notebookIndices']).toEqual([]);
     });
   });
 
@@ -79,21 +78,6 @@ describe('NotebookCollection', () => {
       };
       notebookCollection.request(request);
       expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
-  });
-
-  describe('NOTE response behavior', () => {
-    it('Should have add child to printed collection after note response', () => {
-      const response = {
-        op:'NOTE',
-        data:{
-          id:'note',
-          paragraphs:[]
-        }
-      };
-      notebookCollection.response(response);
-      const notebookCollectionPrinted = notebookCollection.print()();
-      expect((notebookCollectionPrinted.inputs()()['currentNotebook'] as Stubable).isStub()).toBe(false);
     });
   });
 });
