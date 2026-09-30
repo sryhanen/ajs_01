@@ -65,12 +65,12 @@ describe('NotebookIndex', () => {
 
   beforeEach(() => {
     channel = new FakeChannel();
-    notebookIndex = new NotebookIndexImpl(channel, {id: 'notebook'});
+    notebookIndex = new NotebookIndexImpl(channel, notebookPayloadFactory.toPayload());
     notebook = new NotebookImpl(channel, notebookPayloadFactory.toPayload());
   });
 
   it('Should have id', () => {
-    expect(notebookIndex.id()).toEqual('notebook');
+    expect(notebookIndex.id()).toEqual(notebookPayloadFactory.toPayload().id);
   });
 
   it('Should print', () => {
@@ -91,6 +91,14 @@ describe('NotebookIndex', () => {
     const printed = notebookIndex.print()();
     const inputs = printed.inputs()();
     expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(false);
+  });
+
+  it('Should not render notebook', () => {
+    notebook = new NotebookImpl(channel, new NotebookPayloadFactoryImpl().toPayload());
+    notebookIndex.renderNotebook(notebook);
+    const printed = notebookIndex.print()();
+    const inputs = printed.inputs()();
+    expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(true);
   });
 
   describe('Responses', () => {

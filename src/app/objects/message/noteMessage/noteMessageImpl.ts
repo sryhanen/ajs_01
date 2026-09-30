@@ -58,8 +58,6 @@ export class NoteMessageImpl implements NoteMessage {
 
   render(notebookIndex: NotebookIndex): void {
     const notebook = new NotebookImpl(notebookIndex, this._message.data());
-    if(notebook.id() === notebookIndex.id()){
-      notebookIndex.renderNotebook(notebook);
-    }
+    notebookIndex.renderNotebook(notebook);
   }
 }

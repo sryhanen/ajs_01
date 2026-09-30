@@ -72,11 +72,4 @@ describe('Note message unit test', () => {
     noteMessage.render(notebookIndex);
     expect(renderSpy).toHaveBeenCalledTimes(1);
   });
-
-  it('Should not render', () => {
-    const notebookIndex = new NotebookIndexImpl(channel, {id:'wrong-id'});
-    const renderSpy = vi.spyOn(notebookIndex, 'renderNotebook');
-    noteMessage.render(notebookIndex);
-    expect(renderSpy).toHaveBeenCalledTimes(0);
-  });
 });

@@ -88,7 +88,9 @@ export class NotebookIndexImpl implements NotebookIndex {
   }
 
   renderNotebook(notebook: Notebook): void {
-    this._notebookToRender.set(notebook);
+    if(notebook.id() === this.id()){
+      this._notebookToRender.set(notebook);
+    }
   }
 
   id():string {
