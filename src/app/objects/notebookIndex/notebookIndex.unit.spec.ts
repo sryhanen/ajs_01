@@ -45,24 +45,68 @@
  */
 import {NotebookIndex} from './notebookIndex';
 import {NotebookIndexImpl} from './notebookIndexImpl';
+import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
+import {Channel} from '../channel/channel';
+import {RenderNode} from '../rendering/renderNode/renderNode';
+import {NoteServerResponse} from '../../../test/fakes/webSocketServerResponses/note/noteServerResponse';
+import {NotebookPayloadFactoryImpl} from '../../../test/fakes/notebook/notebookPayloadFactoryImpl';
+import {NotebookImpl} from '../notebook/notebookImpl';
+import {Notebook} from '../notebook/notebook';
 
 describe('NotebookIndex', () => {
   let notebookIndex: NotebookIndex;
+  let channel:Channel;
+  const notebookPayloadFactory = new NotebookPayloadFactoryImpl();
+  let notebook: Notebook;
+  const fakeMessage = {
+    op:'test',
+    data:{}
+  };
+
   beforeEach(() => {
-    notebookIndex = new NotebookIndexImpl({id: 'notebook'});
+    channel = new FakeChannel();
+    notebookIndex = new NotebookIndexImpl(channel, {id: 'notebook'});
+    notebook = new NotebookImpl(channel, notebookPayloadFactory.toPayload());
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(notebookIndex).toBeDefined();
+  it('Should have id', () => {
+    expect(notebookIndex.id()).toEqual('notebook');
+  });
+
+  it('Should print', () => {
+    const printed = notebookIndex.print()();
+    const inputs = printed.inputs()();
+    expect(printed.isStub()).toBe(false);
+    expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(true);
+  });
+
+  it('Should request channel', () => {
+    const channelSpy = vi.spyOn(channel, 'request');
+    notebookIndex.request(fakeMessage);
+    expect(channelSpy).toHaveBeenCalledExactlyOnceWith(fakeMessage);
+  });
+
+  it('Should render notebook', () => {
+    notebookIndex.renderNotebook(notebook);
+    const printed = notebookIndex.print()();
+    const inputs = printed.inputs()();
+    expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(false);
+  });
+
+  describe('Responses', () => {
+    it('Should render note after NOTE response', () => {
+      const noteResponse = new NoteServerResponse(notebookPayloadFactory);
+      notebookIndex.response(noteResponse.toObject());
+      const printed = notebookIndex.print()();
+      const inputs = printed.inputs()();
+      expect((inputs['currentNotebook'] as RenderNode).isStub()).toBe(false);
     });
 
-    it('Should have id', () => {
-      expect(notebookIndex.id()).toEqual('notebook');
-    });
-
-    it('Should print', () => {
-      expect(notebookIndex.print()()).toBeDefined();
+    it('Should respond note', () => {
+      notebookIndex.renderNotebook(notebook);
+      const notebookSpy = vi.spyOn(notebook, 'response');
+      notebookIndex.response(fakeMessage);
+      expect(notebookSpy).toHaveBeenCalledExactlyOnceWith(fakeMessage);
     });
   });
 });
