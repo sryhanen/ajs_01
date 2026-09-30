@@ -43,8 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookIndex} from '../../notebookIndex/notebookIndex';
+import {Printable} from '../rendering/printable/printable';
+import {Notebook} from '../notebook/notebook';
+import {Channel} from '../channel/channel';
 
-export interface NoteMessage{
-  render(notebookIndex:NotebookIndex):void;
+export interface NotebookIndex extends Printable, Channel{
+  id():string;
+  renderNotebook(notebook:Notebook):void;
 }

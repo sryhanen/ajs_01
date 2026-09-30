@@ -44,20 +44,20 @@
  * a licensee so wish it.
  */
 import {NoteMessage} from './noteMessage';
-import {Notebook} from '../../notebook/notebook';
-import {Channel} from '../../channel/channel';
 import {TypedMessage} from '../typedMessage/typedMessage';
 import {Message} from '../message';
 import {NotebookImpl} from '../../notebook/notebookImpl';
+import { NotebookIndex } from '../../notebookIndex/notebookIndex';
 
-export class NoteMessageImpl implements NoteMessage{
-  private readonly _message:Message;
+export class NoteMessageImpl implements NoteMessage {
+  private readonly _message: Message;
 
-  constructor(message:Message) {
+  constructor(message: Message) {
     this._message = new TypedMessage('NOTE', message);
   }
 
-  notebook(channel: Channel): Notebook {
-    return new NotebookImpl(channel, this._message.data());
+  render(notebookIndex: NotebookIndex): void {
+    const notebook = new NotebookImpl(notebookIndex, this._message.data());
+    notebookIndex.renderNotebook(notebook);
   }
 }

@@ -44,10 +44,10 @@
  * a licensee so wish it.
  */
 import {NotesInfoMessage} from './notesInfoMessage';
-import {NotebookIndex} from '../../notebookCollection/notebookIndex/notebookIndex';
+import {NotebookIndex} from '../../notebookIndex/notebookIndex';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
-import {NotebookIndexImpl} from '../../notebookCollection/notebookIndex/notebookIndexImpl';
+import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
 
 export class NotesInfoMessageImpl implements NotesInfoMessage {
   private readonly _message:Message;

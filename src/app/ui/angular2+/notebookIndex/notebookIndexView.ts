@@ -43,8 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookIndex} from '../../notebookIndex/notebookIndex';
+import {Component, input} from '@angular/core';
+import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
 
-export interface NoteMessage{
-  render(notebookIndex:NotebookIndex):void;
+@Component({
+  selector: 'notebook-index',
+  imports: [RenderNodeHostView],
+  template: `
+    @if(!currentNotebook().isStub()){
+      <render-node-host [renderNode]="currentNotebook()" [containerId]="containerId()"></render-node-host>
+    }
+  `
+})
+export class NotebookIndexView {
+  currentNotebook = input.required<RenderNode>();
+  containerId = input.required<string>();
 }
