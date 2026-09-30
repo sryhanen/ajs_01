@@ -73,7 +73,7 @@ export class NotebookCollectionImpl implements NotebookCollection{
   }
 
   private notesInfoResponse(message:Message):void{
-    this._notebookIndices.set(new NotesInfoMessageImpl(message).notebookIndices());
+    this._notebookIndices.set(new NotesInfoMessageImpl(message).notebookIndices(this));
   }
 
   print(): Signal<RenderNode> {
