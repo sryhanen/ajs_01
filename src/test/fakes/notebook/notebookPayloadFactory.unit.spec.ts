@@ -102,7 +102,7 @@ describe('FakeNotebook unit test', () => {
   });
 
   it('Should have payload with paragraphs', () => {
-    const fakeParagraphs = [new ParagraphPayloadFactoryImpl(), new ParagraphPayloadFactoryImpl()];
+    const fakeParagraphs = [new ParagraphPayloadFactoryImpl().toPayload(), new ParagraphPayloadFactoryImpl().toPayload()];
     fakeNotebook = new NotebookPayloadFactoryImpl().withParagraphs(fakeParagraphs);
     const notebookPayload = fakeNotebook.toPayload();
     const notebookParagraphs = notebookPayload.paragraphs;
@@ -114,5 +114,21 @@ describe('FakeNotebook unit test', () => {
     const notebookPayload = fakeNotebook.toPayload();
     const notebookName = notebookPayload.name;
     expect(notebookName).toEqual(name);
+  });
+
+  it('Should have notebookIndex payload', () => {
+    const id = 'notebookId';
+    const path = 'notebookPath';
+    const payload = {
+      id: id,
+      name: name,
+      path: path,
+    };
+    fakeNotebook = new NotebookPayloadFactoryImpl(payload);
+    const notebookIndexPayload = fakeNotebook.toIndexPayload();
+    expect(notebookIndexPayload.id).toEqual(id);
+    expect(notebookIndexPayload.name).toEqual(name);
+    expect(notebookIndexPayload.path).toEqual(path);
+    expect(notebookIndexPayload.isTrash).toBe(false);
   });
 });

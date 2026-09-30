@@ -45,35 +45,38 @@
  */
 import {InterpreterErrorListener} from './interpreterErrorListener';
 import {InterpreterErrorListenerImpl} from './interpreterErrorListenerImpl';
+import {
+  InterpreterErrorServerResponse
+} from '../../../test/fakes/webSocketServerResponses/interpreterError/interpreterErrorServerResponse';
 
 describe('InterpreterErrorListener', () => {
   let interpreterErrorListener: InterpreterErrorListener;
+  const errorMessage = 'error message';
+
   beforeEach(() => {
     interpreterErrorListener = new InterpreterErrorListenerImpl();
   });
 
-  describe('Birth', () =>{
-    it('Should initialize', () =>{
-      expect(interpreterErrorListener).toBeInstanceOf(InterpreterErrorListenerImpl);
-    });
-
-    it('Should print', () => {
-      const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-      expect(interpreterErrorListenerPrinted.isStub()).toBe(true);
-    });
+  it('Should print', () => {
+    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
+    expect(interpreterErrorListenerPrinted.isStub()).toBe(true);
   });
 
-  describe('Response behavior', () =>{
-    it('Should have componentView after "INTERPRETER_ERROR" response', () =>{
-      const response = {
-        op:'INTERPRETER_ERROR',
-        data:{
-          message:'message'
-        }
-      };
-      interpreterErrorListener.response(response);
-      const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-      expect(interpreterErrorListenerPrinted.isStub()).toBe(false);
-    });
+  it('Should have componentView after "INTERPRETER_ERROR" response', () =>{
+    const interpreterErrorResponse = new InterpreterErrorServerResponse(errorMessage);
+    interpreterErrorListener.response(interpreterErrorResponse.toObject());
+    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
+    const inputs = interpreterErrorListenerPrinted.inputs()();
+    expect(interpreterErrorListenerPrinted.isStub()).toBe(false);
+    expect(inputs['errorMessage']).toEqual(errorMessage);
+  });
+
+  it('Should render', () => {
+    const errorMessage = 'error message';
+    interpreterErrorListener.renderErrorMessage(errorMessage);
+    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
+    const inputs = interpreterErrorListenerPrinted.inputs()();
+    expect(interpreterErrorListenerPrinted.isStub()).toBe(false);
+    expect(inputs['errorMessage']).toEqual(errorMessage);
   });
 });

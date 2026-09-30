@@ -48,6 +48,7 @@ import {ParagraphPayload} from '../paragraph/paragraphPayload';
 
 export interface NotebookPayloadFactory {
   toPayload(): NotebookPayload;
+  toIndexPayload(): Pick<NotebookPayload, 'name' | 'id' | 'path'> & {isTrash:boolean};
   withName(name: string): NotebookPayloadFactory;
   withParagraphs(paragraphPayloads: ParagraphPayload[]): NotebookPayloadFactory;
 }

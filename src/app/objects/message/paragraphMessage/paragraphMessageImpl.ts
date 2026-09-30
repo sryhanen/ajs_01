@@ -45,23 +45,19 @@
  */
 import {ParagraphMessage} from './paragraphMessage';
 import {TypedMessage} from '../typedMessage/typedMessage';
-import {Channel} from '../../channel/channel';
 import {Message} from '../message';
-import {Paragraph} from '../../paragraph/paragraph';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
+import { ParagraphCollection } from '../../paragraphCollection/paragraphCollection';
 
 export class ParagraphMessageImpl implements ParagraphMessage {
-  private readonly _message:Message;
+  private readonly _message: Message;
 
-  constructor(message:Message) {
+  constructor(message: Message) {
     this._message = new TypedMessage('PARAGRAPH', message);
   }
 
-  data(): object {
-    return this._message.data();
-  }
-
-  paragraph(channel: Channel): Paragraph {
-    return new ParagraphImpl(channel, this._message.data());
+  updateParagraph(paragraphCollection: ParagraphCollection): void {
+    const paragraph = new ParagraphImpl(paragraphCollection, this._message.data());
+    paragraphCollection.updateParagraph(paragraph);
   }
 }

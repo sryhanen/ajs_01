@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {FakeChannel} from '../channel/fakeChannel';
+import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {ParagraphImpl} from './paragraphImpl';
 import {Paragraph} from './paragraph';
@@ -110,6 +110,43 @@ describe('Paragraph', () => {
       const spy = vi.spyOn(channel, 'request');
       paragraph.request(request);
       expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+
+    it('Should decorate RUN_PARAGRAPH request', () => {
+      const initialRequest = {
+        op:'RUN_PARAGRAPH',
+        data:{
+          id: paragraphId,
+          paragraph: '',
+          config: {},
+          params: {},
+        }
+      };
+      const requestSpy = vi.spyOn(channel, 'request');
+      paragraph.request(initialRequest);
+      const expectedRequest = {
+        op:'RUN_PARAGRAPH',
+        data:{
+          id: paragraphId,
+          paragraph: paragraphText,
+          config: paragraphConfig,
+          params: paragraphParams,
+        }
+      };
+      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+
+    it('Should throw if RUN_PARAGRAPH request has wrong id', () => {
+      const initialRequest = {
+        op:'RUN_PARAGRAPH',
+        data:{
+          id: 'wrongId',
+          paragraph: '',
+          config: {},
+          params: {},
+        }
+      };
+      expect(() => paragraph.request(initialRequest)).toThrow();
     });
   });
 });

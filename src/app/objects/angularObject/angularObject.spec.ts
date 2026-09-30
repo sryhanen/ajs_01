@@ -45,7 +45,7 @@
  */
 import {AngularObject} from './angularObject';
 import {AngularObjectImpl} from './angularObjectImpl';
-import {FakeChannel} from '../channel/fakeChannel';
+import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 import {Mock} from 'vitest';
 
 describe('AngularObject', () => {

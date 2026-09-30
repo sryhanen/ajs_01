@@ -44,29 +44,22 @@
  * a licensee so wish it.
  */
 import {ParagraphAddedMessage} from './paragraphAddedMessage';
-import {Channel} from '../../channel/channel';
-import {Paragraph} from '../../paragraph/paragraph';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
+import { ParagraphCollection } from '../../paragraphCollection/paragraphCollection';
 
 export class ParagraphAddedMessageImpl implements ParagraphAddedMessage {
-  private readonly _message:Message;
+  private readonly _message: Message;
 
-  constructor(message:Message) {
+  constructor(message: Message) {
     this._message = new TypedMessage('PARAGRAPH_ADDED', message);
   }
 
-  paragraph(channel: Channel): Paragraph {
+  addParagraph(paragraphCollection: ParagraphCollection): void {
+    const index = this._message.dataAsWebSocketPayload().numberProperty('index');
     const paragraphData:object = this._message.dataAsWebSocketPayload().objectProperty('paragraph');
-    return new ParagraphImpl(channel, paragraphData);
-  }
-
-  index(): number {
-    return this._message.dataAsWebSocketPayload().numberProperty('index');
-  }
-
-  data(): object {
-    return this._message.data();
+    const paragraph = new ParagraphImpl(paragraphCollection, paragraphData);
+    paragraphCollection.addParagraph(paragraph, index);
   }
 }

@@ -43,13 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputPayload} from './outputPayload';
+import {OutputPayload} from '../../../app/objects/output/outputPayload';
 import uPlot from 'uplot';
 import {PaginatedDataTablesData} from './dataTables/paginatedDataTablesData';
 import {FakeOutputPayloadFactory} from './fakeOutputPayloadFactory';
 import {OutputType} from '../../../app/objects/output/outputType';
 
 export class FakeOutputPayloadFactoryImpl implements FakeOutputPayloadFactory {
+  htmlOutputPayload(htmlTemplate: string): OutputPayload {
+    return {
+      type: OutputType.html,
+      data: htmlTemplate,
+      isAggregated: false,
+    };
+  }
+
+  angularOutputPayload(angularTemplate: string): OutputPayload {
+    return {
+      type: OutputType.angular,
+      data: angularTemplate,
+      isAggregated: false,
+    };
+  }
+
   dataTablesOutputPayload(dataTablesData: PaginatedDataTablesData): OutputPayload {
     const headers = Object.keys(dataTablesData.data[0]);
     const options = {

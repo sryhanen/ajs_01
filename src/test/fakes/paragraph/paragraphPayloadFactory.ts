@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {ParagraphPayload} from './paragraphPayload';
-import {OutputPayload} from '../output/outputPayload';
+import {OutputPayload} from '../../../app/objects/output/outputPayload';
 import {ConfigPayload} from './config/configPayload';
 
 export interface ParagraphPayloadFactory {

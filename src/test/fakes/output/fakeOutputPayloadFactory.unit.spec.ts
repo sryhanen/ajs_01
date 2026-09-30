@@ -103,4 +103,26 @@ describe('FakeOutputPayloadFactory unit test', () => {
     };
     expect(textOutputPayload).toEqual(expectedOutputPayload);
   });
+
+  it('Should have htmlOutputPayload', () => {
+    const htmlTemplate = '<div>test</div>';
+    const htmlOutputPayload = fakeOutputPayloadFactory.htmlOutputPayload(htmlTemplate);
+    const expectedOutputPayload = {
+      type:OutputType.html,
+      data:htmlTemplate,
+      isAggregated: false,
+    };
+    expect(htmlOutputPayload).toEqual(expectedOutputPayload);
+  });
+
+  it('Should have angularOutputPayload', () => {
+    const angularTemplate = '<div>{{test}}</div>';
+    const angularOutputPayload = fakeOutputPayloadFactory.angularOutputPayload(angularTemplate);
+    const expectedOutputPayload = {
+      type:OutputType.angular,
+      data:angularTemplate,
+      isAggregated: false,
+    };
+    expect(angularOutputPayload).toEqual(expectedOutputPayload);
+  });
 });

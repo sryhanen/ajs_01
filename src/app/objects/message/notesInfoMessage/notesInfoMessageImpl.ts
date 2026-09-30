@@ -44,29 +44,24 @@
  * a licensee so wish it.
  */
 import {NotesInfoMessage} from './notesInfoMessage';
-import {NotebookIndex} from '../../notebookCollection/notebookIndex/notebookIndex';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
-import {NotebookIndexImpl} from '../../notebookCollection/notebookIndex/notebookIndexImpl';
+import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
+import { NotebookIndexCollection } from '../../notebookIndexCollection/notebookIndexCollection';
 
 export class NotesInfoMessageImpl implements NotesInfoMessage {
-  private readonly _message:Message;
+  private readonly _message: Message;
 
-  constructor(message:Message) {
+  constructor(message: Message) {
     this._message = new TypedMessage('NOTES_INFO', message);
   }
 
-  notebookIndices(): Map<string, NotebookIndex> {
-    const notebookIndices = new Map<string, NotebookIndex>();
-    const notebookIndicesData = this._message.dataAsWebSocketPayload().arrayProperty<object>('notes');
-    notebookIndicesData.forEach(notebookIndexData => {
-      const notebookIndex = new NotebookIndexImpl(notebookIndexData);
-      notebookIndices.set(notebookIndex.id(), notebookIndex);
+  updateNotebookIndices(notebookCollection: NotebookIndexCollection): void {
+    notebookCollection.removeAllNotebookIndices();
+    const receivedNotebookIndices = this._message.dataAsWebSocketPayload().arrayProperty<object>('notes');
+    receivedNotebookIndices.forEach(notebookIndexPayload => {
+      const notebookIndex = new NotebookIndexImpl(notebookCollection, notebookIndexPayload);
+      notebookCollection.addNotebookIndex(notebookIndex);
     });
-    return notebookIndices;
-  }
-
-  operation(): string {
-    return this._message.operation();
   }
 }

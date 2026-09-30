@@ -47,42 +47,32 @@ import {ParagraphMessage} from './paragraphMessage';
 import {ParagraphMessageImpl} from './paragraphMessageImpl';
 import {MessageImpl} from '../messageImpl';
 import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
-import {Channel} from '../../channel/channel';
+import {ParagraphPayloadFactoryImpl} from '../../../../test/fakes/paragraph/paragraphPayloadFactoryImpl';
+import {
+  ParagraphServerResponse
+} from '../../../../test/fakes/webSocketServerResponses/paragraph/paragraphServerResponse';
+import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
+import {ParagraphCollectionImpl} from '../../paragraphCollection/paragraphCollectionImpl';
+import {FakeChannel} from '../../../../test/fakes/channel/fakeChannel';
 
 describe('ParagraphMessage unit test', () => {
-  let channel: Channel;
-  const messageData = {
-    op:'PARAGRAPH',
-    data:{
-      id:'paragraph'
-    }
-  };
+  const paragraphPayloadFactory = new ParagraphPayloadFactoryImpl();
   let paragraphMessage: ParagraphMessage;
+  let paragraphCollection: ParagraphCollection;
 
   beforeEach(() => {
-    paragraphMessage = new ParagraphMessageImpl(new MessageImpl(new WebSocketPayloadImpl(messageData)));
+    paragraphMessage = new ParagraphMessageImpl(new MessageImpl(new WebSocketPayloadImpl(new ParagraphServerResponse(paragraphPayloadFactory).toObject())));
+    paragraphCollection = new ParagraphCollectionImpl(new FakeChannel(), [paragraphPayloadFactory.toPayload()]);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(paragraphMessage).toBeDefined();
-    });
-
-    it('Should have paragraph', () => {
-      expect(paragraphMessage.paragraph(channel)).toBeDefined();
-    });
-
-    it('Should have data', () => {
-      expect(paragraphMessage.data()).toEqual(messageData.data);
-    });
-  });
-
-  describe('Validation', () => {
-    it('Should throw error if message is not "PARAGRAPH"', () => {
-      messageData.op = '';
-      paragraphMessage = new ParagraphMessageImpl(new MessageImpl(new WebSocketPayloadImpl(messageData)));
-      expect(() => paragraphMessage.paragraph(channel)).toThrow();
-      expect(() => paragraphMessage.data()).toThrow();
-    });
+  it('Should update paragraph', () => {
+    // No better way to test the update at this stage
+    // Refactor the test when state change can be asserted
+    const paragraphCollectionPrinted = paragraphCollection.print()();
+    const paragraphsBeforeUpdate = paragraphCollectionPrinted.inputs()()['paragraphs'];
+    paragraphMessage.updateParagraph(paragraphCollection);
+    const paragraphsAfterUpdate = paragraphCollectionPrinted.inputs()()['paragraphs'];
+    expect(paragraphsBeforeUpdate).toHaveLength(1);
+    expect(paragraphsAfterUpdate).toHaveLength(1);
   });
 });

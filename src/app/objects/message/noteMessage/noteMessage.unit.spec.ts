@@ -48,43 +48,33 @@ import {Message} from '../message';
 import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
 import {MessageImpl} from '../messageImpl';
 import {NoteMessageImpl} from './noteMessageImpl';
-import {FakeChannel} from '../../channel/fakeChannel';
+import {FakeChannel} from '../../../../test/fakes/channel/fakeChannel';
 import {Channel} from '../../channel/channel';
+import {NoteServerResponse} from '../../../../test/fakes/webSocketServerResponses/note/noteServerResponse';
+import {NotebookPayloadFactoryImpl} from '../../../../test/fakes/notebook/notebookPayloadFactoryImpl';
+import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
 
 describe('Note message unit test', () => {
   let channel: Channel;
-  const messageData ={
-    op:'NOTE',
-    data:{
-      id:'notebook',
-      paragraphs:[]
-    }
-  };
   let message:Message;
   let noteMessage:NoteMessage;
+  const notebookPayload = new NotebookPayloadFactoryImpl();
 
   beforeEach(() => {
     channel = new FakeChannel();
-    message = new MessageImpl(new WebSocketPayloadImpl(messageData));
+    message = new MessageImpl(new WebSocketPayloadImpl(new NoteServerResponse(notebookPayload).toObject()));
     noteMessage = new NoteMessageImpl(message);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(noteMessage).toBeDefined();
-    });
 
-    it('Should have notebook', () => {
-      expect(noteMessage.notebook(channel)).toBeDefined();
-    });
-  });
-
-  describe('Validation', () => {
-    it('Should throw if message operation is not "NOTE"', () => {
-      messageData.op = '';
-      message = new MessageImpl(new WebSocketPayloadImpl(messageData));
-      noteMessage = new NoteMessageImpl(message);
-      expect(() => noteMessage.notebook(channel)).toThrow();
-    });
+  it('Should render notebook', () => {
+    const notebookIndex = new NotebookIndexImpl(channel, notebookPayload.toPayload());
+    const notebookIndexPrinted = notebookIndex.print()();
+    const renderedNotebookBeforeMessage = notebookIndexPrinted.inputs()()['currentNotebook'] as RenderNode;
+    noteMessage.renderNotebook(notebookIndex);
+    const renderedNotebookAfterMessage = notebookIndexPrinted.inputs()()['currentNotebook'] as RenderNode;
+    expect(renderedNotebookBeforeMessage.isStub()).toBe(true);
+    expect(renderedNotebookAfterMessage.isStub()).toBe(false);
   });
 });

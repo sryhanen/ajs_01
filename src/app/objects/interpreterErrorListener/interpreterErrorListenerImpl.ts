@@ -51,6 +51,7 @@ import { RenderNode } from '../rendering/renderNode/renderNode';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {InterpreterErrorMessageImpl} from '../message/interpreterError/interpreterErrorMessageImpl';
 
 export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
   private readonly _renderNode: WritableSignal<RenderNode>;
@@ -63,11 +64,15 @@ export class InterpreterErrorListenerImpl implements InterpreterErrorListener {
     return this._renderNode;
   }
 
+  renderErrorMessage(errorMessage: string): void {
+    this._renderNode.set(new RenderNodeImpl(RegisteredComponents.INTERPRETER_ERROR_VIEW, signal({errorMessage: errorMessage})));
+  }
+
   response(data: object): void {
     const message = new MessageImpl(new WebSocketPayloadImpl(data));
     if(message.operation() === 'INTERPRETER_ERROR'){
-      const errorMessage = message.dataAsWebSocketPayload().stringProperty('message');
-      this._renderNode.set(new RenderNodeImpl(RegisteredComponents.INTERPRETER_ERROR_VIEW, signal({errorMessage: {errorMessage:errorMessage}})));
+      const interpreterErrorMessage = new InterpreterErrorMessageImpl(message);
+      interpreterErrorMessage.renderError(this);
     }
   }
 }

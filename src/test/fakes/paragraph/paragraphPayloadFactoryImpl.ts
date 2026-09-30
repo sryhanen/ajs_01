@@ -47,7 +47,7 @@ import {ParagraphPayloadFactory} from './paragraphPayloadFactory';
 import {ParagraphPayload} from './paragraphPayload';
 import {WebSocketPayload} from '../../../app/objects/webSocketPayload/webSocketPayload';
 import {WebSocketPayloadImpl} from '../../../app/objects/webSocketPayload/webSocketPayloadImpl';
-import {OutputPayload} from '../output/outputPayload';
+import {OutputPayload} from '../../../app/objects/output/outputPayload';
 import {ConfigPayload} from './config/configPayload';
 import {FakeIdImpl} from '../id/fakeIdImpl';
 import {FakeConfigImpl} from './config/fakeConfigImpl';

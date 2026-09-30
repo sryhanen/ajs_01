@@ -49,7 +49,6 @@ import {WebSocketPayloadImpl} from '../../../app/objects/webSocketPayload/webSoc
 import {WebSocketPayload} from '../../../app/objects/webSocketPayload/webSocketPayload';
 import {FakeIdImpl} from '../id/fakeIdImpl';
 import {ParagraphPayload} from '../paragraph/paragraphPayload';
-import { ParagraphPayloadFactory } from '../paragraph/paragraphPayloadFactory';
 
 export class NotebookPayloadFactoryImpl implements NotebookPayloadFactory {
   private readonly _notebookData: WebSocketPayload;
@@ -60,6 +59,15 @@ export class NotebookPayloadFactoryImpl implements NotebookPayloadFactory {
     this._notebookData = new WebSocketPayloadImpl(notebookData);
     this._id = this._notebookData.propertyExists('id') ? this._notebookData.stringProperty('id') : new FakeIdImpl().id();
     this._name = this._notebookData.propertyExists('name') ? this._notebookData.stringProperty('name') : new FakeIdImpl().id();
+  }
+
+  toIndexPayload(): Pick<NotebookPayload, 'name' | 'id' | 'path'> & { isTrash: boolean; } {
+    return {
+      id: this._id,
+      name: this._name,
+      path: this.path(),
+      isTrash: false
+    };
   }
 
   withParagraphs(paragraphPayloads: ParagraphPayload[]): NotebookPayloadFactory {
@@ -77,7 +85,6 @@ export class NotebookPayloadFactoryImpl implements NotebookPayloadFactory {
   }
 
   toPayload(): NotebookPayload {
-    const path = this._notebookData.propertyExists('path') ? this._notebookData.stringProperty('path') : `/${this._name}`;
     const config = this._notebookData.propertyExists('config') ? this._notebookData.objectProperty('config') : {isZeppelinNotebookCronEnable: true};
     let paragraphs:ParagraphPayload[];
     if(this._notebookData.propertyExists('paragraphs')){
@@ -89,9 +96,13 @@ export class NotebookPayloadFactoryImpl implements NotebookPayloadFactory {
     return {
       id: this._id,
       name: this._name,
-      path: path,
+      path: this.path(),
       config: config,
       paragraphs: paragraphs
     };
+  }
+
+  private path():string {
+    return this._notebookData.propertyExists('path') ? this._notebookData.stringProperty('path') : `/${this._name}`;
   }
 }
