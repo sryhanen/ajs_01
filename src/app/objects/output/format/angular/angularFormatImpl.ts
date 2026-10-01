@@ -56,6 +56,7 @@ import {AngularFormat} from './angularFormat';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import { OutputPayload } from '../../outputPayload';
 
 export class AngularFormatImpl implements AngularFormat {
   private readonly _channel: Channel;
@@ -69,6 +70,10 @@ export class AngularFormatImpl implements AngularFormat {
     this._renderNodeStub = new RenderNodeStub();
     this._renderNode = signal(this._renderNodeStub);
   }
+
+  render(output: Pick<OutputPayload, 'data' | 'options'>): void {
+        throw new Error('Method not implemented.');
+    }
 
   request(json: object): void {
     this._channel.request(json);

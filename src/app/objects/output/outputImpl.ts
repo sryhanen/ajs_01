@@ -96,7 +96,7 @@ export class OutputImpl implements Output {
   }
 
   render(output: OutputPayload): void {
-      throw new Error('Method not implemented.');
+    throw new Error('Method not implemented.');
   }
 
   print(): Signal<RenderNode> {
@@ -120,7 +120,6 @@ export class OutputImpl implements Output {
         this._channel.request(this._previousParagraphOutputRequest.request());
       }
       else{
-        this._outputFormats.forEach(format => format.response(json));
         this._outputSwitcher.response(json);
       }
     }

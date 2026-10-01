@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
 import {OutputFormat} from '../outputFormat';
+import {Requestable} from '../../../channel/requestable';
 
-export interface UPlotFormat extends OutputFormat, Channel {}
+export interface UPlotFormat extends OutputFormat, Requestable {}

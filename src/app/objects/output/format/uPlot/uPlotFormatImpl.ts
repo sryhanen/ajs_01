@@ -59,6 +59,7 @@ import {BasicOptionsImpl} from './uPlotPlugin/configuration/options/basicOptions
 import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import { OutputPayload } from '../../outputPayload';
 
 export class UPlotFormatImpl implements UPlotFormat {
   private readonly _channel: Channel;
@@ -69,37 +70,21 @@ export class UPlotFormatImpl implements UPlotFormat {
   constructor(channel: Channel) {
     this._channel = channel;
     this._switcherButtons = [
-      new uPlotSwitcherButton(this,'Line Chart', 'fas fa-chart-line', GraphType.line),
-      new uPlotSwitcherButton(this,'Area Chart', 'fas fa-chart-area', GraphType.area),
-      new uPlotSwitcherButton(this,'Bar Chart', 'fas fa-chart-bar', GraphType.bar),
-      new uPlotSwitcherButton(this,'Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
+      new uPlotSwitcherButton(this, 'Line Chart', 'fas fa-chart-line', GraphType.line),
+      new uPlotSwitcherButton(this, 'Area Chart', 'fas fa-chart-area', GraphType.area),
+      new uPlotSwitcherButton(this, 'Bar Chart', 'fas fa-chart-bar', GraphType.bar),
+      new uPlotSwitcherButton(this, 'Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
     this._renderNodeStub = new RenderNodeStub();
     this._renderNode = signal(this._renderNodeStub);
   }
 
-  request(json: object): void {
-    this._channel.request(json);
+  render(output: Pick<OutputPayload, 'data' | 'options'>): void {
+    throw new Error('Method not implemented.');
   }
 
-  response(json: object): void {
-    const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT') {
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.type() !== OutputType.uPlot){
-        this._renderNode.set(this._renderNodeStub);
-      }
-      else{
-        const uPlotData:uPlot.AlignedData = paragraphOutputMessage.outputData('object') as uPlot.AlignedData;
-        const safeOutputOptions = new WebSocketPayloadImpl(paragraphOutputMessage.options().value());
-        const labels = safeOutputOptions.arrayProperty<string>('labels');
-        const series = safeOutputOptions.arrayProperty<string>('series');
-        const xAxisLabel = safeOutputOptions.stringProperty('xAxisLabel');
-        const graphType = safeOutputOptions.stringProperty('graphType');
-        const basicOptions = new BasicOptionsImpl(labels, series, xAxisLabel, graphType);
-        this._renderNode.set(new RenderNodeImpl(RegisteredComponents.UPLOT_OUTPUT_VIEW, signal({graphType: graphType, basicOptions: basicOptions, uPlotData: uPlotData})));
-      }
-    }
+  request(json: object): void {
+    this._channel.request(json);
   }
 
   print(): Signal<RenderNode> {

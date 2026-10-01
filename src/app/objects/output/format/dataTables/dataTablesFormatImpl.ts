@@ -45,62 +45,33 @@
  */
 import {Channel} from '../../../channel/channel';
 import {DataTableSwitcherButton} from './switcherButton/dataTablesSwitcherButton';
-import {OutputType} from '../../outputType';
-import {DataTablesPluginImpl} from './dataTablesPlugin/dataTablesPluginImpl';
-import {WebSocketPayloadImpl} from '../../../webSocketPayload/webSocketPayloadImpl';
-import {signal, Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../../../rendering/renderNode/renderNode';
-import {MessageImpl} from '../../../message/messageImpl';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
-import {DataTablesPlugin} from './dataTablesPlugin/dataTablesPlugin';
-import {DataTablesPluginStub} from './dataTablesPlugin/dataTablesPluginStub';
 import {Printable} from '../../../rendering/printable/printable';
 import {DataTablesFormat} from './dataTablesFormat';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
-import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import { OutputPayload } from '../../outputPayload';
 
 export class DataTablesFormatImpl implements DataTablesFormat {
   private readonly _channel: Channel;
   private readonly _switcherButton: Printable;
   private readonly _renderNode: WritableSignal<RenderNode>;
-  private readonly _renderNodeStub: RenderNode;
-  private readonly _pluginStub: DataTablesPlugin;
-  private readonly _plugin: WritableSignal<DataTablesPlugin>;
 
   constructor(channel: Channel) {
     this._channel = channel;
     this._switcherButton = new DataTableSwitcherButton(this);
-    this._renderNodeStub = new RenderNodeStub();
-    this._renderNode = signal(this._renderNodeStub);
-    this._pluginStub = new DataTablesPluginStub();
-    this._plugin = signal(this._pluginStub);
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.DATATABLES_OUTPUT_VIEW, computed(() => ({
+
+    }))));
+  }
+
+  render(output: Pick<OutputPayload, 'data' | 'options'>): void {
+
   }
 
   print(): Signal<RenderNode> {
     return this._renderNode;
-  }
-
-  response(json: object): void {
-    const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(paragraphOutputMessage.type() !== OutputType.dataTables){
-        this._renderNode.set(this._renderNodeStub);
-        this._plugin.set(this._pluginStub);
-      }
-      else{
-        const dataTablesData:object = paragraphOutputMessage.outputData('object') as object;
-        if(!this._plugin().isStub()){
-          this._plugin().response(dataTablesData);
-        }
-        else{
-          const dataTablesOptions = paragraphOutputMessage.options();
-          this._plugin.set(new DataTablesPluginImpl(this, dataTablesData, dataTablesOptions.value()));
-          this._renderNode.set(new RenderNodeImpl(RegisteredComponents.DATATABLES_OUTPUT_VIEW, signal({dataTablesPlugin: this._plugin()})));
-        }
-      }
-    }
   }
 
   request(data: object): void {
