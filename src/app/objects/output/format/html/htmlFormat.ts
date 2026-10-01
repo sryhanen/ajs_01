@@ -50,16 +50,17 @@ import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class HTMLFormat implements OutputFormat {
+  private readonly _htmlTemplate:WritableSignal<string>;
   private readonly _renderNode: WritableSignal<RenderNode>;
 
   constructor() {
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.HTML_OUTPUT_VIEW, computed(() => ({
-
+      htmlTemplate: this._htmlTemplate(),
     }))));
   }
 
-  render(htmlData: string): void {
-    throw new Error('Method not implemented.');
+  render(htmlTemplate: string): void {
+    this._htmlTemplate.set(htmlTemplate);
   }
 
   print(): Signal<RenderNode> {

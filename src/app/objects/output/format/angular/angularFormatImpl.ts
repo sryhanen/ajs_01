@@ -55,18 +55,20 @@ import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 export class AngularFormatImpl implements AngularFormat {
   private readonly _channel: Channel;
   private readonly _angularObjectCollection: AngularObjectCollection;
+  private readonly _angularTemplate:WritableSignal<string>;
   private readonly _renderNode: WritableSignal<RenderNode>;
 
   constructor(channel: Channel) {
     this._channel = channel;
     this._angularObjectCollection = new AngularObjectCollectionImpl(this);
+    this._angularTemplate = signal('');
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.ANGULAR_OUTPUT_VIEW, computed(() => ({
-
+      angularTemplate:this._angularTemplate(),
     }))));
   }
 
-  render(angularData:string): void {
-    throw new Error('Method not implemented.');
+  render(angularTemplate:string): void {
+    this._angularTemplate.set(angularTemplate);
   }
 
   request(json: object): void {

@@ -57,18 +57,31 @@ import {DataTablesOptions} from './dataTablesOptions';
 export class DataTablesFormatImpl implements DataTablesFormat {
   private readonly _channel: Channel;
   private readonly _switcherButton: Printable;
+  private readonly _dataTablesData:WritableSignal<PaginatedDataTablesData>;
+  private readonly _dataTablesOptions:WritableSignal<DataTablesOptions>;
   private readonly _renderNode: WritableSignal<RenderNode>;
 
   constructor(channel: Channel) {
     this._channel = channel;
     this._switcherButton = new DataTableSwitcherButton(this);
+    this._dataTablesData = signal({
+      data: [],
+      draw: 0,
+      recordsFiltered: 0,
+      recordsTotal: 0,
+    });
+    this._dataTablesOptions = signal({
+      headers:[]
+    });
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.DATATABLES_OUTPUT_VIEW, computed(() => ({
-
+      dataTablesData:this._dataTablesData(),
+      dataTablesOptions:this._dataTablesOptions(),
     }))));
   }
 
   render(dataTablesData:PaginatedDataTablesData, dataTablesOptions:DataTablesOptions): void {
-
+    this._dataTablesData.set(dataTablesData);
+    this._dataTablesOptions.set(dataTablesOptions);
   }
 
   print(): Signal<RenderNode> {

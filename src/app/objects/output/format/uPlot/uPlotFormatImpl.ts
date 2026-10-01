@@ -58,6 +58,8 @@ import {uPlotOptions} from './uPlotOptions';
 export class UPlotFormatImpl implements UPlotFormat {
   private readonly _channel: Channel;
   private readonly _switcherButtons: Printable[];
+  private readonly _uPlotData: WritableSignal<uPlot.AlignedData>;
+  private readonly _uPlotOptions: WritableSignal<uPlotOptions>;
   private readonly _renderNode: WritableSignal<RenderNode>;
 
   constructor(channel: Channel) {
@@ -68,13 +70,22 @@ export class UPlotFormatImpl implements UPlotFormat {
       new uPlotSwitcherButton(this, 'Bar Chart', 'fas fa-chart-bar', GraphType.bar),
       new uPlotSwitcherButton(this, 'Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
+    this._uPlotData = signal([]);
+    this._uPlotOptions = signal({
+      labels: [],
+      series: [],
+      xAxisLabel: '',
+      graphType: ''
+    });
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.UPLOT_OUTPUT_VIEW, computed(() => ({
-
+      uPlotData: this._uPlotData(),
+      uPlotOptions: this._uPlotOptions(),
     }))));
   }
 
   render(uPlotData:uPlot.AlignedData, uPlotOptions:uPlotOptions): void {
-    throw new Error('Method not implemented.');
+    this._uPlotData.set(uPlotData);
+    this._uPlotOptions.set(uPlotOptions);
   }
 
   request(json: object): void {
