@@ -53,6 +53,7 @@ import {Channel} from '../../channel/channel';
 import {NoteServerResponse} from '../../../../test/fakes/webSocketServerResponses/note/noteServerResponse';
 import {NotebookPayloadFactoryImpl} from '../../../../test/fakes/notebook/notebookPayloadFactoryImpl';
 import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
 
 describe('Note message unit test', () => {
   let channel: Channel;
@@ -66,10 +67,14 @@ describe('Note message unit test', () => {
     noteMessage = new NoteMessageImpl(message);
   });
 
-  it('Should render', () => {
+
+  it('Should render notebook', () => {
     const notebookIndex = new NotebookIndexImpl(channel, notebookPayload.toPayload());
-    const renderSpy = vi.spyOn(notebookIndex, 'renderNotebook');
+    const notebookIndexPrinted = notebookIndex.print()();
+    const renderedNotebookBeforeMessage = notebookIndexPrinted.inputs()()['currentNotebook'] as RenderNode;
     noteMessage.render(notebookIndex);
-    expect(renderSpy).toHaveBeenCalledTimes(1);
+    const renderedNotebookAfterMessage = notebookIndexPrinted.inputs()()['currentNotebook'] as RenderNode;
+    expect(renderedNotebookBeforeMessage.isStub()).toBe(true);
+    expect(renderedNotebookAfterMessage.isStub()).toBe(false);
   });
 });
