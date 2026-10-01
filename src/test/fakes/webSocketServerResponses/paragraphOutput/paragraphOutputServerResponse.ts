@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {WebSocketServerResponse} from '../webSocketServerResponse';
-import {OutputPayload} from '../../output/outputPayload';
+import {OutputPayload} from '../../../../app/objects/output/outputPayload';
 
 export class ParagraphOutputServerResponse implements WebSocketServerResponse{
   private readonly _paragraphId:string;

@@ -65,16 +65,17 @@ import {ParagraphOutputMessageImpl} from '../message/paragraphOutputMessage/para
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {WebSocketPayloadImpl} from '../webSocketPayload/webSocketPayloadImpl';
+import { OutputPayload } from './outputPayload';
 
 export class OutputImpl implements Output {
-  private readonly _channel:Channel;
-  private readonly _interpreterErrorListener:InterpreterErrorListener;
+  private readonly _channel: Channel;
+  private readonly _interpreterErrorListener: InterpreterErrorListener;
   private readonly _outputFormats: OutputFormat[];
-  private readonly _outputSwitcher:OutputSwitcher;
+  private readonly _outputSwitcher: OutputSwitcher;
   private _previousParagraphOutputRequest: ParagraphOutputRequest;
   private readonly _renderNode: Signal<RenderNode>;
 
-  constructor(channel:Channel) {
+  constructor(channel: Channel) {
     this._channel = channel;
     this._interpreterErrorListener = new InterpreterErrorListenerImpl();
     this._outputFormats = [
@@ -92,6 +93,10 @@ export class OutputImpl implements Output {
       outputSwitcher: this._outputSwitcher.print()(),
       outputFormats: this._outputFormats.map(outputFormat => outputFormat.print()()),
     }))));
+  }
+
+  render(output: OutputPayload): void {
+      throw new Error('Method not implemented.');
   }
 
   print(): Signal<RenderNode> {

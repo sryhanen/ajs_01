@@ -46,7 +46,7 @@
 import {ParagraphPayloadFactory} from './paragraphPayloadFactory';
 import {ParagraphPayloadFactoryImpl} from './paragraphPayloadFactoryImpl';
 import {FakeConfigImpl} from './config/fakeConfigImpl';
-import {OutputPayload} from '../output/outputPayload';
+import {OutputPayload} from '../../../app/objects/output/outputPayload';
 
 describe('ParagraphPayloadFactory unit test', () => {
   let paragraphPayloadFactory: ParagraphPayloadFactory;

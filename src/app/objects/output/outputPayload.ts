@@ -43,9 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface OutputPayload {
-  type: string,
-  isAggregated: boolean,
-  data: string | object,
-  options?:object
-}
+export type OutputPayload = {
+  data: object | string;
+  type:string;
+  isAggregated:boolean;
+  options?:object;
+};
