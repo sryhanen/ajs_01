@@ -43,8 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Message} from '../message';
+import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
 
 export interface ParagraphRemovedMessage{
-  paragraphId():string;
+  removeParagraph(paragraphCollection:ParagraphCollection):void;
 }

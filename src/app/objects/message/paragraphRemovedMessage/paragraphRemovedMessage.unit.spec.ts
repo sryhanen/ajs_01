@@ -45,38 +45,32 @@
  */
 import {MessageImpl} from '../messageImpl';
 import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
-import {Channel} from '../../channel/channel';
 import {ParagraphRemovedMessage} from './paragraphRemovedMessage';
 import {ParagraphRemovedMessageImpl} from './paragraphRemovedMessageImpl';
+import {ParagraphCollectionImpl} from '../../paragraphCollection/paragraphCollectionImpl';
+import {FakeChannel} from '../../../../test/fakes/channel/fakeChannel';
+import {ParagraphPayloadFactoryImpl} from '../../../../test/fakes/paragraph/paragraphPayloadFactoryImpl';
+import {
+  ParagraphRemovedServerResponse
+} from '../../../../test/fakes/webSocketServerResponses/paragraphRemoved/paragraphRemovedServerResponse';
 
 describe('ParagraphAddedMessage unit test', () => {
-  const messageData = {
-    op:'PARAGRAPH_REMOVED',
-    data:{
-      id:'paragraph'
-    }
-  };
-  let paragraphRemovedMessage: ParagraphRemovedMessage;
+  const paragraphId = 'paragraphId';
+  const paragraphRemovedMessage: ParagraphRemovedMessage = new ParagraphRemovedMessageImpl(
+    new MessageImpl(
+      new WebSocketPayloadImpl(
+        new ParagraphRemovedServerResponse(paragraphId).toObject()
+      )
+    )
+  );
+  const paragraphCollection = new ParagraphCollectionImpl(new FakeChannel(), [new ParagraphPayloadFactoryImpl({id: paragraphId}).toPayload()]);
 
-  beforeEach(() => {
-    paragraphRemovedMessage = new ParagraphRemovedMessageImpl(new MessageImpl(new WebSocketPayloadImpl(messageData)));
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(paragraphRemovedMessage).toBeDefined();
-    });
-
-    it('Should have paragraphId', () => {
-      expect(paragraphRemovedMessage.paragraphId()).toEqual(messageData.data.id);
-    });
-  });
-
-  describe('Validation', () => {
-    it('Should throw error if message is not "PARAGRAPH"', () => {
-      messageData.op = '';
-      paragraphRemovedMessage = new ParagraphRemovedMessageImpl(new MessageImpl(new WebSocketPayloadImpl(messageData)));
-      expect(() => paragraphRemovedMessage.paragraphId()).toThrow();
-    });
+  it('Should remove paragraph', () => {
+    const paragraphCollectionPrinted = paragraphCollection.print()();
+    const paragraphsBeforeRemove = paragraphCollectionPrinted.inputs()()['paragraphs'];
+    paragraphRemovedMessage.removeParagraph(paragraphCollection);
+    const paragraphsAfterRemove = paragraphCollectionPrinted.inputs()()['paragraphs'];
+    expect(paragraphsBeforeRemove).toHaveLength(1);
+    expect(paragraphsAfterRemove).toEqual([]);
   });
 });

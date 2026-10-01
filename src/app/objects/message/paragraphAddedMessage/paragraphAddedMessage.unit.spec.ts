@@ -45,52 +45,37 @@
  */
 import {MessageImpl} from '../messageImpl';
 import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
-import {Channel} from '../../channel/channel';
 import {ParagraphAddedMessageImpl} from './paragraphAddedMessageImpl';
 import {ParagraphAddedMessage} from './paragraphAddedMessage';
+import {
+  ParagraphAddedServerResponse
+} from '../../../../test/fakes/webSocketServerResponses/paragraphAdded/paragraphAddedServerResponse';
+import {ParagraphPayloadFactoryImpl} from '../../../../test/fakes/paragraph/paragraphPayloadFactoryImpl';
+import {ParagraphCollectionImpl} from '../../paragraphCollection/paragraphCollectionImpl';
+import {FakeChannel} from '../../../../test/fakes/channel/fakeChannel';
 
 describe('ParagraphAddedMessage unit test', () => {
-  let channel: Channel;
-  const messageData = {
-    op:'PARAGRAPH_ADDED',
-    data:{
-      paragraph:{
-        id:'paragraph'
-      },
-      index:0
-    }
-  };
   let paragraphAddedMessage: ParagraphAddedMessage;
+  const paragraphCollection = new ParagraphCollectionImpl(new FakeChannel(), []);
 
   beforeEach(() => {
-    paragraphAddedMessage = new ParagraphAddedMessageImpl(new MessageImpl(new WebSocketPayloadImpl(messageData)));
+    paragraphAddedMessage = new ParagraphAddedMessageImpl(
+      new MessageImpl(
+        new WebSocketPayloadImpl(
+          new ParagraphAddedServerResponse(
+            new ParagraphPayloadFactoryImpl(), 0).toObject()
+        )
+      )
+    );
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(paragraphAddedMessage).toBeDefined();
-    });
-
-    it('Should have paragraph', () => {
-      expect(paragraphAddedMessage.paragraph(channel)).toBeDefined();
-    });
-
-    it('Should have index', () => {
-      expect(paragraphAddedMessage.index()).toEqual(messageData.data.index);
-    });
-
-    it('Should have data', () => {
-      expect(paragraphAddedMessage.data()).toEqual(messageData.data);
-    });
+  it('Should add paragraph', () => {
+    const paragraphCollectionPrinted = paragraphCollection.print()();
+    const paragraphsBeforeAdd = paragraphCollectionPrinted.inputs()()['paragraphs'];
+    paragraphAddedMessage.addParagraph(paragraphCollection);
+    const paragraphsAfterAdd = paragraphCollectionPrinted.inputs()()['paragraphs'];
+    expect(paragraphsBeforeAdd).toEqual([]);
+    expect(paragraphsAfterAdd).toHaveLength(1);
   });
 
-  describe('Validation', () => {
-    it('Should throw error if message is not "PARAGRAPH"', () => {
-      messageData.op = '';
-      paragraphAddedMessage = new ParagraphAddedMessageImpl(new MessageImpl(new WebSocketPayloadImpl(messageData)));
-      expect(() => paragraphAddedMessage.data()).toThrow();
-      expect(() => paragraphAddedMessage.paragraph(channel)).toThrow();
-      expect(() => paragraphAddedMessage.index()).toThrow();
-    });
-  });
 });
