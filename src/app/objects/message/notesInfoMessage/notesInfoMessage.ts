@@ -43,9 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookIndex} from '../../notebookIndex/notebookIndex';
-import {Channel} from '../../channel/channel';
+import {NotebookIndexCollection} from '../../notebookIndexCollection/notebookIndexCollection';
 
-export interface NotesInfoMessage{
-  notebookIndices(channel:Channel): Map<string, NotebookIndex>;
+export interface NotesInfoMessage {
+  updateNotebookIndices(notebookCollection:NotebookIndexCollection):void;
 }

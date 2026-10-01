@@ -43,46 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Message} from '../message';
 import {MessageImpl} from '../messageImpl';
 import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
 import {NotesInfoMessage} from './notesInfoMessage';
 import {NotesInfoMessageImpl} from './notesInfoMessageImpl';
+import {NotesInfoServerResponse} from '../../../../test/fakes/webSocketServerResponses/notesInfo/notesInfoServerResponse';
+import {NotebookPayloadFactoryImpl} from '../../../../test/fakes/notebook/notebookPayloadFactoryImpl';
+import {NotebookIndexCollectionImpl} from '../../notebookIndexCollection/notebookIndexCollectionImpl';
+import {FakeChannel} from '../../../../test/fakes/channel/fakeChannel';
 
 describe('NotesInfoMessage unit test', () => {
-  const messageData ={
-    op:'NOTES_INFO',
-    data:{
-      notes:[{id:'notebook1'}, {id:'notebook2'}]
-    }
-  };
-  let message:Message;
-  let notesInfoMessage:NotesInfoMessage;
+  const notebookIndices = [
+    new NotebookPayloadFactoryImpl().toIndexPayload(),
+    new NotebookPayloadFactoryImpl().toIndexPayload(),
+    new NotebookPayloadFactoryImpl().toIndexPayload(),
+  ];
+  const payload = new NotesInfoServerResponse(notebookIndices).toObject();
+  const notesInfoMessage: NotesInfoMessage = new NotesInfoMessageImpl(new MessageImpl(new WebSocketPayloadImpl(payload)));
+  const notebookCollection = new NotebookIndexCollectionImpl(new FakeChannel());
 
-  beforeEach(() => {
-    message = new MessageImpl(new WebSocketPayloadImpl(messageData));
-    notesInfoMessage = new NotesInfoMessageImpl(message);
-  });
-
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(notesInfoMessage).toBeDefined();
-    });
-
-    it('Should have notebookIndices', () => {
-      const notebookIndices = notesInfoMessage.notebookIndices();
-      expect(notebookIndices).toHaveLength(2);
-      expect(notebookIndices.get(messageData.data.notes[0].id)).toBeDefined();
-      expect(notebookIndices.get(messageData.data.notes[1].id)).toBeDefined();
-    });
-  });
-
-  describe('Validation', () => {
-    it('Should throw if message operation is not "NOTES_INFO"', () => {
-      messageData.op = '';
-      message = new MessageImpl(new WebSocketPayloadImpl(messageData));
-      notesInfoMessage = new NotesInfoMessageImpl(message);
-      expect(() => notesInfoMessage.notebookIndices()).toThrow();
-    });
+  it('Should update notebook indices', () => {
+    const notebookCollectionPrinted = notebookCollection.print()();
+    const notebookCollectionIndicesBeforeMessage = notebookCollectionPrinted.inputs()()['notebookIndices'];
+    notesInfoMessage.updateNotebookIndices(notebookCollection);
+    const notebookCollectionIndicesAfterMessage = notebookCollectionPrinted.inputs()()['notebookIndices'];
+    expect(notebookCollectionIndicesBeforeMessage).toEqual([]);
+    expect(notebookCollectionIndicesAfterMessage).toHaveLength(3);
   });
 });
