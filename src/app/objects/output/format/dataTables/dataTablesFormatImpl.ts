@@ -51,7 +51,8 @@ import {Printable} from '../../../rendering/printable/printable';
 import {DataTablesFormat} from './dataTablesFormat';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
-import { OutputPayload } from '../../outputPayload';
+import {PaginatedDataTablesData} from './paginatedDataTablesData';
+import {DataTablesOptions} from './dataTablesOptions';
 
 export class DataTablesFormatImpl implements DataTablesFormat {
   private readonly _channel: Channel;
@@ -66,7 +67,7 @@ export class DataTablesFormatImpl implements DataTablesFormat {
     }))));
   }
 
-  render(output: Pick<OutputPayload, 'data' | 'options'>): void {
+  render(dataTablesData:PaginatedDataTablesData, dataTablesOptions:DataTablesOptions): void {
 
   }
 

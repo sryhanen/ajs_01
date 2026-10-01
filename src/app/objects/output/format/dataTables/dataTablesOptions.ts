@@ -43,45 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
-import {AngularObjectCollection} from '../../../angularObjectCollection/angularObjectCollection';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import { RenderNode } from '../../../rendering/renderNode/renderNode';
-import {AngularObjectCollectionImpl} from '../../../angularObjectCollection/angularObjectCollectionImpl';
-import {AngularFormat} from './angularFormat';
-import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
-import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
-
-export class AngularFormatImpl implements AngularFormat {
-  private readonly _channel: Channel;
-  private readonly _angularObjectCollection: AngularObjectCollection;
-  private readonly _renderNode: WritableSignal<RenderNode>;
-
-  constructor(channel: Channel) {
-    this._channel = channel;
-    this._angularObjectCollection = new AngularObjectCollectionImpl(this);
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.ANGULAR_OUTPUT_VIEW, computed(() => ({
-
-    }))));
-  }
-
-  render(angularData:string): void {
-    throw new Error('Method not implemented.');
-  }
-
-  request(json: object): void {
-    this._channel.request(json);
-  }
-
-  response(json: object): void {
-    this._angularObjectCollection.response(json);
-  }
-
-  print(): Signal<RenderNode> {
-    return this._renderNode;
-  }
-
-  switcherButtons(): Signal<RenderNode>[] {
-    return [];
-  }
-}
+export type DataTablesOptions = {
+  headers:string[]
+};

@@ -45,27 +45,20 @@
  */
 import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
 import {GraphType} from './graphType';
-import {WebSocketPayloadImpl} from '../../../webSocketPayload/webSocketPayloadImpl';
-import {OutputType} from '../../outputType';
-import {signal, Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {Channel} from '../../../channel/channel';
-import {MessageImpl} from '../../../message/messageImpl';
-import {ParagraphOutputMessageImpl} from '../../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {Printable} from '../../../rendering/printable/printable';
 import {UPlotFormat} from './uPlotFormat';
 import uPlot from 'uplot';
-import {BasicOptionsImpl} from './uPlotPlugin/configuration/options/basicOptionsImpl';
-import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
-import { OutputPayload } from '../../outputPayload';
+import {uPlotOptions} from './uPlotOptions';
 
 export class UPlotFormatImpl implements UPlotFormat {
   private readonly _channel: Channel;
   private readonly _switcherButtons: Printable[];
   private readonly _renderNode: WritableSignal<RenderNode>;
-  private readonly _renderNodeStub: RenderNode;
 
   constructor(channel: Channel) {
     this._channel = channel;
@@ -75,11 +68,12 @@ export class UPlotFormatImpl implements UPlotFormat {
       new uPlotSwitcherButton(this, 'Bar Chart', 'fas fa-chart-bar', GraphType.bar),
       new uPlotSwitcherButton(this, 'Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
-    this._renderNodeStub = new RenderNodeStub();
-    this._renderNode = signal(this._renderNodeStub);
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.UPLOT_OUTPUT_VIEW, computed(() => ({
+
+    }))));
   }
 
-  render(output: Pick<OutputPayload, 'data' | 'options'>): void {
+  render(uPlotData:uPlot.AlignedData, uPlotOptions:uPlotOptions): void {
     throw new Error('Method not implemented.');
   }
 

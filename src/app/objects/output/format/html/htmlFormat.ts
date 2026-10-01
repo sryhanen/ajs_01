@@ -44,23 +44,23 @@
  * a licensee so wish it.
  */
 import {OutputFormat} from '../outputFormat';
-import {signal, Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
-import { OutputPayload } from '../../outputPayload';
+import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class HTMLFormat implements OutputFormat {
   private readonly _renderNode: WritableSignal<RenderNode>;
-  private readonly _renderNodeStub: RenderNode;
 
   constructor() {
-    this._renderNodeStub = new RenderNodeStub();
-    this._renderNode = signal(this._renderNodeStub);
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.HTML_OUTPUT_VIEW, computed(() => ({
+
+    }))));
   }
 
-  render(output: Pick<OutputPayload, 'data' | 'options'>): void {
-        throw new Error('Method not implemented.');
-    }
+  render(htmlData: string): void {
+    throw new Error('Method not implemented.');
+  }
 
   print(): Signal<RenderNode> {
     return this._renderNode;

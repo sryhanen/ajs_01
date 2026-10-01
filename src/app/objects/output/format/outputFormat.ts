@@ -46,9 +46,8 @@
 import {Printable} from '../../rendering/printable/printable';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
 import {Signal} from '@angular/core';
-import {OutputPayload} from '../outputPayload';
 
 export interface OutputFormat extends Printable {
   switcherButtons(): Signal<RenderNode>[];
-  render(output:Pick<OutputPayload, 'data' | 'options'>): void;
+  render(data:object|string, options?:object):void;
 }
