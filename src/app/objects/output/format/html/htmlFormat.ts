@@ -54,6 +54,7 @@ export class HTMLFormat implements OutputFormat {
   private readonly _renderNode: WritableSignal<RenderNode>;
 
   constructor() {
+    this._htmlTemplate = signal('');
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.HTML_OUTPUT_VIEW, computed(() => ({
       htmlTemplate: this._htmlTemplate(),
     }))));

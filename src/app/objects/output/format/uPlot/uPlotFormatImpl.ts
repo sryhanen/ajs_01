@@ -49,26 +49,24 @@ import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {Channel} from '../../../channel/channel';
 import {Printable} from '../../../rendering/printable/printable';
-import {UPlotFormat} from './uPlotFormat';
 import uPlot from 'uplot';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 import {uPlotOptions} from './uPlotOptions';
+import {OutputFormat} from '../outputFormat';
 
-export class UPlotFormatImpl implements UPlotFormat {
-  private readonly _channel: Channel;
+export class UPlotFormatImpl implements OutputFormat {
   private readonly _switcherButtons: Printable[];
   private readonly _uPlotData: WritableSignal<uPlot.AlignedData>;
   private readonly _uPlotOptions: WritableSignal<uPlotOptions>;
   private readonly _renderNode: WritableSignal<RenderNode>;
 
   constructor(channel: Channel) {
-    this._channel = channel;
     this._switcherButtons = [
-      new uPlotSwitcherButton(this, 'Line Chart', 'fas fa-chart-line', GraphType.line),
-      new uPlotSwitcherButton(this, 'Area Chart', 'fas fa-chart-area', GraphType.area),
-      new uPlotSwitcherButton(this, 'Bar Chart', 'fas fa-chart-bar', GraphType.bar),
-      new uPlotSwitcherButton(this, 'Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
+      new uPlotSwitcherButton(channel, 'Line Chart', 'fas fa-chart-line', GraphType.line),
+      new uPlotSwitcherButton(channel, 'Area Chart', 'fas fa-chart-area', GraphType.area),
+      new uPlotSwitcherButton(channel, 'Bar Chart', 'fas fa-chart-bar', GraphType.bar),
+      new uPlotSwitcherButton(channel, 'Scatter Chart', 'cf cf-scatter-chart', GraphType.scatter),
     ];
     this._uPlotData = signal([]);
     this._uPlotOptions = signal({
@@ -86,10 +84,6 @@ export class UPlotFormatImpl implements UPlotFormat {
   render(uPlotData:uPlot.AlignedData, uPlotOptions:uPlotOptions): void {
     this._uPlotData.set(uPlotData);
     this._uPlotOptions.set(uPlotOptions);
-  }
-
-  request(json: object): void {
-    this._channel.request(json);
   }
 
   print(): Signal<RenderNode> {

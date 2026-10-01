@@ -46,73 +46,56 @@
 import {UPlotFormatImpl} from './uPlotFormatImpl';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../../../test/fakes/channel/fakeChannel';
-import {OutputType} from '../../outputType';
+import {OutputFormat} from '../outputFormat';
+import uPlot from 'uplot';
 
 describe('uPlotFormat unit test', () => {
   let channel:Channel;
-  let uPlotFormat: UPlotFormatImpl;
+  let uPlotFormat: OutputFormat;
   beforeEach(() => {
     channel = new FakeChannel();
     uPlotFormat = new UPlotFormatImpl(channel);
   });
 
-  describe('Birth', ()=> {
-    it('Should be initialized', () => {
-      expect(uPlotFormat).toBeDefined();
-    });
-
-    it('Should have switcher buttons', () => {
-      const switcherButtons = uPlotFormat.switcherButtons();
-      expect(switcherButtons).toHaveLength(4);
-    });
-
-    it('Should print', () => {
-      const uPlotFormatPrinted = uPlotFormat.print()();
-      expect(uPlotFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should print', () => {
+    const printed = uPlotFormat.print()();
+    const inputs = printed.inputs()();
+    const initialUplotData=[];
+    const initialUplotOptions = {
+      labels: [],
+      series: [],
+      xAxisLabel: '',
+      graphType: ''
+    };
+    expect(printed.isStub()).toBe(false);
+    expect(inputs['uPlotData']).toEqual(initialUplotData);
+    expect(inputs['uPlotOptions']).toEqual(initialUplotOptions);
   });
 
-  describe('Request', () => {
-    it('Should request channel', () =>{
-      const requestData= {test:'test'};
-      const channelSpy = vi.spyOn(channel, 'request');
-      uPlotFormat.request(requestData);
-      expect(channelSpy).toHaveBeenCalledTimes(1);
-      expect(channelSpy).toHaveBeenCalledWith(requestData);
-    });
+  it('Should have buttons', () => {
+    const buttons = uPlotFormat.switcherButtons();
+    expect(buttons).toHaveLength(4);
+    expect(buttons[0].isStub()).toBe(false);
+    expect(buttons[1].isStub()).toBe(false);
+    expect(buttons[2].isStub()).toBe(false);
+    expect(buttons[3].isStub()).toBe(false);
   });
 
-  describe('ComponentView updates', () => {
-    let outputResponse;
-    beforeEach(() => {
-      outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.uPlot,
-            data:{},
-            options:{
-              labels:[],
-              series:[],
-              xAxisLabel:'',
-              graphType:''
-            }
-          }
-        }
-      };
-      uPlotFormat.response(outputResponse);
-    });
-
-    it('Should have componentView', () => {
-      const uPlotFormatPrinted = uPlotFormat.print()();
-      expect(uPlotFormatPrinted.isStub()).toBe(false);
-    });
-
-    it('Should not have component view after output type change', () => {
-      outputResponse.data.output.type = '';
-      uPlotFormat.response(outputResponse);
-      const uPlotFormatPrinted = uPlotFormat.print()();
-      expect(uPlotFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should render', () => {
+    const uPlotData:uPlot.AlignedData = [
+      [1,2,3],
+      [1,2,3]
+    ];
+    const uPlotOptions = {
+      labels: ['label1','label2', 'label3'],
+      series: ['series1','series2','series3'],
+      xAxisLabel: 'xAxis',
+      graphType: 'graphType'
+    };
+    uPlotFormat.render(uPlotData, uPlotOptions);
+    const printed = uPlotFormat.print()();
+    const inputs = printed.inputs()();
+    expect(inputs['uPlotData']).toEqual(uPlotData);
+    expect(inputs['uPlotOptions']).toEqual(uPlotOptions);
   });
 });

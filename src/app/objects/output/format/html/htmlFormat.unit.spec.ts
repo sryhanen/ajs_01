@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import {HTMLFormat} from './htmlFormat';
-import {OutputType} from '../../outputType';
 
 describe('HTMLFormat unit test', () => {
   let htmlFormat: HTMLFormat;
@@ -53,46 +52,22 @@ describe('HTMLFormat unit test', () => {
     htmlFormat = new HTMLFormat();
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(htmlFormat).toBeInstanceOf(HTMLFormat);
-    });
-
-    it('Should not have switcherButtons', () => {
-      expect(htmlFormat.switcherButtons()).toEqual([]);
-    });
-
-    it('Should print', () => {
-      const htmlFormatPrinted = htmlFormat.print()();
-      expect(htmlFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should print', () => {
+    const printed = htmlFormat.print()();
+    const inputs = printed.inputs()();
+    expect(printed.isStub()).toBe(false);
+    expect(inputs['htmlTemplate']).toEqual('');
   });
 
-  describe('ComponentView updates', () => {
-    let outputResponse;
-    beforeEach(() => {
-      outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.html,
-            data:'',
-          }
-        }
-      };
-      htmlFormat.response(outputResponse);
-    });
+  it('Should not have buttons', () => {
+    expect(htmlFormat.switcherButtons()).toEqual([]);
+  });
 
-    it('Should have componentView', () => {
-      const htmlFormatPrinted = htmlFormat.print()();
-      expect(htmlFormatPrinted.isStub()).toBe(false);
-    });
-
-    it('Should not have componentView after output type change', () => {
-      outputResponse.data.output.type = '';
-      htmlFormat.response(outputResponse);
-      const htmlFormatPrinted = htmlFormat.print()();
-      expect(htmlFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should render', () => {
+    const htmlTemplate = '<p>test</p>';
+    htmlFormat.render(htmlTemplate);
+    const printed = htmlFormat.print()();
+    const inputs = printed.inputs()();
+    expect(inputs['htmlTemplate']).toEqual(htmlTemplate);
   });
 });

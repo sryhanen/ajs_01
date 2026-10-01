@@ -46,7 +46,8 @@
 import {DataTablesFormatImpl} from './dataTablesFormatImpl';
 import {Channel} from '../../../channel/channel';
 import {FakeChannel} from '../../../../../test/fakes/channel/fakeChannel';
-import {OutputType} from '../../outputType';
+import {PaginatedDataTablesData} from './paginatedDataTablesData';
+import {DataTablesOptions} from './dataTablesOptions';
 
 describe('DataTablesFormat unit test', () => {
   let channel:Channel;
@@ -57,67 +58,53 @@ describe('DataTablesFormat unit test', () => {
     dataTablesFormat = new DataTablesFormatImpl(channel);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () =>{
-      expect(dataTablesFormat).toBeInstanceOf(DataTablesFormatImpl);
-    });
-
-    it('Should have a switcher button', () =>{
-      const buttons = dataTablesFormat.switcherButtons();
-      expect(buttons).toHaveLength(1);
-    });
-
-    it('Should print', () => {
-      const dataTablesFormatPrinted = dataTablesFormat.print()();
-      expect(dataTablesFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should print', () => {
+    const printed = dataTablesFormat.print()();
+    const inputs = printed.inputs()();
+    const initialDataTablesData = {
+      data: [],
+      draw: 0,
+      recordsFiltered: 0,
+      recordsTotal: 0,
+    };
+    const initialDataTablesOptions = {
+      headers:[]
+    };
+    expect(printed.isStub()).toBe(false);
+    expect(inputs['dataTablesData']).toEqual(initialDataTablesData);
+    expect(inputs['dataTablesOptions']).toEqual(initialDataTablesOptions);
   });
 
-  describe('Request', () => {
-    it('Should request channel', () =>{
-      const requestData= {test:'test'};
-      const channelSpy = vi.spyOn(channel, 'request');
-      dataTablesFormat.request(requestData);
-      expect(channelSpy).toHaveBeenCalledTimes(1);
-      expect(channelSpy).toHaveBeenCalledWith(requestData);
-    });
+  it('Should have button', () => {
+    const buttons = dataTablesFormat.switcherButtons();
+    expect(buttons).toHaveLength(1);
+    expect(buttons[0].isStub()).toBe(false);
   });
 
-  describe('ComponentView updates', () => {
-    let outputResponse;
-    beforeEach(() => {
-      outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.dataTables,
-            data:{},
-            options:{},
-          }
-        }
-      };
-      dataTablesFormat.response(outputResponse);
-    });
+  it('Should request channel', () => {
+    const channelSpy = vi.spyOn(channel, 'request');
+    const request = {
+      op:'test',
+      data:{}
+    };
+    dataTablesFormat.request(request);
+    expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
 
-    it('Should have componentView', () => {
-      const dataTablesFormatPrinted = dataTablesFormat.print()();
-      expect(dataTablesFormatPrinted.isStub()).toBe(false);
-    });
-
-    it('Should respond plugin on consequential output responses', () => {
-      const plugin = dataTablesFormat.print()().inputs()()['dataTablesPlugin'] as Channel;
-      const spy = vi.spyOn(plugin, 'response');
-      dataTablesFormat.response(outputResponse);
-      dataTablesFormat.response(outputResponse);
-      dataTablesFormat.response(outputResponse);
-      expect(spy).toHaveBeenCalledTimes(3);
-    });
-
-    it('Should not have component view after output type change', () => {
-      outputResponse.data.output.type = '';
-      dataTablesFormat.response(outputResponse);
-      const dataTablesFormatPrinted = dataTablesFormat.print()();
-      expect(dataTablesFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should render', () => {
+    const dataTablesData:PaginatedDataTablesData = {
+      data: [{test:'test'}],
+      draw: 1,
+      recordsFiltered: 1,
+      recordsTotal: 1
+    };
+    const dataTablesOptions:DataTablesOptions = {
+      headers:['test']
+    };
+    dataTablesFormat.render(dataTablesData, dataTablesOptions);
+    const printed = dataTablesFormat.print()();
+    const inputs = printed.inputs()();
+    expect(inputs['dataTablesData']).toEqual(dataTablesData);
+    expect(inputs['dataTablesOptions']).toEqual(dataTablesOptions);
   });
 });
