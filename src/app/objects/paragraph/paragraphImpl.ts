@@ -57,17 +57,18 @@ import {OutputImpl} from '../output/outputImpl';
 import {MessagePropertyEqualsFilter} from '../message/messageFilter/messagePropertyEqualsFilter';
 import {MessageImpl} from '../message/messageImpl';
 import {PropertyDecoratedMessage} from '../message/propertyDecoratedMessage/propertyDecoratedMessage';
+import {Message} from '../message/message';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _output: Output;
-  private readonly _paragraph: WebSocketPayload;
+  private readonly _paragraphData: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _paragraphIdFilter: MessagePropertyEqualsFilter;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
-    this._paragraph = new WebSocketPayloadImpl(paragraph);
+    this._paragraphData = new WebSocketPayloadImpl(paragraph);
     this._output = this.initializedOutput(paragraph);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
       output:this._output.print()(),
@@ -91,16 +92,36 @@ export class ParagraphImpl implements Paragraph {
   }
 
   id(): string {
-    return this._paragraph.stringProperty('id');
+    return this._paragraphData.stringProperty('id');
   }
 
   request(json: object): void {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    const paragraphIdDecoratedMessage = new PropertyDecoratedMessage(message, 'paragraphId', this.id());
-    this._channel.request({
-      op:paragraphIdDecoratedMessage.operation(),
-      data:paragraphIdDecoratedMessage.data()
-    });
+    if(message.operation() === 'EXECUTE_PARAGRAPH'){
+      this.executeParagraphRequest(message);
+    }
+    else{
+      const paragraphIdDecoratedMessage = new PropertyDecoratedMessage(message, 'paragraphId', this.id());
+      this._channel.request({
+        op:paragraphIdDecoratedMessage.operation(),
+        data:paragraphIdDecoratedMessage.data()
+      });
+    }
+  }
+
+  private executeParagraphRequest(message:Message):void{
+    if(message.dataAsWebSocketPayload().stringProperty('paragraphId') === this.id()){
+      const runParagraphRequest = {
+        op:'RUN_PARAGRAPH',
+        data: {
+          id: this.id(),
+          paragraph: this._paragraphData.stringProperty('text'),
+          config: this._paragraphData.objectProperty('config'),
+          params: this._paragraphData.objectPropertyAsPayload('settings').objectProperty('params'),
+        },
+      };
+      this._channel.request(runParagraphRequest);
+    }
   }
 
   response(json: object): void {

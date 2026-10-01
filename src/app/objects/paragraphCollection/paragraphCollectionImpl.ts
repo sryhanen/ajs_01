@@ -45,7 +45,6 @@
  */
 import {Channel} from '../channel/channel';
 import {Paragraph} from '../paragraph/paragraph';
-import {RunParagraphRequest} from './runParagraphRequest/runParagraphRequest';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
@@ -62,14 +61,12 @@ import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _channel: Channel;
   private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
-  private readonly _decoratorParagraphs:Map<string,  object>;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _responseEvents:Map<string, (message:Message) => void>;
 
   constructor(channel: Channel, initialParagraphData: object[]) {
     this._channel = channel;
     this._paragraphs = this.initializedParagraphs(initialParagraphData);
-    this._decoratorParagraphs = this.initializedDecoratorParagraphs(initialParagraphData);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, computed(() => ({
       paragraphs: Array.from(this._paragraphs().values()).map(paragraph => paragraph.print()()),
     }))));
@@ -80,11 +77,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     ]);
   }
 
-  private runParagraphRequest(json:object):void {
-    const runParagraphRequest = new RunParagraphRequest(this._channel, this._decoratorParagraphs);
-    runParagraphRequest.request(json);
-  }
-
   private paragraphResponse(message:Message):void{
     const paragraphMessage = new ParagraphMessageImpl(message);
     const paragraph = paragraphMessage.paragraph(this);
@@ -92,7 +84,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       paragraphs.set(paragraph.id(), paragraph);
       return paragraphs;
     });
-    this._decoratorParagraphs.set(paragraph.id(), paragraphMessage.data());
   }
 
   private paragraphAddedResponse(message:Message):void{
@@ -104,13 +95,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       paragraphsAsArray.splice(index, 0, [paragraph.id(), paragraph]);
       return new Map(paragraphsAsArray);
     });
-
-    const decoratorParagraphsAsArray = Array.from(this._decoratorParagraphs);
-    decoratorParagraphsAsArray.splice(index, 0, [paragraph.id(), paragraphAddedMessage.data()]);
-    this._decoratorParagraphs.clear();
-    for(const decoratorParagraph of decoratorParagraphsAsArray) {
-      this._decoratorParagraphs.set(decoratorParagraph[0], decoratorParagraph[1]);
-    }
   }
 
   private paragraphRemovedResponse(message:Message):void{
@@ -120,16 +104,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
       paragraphs.delete(paragraphId);
       return paragraphs;
     });
-    this._decoratorParagraphs.delete(paragraphId);
-  }
-
-  private initializedDecoratorParagraphs(initialParagraphData: object[]): Map<string,  object>{
-    const paragraphMap = new Map<string, object>();
-    initialParagraphData.forEach(paragraphData => {
-      const paragraph = new ParagraphImpl(this, paragraphData);
-      paragraphMap.set(paragraph.id(), paragraphData);
-    });
-    return paragraphMap;
   }
 
   private initializedParagraphs(initialParagraphData: object[]): WritableSignal<Map<string,  Paragraph>> {
@@ -149,12 +123,21 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
 
   request(json: object): void {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    if(message.operation() === 'RUN_PARAGRAPH') {
-      this.runParagraphRequest(json);
+    if(message.operation() === 'EXECUTE_PARAGRAPH') {
+      this.executeParagraphRequest(message);
     }
     else{
       this._channel.request(json);
     }
+  }
+
+  private executeParagraphRequest(message:Message):void {
+    const executableParagraphId = message.dataAsWebSocketPayload().stringProperty('paragraphId');
+    const executableParagraph = this._paragraphs().get(executableParagraphId);
+    executableParagraph.request({
+      op:message.operation(),
+      data:message.data()
+    });
   }
 
   response(json: object): void {
