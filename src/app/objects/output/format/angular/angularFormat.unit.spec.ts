@@ -45,7 +45,6 @@
  */
 import {FakeChannel} from '../../../../../test/fakes/channel/fakeChannel';
 import {AngularFormatImpl} from './angularFormatImpl';
-import {OutputType} from '../../outputType';
 
 describe('AngularFormat unit test', () => {
   const channel = new FakeChannel();
@@ -55,59 +54,34 @@ describe('AngularFormat unit test', () => {
     angularFormat = new AngularFormatImpl(channel);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(angularFormat).toBeInstanceOf(AngularFormatImpl);
-    });
-
-    it('Should not have switcherButtons', () => {
-      expect(angularFormat.switcherButtons()).toEqual([]);
-    });
-
-    it('Should print', () => {
-      const angularFormatPrinted = angularFormat.print()();
-      expect(angularFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should print', () => {
+    const printed = angularFormat.print()();
+    const inputs = printed.inputs()();
+    expect(printed.isStub()).toBe(false);
+    expect(inputs['angularTemplate']).toEqual('');
+    expect(inputs['angularObjects']).toEqual([]);
+    expect(inputs['requestable']).toBeDefined();
   });
 
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const spy = vi.spyOn(channel, 'request');
-      const request = {
-        op:'',
-        data:{}
-      };
-      angularFormat.request(request);
-      expect(spy).toHaveBeenCalledExactlyOnceWith(request);
-    });
+  it('Should not have buttons', () => {
+    expect(angularFormat.switcherButtons()).toEqual([]);
   });
 
-  describe('ComponentView updates', () => {
-    let outputResponse;
-    const template = '<h1>template</h1>';
-    beforeEach(() => {
-      outputResponse = {
-        op:'PARAGRAPH_OUTPUT',
-        data:{
-          output:{
-            type:OutputType.angular,
-            data:template,
-          }
-        }
-      };
-    });
+  it('Should request channel', () => {
+    const channelSpy = vi.spyOn(channel, 'request');
+    const request = {
+      op:'test',
+      data:{}
+    };
+    angularFormat.request(request);
+    expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
 
-    it('Should have component view', () => {
-      angularFormat.response(outputResponse);
-      const angularFormatPrinted = angularFormat.print()();
-      expect(angularFormatPrinted.isStub()).toBe(false);
-    });
-
-    it('Should have not have component view after output type change', () => {
-      outputResponse.data.output.type = '';
-      angularFormat.response(outputResponse);
-      const angularFormatPrinted = angularFormat.print()();
-      expect(angularFormatPrinted.isStub()).toBe(true);
-    });
+  it('Should render', () => {
+    const angularTemplate = 'angularTemplate';
+    angularFormat.render(angularTemplate);
+    const printed = angularFormat.print()();
+    const inputs = printed.inputs()();
+    expect(inputs['angularTemplate']).toEqual(angularTemplate);
   });
 });
