@@ -92,7 +92,7 @@ export class DataTablesFormatImpl implements DataTablesFormat {
     this._channel.request(data);
   }
 
-  switcherButtons(): Signal<RenderNode>[] {
-    return [this._switcherButton.print()];
+  switcherButtons(): RenderNode[] {
+    return [this._switcherButton.print()()];
   }
 }

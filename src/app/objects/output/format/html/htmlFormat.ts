@@ -67,7 +67,7 @@ export class HTMLFormat implements OutputFormat {
     return this._renderNode;
   }
 
-  switcherButtons(): Signal<RenderNode>[] {
+  switcherButtons(): RenderNode[] {
     return [];
   }
 }

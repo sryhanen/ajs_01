@@ -83,7 +83,7 @@ export class AngularFormatImpl implements AngularFormat {
     return this._renderNode;
   }
 
-  switcherButtons(): Signal<RenderNode>[] {
+  switcherButtons(): RenderNode[] {
     return [];
   }
 }
