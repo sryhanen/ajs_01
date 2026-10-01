@@ -49,18 +49,19 @@ import {Respondable} from '../channel/respondable';
 import {AngularObject} from '../angularObject/angularObject';
 import {AngularObjectRemoveResponse} from './responses/angularObjectRemove/angularObjectRemoveResponse';
 import {AngularObjectUpdateResponse} from './responses/angularObjectUpdate/angularObjectUpdateResponse';
+import {signal, Signal, WritableSignal} from '@angular/core';
 
 export class AngularObjectCollectionImpl implements AngularObjectCollection {
   private readonly _channel: Channel;
-  private readonly _angularObjects: AngularObject[];
+  private readonly _angularObjects: WritableSignal<AngularObject[]>;
   private readonly _responses: Respondable[];
 
   constructor(channel: Channel) {
     this._channel = channel;
-    this._angularObjects = [];
+    this._angularObjects = signal([]);
     this._responses = [
-      new AngularObjectRemoveResponse(this._angularObjects),
-      new AngularObjectUpdateResponse(this, this._angularObjects)
+      new AngularObjectRemoveResponse(this._angularObjects()),
+      new AngularObjectUpdateResponse(this, this._angularObjects())
     ];
   }
 
@@ -72,7 +73,7 @@ export class AngularObjectCollectionImpl implements AngularObjectCollection {
     this._responses.forEach(response => response.response(data));
   }
 
-  angularObjects(): AngularObject[] {
+  angularObjects(): Signal<AngularObject[]> {
     return this._angularObjects;
   }
 }
