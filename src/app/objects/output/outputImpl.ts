@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Output} from './output';
-import {computed, signal, Signal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {Channel} from '../channel/channel';
 import {InterpreterErrorListenerImpl} from '../interpreterErrorListener/interpreterErrorListenerImpl';
@@ -66,37 +66,48 @@ import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {WebSocketPayloadImpl} from '../webSocketPayload/webSocketPayloadImpl';
 import { OutputPayload } from './outputPayload';
+import {OutputType} from './outputType';
+import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class OutputImpl implements Output {
   private readonly _channel: Channel;
   private readonly _interpreterErrorListener: InterpreterErrorListener;
-  private readonly _outputFormats: OutputFormat[];
+  private readonly _outputFormats: Map<string, OutputFormat>;
   private readonly _outputSwitcher: OutputSwitcher;
   private _previousParagraphOutputRequest: ParagraphOutputRequest;
   private readonly _renderNode: Signal<RenderNode>;
+  private readonly _output:WritableSignal<RenderNode>;
 
   constructor(channel: Channel) {
     this._channel = channel;
     this._interpreterErrorListener = new InterpreterErrorListenerImpl();
-    this._outputFormats = [
-      new DataTablesFormatImpl(this),
-      new HTMLFormat(),
-      new UPlotFormatImpl(this),
-      new TextFormat(),
-      new AngularFormatImpl(this),
+    const outputFormatList:[string, OutputFormat][] = [
+      [OutputType.dataTables, new DataTablesFormatImpl(this)],
+      [OutputType.dataTables, new HTMLFormat()],
+      [OutputType.dataTables, new UPlotFormatImpl(this)],
+      [OutputType.dataTables, new TextFormat()],
+      [OutputType.dataTables, new AngularFormatImpl(this)],
     ];
-    const buttons = this._outputFormats.map(format => format.switcherButtons());
+    this._outputFormats = new Map(outputFormatList); // ts compiler gets confused if initializing directly in the map
+    const buttons = Array.from(this._outputFormats.values()).map(format => format.switcherButtons());
     this._outputSwitcher = new OutputSwitcherImpl(buttons.flat());
     this._previousParagraphOutputRequest = new ParagraphOutputRequestStub();
+    this._output = signal(new RenderNodeStub());
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.OUTPUT_VIEW, computed(() => ({
       interpreterErrorListener: this._interpreterErrorListener.print()(),
       outputSwitcher: this._outputSwitcher.print()(),
-      outputFormats: this._outputFormats.map(outputFormat => outputFormat.print()()),
+      output:this._output()
     }))));
   }
 
   render(output: OutputPayload): void {
-    throw new Error('Method not implemented.');
+    const outputType = output.type;
+    if(!this._outputFormats.has(outputType)){
+      throw new RangeError(`Output of type "${outputType}" is not valid type.`);
+    }
+    const outputFormat = this._outputFormats.get(outputType);
+    outputFormat.render(output.data, output.options);
+    this._output.set(outputFormat.print()());
   }
 
   print(): Signal<RenderNode> {
