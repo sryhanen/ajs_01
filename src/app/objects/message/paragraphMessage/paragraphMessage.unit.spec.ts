@@ -66,11 +66,13 @@ describe('ParagraphMessage unit test', () => {
   });
 
   it('Should update paragraph', () => {
-    const paragraphCollectionUpdateSpy = vi.spyOn(paragraphCollection, 'updateParagraph');
-    paragraphMessage.updateParagraph(paragraphCollection);
-
     // No better way to test the update at this stage
-    // Implement test by state change when possible
-    expect(paragraphCollectionUpdateSpy).toHaveReturned();
+    // Refactor the test when state change can be asserted
+    const paragraphCollectionPrinted = paragraphCollection.print()();
+    const paragraphsBeforeUpdate = paragraphCollectionPrinted.inputs()()['paragraphs'];
+    paragraphMessage.updateParagraph(paragraphCollection);
+    const paragraphsAfterUpdate = paragraphCollectionPrinted.inputs()()['paragraphs'];
+    expect(paragraphsBeforeUpdate).toHaveLength(1);
+    expect(paragraphsAfterUpdate).toHaveLength(1);
   });
 });

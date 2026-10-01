@@ -77,33 +77,53 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     ]);
   }
 
-  private paragraphResponse(message:Message):void{
-    const paragraphMessage = new ParagraphMessageImpl(message);
-    const paragraph = paragraphMessage.paragraph(this);
+  updateParagraph(paragraph: Paragraph): void {
+    const paragraphId = paragraph.id();
+    if(!this._paragraphs().has(paragraphId)){
+      throw new Error(`Paragraph with id $"${paragraphId}" is not part of paragraph collection.`);
+    }
     this._paragraphs.update(paragraphs => {
       paragraphs.set(paragraph.id(), paragraph);
       return paragraphs;
     });
   }
 
-  private paragraphAddedResponse(message:Message):void{
-    const paragraphAddedMessage = new ParagraphAddedMessageImpl(message);
-    const index = paragraphAddedMessage.index();
-    const paragraph = paragraphAddedMessage.paragraph(this);
-    this._paragraphs.update(paragraphs => {
-      const paragraphsAsArray = Array.from(paragraphs);
-      paragraphsAsArray.splice(index, 0, [paragraph.id(), paragraph]);
-      return new Map(paragraphsAsArray);
-    });
+  addParagraph(paragraph: Paragraph, index:number): void {
+    if(index < 0 || index > 0 && index > Array.from(this._paragraphs()).length - 1){
+      throw new Error(` 1 Invalid index provided: ${index}.`);
+    }
+    const paragraphId = paragraph.id();
+    if(this._paragraphs().has(paragraphId)){
+      throw new Error(`Paragraph with id "${paragraphId}" already exists.`);
+    }
+    const paragraphsAsArray = Array.from(this._paragraphs().values());
+    paragraphsAsArray.splice(index, 0, paragraph);
+    this._paragraphs.set(new Map(paragraphsAsArray.map(paragraph => [paragraph.id(), paragraph])));
   }
 
-  private paragraphRemovedResponse(message:Message):void{
-    const paragraphRemovedMessage = new ParagraphRemovedMessageImpl(message);
-    const paragraphId = paragraphRemovedMessage.paragraphId();
+  removeParagraph(paragraphId: string): void {
+    if(!this._paragraphs().has(paragraphId)){
+      throw new Error(`Paragraph with id "${paragraphId}" does not exists.`);
+    }
     this._paragraphs.update(paragraphs => {
       paragraphs.delete(paragraphId);
       return paragraphs;
     });
+  }
+
+  private paragraphResponse(message:Message):void{
+    const paragraphMessage = new ParagraphMessageImpl(message);
+    paragraphMessage.updateParagraph(this);
+  }
+
+  private paragraphAddedResponse(message:Message):void{
+    const paragraphAddedMessage = new ParagraphAddedMessageImpl(message);
+    paragraphAddedMessage.addParagraph(this);
+  }
+
+  private paragraphRemovedResponse(message:Message):void{
+    const paragraphRemovedMessage = new ParagraphRemovedMessageImpl(message);
+    paragraphRemovedMessage.removeParagraph(this);
   }
 
   private initializedParagraphs(initialParagraphData: object[]): WritableSignal<Map<string,  Paragraph>> {
