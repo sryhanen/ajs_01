@@ -73,14 +73,22 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
   }
 
   addNotebookIndex(notebookIndex: NotebookIndex): void {
-        throw new Error('Method not implemented.');
-    }
-    removeAllNotebookIndices(): void {
-        throw new Error('Method not implemented.');
-    }
+    this._notebookIndices.update(notebookIndices => {
+      notebookIndices.set(notebookIndex.id(), notebookIndex);
+      return notebookIndices;
+    });
+  }
+
+  removeAllNotebookIndices(): void {
+    this._notebookIndices.update(notebookIndices  => {
+      notebookIndices.clear();
+      return notebookIndices;
+    });
+  }
 
   private notesInfoResponse(message:Message):void{
-    this._notebookIndices.set(new NotesInfoMessageImpl(message).notebookIndices(this));
+    const notesInfoMessage = new NotesInfoMessageImpl(message);
+    notesInfoMessage.updateNotebookIndices(this);
   }
 
   print(): Signal<RenderNode> {

@@ -47,6 +47,9 @@ import {Channel} from '../channel/channel';
 import {NotebookIndexCollection} from './notebookIndexCollection';
 import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 import {NotebookIndexCollectionImpl} from './notebookIndexCollectionImpl';
+import {NotebookIndexImpl} from '../notebookIndex/notebookIndexImpl';
+import {NotebookPayloadFactoryImpl} from '../../../test/fakes/notebook/notebookPayloadFactoryImpl';
+import {NotesInfoServerResponse} from '../../../test/fakes/webSocketServerResponses/notesInfo/notesInfoServerResponse';
 
 describe('NotebookCollection', () => {
   let channel: Channel;
@@ -57,27 +60,68 @@ describe('NotebookCollection', () => {
     notebookCollection = new NotebookIndexCollectionImpl(channel);
   });
 
-  describe('Birth', () => {
-    it('Should have been initialized', () =>{
-      expect(notebookCollection).toBeInstanceOf(NotebookIndexCollectionImpl);
-    });
-
-    it('Should print', () => {
-      const notebookCollectionPrinted = notebookCollection.print()();
-      expect(notebookCollectionPrinted.isStub()).toBe(false);
-      expect(notebookCollectionPrinted.inputs()()['notebookIndices']).toEqual([]);
-    });
+  it('Should print', () => {
+    const notebookCollectionPrinted = notebookCollection.print()();
+    expect(notebookCollectionPrinted.isStub()).toBe(false);
+    expect(notebookCollectionPrinted.inputs()()['notebookIndices']).toEqual([]);
   });
 
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const channelSpy = vi.spyOn(channel, 'request');
-      const request = {
-        op:'test',
-        data:{}
-      };
-      notebookCollection.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
+  it('Should request channel', () => {
+    const channelSpy = vi.spyOn(channel, 'request');
+    const request = {
+      op:'test',
+      data:{}
+    };
+    notebookCollection.request(request);
+    expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
+
+  it('Should add notebookIndex', () => {
+    const notebookIndex = new NotebookIndexImpl(channel, new NotebookPayloadFactoryImpl().toIndexPayload());
+    notebookCollection.addNotebookIndex(notebookIndex);
+    const notebookCollectionPrinted = notebookCollection.print()();
+    expect(notebookCollectionPrinted.inputs()()['notebookIndices']).toHaveLength(1);
+  });
+
+  it('Should remove all NotebookIndices', () => {
+    notebookCollection.addNotebookIndex(new NotebookIndexImpl(channel, new NotebookPayloadFactoryImpl().toIndexPayload()));
+    notebookCollection.addNotebookIndex(new NotebookIndexImpl(channel, new NotebookPayloadFactoryImpl().toIndexPayload()));
+    notebookCollection.addNotebookIndex(new NotebookIndexImpl(channel, new NotebookPayloadFactoryImpl().toIndexPayload()));
+    const notebookCollectionPrinted = notebookCollection.print()();
+    const notebookIndicesInitially = notebookCollectionPrinted.inputs()()['notebookIndices'];
+    notebookCollection.removeAllNotebookIndices();
+    const notebookIndicesAfterRemove = notebookCollectionPrinted.inputs()()['notebookIndices'];
+    expect(notebookIndicesInitially).toHaveLength(3);
+    expect(notebookIndicesAfterRemove).toEqual([]);
+  });
+
+  it('Should update NotebookIndices on NOTES_INFO response', () => {
+    const notebookIndicesPayload = [
+      new NotebookPayloadFactoryImpl().toIndexPayload(),
+      new NotebookPayloadFactoryImpl().toIndexPayload(),
+      new NotebookPayloadFactoryImpl().toIndexPayload()
+    ];
+    const notesInfoResponse = new NotesInfoServerResponse(notebookIndicesPayload).toObject();
+    notebookCollection.response(notesInfoResponse);
+    const notebookCollectionPrinted = notebookCollection.print()();
+    const notebookIndicesAfterResponse = notebookCollectionPrinted.inputs()()['notebookIndices'];
+    expect(notebookIndicesAfterResponse).toHaveLength(3);
+  });
+
+  it('Should respond to notebookIndices', () => {
+    const notebookIndex1 = new NotebookIndexImpl(channel, new NotebookPayloadFactoryImpl().toIndexPayload());
+    const notebookIndex2 = new NotebookIndexImpl(channel, new NotebookPayloadFactoryImpl().toIndexPayload());
+    notebookCollection.addNotebookIndex(notebookIndex1);
+    notebookCollection.addNotebookIndex(notebookIndex2);
+
+    const notebookIndex1Spy = vi.spyOn(notebookIndex1, 'response');
+    const notebookIndex2Spy = vi.spyOn(notebookIndex2, 'response');
+    const response = {
+      op:'test',
+      data:{}
+    };
+    notebookCollection.response(response);
+    expect(notebookIndex1Spy).toHaveBeenCalledExactlyOnceWith(response);
+    expect(notebookIndex2Spy).toHaveBeenCalledExactlyOnceWith(response);
   });
 });
