@@ -43,40 +43,19 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {InterpreterErrorListener} from './interpreterErrorListener';
-import {InterpreterErrorListenerImpl} from './interpreterErrorListenerImpl';
-import {
-  InterpreterErrorServerResponse
-} from '../../../test/fakes/webSocketServerResponses/interpreterError/interpreterErrorServerResponse';
+import {InterpreterErrorMessage} from './interpreterErrorMessage';
+import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
+import {TypedMessage} from '../typedMessage/typedMessage';
+import {Message} from '../message';
 
-describe('InterpreterErrorListener', () => {
-  let interpreterErrorListener: InterpreterErrorListener;
-  const errorMessage = 'error message';
+export class InterpreterErrorMessageImpl implements InterpreterErrorMessage {
+  private readonly _message:Message;
 
-  beforeEach(() => {
-    interpreterErrorListener = new InterpreterErrorListenerImpl();
-  });
+  constructor(message:Message) {
+    this._message = new TypedMessage('INTERPRETER_ERROR', message);
+  }
 
-  it('Should print', () => {
-    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-    expect(interpreterErrorListenerPrinted.isStub()).toBe(true);
-  });
-
-  it('Should have componentView after "INTERPRETER_ERROR" response', () =>{
-    const interpreterErrorResponse = new InterpreterErrorServerResponse(errorMessage);
-    interpreterErrorListener.response(interpreterErrorResponse.toObject());
-    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-    const inputs = interpreterErrorListenerPrinted.inputs()();
-    expect(interpreterErrorListenerPrinted.isStub()).toBe(false);
-    expect(inputs['errorMessage']).toEqual(errorMessage);
-  });
-
-  it('Should render', () => {
-    const errorMessage = 'error message';
-    interpreterErrorListener.renderErrorMessage(errorMessage);
-    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-    const inputs = interpreterErrorListenerPrinted.inputs()();
-    expect(interpreterErrorListenerPrinted.isStub()).toBe(false);
-    expect(inputs['errorMessage']).toEqual(errorMessage);
-  });
-});
+  renderError(interpreterErrorListener: InterpreterErrorListener): void {
+    interpreterErrorListener.renderErrorMessage(this._message.dataAsWebSocketPayload().stringProperty('message'));
+  }
+}

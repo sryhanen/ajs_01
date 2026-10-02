@@ -46,4 +46,6 @@
 import {Respondable} from '../channel/respondable';
 import {Printable} from '../rendering/printable/printable';
 
-export interface InterpreterErrorListener extends Respondable, Printable {}
+export interface InterpreterErrorListener extends Respondable, Printable {
+  renderErrorMessage(errorMessage:string):void;
+}

@@ -43,40 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {InterpreterErrorListener} from './interpreterErrorListener';
-import {InterpreterErrorListenerImpl} from './interpreterErrorListenerImpl';
-import {
-  InterpreterErrorServerResponse
-} from '../../../test/fakes/webSocketServerResponses/interpreterError/interpreterErrorServerResponse';
+import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
 
-describe('InterpreterErrorListener', () => {
-  let interpreterErrorListener: InterpreterErrorListener;
-  const errorMessage = 'error message';
-
-  beforeEach(() => {
-    interpreterErrorListener = new InterpreterErrorListenerImpl();
-  });
-
-  it('Should print', () => {
-    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-    expect(interpreterErrorListenerPrinted.isStub()).toBe(true);
-  });
-
-  it('Should have componentView after "INTERPRETER_ERROR" response', () =>{
-    const interpreterErrorResponse = new InterpreterErrorServerResponse(errorMessage);
-    interpreterErrorListener.response(interpreterErrorResponse.toObject());
-    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-    const inputs = interpreterErrorListenerPrinted.inputs()();
-    expect(interpreterErrorListenerPrinted.isStub()).toBe(false);
-    expect(inputs['errorMessage']).toEqual(errorMessage);
-  });
-
-  it('Should render', () => {
-    const errorMessage = 'error message';
-    interpreterErrorListener.renderErrorMessage(errorMessage);
-    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-    const inputs = interpreterErrorListenerPrinted.inputs()();
-    expect(interpreterErrorListenerPrinted.isStub()).toBe(false);
-    expect(inputs['errorMessage']).toEqual(errorMessage);
-  });
-});
+export interface InterpreterErrorMessage {
+  renderError(interpreterErrorListener:InterpreterErrorListener):void;
+}

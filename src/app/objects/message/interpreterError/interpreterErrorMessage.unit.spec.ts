@@ -43,40 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {InterpreterErrorListener} from './interpreterErrorListener';
-import {InterpreterErrorListenerImpl} from './interpreterErrorListenerImpl';
+import {InterpreterErrorListener} from '../../interpreterErrorListener/interpreterErrorListener';
+import {Signal} from '@angular/core';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {InterpreterErrorMessage} from './interpreterErrorMessage';
+import {InterpreterErrorMessageImpl} from './interpreterErrorMessageImpl';
+import {MessageImpl} from '../messageImpl';
+import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
 import {
   InterpreterErrorServerResponse
-} from '../../../test/fakes/webSocketServerResponses/interpreterError/interpreterErrorServerResponse';
+} from '../../../../test/fakes/webSocketServerResponses/interpreterError/interpreterErrorServerResponse';
 
-describe('InterpreterErrorListener', () => {
-  let interpreterErrorListener: InterpreterErrorListener;
-  const errorMessage = 'error message';
+describe('InterpreterErrorMessage unit test', () => {
+  const interpreterErrorListener: InterpreterErrorListener = {
+    print(): Signal<RenderNode> {
+      return undefined;
+    },
+    renderErrorMessage:vi.fn(),
+    response(json: object): void {}
+  };
+  const errorMessage = 'Error message';
+  const errorResponse = new InterpreterErrorServerResponse(errorMessage);
+  const interpreterErrorMessage:InterpreterErrorMessage = new InterpreterErrorMessageImpl(new MessageImpl(new WebSocketPayloadImpl(errorResponse.toObject())));
 
-  beforeEach(() => {
-    interpreterErrorListener = new InterpreterErrorListenerImpl();
-  });
-
-  it('Should print', () => {
-    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-    expect(interpreterErrorListenerPrinted.isStub()).toBe(true);
-  });
-
-  it('Should have componentView after "INTERPRETER_ERROR" response', () =>{
-    const interpreterErrorResponse = new InterpreterErrorServerResponse(errorMessage);
-    interpreterErrorListener.response(interpreterErrorResponse.toObject());
-    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-    const inputs = interpreterErrorListenerPrinted.inputs()();
-    expect(interpreterErrorListenerPrinted.isStub()).toBe(false);
-    expect(inputs['errorMessage']).toEqual(errorMessage);
-  });
-
-  it('Should render', () => {
-    const errorMessage = 'error message';
-    interpreterErrorListener.renderErrorMessage(errorMessage);
-    const interpreterErrorListenerPrinted = interpreterErrorListener.print()();
-    const inputs = interpreterErrorListenerPrinted.inputs()();
-    expect(interpreterErrorListenerPrinted.isStub()).toBe(false);
-    expect(inputs['errorMessage']).toEqual(errorMessage);
+  it('Should render error message', () => {
+    interpreterErrorMessage.renderError(interpreterErrorListener);
+    expect(interpreterErrorListener.renderErrorMessage).toHaveBeenCalledExactlyOnceWith(errorMessage);
   });
 });
