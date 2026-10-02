@@ -56,6 +56,8 @@ import {FakeOutputPayloadFactory} from '../../../../test/fakes/output/fakeOutput
 import {OutputType} from '../../output/outputType';
 import {DataTablesDataFactoryImpl} from '../../../../test/fakes/output/dataTables/dataTablesDataFactoryImpl';
 import {uPlotDataFactoryImpl} from '../../../../test/fakes/output/uPlot/uPlotDataFactoryImpl';
+import {OutputSwitcher} from '../../output/switcher/outputSwitcher';
+import {OutputSwitcherImpl} from '../../output/switcher/outputSwitcherImpl';
 
 describe('ParagraphOutputMessage unit test', () => {
   const paragraphId = 'paragraphId';
@@ -178,6 +180,37 @@ describe('ParagraphOutputMessage unit test', () => {
 
     it('Should have output type', () => {
       expect(paragraphOutputMessage.outputType()).toEqual(OutputType.uPlot);
+    });
+  });
+
+  describe('Updating switcher', () => {
+    let outputSwitcher:OutputSwitcher;
+
+    beforeEach(() => {
+      outputSwitcher = new OutputSwitcherImpl([]);
+    });
+
+    it('Should set loader and switcher visibility', () => {
+      outputSwitcher.toggleLoader(true);
+      const outputIsAggregated = {
+        data:{},
+        type:'',
+        isAggregated: true,
+      };
+      const paragraphOutputServerResponse = new ParagraphOutputServerResponse(paragraphId, noteId, outputIsAggregated);
+
+      paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputServerResponse.toObject())));
+      const switcherPrinted = outputSwitcher.print()();
+      const loaderBeforeUpdate = switcherPrinted.inputs()()['loaderIsVisible'];
+      const switcherBeforeUpdate = switcherPrinted.inputs()()['switcherIsVisible'];
+      paragraphOutputMessage.updateSwitcher(outputSwitcher);
+      const loaderAfterUpdate = switcherPrinted.inputs()()['loaderIsVisible'];
+      const switcherAfterUpdate = switcherPrinted.inputs()()['switcherIsVisible'];
+
+      expect(loaderBeforeUpdate).toBe(true);
+      expect(switcherBeforeUpdate).toBe(false);
+      expect(loaderAfterUpdate).toBe(false);
+      expect(switcherAfterUpdate).toBe(true);
     });
   });
 });

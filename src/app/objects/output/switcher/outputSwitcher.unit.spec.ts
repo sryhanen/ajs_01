@@ -45,79 +45,39 @@
  */
 import {OutputSwitcher} from './outputSwitcher';
 import {OutputSwitcherImpl} from './outputSwitcherImpl';
-import {Signal} from '@angular/core';
+import {FakeRenderNode} from '../../../../test/fakes/fakeRenderNode';
 
 describe('OutputSwitcher', () => {
   let outputSwitcher: OutputSwitcher;
+  const switcherButtons = [
+    new FakeRenderNode(),
+    new FakeRenderNode(),
+    new FakeRenderNode(),
+  ];
 
   beforeEach(() => {
-    outputSwitcher = new OutputSwitcherImpl([]);
+    outputSwitcher = new OutputSwitcherImpl(switcherButtons);
   });
 
-  describe('Birth', () => {
-    it('Should initialize', () => {
-      expect(outputSwitcher).toBeInstanceOf(OutputSwitcherImpl);
-    });
-
-    it('Should print', () => {
-      const printed = outputSwitcher.print()();
-      expect(printed.isStub()).toBe(false);
-      expect(printed.inputs()()['switcherButtons']).toBeDefined();
-      expect(printed.inputs()()['switchIsPending']).toBeDefined();
-      expect(printed.inputs()()['outputIsSwitchable']).toBeDefined();
-    });
+  it('Should print', () => {
+    const printed = outputSwitcher.print()();
+    const inputs = printed.inputs()();
+    expect(inputs['switcherButtons']).toHaveLength(3);
+    expect(inputs['loaderIsVisible']).toBe(false);
+    expect(inputs['switcherIsVisible']).toEqual(false);
   });
 
-  describe('State changes', () => {
-    let inputSignal: Signal<Record<string, unknown>>;
-    const paragraphOutputRequest = {
-      op:'PARAGRAPH_OUTPUT_REQUEST',
-      data:{}
-    };
-    const paragraphOutputResponse = {
-      op:'PARAGRAPH_OUTPUT',
-      data:{
-        output:{
-          isAggregated: true
-        }
-      }
-    };
+  it('Should set loader to be visible', () => {
+    outputSwitcher.toggleLoader(true);
+    const printed = outputSwitcher.print()();
+    const inputs = printed.inputs()();
+    expect(inputs['loaderIsVisible']).toBe(true);
+  });
 
-    beforeEach(() => {
-      const printed = outputSwitcher.print()();
-      inputSignal = printed.inputs();
-    });
-
-    it('Initial state', () => {
-      const inputs = inputSignal();
-      expect(inputs['switchIsPending']).toBe(false);
-      expect(inputs['outputIsSwitchable']).toBe(false);
-    });
-
-    it('Switch should be pending after request', () => {
-      outputSwitcher.request(paragraphOutputRequest);
-      const inputs = inputSignal();
-      expect(inputs['switchIsPending']).toBe(true);
-    });
-
-    it('Should be not pending after response', () => {
-      outputSwitcher.request(paragraphOutputRequest);
-      outputSwitcher.response(paragraphOutputResponse);
-      const inputs = inputSignal();
-      expect(inputs['switchIsPending']).toBe(false);
-    });
-
-    it('Should be switchable after response', () => {
-      outputSwitcher.response(paragraphOutputResponse);
-      const inputs = inputSignal();
-      expect(inputs['outputIsSwitchable']).toBe(true);
-    });
-
-    it('Should not be switchable after response', () => {
-      paragraphOutputResponse.data.output.isAggregated = false;
-      outputSwitcher.response(paragraphOutputResponse);
-      const inputs = inputSignal();
-      expect(inputs['outputIsSwitchable']).toBe(false);
-    });
+  it('Should set switcher to be visible', () => {
+    outputSwitcher.toggleSwitcher(true);
+    const printed = outputSwitcher.print()();
+    const inputs = printed.inputs()();
+    expect(inputs['switcherIsVisible']).toBe(true);
   });
 });

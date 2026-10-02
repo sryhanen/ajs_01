@@ -44,8 +44,10 @@
  * a licensee so wish it.
  */
 import {Output} from '../../output/output';
+import {OutputSwitcher} from '../../output/switcher/outputSwitcher';
 
 export interface ParagraphOutputMessage {
+  updateSwitcher(outputSwitcher:OutputSwitcher): void;
   renderOutput(output:Output):void;
   outputType():string;
 }

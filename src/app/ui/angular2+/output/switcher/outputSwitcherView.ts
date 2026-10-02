@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, Signal} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeHostView} from '../../renderNodeHost/renderNodeHostView';
 
@@ -53,13 +53,13 @@ import {RenderNodeHostView} from '../../renderNodeHost/renderNodeHostView';
     RenderNodeHostView
   ],
   template: `
-    @if (outputIsSwitchable()) {
+    @if (switcherIsVisible()) {
       <div class="btn-group" role="group">
         @for (button of switcherButtons(); track $index) {
           <render-node-host [renderNode]="button"></render-node-host>
         }
       </div>
-      @if (switchIsPending()) {
+      @if (loaderIsVisible()) {
         <div class="spinner-border mx-2 text-primary" role="status"></div>
       }
     }
@@ -67,6 +67,6 @@ import {RenderNodeHostView} from '../../renderNodeHost/renderNodeHostView';
 })
 export class OutputSwitcherView {
   switcherButtons = input.required<RenderNode[]>();
-  switchIsPending= input.required<boolean>();
-  outputIsSwitchable= input.required<boolean>();
+  loaderIsVisible= input.required<boolean>();
+  switcherIsVisible= input.required<boolean>();
 }

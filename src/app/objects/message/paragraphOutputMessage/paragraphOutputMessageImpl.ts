@@ -49,12 +49,19 @@ import {TypedMessage} from '../typedMessage/typedMessage';
 import {Output} from '../../output/output';
 import {OutputPayload} from '../../output/outputPayload';
 import {OutputType} from '../../output/outputType';
+import { OutputSwitcher } from '../../output/switcher/outputSwitcher';
 
 export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
   private readonly _message: Message;
 
   constructor(message: Message) {
     this._message = new TypedMessage('PARAGRAPH_OUTPUT', message);
+  }
+
+  updateSwitcher(outputSwitcher: OutputSwitcher): void {
+    const shouldDisplaySwitcher = this._message.dataAsWebSocketPayload().objectPropertyAsPayload('output').booleanProperty('isAggregated');
+    outputSwitcher.toggleSwitcher(shouldDisplaySwitcher);
+    outputSwitcher.toggleLoader(false);
   }
 
   renderOutput(output:Output):void {

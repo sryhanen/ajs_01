@@ -118,7 +118,7 @@ export class OutputImpl implements Output {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT_REQUEST'){
       this._previousParagraphOutputRequest = new ParagraphOutputRequestImpl(message);
-      this._outputSwitcher.request(json);
+      this._outputSwitcher.toggleLoader(true);
     }
     this._channel.request(json);
   }
@@ -132,7 +132,7 @@ export class OutputImpl implements Output {
       }
       else{
         paragraphOutputMessage.renderOutput(this);
-        this._outputSwitcher.response(json);
+        paragraphOutputMessage.updateSwitcher(this._outputSwitcher);
       }
     }
   }
