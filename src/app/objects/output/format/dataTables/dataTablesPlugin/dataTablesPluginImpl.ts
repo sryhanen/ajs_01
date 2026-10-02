@@ -45,31 +45,33 @@
  */
 import DataTable, {Api, Config, ConfigColumnDefs, ConfigColumns} from 'datatables.net-bs5';
 import 'datatables.net-buttons-bs5';
-import {Channel} from '../../../../channel/channel';
 import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
 import {DataTablesAjax} from './ajax/dataTablesAjax';
 import {WebSocketPayloadImpl} from '../../../../webSocketPayload/webSocketPayloadImpl';
 import {DataTablesPlugin} from './dataTablesPlugin';
+import {Requestable} from '../../../../channel/requestable';
+import {PaginatedDataTablesData} from '../paginatedDataTablesData';
+import {DataTablesOptions} from '../dataTablesOptions';
 
 export class DataTablesPluginImpl implements DataTablesPlugin {
-  private readonly _channel: Channel;
+  private readonly _requestable: Requestable;
   private readonly _dataTablesAjax: DataTablesAjax;
-  private readonly _outputData:object;
-  private readonly _outputOptions:object;
+  private readonly _outputData:PaginatedDataTablesData;
+  private readonly _outputOptions:DataTablesOptions;
 
-  constructor(channel:Channel, outputData:object, outputOptions:object) {
-    this._channel = channel;
+  constructor(requestable: Requestable, outputData:PaginatedDataTablesData, outputOptions:DataTablesOptions) {
+    this._requestable = requestable;
     this._outputData = outputData;
     this._outputOptions = outputOptions;
     this._dataTablesAjax = new DataTablesAjaxImpl(this);
   }
 
-  request(data: object): void {
-    this._channel.request(data);
+  request(json: object): void {
+    this._requestable.request(json);
   }
 
-  response(data:object): void {
-    this._dataTablesAjax.response(data);
+  response(paginatedDataTablesData: PaginatedDataTablesData):void {
+    this._dataTablesAjax.response(paginatedDataTablesData);
   }
 
   initializedTable(tableElement: HTMLTableElement): Api<unknown>{

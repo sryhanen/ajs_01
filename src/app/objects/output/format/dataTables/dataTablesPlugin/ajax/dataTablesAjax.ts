@@ -44,8 +44,9 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../../../../channel/channel';
+import {PaginatedDataTablesData} from '../../paginatedDataTablesData';
 
 export interface DataTablesAjax extends Channel {
-  response(dataTablesData:object): void;
-  configFunction(data:object): (data: {draw:number, start:number, length:number}, callback: (data:object) => void) => void;
+  response(paginatedDataTablesData: PaginatedDataTablesData): void;
+  configFunction(paginatedDataTablesData: PaginatedDataTablesData): (data: {draw:number, start:number, length:number}, callback: (data:object) => void) => void;
 }

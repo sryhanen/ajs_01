@@ -52,8 +52,13 @@ import {
   OnDestroy,
   ViewChild
 } from '@angular/core';
-import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
 import {Api} from 'datatables.net-bs5';
+import {PaginatedDataTablesData} from '../../../../../objects/output/format/dataTables/paginatedDataTablesData';
+import {DataTablesOptions} from '../../../../../objects/output/format/dataTables/dataTablesOptions';
+import {Requestable} from '../../../../../objects/channel/requestable';
+import {
+  DataTablesPluginImpl
+} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPluginImpl';
 
 @Component({
   selector: 'dataTablesView',
@@ -62,12 +67,14 @@ import {Api} from 'datatables.net-bs5';
   `
 })
 export class DataTablesOutputView implements AfterViewInit, OnDestroy, OnChanges {
-  dataTablesPlugin = input.required<DataTablesPlugin>();
+  dataTablesData = input.required<PaginatedDataTablesData>();
+  dataTablesOptions = input.required<DataTablesOptions>();
+  requestable = input.required<Requestable>();
   @ViewChild('table') table: ElementRef;
   private dataTablesInstance:Api<unknown>;
 
   ngAfterViewInit() {
-    this.dataTablesInstance = this.dataTablesPlugin().initializedTable(this.table.nativeElement);
+    this.dataTablesInstance = new DataTablesPluginImpl(this.requestable(), this.dataTablesData(), this.dataTablesOptions());
   }
 
   ngOnChanges() {

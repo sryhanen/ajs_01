@@ -46,7 +46,9 @@
 import {Channel} from '../../../../channel/channel';
 import Stubable from '../../../../../shared/interfaces/stubable';
 import {Api} from 'datatables.net-bs5';
+import {PaginatedDataTablesData} from '../paginatedDataTablesData';
 
 export interface DataTablesPlugin extends Channel, Stubable {
+  response(paginatedDataTablesData: PaginatedDataTablesData):void;
   initializedTable(tableElement: HTMLTableElement): Api<unknown>;
 }

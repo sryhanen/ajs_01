@@ -76,6 +76,7 @@ export class DataTablesFormatImpl implements DataTablesFormat {
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.DATATABLES_OUTPUT_VIEW, computed(() => ({
       dataTablesData:this._dataTablesData(),
       dataTablesOptions:this._dataTablesOptions(),
+      requestable:this,
     }))));
   }
 

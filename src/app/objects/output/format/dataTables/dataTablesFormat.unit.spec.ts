@@ -73,6 +73,7 @@ describe('DataTablesFormat unit test', () => {
     expect(printed.isStub()).toBe(false);
     expect(inputs['dataTablesData']).toEqual(initialDataTablesData);
     expect(inputs['dataTablesOptions']).toEqual(initialDataTablesOptions);
+    expect(inputs['requestable']).toBeDefined();
   });
 
   it('Should have button', () => {
