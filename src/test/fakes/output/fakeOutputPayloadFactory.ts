@@ -51,4 +51,6 @@ export interface FakeOutputPayloadFactory {
   uPlotOutputPayload(uPlotData: uPlot.AlignedData, graphType:string): OutputPayload;
   dataTablesOutputPayload(dataTablesData: PaginatedDataTablesData):OutputPayload;
   textOutputPayload(textData:string):OutputPayload;
+  htmlOutputPayload(htmlTemplate:string):OutputPayload;
+  angularOutputPayload(angularTemplate:string):OutputPayload;
 }

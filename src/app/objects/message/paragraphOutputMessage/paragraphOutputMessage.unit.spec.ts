@@ -47,100 +47,137 @@ import {ParagraphOutputMessage} from './paragraphOutputMessage';
 import {ParagraphOutputMessageImpl} from './paragraphOutputMessageImpl';
 import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
 import {MessageImpl} from '../messageImpl';
+import {ParagraphOutputServerResponse} from '../../../../test/fakes/webSocketServerResponses/paragraphOutput/paragraphOutputServerResponse';
+import {FakeOutputPayloadFactoryImpl} from '../../../../test/fakes/output/fakeOutputPayloadFactoryImpl';
+import {Output} from '../../output/output';
+import {Signal} from '@angular/core';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {FakeOutputPayloadFactory} from '../../../../test/fakes/output/fakeOutputPayloadFactory';
+import {OutputType} from '../../output/outputType';
+import {DataTablesDataFactoryImpl} from '../../../../test/fakes/output/dataTables/dataTablesDataFactoryImpl';
+import {uPlotDataFactoryImpl} from '../../../../test/fakes/output/uPlot/uPlotDataFactoryImpl';
 
 describe('ParagraphOutputMessage unit test', () => {
-  let paragraphOutputMessageData = {
-    op:'PARAGRAPH_OUTPUT',
-    data:{
-      noteId:'',
-      paragraphId:'',
-      output:{
-        type:'type',
-        isAggregated:true,
-        data:{},
-        options:{}
-      }
-    }
-  };
+  const paragraphId = 'paragraphId';
+  const noteId = 'noteId';
   let paragraphOutputMessage: ParagraphOutputMessage;
+  let fakeOutput:Output;
+  const fakeOutputPayloadFactory:FakeOutputPayloadFactory = new FakeOutputPayloadFactoryImpl();
+  let paragraphOutputServerResponse:ParagraphOutputServerResponse;
+
   beforeEach(() => {
-    paragraphOutputMessageData = {
-      op:'PARAGRAPH_OUTPUT',
-      data:{
-        noteId:'',
-        paragraphId:'',
-        output:{
-          type:'type',
-          isAggregated:true,
-          data:{
-            dataKey:'data'
-          },
-          options:{
-            optionsKey:'options'
-          }
-        }
-      }
+    fakeOutput = {
+      render:  vi.fn(),
+      print(): Signal<RenderNode> {
+        return undefined;
+      },
+      request(json: object): void {},
+      response(json: object): void {}
     };
-    paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputMessageData)));
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(paragraphOutputMessage).toBeDefined();
+  describe('Text Output', () => {
+    const textData = 'text data';
+    const outputPayload = fakeOutputPayloadFactory.textOutputPayload(textData);
+
+    beforeEach(() => {
+      paragraphOutputServerResponse = new ParagraphOutputServerResponse(paragraphId, noteId, outputPayload);
+      paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputServerResponse.toObject())));
     });
 
-    it('Should have outputData', () => {
-      expect(paragraphOutputMessage.outputData('object')).toEqual(paragraphOutputMessageData.data.output.data);
+    it('Should render', () => {
+      paragraphOutputMessage.renderOutput(fakeOutput);
+      expect(fakeOutput.render).toHaveBeenCalledExactlyOnceWith(outputPayload);
     });
 
-    it('Should print', () => {
-      expect(paragraphOutputMessage.print()).toEqual(paragraphOutputMessageData);
-    });
-
-    describe('isAggregated', () => {
-      it('Should be true', () => {
-        expect(paragraphOutputMessage.isAggregated()).toEqual(true);
-      });
-
-      it('Should be false if property is false', () => {
-        paragraphOutputMessageData.data.output.isAggregated = false;
-        paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputMessageData)));
-        expect(paragraphOutputMessage.isAggregated()).toEqual(false);
-      });
-
-      it('Should be false if property is undefined', () => {
-        delete paragraphOutputMessageData.data.output.isAggregated;
-        paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputMessageData)));
-        expect(paragraphOutputMessage.isAggregated()).toEqual(false);
-      });
-    });
-
-
-    describe('options', () => {
-      it('Should have options', () => {
-        expect(paragraphOutputMessage.options().isStub()).toBe(false);
-      });
-
-      it('Should have options stub', () => {
-        delete paragraphOutputMessageData.data.output.options;
-        paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputMessageData)));
-        expect(paragraphOutputMessage.options().isStub()).toBe(true);
-      });
-    });
-
-    it('Should not be a stub', () => {
-      expect(paragraphOutputMessage.isStub()).toBe(false);
+    it('Should have output type', () => {
+      expect(paragraphOutputMessage.outputType()).toEqual(OutputType.text);
     });
   });
 
-  describe('Operation validation', () => {
-    it('Should throw if operation is not "PARAGRAPH_OUTPUT"', () => {
-      paragraphOutputMessageData.op = '';
-      paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputMessageData)));
-      expect(() => paragraphOutputMessage.options()).toThrow();
-      expect(() => paragraphOutputMessage.type()).toThrow();
-      expect(() => paragraphOutputMessage.isAggregated()).toThrow();
-      expect(() => paragraphOutputMessage.outputData('object')).toThrow();
+  describe('Html Output', () => {
+    const htmlTemplate = '<div>test</div>';
+    const outputPayload = fakeOutputPayloadFactory.htmlOutputPayload(htmlTemplate);
+
+    beforeEach(() => {
+      paragraphOutputServerResponse = new ParagraphOutputServerResponse(paragraphId, noteId, outputPayload);
+      paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputServerResponse.toObject())));
+    });
+
+    it('Should render', () => {
+      paragraphOutputMessage.renderOutput(fakeOutput);
+      expect(fakeOutput.render).toHaveBeenCalledExactlyOnceWith(outputPayload);
+    });
+
+    it('Should have output type', () => {
+      expect(paragraphOutputMessage.outputType()).toEqual(OutputType.html);
+    });
+  });
+
+  describe('Angular Output', () => {
+    const htmlTemplate = '<div>{{test}}</div>';
+    const outputPayload = fakeOutputPayloadFactory.angularOutputPayload(htmlTemplate);
+
+    beforeEach(() => {
+      paragraphOutputServerResponse = new ParagraphOutputServerResponse(paragraphId, noteId, outputPayload);
+      paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputServerResponse.toObject())));
+    });
+
+    it('Should render', () => {
+      paragraphOutputMessage.renderOutput(fakeOutput);
+      expect(fakeOutput.render).toHaveBeenCalledExactlyOnceWith(outputPayload);
+    });
+
+    it('Should have output type', () => {
+      expect(paragraphOutputMessage.outputType()).toEqual(OutputType.angular);
+    });
+  });
+
+  describe('DataTables Output Server Response', () => {
+    const dataTablesDataFactory = new DataTablesDataFactoryImpl();
+    const rowCount = 10;
+    const rawData= dataTablesDataFactory.rawData(rowCount);
+    const start = 0;
+    const length = 10;
+    const draw = 1;
+    const dataTablesData = dataTablesDataFactory.paginatedData(rawData, start, length, draw);
+    const outputPayload = fakeOutputPayloadFactory.dataTablesOutputPayload(dataTablesData);
+
+    beforeEach(() => {
+      paragraphOutputServerResponse = new ParagraphOutputServerResponse(paragraphId, noteId, outputPayload);
+      paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputServerResponse.toObject())));
+    });
+
+    it('Should render', () => {
+      paragraphOutputMessage.renderOutput(fakeOutput);
+      expect(fakeOutput.render).toHaveBeenCalledExactlyOnceWith(outputPayload);
+    });
+
+    it('Should have output type', () => {
+      expect(paragraphOutputMessage.outputType()).toEqual(OutputType.dataTables);
+    });
+  });
+
+  describe('uPlot Output Server Response', () => {
+    const uPlotDataFactory = new uPlotDataFactoryImpl();
+    const seriesCount = 3;
+    const seriesLength = 10;
+    const uPlotAlignedData = uPlotDataFactory.uPlotAlignedData(seriesCount, seriesLength);
+    const graphType = 'graphType';
+    const outputPayload = fakeOutputPayloadFactory.uPlotOutputPayload(uPlotAlignedData, graphType);
+
+    beforeEach(() => {
+      paragraphOutputServerResponse = new ParagraphOutputServerResponse(paragraphId, noteId, outputPayload);
+      paragraphOutputMessage = new ParagraphOutputMessageImpl(new MessageImpl(new WebSocketPayloadImpl(paragraphOutputServerResponse.toObject())));
+    });
+
+    it('Should render', () => {
+      paragraphOutputMessage.renderOutput(fakeOutput);
+      expect(fakeOutput.render).toHaveBeenCalledExactlyOnceWith(outputPayload);
+    });
+
+    it('Should have output type', () => {
+      expect(paragraphOutputMessage.outputType()).toEqual(OutputType.uPlot);
     });
   });
 });

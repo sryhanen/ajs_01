@@ -50,6 +50,22 @@ import {FakeOutputPayloadFactory} from './fakeOutputPayloadFactory';
 import {OutputType} from '../../../app/objects/output/outputType';
 
 export class FakeOutputPayloadFactoryImpl implements FakeOutputPayloadFactory {
+  htmlOutputPayload(htmlTemplate: string): OutputPayload {
+    return {
+      type: OutputType.html,
+      data: htmlTemplate,
+      isAggregated: false,
+    };
+  }
+
+  angularOutputPayload(angularTemplate: string): OutputPayload {
+    return {
+      type: OutputType.angular,
+      data: angularTemplate,
+      isAggregated: false,
+    };
+  }
+
   dataTablesOutputPayload(dataTablesData: PaginatedDataTablesData): OutputPayload {
     const headers = Object.keys(dataTablesData.data[0]);
     const options = {
