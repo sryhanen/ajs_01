@@ -43,23 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {DataTablesPlugin} from './dataTablesPlugin';
-import {Api} from 'datatables.net-bs5';
+import {PaginatedDataTablesData} from '../paginatedDataTablesData';
+import {Requestable} from '../../../../channel/requestable';
 
-export class DataTablesPluginStub implements DataTablesPlugin {
-  isStub(): boolean {
-    return true;
-  }
-
-  initializedTable(anchorElement: HTMLElement): Api<unknown> {
-    throw new Error('DataTablesPluginStub: Method not implemented.');
-  }
-
-  request(data: object): void {
-    throw new Error('DataTablesPluginStub: Method not implemented.');
-  }
-
-  response(data: object): void {
-    throw new Error('DataTablesPluginStub: Method not implemented.');
-  }
+export interface ServerSideDataTable extends Requestable {
+  update(paginatedDataTablesData: PaginatedDataTablesData):void;
+  destroy():void;
 }

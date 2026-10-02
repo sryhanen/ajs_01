@@ -52,7 +52,7 @@ import {InterpreterErrorListener} from '../interpreterErrorListener/interpreterE
 import {OutputFormat} from './format/outputFormat';
 import {OutputSwitcher} from './switcher/outputSwitcher';
 import {ParagraphOutputRequest} from './paragraphOutputRequest/paragraphOutputRequest';
-import {DataTablesFormatImpl} from './format/dataTables/dataTablesFormatImpl';
+import {DataTablesFormatImpl} from './format/dataTable/dataTablesFormatImpl';
 import {HTMLFormat} from './format/html/htmlFormat';
 import {UPlotFormatImpl} from './format/uPlot/uPlotFormatImpl';
 import {TextFormat} from './format/text/textFormat';

@@ -48,33 +48,39 @@ import 'datatables.net-buttons-bs5';
 import {DataTablesAjaxImpl} from './ajax/dataTablesAjaxImpl';
 import {DataTablesAjax} from './ajax/dataTablesAjax';
 import {WebSocketPayloadImpl} from '../../../../webSocketPayload/webSocketPayloadImpl';
-import {DataTablesPlugin} from './dataTablesPlugin';
+import {ServerSideDataTable} from './serverSideDataTable';
 import {Requestable} from '../../../../channel/requestable';
 import {PaginatedDataTablesData} from '../paginatedDataTablesData';
 import {DataTablesOptions} from '../dataTablesOptions';
 
-export class DataTablesPluginImpl implements DataTablesPlugin {
+export class ServerSideDataTableImpl implements ServerSideDataTable {
   private readonly _requestable: Requestable;
   private readonly _dataTablesAjax: DataTablesAjax;
   private readonly _outputData:PaginatedDataTablesData;
   private readonly _outputOptions:DataTablesOptions;
+  private readonly _dataTable: Api<unknown>;
 
-  constructor(requestable: Requestable, outputData:PaginatedDataTablesData, outputOptions:DataTablesOptions) {
+  constructor(requestable: Requestable, outputData:PaginatedDataTablesData, outputOptions:DataTablesOptions, tableElement: HTMLTableElement) {
     this._requestable = requestable;
     this._outputData = outputData;
     this._outputOptions = outputOptions;
     this._dataTablesAjax = new DataTablesAjaxImpl(this);
+    this._dataTable = this.initializeDataTable(tableElement);
+  }
+
+  destroy(): void {
+    this._dataTable.destroy(true);
   }
 
   request(json: object): void {
     this._requestable.request(json);
   }
 
-  response(paginatedDataTablesData: PaginatedDataTablesData):void {
+  update(paginatedDataTablesData: PaginatedDataTablesData):void {
     this._dataTablesAjax.response(paginatedDataTablesData);
   }
 
-  initializedTable(tableElement: HTMLTableElement): Api<unknown>{
+  private initializeDataTable(tableElement: HTMLTableElement): Api<unknown>{
     const safeOptions = new WebSocketPayloadImpl(this._outputOptions);
     const headers:Array<string> = safeOptions.arrayProperty<string>('headers');
     const config: Config = {
@@ -107,10 +113,6 @@ export class DataTablesPluginImpl implements DataTablesPlugin {
       processing: true,
     };
     return new DataTable(tableElement, config);
-  }
-
-  isStub(): boolean {
-    return false;
   }
 
   private transformedColumns(columns:string[]): ConfigColumns[]{

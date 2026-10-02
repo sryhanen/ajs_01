@@ -46,15 +46,15 @@
 import {ComponentFixture} from '@angular/core/testing';
 import {render, screen} from '@testing-library/angular';
 import {DataTablesOutputView} from './dataTablesOutputView';
-import {DataTablesPlugin} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPlugin';
-import {DataTablesPluginImpl} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPluginImpl';
+import {ServerSideDataTable} from '../../../../../objects/output/format/dataTable/serverSideDataTable/serverSideDataTable';
+import {ServerSideDataTableImpl} from '../../../../../objects/output/format/dataTable/serverSideDataTable/serverSideDataTableImpl';
 import {FakeChannel} from '../../../../../../test/fakes/channel/fakeChannel';
 
 describe('DataTablesOutputView functional test', () => {
-  let dataTablesPlugin: DataTablesPlugin;
+  let dataTablesPlugin: ServerSideDataTable;
   let fixture: ComponentFixture<DataTablesOutputView>;
   beforeEach(async () => {
-    dataTablesPlugin = new DataTablesPluginImpl(new FakeChannel(), {data: [{test:'test'}], draw:0, recordsTotal: 1, recordsFiltered: 1}, {headers:['test']});
+    dataTablesPlugin = new ServerSideDataTableImpl(new FakeChannel(), {data: [{test:'test'}], draw:0, recordsTotal: 1, recordsFiltered: 1}, {headers:['test']});
     const renderResult = await render(DataTablesOutputView, {
       inputs:{
         dataTablesPlugin: dataTablesPlugin,

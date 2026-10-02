@@ -52,13 +52,15 @@ import {
   OnDestroy,
   ViewChild
 } from '@angular/core';
-import {Api} from 'datatables.net-bs5';
-import {PaginatedDataTablesData} from '../../../../../objects/output/format/dataTables/paginatedDataTablesData';
-import {DataTablesOptions} from '../../../../../objects/output/format/dataTables/dataTablesOptions';
+import {PaginatedDataTablesData} from '../../../../../objects/output/format/dataTable/paginatedDataTablesData';
+import {DataTablesOptions} from '../../../../../objects/output/format/dataTable/dataTablesOptions';
 import {Requestable} from '../../../../../objects/channel/requestable';
 import {
-  DataTablesPluginImpl
-} from '../../../../../objects/output/format/dataTables/dataTablesPlugin/dataTablesPluginImpl';
+  ServerSideDataTableImpl
+} from '../../../../../objects/output/format/dataTable/serverSideDataTable/serverSideDataTableImpl';
+import {
+  ServerSideDataTable
+} from '../../../../../objects/output/format/dataTable/serverSideDataTable/serverSideDataTable';
 
 @Component({
   selector: 'dataTablesView',
@@ -71,20 +73,19 @@ export class DataTablesOutputView implements AfterViewInit, OnDestroy, OnChanges
   dataTablesOptions = input.required<DataTablesOptions>();
   requestable = input.required<Requestable>();
   @ViewChild('table') table: ElementRef;
-  private dataTablesInstance:Api<unknown>;
+  private _dataTable:ServerSideDataTable;
 
   ngAfterViewInit() {
-    this.dataTablesInstance = new DataTablesPluginImpl(this.requestable(), this.dataTablesData(), this.dataTablesOptions());
+    this._dataTable = new ServerSideDataTableImpl(this.requestable(), this.dataTablesData(), this.dataTablesOptions(), this.table.nativeElement);
   }
 
   ngOnChanges() {
-    if(this.dataTablesInstance){
-      this.dataTablesInstance.destroy();
-      this.dataTablesInstance = this.dataTablesPlugin().initializedTable(this.table.nativeElement);
+    if(this._dataTable){
+      this._dataTable.update(this.dataTablesData());
     }
   }
 
   ngOnDestroy() {
-    this.dataTablesInstance.destroy(true);
+    this._dataTable.destroy();
   }
 }
