@@ -45,11 +45,10 @@
  */
 import {ParagraphOutputMessage} from './paragraphOutputMessage';
 import {Message} from '../message';
-import {WebSocketPayload} from '../../webSocketPayload/webSocketPayload';
-import { StubableObject } from '../../stubableObject/stubableObject';
 import {TypedMessage} from '../typedMessage/typedMessage';
-import {StubableObjectImpl} from '../../stubableObject/stubableObjectImpl';
-import {StubableObjectStub} from '../../stubableObject/stubableObjectStub';
+import {Output} from '../../output/output';
+import {OutputPayload} from '../../output/outputPayload';
+import {OutputType} from '../../output/outputType';
 
 export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
   private readonly _message: Message;
@@ -57,50 +56,31 @@ export class ParagraphOutputMessageImpl implements ParagraphOutputMessage {
   constructor(message: Message) {
     this._message = new TypedMessage('PARAGRAPH_OUTPUT', message);
   }
-  print():{op:string,data:object}{
-    return {
-      op:this._message.operation(),
-      data:this._message.data(),
-    };
-  }
 
-  isAggregated(): boolean {
-    const output = this.output();
-    return output.propertyExists('isAggregated') && output.booleanProperty('isAggregated');
-  }
-
-  type(): string {
-    return this.output().stringProperty('type');
-  }
-
-  outputData(type: string): string | object {
-    let outputData: string | object;
-    if(type === 'string') {
-      outputData = this.output().stringProperty('data');
-    }
-    else if(type === 'object') {
-      outputData = this.output().objectProperty('data');
-    }
-    return outputData;
-  }
-
-  options(): StubableObject {
-    let options: StubableObject;
-    const output = this.output();
-    if(output.propertyExists('options')){
-      options = new StubableObjectImpl(output.objectProperty('options'));
+  renderOutput(output:Output):void {
+    const messagePayload = this._message.dataAsWebSocketPayload().objectPropertyAsPayload('output');
+    let outputPayload:OutputPayload;
+    const outputType = this.outputType();
+    const isAggregated = messagePayload.booleanProperty('isAggregated');
+    if(outputType === OutputType.text || outputType === OutputType.html || outputType === OutputType.angular) {
+      outputPayload = {
+        data:messagePayload.stringProperty('data'),
+        type:outputType,
+        isAggregated:isAggregated,
+      };
     }
     else{
-      options = new StubableObjectStub();
+      outputPayload = {
+        data:messagePayload.objectProperty('data'),
+        type:outputType,
+        isAggregated:isAggregated,
+        options:messagePayload.objectProperty('options'),
+      };
     }
-    return options;
+    output.render(outputPayload);
   }
 
-  private output(): WebSocketPayload {
-    return this._message.dataAsWebSocketPayload().objectPropertyAsPayload('output');
-  }
-
-  isStub(): boolean {
-    return false;
+  outputType(): string {
+    return this._message.dataAsWebSocketPayload().objectPropertyAsPayload('output').stringProperty('type');
   }
 }

@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import {Component, input, Signal} from '@angular/core';
-import {NgComponentOutlet} from '@angular/common';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeHostView} from '../../renderNodeHost/renderNodeHostView';
 
@@ -57,7 +56,7 @@ import {RenderNodeHostView} from '../../renderNodeHost/renderNodeHostView';
     @if (outputIsSwitchable()) {
       <div class="btn-group" role="group">
         @for (button of switcherButtons(); track $index) {
-          <render-node-host [renderNode]="button()"></render-node-host>
+          <render-node-host [renderNode]="button"></render-node-host>
         }
       </div>
       @if (switchIsPending()) {
@@ -67,7 +66,7 @@ import {RenderNodeHostView} from '../../renderNodeHost/renderNodeHostView';
   `
 })
 export class OutputSwitcherView {
-  switcherButtons = input.required<Signal<RenderNode>[]>();
+  switcherButtons = input.required<RenderNode[]>();
   switchIsPending= input.required<boolean>();
   outputIsSwitchable= input.required<boolean>();
 }

@@ -83,10 +83,10 @@ export class OutputImpl implements Output {
     this._interpreterErrorListener = new InterpreterErrorListenerImpl();
     const outputFormatList:[string, OutputFormat][] = [
       [OutputType.dataTables, new DataTablesFormatImpl(this)],
-      [OutputType.dataTables, new HTMLFormat()],
-      [OutputType.dataTables, new UPlotFormatImpl(this)],
-      [OutputType.dataTables, new TextFormat()],
-      [OutputType.dataTables, new AngularFormatImpl(this)],
+      [OutputType.html, new HTMLFormat()],
+      [OutputType.uPlot, new UPlotFormatImpl(this)],
+      [OutputType.text, new TextFormat()],
+      [OutputType.angular, new AngularFormatImpl(this)],
     ];
     this._outputFormats = new Map(outputFormatList); // ts compiler gets confused if initializing directly in the map
     const buttons = Array.from(this._outputFormats.values()).map(format => format.switcherButtons());
@@ -127,10 +127,11 @@ export class OutputImpl implements Output {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
       const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      if(!this._previousParagraphOutputRequest.isStub() && paragraphOutputMessage.type() !== this._previousParagraphOutputRequest.type()){
+      if(!this._previousParagraphOutputRequest.isStub() && paragraphOutputMessage.outputType() !== this._previousParagraphOutputRequest.type()){
         this._channel.request(this._previousParagraphOutputRequest.request());
       }
       else{
+        paragraphOutputMessage.renderOutput(this);
         this._outputSwitcher.response(json);
       }
     }

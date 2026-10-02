@@ -82,7 +82,7 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   response(json: object): void {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      this._outputIsSwitchable.set(message.data()['isAggregated']);
+      this._outputIsSwitchable.set(message.dataAsWebSocketPayload().objectPropertyAsPayload('output').booleanProperty('isAggregated'));
       this._switchIsPending.set(false);
     }
   }

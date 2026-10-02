@@ -81,7 +81,7 @@ export class ParagraphImpl implements Paragraph {
     if(paragraphData.propertyExists('output')){
       const outputAsPayload = paragraphData.objectPropertyAsPayload('output');
       const outputData = paragraphData.objectProperty('output');
-      if(!outputAsPayload.propertyExists('data') || outputAsPayload.propertyExists('type')){
+      if(!outputAsPayload.propertyExists('data') || !outputAsPayload.propertyExists('type')){
         console.error(`Output data not processed, format invalid: ${JSON.stringify(outputData)}`);
       }
       else{
