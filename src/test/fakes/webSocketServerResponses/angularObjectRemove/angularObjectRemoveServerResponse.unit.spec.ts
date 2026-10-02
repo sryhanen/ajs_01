@@ -43,31 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
-import {AngularObjectCollection} from './angularObjectCollection';
-import {AngularObjectCollectionImpl} from './angularObjectCollectionImpl';
-import {AngularObject} from '../angularObject/angularObject';
+import {AngularObjectRemoveServerResponse} from './angularObjectRemoveServerResponse';
 
-describe('angularObjectCollection', () => {
-  let angularObjectCollection:AngularObjectCollection;
-  const channel = new FakeChannel();
+describe('AngularObjectRemoveServerResponse unit test', () => {
+  const noteId = 'noteId';
+  const angularObjectName = 'angularObjectName';
+  const angularObjectUpdateServerResponse = new AngularObjectRemoveServerResponse(noteId, angularObjectName);
 
-  beforeEach(() => {
-    angularObjectCollection = new AngularObjectCollectionImpl(channel);
+  const expectedObject = {
+    op: 'ANGULAR_OBJECT_REMOVE',
+    data: {
+      name:angularObjectName,
+      noteId:noteId,
+    }
+  };
+
+  it('Should have object', () => {
+    expect(angularObjectUpdateServerResponse.toObject()).toEqual(expectedObject);
   });
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(angularObjectCollection).toBeInstanceOf(AngularObjectCollectionImpl);
-    });
-  });
-
-  describe('Request', () => {
-    it('Should request channel', () => {
-      const channelSpy = vi.spyOn(channel, 'request');
-      const request = {op:'Test', data:{}};
-      angularObjectCollection.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
+  it('Should have json', () => {
+    const expectedJson = JSON.stringify(expectedObject);
+    expect(angularObjectUpdateServerResponse.toJson()).toEqual(expectedJson);
   });
 });

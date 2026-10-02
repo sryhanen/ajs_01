@@ -43,12 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
-import {AngularObject} from '../angularObject/angularObject';
-import {Signal} from '@angular/core';
+import {AngularObjectUpdateMessage} from './angularObjectUpdateMessage';
+import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
+import {Message} from '../message';
+import {TypedMessage} from '../typedMessage/typedMessage';
+import {AngularObjectImpl} from '../../angularObject/angularObjectImpl';
 
-export interface AngularObjectCollection extends Channel{
-  updateOrAddAngularObject(angularObject:AngularObject):void;
-  removeAngularObject(angularObjectName:string):void;
-  angularObjects(): Signal<AngularObject[]>;
+export class AngularObjectUpdateMessageImpl implements AngularObjectUpdateMessage {
+  private readonly _message:Message;
+
+  constructor(message:Message) {
+    this._message = new TypedMessage('ANGULAR_OBJECT_UPDATE', message);
+  }
+
+  addOrUpdateAngularObject(angularObjectCollection: AngularObjectCollection): void {
+    const angularObjectPayload = this._message.dataAsWebSocketPayload();
+    const angularObjectData = angularObjectPayload.objectProperty('angularObject');
+    const interpreterGroupId = angularObjectPayload.stringProperty('interpreterGroupId');
+    const angularObject = new AngularObjectImpl(angularObjectCollection, angularObjectData, interpreterGroupId);
+    angularObjectCollection.updateOrAddAngularObject(angularObject);
+  }
 }

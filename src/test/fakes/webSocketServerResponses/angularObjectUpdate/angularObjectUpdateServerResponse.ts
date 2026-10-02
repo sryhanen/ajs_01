@@ -43,12 +43,34 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
-import {AngularObject} from '../angularObject/angularObject';
-import {Signal} from '@angular/core';
+import {WebSocketServerResponse} from '../webSocketServerResponse';
 
-export interface AngularObjectCollection extends Channel{
-  updateOrAddAngularObject(angularObject:AngularObject):void;
-  removeAngularObject(angularObjectName:string):void;
-  angularObjects(): Signal<AngularObject[]>;
+export class AngularObjectUpdateServerResponse implements WebSocketServerResponse{
+  private readonly _noteId: string;
+  private readonly _paragraphId:string;
+  private readonly _interpreterGroupId:string;
+  private readonly _angularObjectData:object;
+
+  constructor(noteId:string, paragraphId:string, interpreterGroupId:string, angularObjectData:object) {
+    this._noteId = noteId;
+    this._paragraphId = paragraphId;
+    this._interpreterGroupId = interpreterGroupId;
+    this._angularObjectData = angularObjectData;
+  }
+
+  toJson(): string {
+    return JSON.stringify(this.toObject());
+  }
+
+  toObject(): { op: string; data: object } {
+    return {
+      op: 'ANGULAR_OBJECT_UPDATE',
+      data: {
+        angularObject:this._angularObjectData,
+        interpreterGroupId:this._interpreterGroupId,
+        paragraphId:this._paragraphId,
+        noteId:this._noteId,
+      },
+    };
+  }
 }

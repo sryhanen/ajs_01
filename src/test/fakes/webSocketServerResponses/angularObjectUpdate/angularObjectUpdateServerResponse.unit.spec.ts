@@ -43,36 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Respondable} from '../../../channel/respondable';
-import {AngularObject} from '../../../angularObject/angularObject';
-import {Channel} from '../../../channel/channel';
-import {MessageImpl} from '../../../message/messageImpl';
-import {WebSocketPayloadImpl} from '../../../webSocketPayload/webSocketPayloadImpl';
-import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
+import {AngularObjectRemoveServerResponse} from './angularObjectUpdateServerResponse';
 
-export class AngularObjectUpdateResponse implements Respondable {
-  private readonly _channel: Channel;
-  private readonly _angularObjects: AngularObject[];
+describe('AngularObjectUpdateServerResponse unit test', () => {
+  const noteId = 'noteId';
+  const paragraphId = 'paragraphId';
+  const interpreterGroupId = 'interpreterGroupId';
+  const angularObjectData = {name:'name', object:'value'};
+  const angularObjectUpdateServerResponse = new Ang(noteId, paragraphId, interpreterGroupId, angularObjectData);
 
-  constructor(channel: Channel, angularObjects: AngularObject[]) {
-    this._channel = channel;
-    this._angularObjects = angularObjects;
-  }
-
-  response(data: object) {
-    const message = new MessageImpl(new WebSocketPayloadImpl(data));
-    if(message.operation() === 'ANGULAR_OBJECT_UPDATE'){
-      const angularObjectUpdateData = new WebSocketPayloadImpl(message.data());
-      const angularObjectData:object = angularObjectUpdateData.objectProperty('angularObject');
-      const interpreterGroupId:string = angularObjectUpdateData.stringProperty('interpreterGroupId');
-      const angularObject = new AngularObjectImpl(this._channel, angularObjectData, interpreterGroupId);
-      const existingAngularObjectIndex = this._angularObjects.findIndex(ao => ao.name() === angularObject.name());
-      if(existingAngularObjectIndex === -1){
-        this._angularObjects.push(angularObject);
-      }
-      else{
-        this._angularObjects.splice(existingAngularObjectIndex, 1, angularObject);
-      }
+  const expectedObject = {
+    op: 'ANGULAR_OBJECT_UPDATE',
+    data: {
+      angularObject:angularObjectData,
+      interpreterGroupId:interpreterGroupId,
+      paragraphId:paragraphId,
+      noteId:noteId,
     }
-  }
-}
+  };
+
+  it('Should have object', () => {
+    expect(angularObjectUpdateServerResponse.toObject()).toEqual(expectedObject);
+  });
+
+  it('Should have json', () => {
+    const expectedJson = JSON.stringify(expectedObject);
+    expect(angularObjectUpdateServerResponse.toJson()).toEqual(expectedJson);
+  });
+});

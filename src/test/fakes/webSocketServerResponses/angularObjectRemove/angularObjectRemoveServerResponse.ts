@@ -43,57 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AngularObject} from '../../../angularObject/angularObject';
-import {AngularObjectRemoveResponse} from './angularObjectRemoveResponse';
-import {AngularObjectImpl} from '../../../angularObject/angularObjectImpl';
-import {Channel} from '../../../channel/channel';
-import {FakeChannel} from '../../../../../test/fakes/channel/fakeChannel';
+import {WebSocketServerResponse} from '../webSocketServerResponse';
 
-describe('AngularObjectRemoveResponse', () => {
-  const defaultAngularObjectData =  {
-    noteId: 'noteId',
-    paragraphId: 'paragraphId',
-    name: 'object1',
-    value: 'value1'
-  };
-  const interpreterGroupId = 'interpreterGroupId';
-  let channel:Channel;
-  let defaultAngularObject: AngularObject;
-  let angularObjects: AngularObject[];
-  let angularObjectRemoveResponse:AngularObjectRemoveResponse;
+export class AngularObjectRemoveServerResponse implements WebSocketServerResponse {
+  private readonly _noteId:string;
+  private readonly _angularObjectName:string;
 
-  beforeEach(() => {
-    channel = new FakeChannel();
-    defaultAngularObject = new AngularObjectImpl(channel, defaultAngularObjectData, interpreterGroupId);
-    angularObjects = [defaultAngularObject];
-    angularObjectRemoveResponse = new AngularObjectRemoveResponse(angularObjects);
-  });
+  constructor(noteId:string, angularObjectName:string) {
+    this._noteId = noteId;
+    this._angularObjectName = angularObjectName;
+  }
 
-  describe('Birth', () => {
-    it('Should be initialized', () => {
-      expect(angularObjectRemoveResponse).toBeInstanceOf(AngularObjectRemoveResponse);
-    });
-  });
+  toJson(): string {
+    return JSON.stringify(this.toObject());
+  }
 
-  describe('Response', () => {
-    let response;
-    beforeEach(() => {
-      response = {
-        op:'ANGULAR_OBJECT_REMOVE',
-        data: {
-          name: defaultAngularObjectData.name,
-        }
-      };
-    });
+  toObject(): { op: string; data: object } {
+    return {
+      op: 'ANGULAR_OBJECT_REMOVE',
+      data: {
+        name: this._angularObjectName,
+        noteId: this._noteId,
+      }
+    };
+  }
 
-    it('Should remove object', () => {
-      angularObjectRemoveResponse.response(response);
-      expect(angularObjects).toEqual([]);
-    });
-
-    it('Should throw if object is not in the collection remove object', () => {
-      response.data.name = 'object2';
-      expect(() => angularObjectRemoveResponse.response(response)).toThrow();
-    });
-  });
-});
+}

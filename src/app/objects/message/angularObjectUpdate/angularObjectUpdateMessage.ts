@@ -43,12 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
-import {AngularObject} from '../angularObject/angularObject';
-import {Signal} from '@angular/core';
+import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 
-export interface AngularObjectCollection extends Channel{
-  updateOrAddAngularObject(angularObject:AngularObject):void;
-  removeAngularObject(angularObjectName:string):void;
-  angularObjects(): Signal<AngularObject[]>;
+export interface AngularObjectUpdateMessage {
+  addOrUpdateAngularObject(angularObjectCollection: AngularObjectCollection): void;
 }

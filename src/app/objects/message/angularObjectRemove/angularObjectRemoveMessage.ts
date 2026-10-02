@@ -43,28 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Respondable} from '../../../channel/respondable';
-import {AngularObject} from '../../../angularObject/angularObject';
-import {MessageImpl} from '../../../message/messageImpl';
-import {WebSocketPayloadImpl} from '../../../webSocketPayload/webSocketPayloadImpl';
+import {AngularObjectCollection} from '../../angularObjectCollection/angularObjectCollection';
 
-export class AngularObjectRemoveResponse implements Respondable {
-  private readonly _angularObjects: AngularObject[];
-
-  constructor(angularObjects: AngularObject[]) {
-    this._angularObjects = angularObjects;
-  }
-
-  response(data: object) {
-    const message = new MessageImpl(new WebSocketPayloadImpl(data));
-    if(message.operation() === 'ANGULAR_OBJECT_REMOVE'){
-      const angularObjectRemoveData = new WebSocketPayloadImpl(message.data());
-      const objectToRemoveName:string = angularObjectRemoveData.stringProperty('name');
-      const objectIndex = this._angularObjects.findIndex(ao => ao.name() === objectToRemoveName);
-      if(objectIndex === -1){
-        throw new Error(`Error during angular object remove: no object "${objectToRemoveName}" in current collection.`);
-      }
-      this._angularObjects.splice(objectIndex, 1);
-    }
-  }
+export interface AngularObjectRemoveMessage {
+  removeAngularObject(angularObjectCollection: AngularObjectCollection): void;
 }

@@ -43,12 +43,39 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
-import {AngularObject} from '../angularObject/angularObject';
-import {Signal} from '@angular/core';
+import {AngularObjectUpdateMessage} from './angularObjectUpdateMessage';
+import {AngularObjectUpdateMessageImpl} from './angularObjectUpdateMessageImpl';
+import {MessageImpl} from '../messageImpl';
+import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
+import {
+  AngularObjectUpdateServerResponse
+} from '../../../../test/fakes/webSocketServerResponses/angularObjectUpdate/angularObjectUpdateServerResponse';
+import {AngularObjectCollectionImpl} from '../../angularObjectCollection/angularObjectCollectionImpl';
+import {FakeChannel} from '../../../../test/fakes/channel/fakeChannel';
 
-export interface AngularObjectCollection extends Channel{
-  updateOrAddAngularObject(angularObject:AngularObject):void;
-  removeAngularObject(angularObjectName:string):void;
-  angularObjects(): Signal<AngularObject[]>;
-}
+describe('AngularObjectUpdateMessage unit test', () => {
+  const noteId = 'noteId';
+  const paragraphId = 'paragraphId';
+  const interpreterGroupId = 'interpreterGroupId';
+  const angularObjectData = {
+    name:'name',
+    object:'value'
+  };
+  const angularObjectUpdateMessage:AngularObjectUpdateMessage =  new AngularObjectUpdateMessageImpl(
+    new MessageImpl(
+      new WebSocketPayloadImpl(
+        new AngularObjectUpdateServerResponse(noteId, paragraphId, interpreterGroupId, angularObjectData).toObject()
+      )
+    )
+  );
+
+  const angularObjectCollection = new AngularObjectCollectionImpl(new FakeChannel());
+
+  it('Should add AngularObject to the collection', () => {
+    const angularObjectsBeforeAdd = angularObjectCollection.angularObjects()();
+    angularObjectUpdateMessage.addOrUpdateAngularObject(angularObjectCollection);
+    const angularObjectsAfterAdd = angularObjectCollection.angularObjects()();
+    expect(angularObjectsBeforeAdd).toHaveLength(0);
+    expect(angularObjectsAfterAdd).toHaveLength(1);
+  });
+});

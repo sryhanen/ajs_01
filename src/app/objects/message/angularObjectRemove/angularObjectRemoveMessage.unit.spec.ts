@@ -43,12 +43,41 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
-import {AngularObject} from '../angularObject/angularObject';
-import {Signal} from '@angular/core';
+import {AngularObjectCollectionImpl} from '../../angularObjectCollection/angularObjectCollectionImpl';
+import {FakeChannel} from '../../../../test/fakes/channel/fakeChannel';
+import {AngularObjectImpl} from '../../angularObject/angularObjectImpl';
+import {Channel} from '../../channel/channel';
+import {AngularObjectRemoveMessageImpl} from './angularObjectRemoveMessageImpl';
+import {
+  AngularObjectRemoveServerResponse
+} from '../../../../test/fakes/webSocketServerResponses/angularObjectRemove/angularObjectRemoveServerResponse';
+import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
+import {MessageImpl} from '../messageImpl';
 
-export interface AngularObjectCollection extends Channel{
-  updateOrAddAngularObject(angularObject:AngularObject):void;
-  removeAngularObject(angularObjectName:string):void;
-  angularObjects(): Signal<AngularObject[]>;
-}
+describe('AngularObjectRemoveMessage unit test', () => {
+  const channel:Channel=  new FakeChannel();
+  const angularObjectCollection = new AngularObjectCollectionImpl(channel);
+  const angularObjectData = {
+    name:'name',
+    object:'value'
+  };
+  const noteId = 'noteId';
+  const angularObjectRemoveMessage = new AngularObjectRemoveMessageImpl(
+    new MessageImpl(
+      new WebSocketPayloadImpl(
+        new AngularObjectRemoveServerResponse(noteId, angularObjectData.name).toObject()
+      )
+    )
+  );
+
+  it('Should remove angularObject from collection', () => {
+    const interpreterGroupId = 'interpreterGroupId';
+    const angularObject = new AngularObjectImpl(channel, angularObjectData, interpreterGroupId);
+    angularObjectCollection.updateOrAddAngularObject(angularObject);
+    const angularObjectsBeforeRemove = angularObjectCollection.angularObjects()();
+    angularObjectRemoveMessage.removeAngularObject(angularObjectCollection);
+    const angularObjectsAfterRemove = angularObjectCollection.angularObjects()();
+    expect(angularObjectsBeforeRemove).toHaveLength(1);
+    expect(angularObjectsAfterRemove).toHaveLength(0);
+  });
+});
