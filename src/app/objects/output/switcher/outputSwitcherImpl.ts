@@ -48,7 +48,6 @@ import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl'
 import {MessageImpl} from '../../message/messageImpl';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../../rendering/renderNode/renderNode';
-import {ParagraphOutputMessageImpl} from '../../message/paragraphOutputMessage/paragraphOutputMessageImpl';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 
@@ -83,8 +82,7 @@ export class OutputSwitcherImpl implements OutputSwitcher {
   response(json: object): void {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
     if(message.operation() === 'PARAGRAPH_OUTPUT'){
-      const paragraphOutputMessage = new ParagraphOutputMessageImpl(message);
-      this._outputIsSwitchable.set(paragraphOutputMessage.isAggregated());
+      this._outputIsSwitchable.set(message.data()['isAggregated']);
       this._switchIsPending.set(false);
     }
   }
