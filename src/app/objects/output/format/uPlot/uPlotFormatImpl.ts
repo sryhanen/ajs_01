@@ -54,11 +54,13 @@ import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/r
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 import {uPlotOptions} from './uPlotOptions';
 import {OutputFormat} from '../outputFormat';
+import {BasicOptionsImpl} from './uPlotPlugin/configuration/options/basicOptionsImpl';
+import {BarChartOptionsImpl} from './uPlotPlugin/configuration/options/barChartOptionsImpl';
 
 export class UPlotFormatImpl implements OutputFormat {
   private readonly _switcherButtons: Printable[];
   private readonly _uPlotData: WritableSignal<uPlot.AlignedData>;
-  private readonly _uPlotOptions: WritableSignal<uPlotOptions>;
+  private readonly _uPlotOptions: WritableSignal<uPlot.Options>;
   private readonly _renderNode: WritableSignal<RenderNode>;
 
   constructor(channel: Channel) {
@@ -70,10 +72,9 @@ export class UPlotFormatImpl implements OutputFormat {
     ];
     this._uPlotData = signal([]);
     this._uPlotOptions = signal({
-      labels: [],
-      series: [],
-      xAxisLabel: '',
-      graphType: ''
+      width:0,
+      height:0,
+      series:[]
     });
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.UPLOT_OUTPUT_VIEW, computed(() => ({
       uPlotData: this._uPlotData(),
@@ -83,7 +84,23 @@ export class UPlotFormatImpl implements OutputFormat {
 
   render(uPlotData:uPlot.AlignedData, uPlotOptions:uPlotOptions): void {
     this._uPlotData.set(uPlotData);
-    this._uPlotOptions.set(uPlotOptions);
+    this._uPlotOptions.set(this.parseOptions(uPlotOptions));
+  }
+
+  private parseOptions(uPlotOptions:uPlotOptions):uPlot.Options {
+    const labels = uPlotOptions.labels;
+    const series = uPlotOptions.series;
+    const xAxisLabel = uPlotOptions.xAxisLabel;
+    const graphType = uPlotOptions.graphType;
+    const basicOptions = new BasicOptionsImpl(labels, series, xAxisLabel, graphType);
+    let options: uPlot.Options;
+    if(graphType === GraphType.bar){
+      options = new BarChartOptionsImpl(basicOptions).options();
+    }
+    else{
+      options = basicOptions.options();
+    }
+    return options;
   }
 
   print(): Signal<RenderNode> {
