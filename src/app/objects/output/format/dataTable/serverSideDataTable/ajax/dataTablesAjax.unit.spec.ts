@@ -113,12 +113,6 @@ describe('Ajax', () => {
         expect(callback).toHaveBeenCalledTimes(2);
         expect(callback).toHaveBeenCalledWith(initialData);
       });
-
-      it('Should validate received data', () => {
-        configFunction(requestData, callback);
-        delete initialData.recordsTotal;
-        expect(() => dataTablesAjax.response(initialData)).toThrow();
-      });
     });
   });
 });

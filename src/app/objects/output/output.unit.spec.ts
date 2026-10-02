@@ -62,11 +62,10 @@ describe('Output unit test', () => {
   it('Should print', () => {
     const printed = output.print()();
     const inputs = printed.inputs()();
-    const nonStubFormats = (inputs['outputFormats'] as RenderNode[]).filter(format => !format.isStub());
     expect(printed.isStub()).toBe(false);
     expect(inputs['interpreterErrorListener']).toBeDefined();
-    expect((inputs['outputSwitcher'] as RenderNode).inputs()()['switchIsPending']).toBe(false);
-    expect(nonStubFormats).toHaveLength(0);
+    expect((inputs['outputSwitcher'] as RenderNode).inputs()()['loaderIsVisible']).toBe(false);
+    expect((inputs['output'] as RenderNode).isStub()).toBe(true);
   });
 
   it('Should request channel', () => {
@@ -95,7 +94,7 @@ describe('Output unit test', () => {
     it('OutputSwitcher should be pending', () => {
       const printed = output.print()();
       const inputs = printed.inputs()();
-      expect((inputs['outputSwitcher'] as RenderNode).inputs()()['switchIsPending']).toBe(true);
+      expect((inputs['outputSwitcher'] as RenderNode).inputs()()['loaderIsVisible']).toBe(true);
     });
 
     it('Should update output and switcher', () => {
@@ -104,15 +103,15 @@ describe('Output unit test', () => {
         data:{
           output:{
             type:requestedOutputType,
-            data:''
+            data:'',
+            isAggregated:false,
           }
         }
       });
       const printed = output.print()();
       const inputs = printed.inputs()();
-      const nonStubFormats = (inputs['outputFormats'] as RenderNode[]).filter(format => !format.isStub());
-      expect((inputs['outputSwitcher'] as RenderNode).inputs()()['switchIsPending']).toBe(false);
-      expect(nonStubFormats).toHaveLength(1);
+      expect((inputs['outputSwitcher'] as RenderNode).inputs()()['loaderIsVisible']).toBe(false);
+      expect((inputs['output'] as RenderNode).isStub()).toBe(false);
     });
 
     it('Should create new request if received wrong output type', () => {
@@ -128,7 +127,7 @@ describe('Output unit test', () => {
       });
       const printed = output.print()();
       const inputs = printed.inputs()();
-      expect((inputs['outputSwitcher'] as RenderNode).inputs()()['switchIsPending']).toBe(true);
+      expect((inputs['outputSwitcher'] as RenderNode).inputs()()['loaderIsVisible']).toBe(true);
       expect(channelSpy).toHaveBeenCalledExactlyOnceWith(paragraphOutputRequest);
     });
   });

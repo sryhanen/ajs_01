@@ -46,7 +46,6 @@
 import {ComponentFixture} from '@angular/core/testing';
 import {render, screen} from '@testing-library/angular';
 import {OutputSwitcherView} from './outputSwitcherView';
-import {Component, Signal, signal} from '@angular/core';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 import {By} from '@angular/platform-browser';
 import {FakeRenderNode} from '../../../../../test/fakes/fakeRenderNode';
@@ -55,23 +54,23 @@ import {FakeComponentRegistryProvider} from '../../../../../test/fakes/fakeCompo
 
 describe('OutputSwitcherView functional test', () => {
   let fixture: ComponentFixture<OutputSwitcherView>;
-  let switcherButtons: Signal<RenderNode>[];
-  let switchIsPending: boolean;
-  let outputIsSwitchable: boolean;
+  let switcherButtons: RenderNode[];
+  let loaderIsVisible: boolean;
+  let switcherIsVisible: boolean;
 
   beforeEach(async () => {
     switcherButtons = [
-      signal(new FakeRenderNode()),
-      signal(new FakeRenderNode())
+      new FakeRenderNode(),
+      new FakeRenderNode()
     ];
-    switchIsPending = false;
-    outputIsSwitchable = true;
+    loaderIsVisible = false;
+    switcherIsVisible = true;
 
     const renderResult = await render(OutputSwitcherView, {
       inputs:{
         switcherButtons: switcherButtons,
-        switchIsPending: switchIsPending,
-        outputIsSwitchable: outputIsSwitchable
+        loaderIsVisible: loaderIsVisible,
+        switcherIsVisible: switcherIsVisible
       },
       providers: [FakeComponentRegistryProvider]
     });
@@ -94,7 +93,7 @@ describe('OutputSwitcherView functional test', () => {
 
   describe('Content visibility', () => {
     it('Should hide everything if output is not switchable', () => {
-      fixture.componentRef.setInput('outputIsSwitchable', false);
+      fixture.componentRef.setInput('switcherIsVisible', false);
       fixture.detectChanges();
       expect(() => screen.getByRole('group')).toThrow();
       expect(fixture.debugElement.queryAll(By.directive(FakeComponent))).toHaveLength(0);
@@ -106,7 +105,7 @@ describe('OutputSwitcherView functional test', () => {
       });
 
       it('Should be visible', () => {
-        fixture.componentRef.setInput('switchIsPending', true);
+        fixture.componentRef.setInput('loaderIsVisible', true);
         fixture.detectChanges();
         expect(screen.getByRole('status')).toBeDefined();
       });

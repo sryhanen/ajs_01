@@ -43,14 +43,16 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AngularObjectRemoveServerResponse} from './angularObjectUpdateServerResponse';
+import {
+  AngularObjectUpdateServerResponse
+} from './angularObjectUpdateServerResponse';
 
 describe('AngularObjectUpdateServerResponse unit test', () => {
   const noteId = 'noteId';
   const paragraphId = 'paragraphId';
   const interpreterGroupId = 'interpreterGroupId';
   const angularObjectData = {name:'name', object:'value'};
-  const angularObjectUpdateServerResponse = new Ang(noteId, paragraphId, interpreterGroupId, angularObjectData);
+  const angularObjectUpdateServerResponse = new AngularObjectUpdateServerResponse(noteId, paragraphId, interpreterGroupId, angularObjectData);
 
   const expectedObject = {
     op: 'ANGULAR_OBJECT_UPDATE',
