@@ -49,7 +49,6 @@ import {WebSocketPayload} from '../webSocketPayload/webSocketPayload';
 import {WebSocketPayloadImpl} from '../webSocketPayload/webSocketPayloadImpl';
 import {signal, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
-import {ParagraphOutputMessageFactoryImpl} from './paragraphOutputMessageFactory/paragraphOutputMessageFactoryImpl';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {Output} from '../output/output';
@@ -69,7 +68,8 @@ export class ParagraphImpl implements Paragraph {
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
     this._paragraphData = new WebSocketPayloadImpl(paragraph);
-    this._output = this.initializedOutput(paragraph);
+    this._output = new OutputImpl(this);
+    this.initializeOutput(this._paragraphData, this._output);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
       output:this._output.print()(),
       paragraphId:this.id()
@@ -77,14 +77,25 @@ export class ParagraphImpl implements Paragraph {
     this._paragraphIdFilter = new MessagePropertyEqualsFilter('paragraphId', this.id());
   }
 
-  private initializedOutput(paragraph: object): Output {
-    const outputContainer = new OutputImpl(this);
-    const paragraphOutputMessageFactory = new ParagraphOutputMessageFactoryImpl(paragraph);
-    const paragraphOutputMessage = paragraphOutputMessageFactory.paragraphOutputMessage();
-    if(!paragraphOutputMessage.isStub()){
-      outputContainer.response(paragraphOutputMessage.print());
+  private initializeOutput(paragraphData: WebSocketPayload, output:Output):void{
+    if(paragraphData.propertyExists('output')){
+      const outputAsPayload = paragraphData.objectPropertyAsPayload('output');
+      const outputData = paragraphData.objectProperty('output');
+      if(!outputAsPayload.propertyExists('data') || outputAsPayload.propertyExists('type')){
+        console.error(`Output data not processed, format invalid: ${JSON.stringify(outputData)}`);
+      }
+      else{
+        const paragraphOutputMessageData = {
+          op: 'PARAGRAPH_OUTPUT',
+          data: {
+            noteId: '',
+            paragraphId: '',
+            output:outputData,
+          }
+        };
+        output.response(paragraphOutputMessageData);
+      }
     }
-    return outputContainer;
   }
 
   print(): Signal<RenderNode> {
