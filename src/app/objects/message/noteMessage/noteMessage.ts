@@ -46,5 +46,5 @@
 import {NotebookIndex} from '../../notebookIndex/notebookIndex';
 
 export interface NoteMessage{
-  render(notebookIndex:NotebookIndex):void;
+  renderNotebook(notebookIndex:NotebookIndex):void;
 }

@@ -72,7 +72,7 @@ describe('Note message unit test', () => {
     const notebookIndex = new NotebookIndexImpl(channel, notebookPayload.toPayload());
     const notebookIndexPrinted = notebookIndex.print()();
     const renderedNotebookBeforeMessage = notebookIndexPrinted.inputs()()['currentNotebook'] as RenderNode;
-    noteMessage.render(notebookIndex);
+    noteMessage.renderNotebook(notebookIndex);
     const renderedNotebookAfterMessage = notebookIndexPrinted.inputs()()['currentNotebook'] as RenderNode;
     expect(renderedNotebookBeforeMessage.isStub()).toBe(true);
     expect(renderedNotebookAfterMessage.isStub()).toBe(false);

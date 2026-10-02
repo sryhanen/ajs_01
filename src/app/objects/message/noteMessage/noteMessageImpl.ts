@@ -56,7 +56,7 @@ export class NoteMessageImpl implements NoteMessage {
     this._message = new TypedMessage('NOTE', message);
   }
 
-  render(notebookIndex: NotebookIndex): void {
+  renderNotebook(notebookIndex: NotebookIndex): void {
     const notebook = new NotebookImpl(notebookIndex, this._message.data());
     notebookIndex.renderNotebook(notebook);
   }
