@@ -54,12 +54,14 @@ import {RenderNodeHostView} from '../renderNodeHost/renderNodeHostView';
   ],
   template: `
     @if(containerId() === paragraphId()){
+      <render-node-host [renderNode]="editor()"></render-node-host>
       <render-node-host [renderNode]="output()"></render-node-host>
     }
   `
 })
 export class ParagraphView{
   output = input.required<RenderNode>();
+  editor = input.required<RenderNode>();
   paragraphId = input.required<string>();
   containerId = input.required<string>();
 }

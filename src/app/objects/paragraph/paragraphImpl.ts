@@ -57,10 +57,13 @@ import {MessagePropertyEqualsFilter} from '../message/messageFilter/messagePrope
 import {MessageImpl} from '../message/messageImpl';
 import {PropertyDecoratedMessage} from '../message/propertyDecoratedMessage/propertyDecoratedMessage';
 import {Message} from '../message/message';
+import {Editor} from '../editor/editor';
+import {EditorImpl} from '../editor/editorImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
   private readonly _output: Output;
+  private readonly _editor:Editor;
   private readonly _paragraphData: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _paragraphIdFilter: MessagePropertyEqualsFilter;
@@ -69,9 +72,11 @@ export class ParagraphImpl implements Paragraph {
     this._channel = channel;
     this._paragraphData = new WebSocketPayloadImpl(paragraph);
     this._output = new OutputImpl(this);
+    this._editor = new EditorImpl(this);
     this.initializeOutput(this._paragraphData, this._output);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
       output:this._output.print()(),
+      editor:this._editor.print()(),
       paragraphId:this.id()
     })));
     this._paragraphIdFilter = new MessagePropertyEqualsFilter('paragraphId', this.id());
