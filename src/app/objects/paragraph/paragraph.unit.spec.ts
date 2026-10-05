@@ -112,15 +112,18 @@ describe('Paragraph', () => {
       expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
     });
 
-    it('Should create RUN_PARAGRAPH request when receiving EXECUTE_PARAGRAPH request', () => {
-      const executeParagraphRequest = {
-        op:'EXECUTE_PARAGRAPH',
+    it('Should decorate RUN_PARAGRAPH request', () => {
+      const initialRequest = {
+        op:'RUN_PARAGRAPH',
         data:{
-          paragraphId:paragraphId
+          id: paragraphId,
+          paragraph: '',
+          config: {},
+          params: {},
         }
       };
       const requestSpy = vi.spyOn(channel, 'request');
-      paragraph.request(executeParagraphRequest);
+      paragraph.request(initialRequest);
       const expectedRequest = {
         op:'RUN_PARAGRAPH',
         data:{
@@ -131,6 +134,19 @@ describe('Paragraph', () => {
         }
       };
       expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    });
+
+    it('Should throw if RUN_PARAGRAPH request has wrong id', () => {
+      const initialRequest = {
+        op:'RUN_PARAGRAPH',
+        data:{
+          id: 'wrongId',
+          paragraph: '',
+          config: {},
+          params: {},
+        }
+      };
+      expect(() => paragraph.request(initialRequest)).toThrow();
     });
   });
 });

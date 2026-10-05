@@ -108,8 +108,8 @@ export class ParagraphImpl implements Paragraph {
 
   request(json: object): void {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    if(message.operation() === 'EXECUTE_PARAGRAPH'){
-      this.executeParagraphRequest(message);
+    if(message.operation() === 'RUN_PARAGRAPH'){
+      this.runParagraphRequest(message);
     }
     else{
       const paragraphIdDecoratedMessage = new PropertyDecoratedMessage(message, 'paragraphId', this.id());
@@ -120,19 +120,21 @@ export class ParagraphImpl implements Paragraph {
     }
   }
 
-  private executeParagraphRequest(message:Message):void{
-    if(message.dataAsWebSocketPayload().stringProperty('paragraphId') === this.id()){
-      const runParagraphRequest = {
-        op:'RUN_PARAGRAPH',
-        data: {
-          id: this.id(),
-          paragraph: this._paragraphData.stringProperty('text'),
-          config: this._paragraphData.objectProperty('config'),
-          params: this._paragraphData.objectPropertyAsPayload('settings').objectProperty('params'),
-        },
-      };
-      this._channel.request(runParagraphRequest);
+  private runParagraphRequest(message:Message):void{
+    const paragraphId = message.dataAsWebSocketPayload().stringProperty('id');
+    if(paragraphId !== this.id()){
+      throw new RangeError(`Wrong paragraphId "${paragraphId} given`);
     }
+    const runParagraphRequest = {
+      op:'RUN_PARAGRAPH',
+      data: {
+        id: this.id(),
+        paragraph: this._paragraphData.stringProperty('text'),
+        config: this._paragraphData.objectProperty('config'),
+        params: this._paragraphData.objectPropertyAsPayload('settings').objectProperty('params'),
+      },
+    };
+    this._channel.request(runParagraphRequest);
   }
 
   response(json: object): void {
