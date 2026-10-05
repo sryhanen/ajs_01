@@ -64,11 +64,12 @@ export class EditorImpl implements Editor {
   private readonly _language:WritableSignal<string>;
   private readonly _responseEvents: Map<string, (message:Message) => void>;
 
-  constructor(requestable:Requestable, editorConfiguration:EditorConfiguration={disableEditor:false, fontSize:12, showLineNumbers:true}) {
+  constructor(requestable:Requestable, editorConfiguration:EditorConfiguration={disableEditor:false, fontSize:12, showLineNumbers:true, editorValue:''}) {
     this._requestable = requestable;
     this._completions = signal([]);
     this._language = signal('');
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
+      requestable:this,
       editorConfiguration: editorConfiguration,
       completions: this._completions(),
       editorLanguage: this._language(),

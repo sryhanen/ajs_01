@@ -46,5 +46,6 @@
 export type EditorConfiguration = {
   disableEditor:boolean;
   fontSize:number;
-  showLineNumbers: boolean;
+  showLineNumbers:boolean;
+  editorValue:string;
 };

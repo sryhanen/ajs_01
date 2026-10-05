@@ -59,6 +59,7 @@ import ace from 'ace-builds';
 import {EditorConfiguration} from '../../../objects/editor/editorConfiguration';
 import {AceCustomCompleter} from '../../../objects/editor/aceCustomCompleter/aceCustomCompleter';
 import {AceCustomCompleterImpl} from '../../../objects/editor/aceCustomCompleter/aceCustomCompleterImpl';
+import {Requestable} from '../../../objects/channel/requestable';
 
 @Component({
   selector: 'editor',
@@ -70,26 +71,116 @@ import {AceCustomCompleterImpl} from '../../../objects/editor/aceCustomCompleter
 })
 export class EditorView implements AfterViewInit, OnDestroy, OnInit {
   @ViewChild('editorAnchor') editorAnchor: ElementRef;
+  requestable = input.required<Requestable>();
   editorConfiguration = input.required<EditorConfiguration>();
   completions = input<ace.Ace.Completion[]>([]);
   editorLanguage = input<string>('ace/mode/text');
 
   private _aceEditor: ace.Ace.Editor;
   private _aceCustomCompleter:Signal<AceCustomCompleter>;
+  private _aceLangTools;
 
   private _completionsChanged = effect(() => {
     this._aceCustomCompleter().applyCompletions(this.completions());
   });
 
+  private _languageChanged = effect(() => {
+    if(this._aceEditor) {
+      this._aceEditor.getSession().setMode(this.editorLanguage());
+    }
+  });
+
   ngOnInit() {
     this._aceCustomCompleter = signal(new AceCustomCompleterImpl());
+    this._aceLangTools = ace.require('ace/ext/language_tools');
   }
 
   ngAfterViewInit() {
     this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
+    this.configureEditor(this._aceEditor, this.editorConfiguration());
   }
 
   ngOnDestroy() {
     this._aceEditor.destroy();
+  }
+
+  private configureEditor(editor:ace.Editor, editorConfiguration:EditorConfiguration):void{
+    editor.setFontSize(editorConfiguration.fontSize);
+    editor.setValue(editorConfiguration.editorValue);
+    editor.clearSelection();
+    editor.setReadOnly(editorConfiguration.disableEditor);
+    if(editorConfiguration.disableEditor){
+      editor.setStyle('paragraph-disable');
+    }
+
+    editor.renderer.setShowGutter(editorConfiguration.showLineNumbers);
+    editor.setShowFoldWidgets(false);
+    editor.getSession().setUseWrapMode(true);
+
+    editor.setOptions({
+      maxLines: 30,
+      enableBasicAutocompletion: true,
+    });
+
+    editor.commands.bindKey('tab', 'startAutocomplete');
+    editor.commands.bindKey('ctrl-space', null);
+    editor.commands.removeCommand('showSettingsMenu');
+    editor.commands.removeCommand('find');
+    editor.commands.removeCommand('replace');
+    editor.setHighlightActiveLine(false);
+    editor.setHighlightGutterLine(false);
+    editor.on('blur', () => {
+      editor.setHighlightActiveLine(false);
+      editor.setHighlightGutterLine(false);
+    });
+    editor.on('focus', () => {
+      editor.setHighlightActiveLine(true);
+      editor.setHighlightGutterLine(true);
+    });
+
+    const keyWordCompleter = this._aceLangTools.keyWordCompleter;
+    const snippetCompleter = this._aceLangTools.snippetCompleter;
+    const textCompleter = this._aceLangTools.textCompleter;
+    this._aceLangTools.setCompleters([this._aceCustomCompleter(), keyWordCompleter, snippetCompleter, textCompleter]);
+    editor.commands.on('exec', (eventData)=> {
+      if(eventData.command.name === 'startAutocomplete') {
+        // request completions this._customCompleter.requestCompletions(aceEditor.getValue());
+      }
+    });
+    editor.on('change', (delta:ace.Ace.Delta)=> {
+      if(delta.start.row === 0) {
+        // request editor setting this._customCompleter.requestEditorSetting(aceEditor.getValue());
+      }
+    });
+    editor.on('change', () => {
+      const commitParagraphRequest = {
+        op:'COMMIT_PARAGRAPH',
+        data:{
+          id: '',
+          noteId: '',
+          title: '',
+          paragraph: editor.getValue(),
+          config: '',
+          params: '',
+        }
+      };
+      this.requestable().request(commitParagraphRequest);
+    });
+    editor.on('change', (delta:ace.Ace.Delta)=> {
+      const timeConsumingQuery = editor.find(/index\s*=\s*("\*"|\*)(\s|\||$)/);
+      if(timeConsumingQuery){
+        editor.getSession().setAnnotations([
+          {
+            row:timeConsumingQuery.start.row,
+            column:timeConsumingQuery.start.column,
+            text: 'The search query "index=*" can be time-consuming. Please consider using date-range filters to narrow down your search.',
+            type: 'error'
+          }
+        ]);
+      }
+      else{
+        editor.getSession().setAnnotations([]);
+      }
+    });
   }
 }
