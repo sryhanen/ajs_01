@@ -79,7 +79,7 @@ export class AutoCompleteRule implements EditorRule {
         this._requestable.request({
           op: 'COMPLETION',
           data: {
-            id: '',
+            paragraphId: '', //Change required in the server
             buf: editorValue,
             cursor: editorValue.length,
           },

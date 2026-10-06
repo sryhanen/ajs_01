@@ -67,6 +67,7 @@ export class ParagraphImpl implements Paragraph {
   private readonly _paragraphData: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _paragraphIdFilter: MessagePropertyEqualsFilter;
+  private readonly _requestEvents: Map<string, (message:Message) => void>;
 
   constructor(channel: Channel, paragraph: object) {
     this._channel = channel;
@@ -80,6 +81,10 @@ export class ParagraphImpl implements Paragraph {
       paragraphId:this.id()
     })));
     this._paragraphIdFilter = new MessagePropertyEqualsFilter('paragraphId', this.id());
+    this._requestEvents = new Map([
+      ['RUN_PARAGRAPH', (message) => this.runParagraphRequest(message)],
+      ['COMMIT_PARAGRAPH', (message) => this.commitParagraphRequest(message)],
+    ]);
   }
 
   private initializeOutput(paragraphData: WebSocketPayload, output:Output):void{
@@ -125,6 +130,19 @@ export class ParagraphImpl implements Paragraph {
     }
   }
 
+  response(json: object): void {
+    const message = new MessageImpl(new WebSocketPayloadImpl(json));
+    const filteredMessage = this._paragraphIdFilter.filteredMessage(message);
+    if(!filteredMessage.isStub()) {
+      const message = {
+        op:filteredMessage.operation(),
+        data:filteredMessage.data()
+      };
+      this._output.response(message);
+      this._editor.response(message);
+    }
+  }
+
   private runParagraphRequest(message:Message):void{
     const paragraphId = message.dataAsWebSocketPayload().stringProperty('id');
     if(paragraphId !== this.id()){
@@ -142,16 +160,18 @@ export class ParagraphImpl implements Paragraph {
     this._channel.request(runParagraphRequest);
   }
 
-  response(json: object): void {
-    const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    const filteredMessage = this._paragraphIdFilter.filteredMessage(message);
-    if(!filteredMessage.isStub()) {
-      const message = {
-        op:filteredMessage.operation(),
-        data:filteredMessage.data()
-      };
-      this._output.response(message);
-      this._editor.response(message);
-    }
+  private commitParagraphRequest(message:Message):void{
+   // const commitParagraphRequest = {
+   //   op:'COMMIT_PARAGRAPH',
+   //   data:{
+   //     id: '',
+   //     noteId: '',
+   //     title: '',
+   //     paragraph: editor.getValue(),
+   //     config: '',
+   //     params: '',
+   //   }
+   // };
+
   }
 }
