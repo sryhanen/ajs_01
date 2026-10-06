@@ -46,19 +46,12 @@
 import {
   AfterViewInit,
   Component,
-  effect,
   ElementRef,
   input,
   OnDestroy,
-  OnInit,
-  Signal,
-  signal,
   ViewChild
 } from '@angular/core';
 import ace from 'ace-builds';
-import {EditorConfiguration} from '../../../objects/editor/editorConfiguration';
-import {AceCustomCompleter} from '../../../objects/editor/aceCustomCompleter/aceCustomCompleter';
-import {AceCustomCompleterImpl} from '../../../objects/editor/aceCustomCompleter/aceCustomCompleterImpl';
 import {Requestable} from '../../../objects/channel/requestable';
 
 @Component({
@@ -69,42 +62,22 @@ import {Requestable} from '../../../objects/channel/requestable';
     </div>
   `
 })
-export class EditorView implements AfterViewInit, OnDestroy, OnInit {
+export class EditorView implements AfterViewInit, OnDestroy{
   @ViewChild('editorAnchor') editorAnchor: ElementRef;
   requestable = input.required<Requestable>();
-  editorConfiguration = input.required<EditorConfiguration>();
   completions = input<ace.Ace.Completion[]>([]);
   editorLanguage = input<string>('ace/mode/text');
-
   private _aceEditor: ace.Ace.Editor;
-  private _aceCustomCompleter:Signal<AceCustomCompleter>;
-  private _aceLangTools;
-
-  private _completionsChanged = effect(() => {
-    this._aceCustomCompleter().applyCompletions(this.completions());
-  });
-
-  private _languageChanged = effect(() => {
-    if(this._aceEditor) {
-      this._aceEditor.getSession().setMode(this.editorLanguage());
-    }
-  });
-
-  ngOnInit() {
-    this._aceCustomCompleter = signal(new AceCustomCompleterImpl());
-    this._aceLangTools = ace.require('ace/ext/language_tools');
-  }
 
   ngAfterViewInit() {
     this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
-    this.configureEditor(this._aceEditor, this.editorConfiguration());
   }
 
   ngOnDestroy() {
     this._aceEditor.destroy();
   }
 
-  private configureEditor(editor:ace.Editor, editorConfiguration:EditorConfiguration):void{
+  private configureEditor(editor:ace.Editor, editorConfiguration:object):void{
     editor.setFontSize(editorConfiguration.fontSize);
     editor.setValue(editorConfiguration.editorValue);
     editor.clearSelection();
@@ -138,10 +111,6 @@ export class EditorView implements AfterViewInit, OnDestroy, OnInit {
       editor.setHighlightGutterLine(true);
     });
 
-    const keyWordCompleter = this._aceLangTools.keyWordCompleter;
-    const snippetCompleter = this._aceLangTools.snippetCompleter;
-    const textCompleter = this._aceLangTools.textCompleter;
-    this._aceLangTools.setCompleters([this._aceCustomCompleter(), keyWordCompleter, snippetCompleter, textCompleter]);
     editor.commands.on('exec', (eventData)=> {
       if(eventData.command.name === 'startAutocomplete') {
         // request completions this._customCompleter.requestCompletions(aceEditor.getValue());

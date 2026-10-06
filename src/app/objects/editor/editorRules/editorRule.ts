@@ -43,9 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export type EditorConfiguration = {
-  disableEditor:boolean;
-  fontSize:number;
-  showLineNumbers:boolean;
-  editorValue:string;
-};
+import {Ace} from 'ace-builds';
+
+export interface EditorRule {
+  applyTo(editor:Ace.Editor):void;
+}
