@@ -57,7 +57,8 @@ export class EditorSettingsMessageImpl implements EditorSettingsMessage {
   }
 
   setEditorLanguage(editor: Editor): void {
-    const language = this._message.dataAsWebSocketPayload().objectPropertyAsPayload('editor').stringProperty('language');
+    const languagePayload = this._message.dataAsWebSocketPayload().objectPropertyAsPayload('editor').stringProperty('language');
+    const language = `ace/mode/${languagePayload}`;
     editor.setEditorLanguage(language);
   }
 }
