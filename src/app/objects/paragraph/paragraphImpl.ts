@@ -146,10 +146,12 @@ export class ParagraphImpl implements Paragraph {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
     const filteredMessage = this._paragraphIdFilter.filteredMessage(message);
     if(!filteredMessage.isStub()) {
-      this._output.response({
+      const message = {
         op:filteredMessage.operation(),
         data:filteredMessage.data()
-      });
+      };
+      this._output.response(message);
+      this._editor.response(message);
     }
   }
 }
