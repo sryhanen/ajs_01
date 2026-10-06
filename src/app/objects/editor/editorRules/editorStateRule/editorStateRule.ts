@@ -43,39 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {
-  AfterViewInit,
-  Component,
-  ElementRef, inject, Injector,
-  input,
-  OnDestroy,
-  ViewChild
-} from '@angular/core';
-import ace from 'ace-builds';
-import {EditorRule} from '../../../objects/editor/editorRules/editorRule';
+import {EditorRule} from '../editorRule';
+import {Ace} from 'ace-builds';
+import {RawEditorState} from '../../rawEditorState';
 
-@Component({
-  selector: 'editor',
-  template: `
-    <div class="paragraph-editor">
-      <pre #editorAnchor class="editor-container"></pre>
-    </div>
-  `
-})
-export class EditorView implements AfterViewInit, OnDestroy{
-  @ViewChild('editorAnchor') editorAnchor: ElementRef;
-  editorRules = input.required<EditorRule[]>();
-  private _aceEditor: ace.Ace.Editor;
-  private injector = inject(Injector);
+export class EditorStateRule implements EditorRule {
+  private readonly _rawEditorState:RawEditorState;
 
-  ngAfterViewInit() {
-    this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
-    this.editorRules().forEach(rule => {
-      rule.applyTo(this._aceEditor, this.injector);
-    });
+  constructor(rawEditorState:RawEditorState) {
+    this._rawEditorState = rawEditorState;
   }
 
-  ngOnDestroy() {
-    this._aceEditor.destroy();
+  applyTo(editor: Ace.Editor): void {
+    editor.setFontSize(this._rawEditorState.fontSize);
+    editor.setValue(this._rawEditorState.textValue);
+    editor.clearSelection();
+    editor.setReadOnly(this._rawEditorState.disableEditor);
+    if(this._rawEditorState.disableEditor){
+      editor.setStyle('paragraph-disable');
+    }
+    editor.renderer.setShowGutter(this._rawEditorState.showLineNumbers);
+    editor.setShowFoldWidgets(false);
+    editor.getSession().setUseWrapMode(true);
+    editor.setOptions({
+      maxLines: 30,
+      enableBasicAutocompletion: true,
+    });
   }
 }

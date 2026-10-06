@@ -43,39 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {
-  AfterViewInit,
-  Component,
-  ElementRef, inject, Injector,
-  input,
-  OnDestroy,
-  ViewChild
-} from '@angular/core';
-import ace from 'ace-builds';
-import {EditorRule} from '../../../objects/editor/editorRules/editorRule';
+import {EditorRule} from '../editorRule';
+import {Ace} from 'ace-builds';
 
-@Component({
-  selector: 'editor',
-  template: `
-    <div class="paragraph-editor">
-      <pre #editorAnchor class="editor-container"></pre>
-    </div>
-  `
-})
-export class EditorView implements AfterViewInit, OnDestroy{
-  @ViewChild('editorAnchor') editorAnchor: ElementRef;
-  editorRules = input.required<EditorRule[]>();
-  private _aceEditor: ace.Ace.Editor;
-  private injector = inject(Injector);
-
-  ngAfterViewInit() {
-    this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
-    this.editorRules().forEach(rule => {
-      rule.applyTo(this._aceEditor, this.injector);
+export class HighlightsRule implements EditorRule {
+  applyTo(editor: Ace.Editor) {
+    editor.setHighlightActiveLine(false);
+    editor.setHighlightGutterLine(false);
+    editor.on('blur', () => {
+      editor.setHighlightActiveLine(false);
+      editor.setHighlightGutterLine(false);
     });
-  }
-
-  ngOnDestroy() {
-    this._aceEditor.destroy();
+    editor.on('focus', () => {
+      editor.setHighlightActiveLine(true);
+      editor.setHighlightGutterLine(true);
+    });
   }
 }

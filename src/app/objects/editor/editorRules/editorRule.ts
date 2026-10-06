@@ -44,7 +44,8 @@
  * a licensee so wish it.
  */
 import {Ace} from 'ace-builds';
+import {Injector} from '@angular/core';
 
 export interface EditorRule {
-  applyTo(editor:Ace.Editor):void;
+  applyTo(editor:Ace.Editor, injector?: Injector):void;
 }

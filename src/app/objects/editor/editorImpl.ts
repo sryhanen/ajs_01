@@ -48,7 +48,6 @@ import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {Ace} from 'ace-builds';
 import {Requestable} from '../channel/requestable';
-import {EditorConfiguration} from './editorConfiguration';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {Message} from '../message/message';
@@ -56,23 +55,39 @@ import {CompletionListMessageImpl} from '../message/completionList/completionLis
 import {EditorSettingsMessageImpl} from '../message/editorSettings/editorSettingsMessageImpl';
 import {WebSocketPayloadImpl} from '../webSocketPayload/webSocketPayloadImpl';
 import {MessageImpl} from '../message/messageImpl';
+import {RawEditorState} from './rawEditorState';
+import {EditorRule} from './editorRules/editorRule';
+import {AnnotationsRule} from './editorRules/annotationsRule/annotationsRule';
+import {AutoCommitRule} from './editorRules/autoCommitRule/autoCommitRule';
+import {AutoCompleteRule} from './editorRules/autoCompleteRule/autoCompleteRule';
+import {EditorStateRule} from './editorRules/editorStateRule/editorStateRule';
+import {ExcludedCommandsRule} from './editorRules/excludedCommandsRule/excludedCommandsRule';
+import {HighlightsRule} from './editorRules/highlightsRule/highlightsRule';
+import {KeyBindingsRule} from './editorRules/keyBindingsRule/keyBindingsRule';
 
 export class EditorImpl implements Editor {
   private readonly _requestable:Requestable;
+  private readonly _editorRules:EditorRule[];
   private readonly _renderNode:Signal<RenderNode>;
   private readonly _completions:WritableSignal<Ace.Completion[]>;
-  private readonly _language:WritableSignal<string>;
+  private readonly _editorLanguage:WritableSignal<string>;
   private readonly _responseEvents: Map<string, (message:Message) => void>;
 
-  constructor(requestable:Requestable, editorConfiguration:EditorConfiguration={disableEditor:false, fontSize:12, showLineNumbers:true, editorValue:''}) {
+  constructor(requestable:Requestable, rawEditorState:RawEditorState={disableEditor:false, fontSize:12, showLineNumbers:true, textValue:''}) {
     this._requestable = requestable;
     this._completions = signal([]);
-    this._language = signal('');
+    this._editorLanguage = signal('ace/mode/text');
+    this._editorRules = [
+      new AnnotationsRule(),
+      new AutoCommitRule(this),
+      new AutoCompleteRule(this, this._completions, this._editorLanguage),
+      new EditorStateRule(rawEditorState),
+      new ExcludedCommandsRule(),
+      new HighlightsRule(),
+      new KeyBindingsRule(this)
+    ];
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
-      requestable:this,
-      editorConfiguration: editorConfiguration,
-      completions: this._completions(),
-      editorLanguage: this._language(),
+      editorRules:this._editorRules
     }))));
     this._responseEvents = new Map([
       ['EDITOR_SETTING', (message) => this.editorSettingResponse(message)],
@@ -102,7 +117,7 @@ export class EditorImpl implements Editor {
   }
 
   setEditorLanguage(language: string): void {
-    this._language.set(language);
+    this._editorLanguage.set(language);
   }
 
   private editorSettingResponse(message:Message): void {

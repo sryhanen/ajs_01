@@ -43,39 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {
-  AfterViewInit,
-  Component,
-  ElementRef, inject, Injector,
-  input,
-  OnDestroy,
-  ViewChild
-} from '@angular/core';
-import ace from 'ace-builds';
-import {EditorRule} from '../../../objects/editor/editorRules/editorRule';
-
-@Component({
-  selector: 'editor',
-  template: `
-    <div class="paragraph-editor">
-      <pre #editorAnchor class="editor-container"></pre>
-    </div>
-  `
-})
-export class EditorView implements AfterViewInit, OnDestroy{
-  @ViewChild('editorAnchor') editorAnchor: ElementRef;
-  editorRules = input.required<EditorRule[]>();
-  private _aceEditor: ace.Ace.Editor;
-  private injector = inject(Injector);
-
-  ngAfterViewInit() {
-    this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
-    this.editorRules().forEach(rule => {
-      rule.applyTo(this._aceEditor, this.injector);
-    });
-  }
-
-  ngOnDestroy() {
-    this._aceEditor.destroy();
-  }
-}
+export type RawEditorState = {
+  disableEditor: boolean,
+  fontSize: number,
+  textValue: string,
+  showLineNumbers: boolean,
+};

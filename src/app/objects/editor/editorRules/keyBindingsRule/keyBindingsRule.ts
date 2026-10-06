@@ -43,39 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {
-  AfterViewInit,
-  Component,
-  ElementRef, inject, Injector,
-  input,
-  OnDestroy,
-  ViewChild
-} from '@angular/core';
-import ace from 'ace-builds';
-import {EditorRule} from '../../../objects/editor/editorRules/editorRule';
+import {EditorRule} from '../editorRule';
+import {Ace} from 'ace-builds';
+import {Requestable} from '../../../channel/requestable';
 
-@Component({
-  selector: 'editor',
-  template: `
-    <div class="paragraph-editor">
-      <pre #editorAnchor class="editor-container"></pre>
-    </div>
-  `
-})
-export class EditorView implements AfterViewInit, OnDestroy{
-  @ViewChild('editorAnchor') editorAnchor: ElementRef;
-  editorRules = input.required<EditorRule[]>();
-  private _aceEditor: ace.Ace.Editor;
-  private injector = inject(Injector);
+export class KeyBindingsRule implements EditorRule {
+  private readonly _requestable:Requestable;
 
-  ngAfterViewInit() {
-    this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
-    this.editorRules().forEach(rule => {
-      rule.applyTo(this._aceEditor, this.injector);
-    });
+  constructor(requestable:Requestable) {
+    this._requestable = requestable;
   }
 
-  ngOnDestroy() {
-    this._aceEditor.destroy();
+  applyTo(editor: Ace.Editor): void {
+    editor.commands.bindKey('tab', 'startAutocomplete');
+    editor.commands.bindKey('ctrl-space', null);
+    const requestable = this._requestable;
+    editor.commands.addCommand({
+      name: 'Run paragraph',
+      bindKey: {
+        win: 'Shift-Enter',
+        mac: 'Shift-Enter'
+      },
+      exec: function() {
+        requestable.request({op:'RUN_PARAGRAPH',
+          data: {
+            id: '',
+            paragraph: '',
+            config: {},
+            params: {},
+          },
+        });
+      }
+    });
   }
 }
