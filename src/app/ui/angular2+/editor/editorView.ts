@@ -182,5 +182,23 @@ export class EditorView implements AfterViewInit, OnDestroy, OnInit {
         editor.getSession().setAnnotations([]);
       }
     });
+    const requestable = this.requestable();
+    editor.commands.addCommand({
+      name: 'Run paragraph',
+      bindKey: {
+        win: 'Shift-Enter',
+        mac: 'Shift-Enter'
+      },
+      exec: function() {
+        requestable.request({op:'RUN_PARAGRAPH',
+          data: {
+            id: '',
+            paragraph: '',
+            config: {},
+            params: {},
+          },
+        });
+      }
+    });
   }
 }
