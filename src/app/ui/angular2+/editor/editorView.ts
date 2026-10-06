@@ -69,6 +69,10 @@ export class EditorView implements AfterViewInit, OnDestroy{
   private injector = inject(Injector);
 
   ngAfterViewInit() {
+    ace.config.set('basePath', '/');
+    ace.config.set('modePath', '/');
+    ace.config.set('themePath', '/');
+    ace.config.set('workerPath', '/');
     this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
     this.editorRules().forEach(rule => {
       rule.applyTo(this._aceEditor, this.injector);
