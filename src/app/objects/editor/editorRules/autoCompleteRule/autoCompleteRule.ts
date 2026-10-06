@@ -47,8 +47,8 @@ import {EditorRule} from '../editorRule';
 import ace, {Ace} from 'ace-builds';
 import {Requestable} from '../../../channel/requestable';
 import {effect, Injector, WritableSignal} from '@angular/core';
-import {AceCustomCompleterImpl} from '../../aceCustomCompleter/aceCustomCompleterImpl';
-import {AceCustomCompleter} from '../../aceCustomCompleter/aceCustomCompleter';
+import {AceCustomCompleterImpl} from './aceCustomCompleter/aceCustomCompleterImpl';
+import {AceCustomCompleter} from './aceCustomCompleter/aceCustomCompleter';
 
 export class AutoCompleteRule implements EditorRule {
   private readonly _requestable:Requestable;
