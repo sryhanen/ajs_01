@@ -43,8 +43,29 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {SyntaxLanguageRule} from '../../editor/editorRules/syntaxLanguageRule/syntaxLanguageRule';
+import {Editor} from './editor';
+import {EditorImpl} from './editorImpl';
+import {RawEditorState} from './rawEditorState';
+import {Requestable} from '../channel/requestable';
+import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 
-export interface EditorSettingMessage {
-  setEditorLanguage(syntaxLanguageRule:SyntaxLanguageRule):void;
-}
+describe('Editor unit test', () => {
+  let editor: Editor;
+  let requestable:Requestable;
+  const rawEditorState:RawEditorState={
+    disableEditor: false,
+    fontSize: 0,
+    showLineNumbers: false,
+    textValue: ''
+  };
+
+  beforeEach(() => {
+    requestable = new FakeChannel();
+    editor = new EditorImpl(requestable, rawEditorState);
+  });
+
+  it('Should print', () => {
+
+  });
+
+});

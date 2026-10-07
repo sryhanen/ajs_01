@@ -59,16 +59,20 @@ import {ExcludedCommandsRule} from './editorRules/excludedCommandsRule/excludedC
 import {HighlightsRule} from './editorRules/highlightsRule/highlightsRule';
 import {KeyBindingsRule} from './editorRules/keyBindingsRule/keyBindingsRule';
 import {AutoCompleteRule} from './editorRules/autoCompleteRule/autoCompleteRule';
+import {SyntaxLanguageRule} from './editorRules/syntaxLanguageRule/syntaxLanguageRule';
+import {SyntaxLanguageRuleImpl} from './editorRules/syntaxLanguageRule/syntaxLanguageRuleImpl';
 
 export class EditorImpl implements Editor {
   private readonly _requestable:Requestable;
   private readonly _editorRules:EditorRule[];
   private readonly _renderNode:Signal<RenderNode>;
   private readonly _autoCompleteRule:AutoCompleteRule;
+  private readonly _syntaxLanguageRule:SyntaxLanguageRule;
 
   constructor(requestable:Requestable, rawEditorState:RawEditorState) {
     this._requestable = requestable;
     this._autoCompleteRule = new AutoCompleteRuleImpl(this);
+    this._syntaxLanguageRule = new SyntaxLanguageRuleImpl(this);
     this._editorRules = [
       new AnnotationsRule(),
       new AutoCommitRule(this),
@@ -76,7 +80,8 @@ export class EditorImpl implements Editor {
       new ExcludedCommandsRule(),
       new HighlightsRule(),
       new KeyBindingsRule(this),
-      this._autoCompleteRule
+      this._autoCompleteRule,
+      this._syntaxLanguageRule
     ];
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
       editorRules:this._editorRules
@@ -93,5 +98,6 @@ export class EditorImpl implements Editor {
 
   response(json: object): void {
     this._autoCompleteRule.response(json);
+    this._syntaxLanguageRule.response(json);
   }
 }

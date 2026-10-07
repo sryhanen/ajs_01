@@ -47,7 +47,7 @@
 import {EditorSettingMessage} from './editorSettingMessage';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
-import {AutoCompleteRule} from '../../editor/editorRules/autoCompleteRule/autoCompleteRule';
+import {SyntaxLanguageRule} from '../../editor/editorRules/syntaxLanguageRule/syntaxLanguageRule';
 
 export class EditorSettingMessageImpl implements EditorSettingMessage {
   private readonly _message:Message;
@@ -56,9 +56,9 @@ export class EditorSettingMessageImpl implements EditorSettingMessage {
     this._message = new TypedMessage('EDITOR_SETTING', message);
   }
 
-  setEditorLanguage(autoCompleteRule:AutoCompleteRule): void {
+  setEditorLanguage(syntaxLanguageRule:SyntaxLanguageRule): void {
     const languagePayload = this._message.dataAsWebSocketPayload().objectPropertyAsPayload('editor').stringProperty('language');
     const language = `ace/mode/${languagePayload}`;
-    autoCompleteRule.setEditorLanguage(language);
+    syntaxLanguageRule.setEditorLanguage(language);
   }
 }

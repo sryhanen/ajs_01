@@ -48,31 +48,16 @@ import {Requestable} from '../../../channel/requestable';
 import {DplCompleterImpl} from './dplCompleter/dplCompleterImpl';
 import {DplCompleter} from './dplCompleter/dplCompleter';
 import {AutoCompleteRule} from './autoCompleteRule';
-import {EditorSettingMessageImpl} from '../../../message/editorSetting/editorSettingMessageImpl';
-import {MessageImpl} from '../../../message/messageImpl';
-import {WebSocketPayloadImpl} from '../../../webSocketPayload/webSocketPayloadImpl';
 
 export class AutoCompleteRuleImpl implements AutoCompleteRule {
-  private readonly _requestable:Requestable;
   private readonly _dplCompleter:DplCompleter;
-  private readonly _aceLangTools;
-  private _editor:Ace.Editor;
 
   constructor(requestable:Requestable) {
-    this._requestable = requestable;
     this._dplCompleter = new DplCompleterImpl(requestable);
-    this._aceLangTools = ace.require('ace/ext/language_tools');
   }
 
   response(json: object): void {
-    const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    if(message.operation() === 'EDITOR_SETTING') {
-      const editorSettingMessage = new EditorSettingMessageImpl(message);
-      editorSettingMessage.setEditorLanguage(this);
-    }
-    else{
-      this._dplCompleter.response(json);
-    }
+    this._dplCompleter.response(json);
   }
 
   applyTo(editor:Ace.Editor): void {
@@ -81,27 +66,5 @@ export class AutoCompleteRuleImpl implements AutoCompleteRule {
     const snippetCompleter = langTools.snippetCompleter;
     const textCompleter = langTools.textCompleter;
     editor.completers = [this._dplCompleter, keyWordCompleter, snippetCompleter, textCompleter];
-  }
-
-  private requestLanguageOnFirstRowChange(editor:Ace.Editor):void{
-    editor.on('change', (delta:ace.Ace.Delta)=> {
-      if(delta.start.row === 0) {
-        const editorValue = editor.getValue();
-        this._requestable.request({
-          op:'EDITOR_SETTING',
-          data:{
-            paragraphId:'',
-            paragraphText: editorValue
-          }
-        });
-      }
-    });
-  }
-
-  private initializeCompleters():void {
-    const keyWordCompleter = this._aceLangTools.keyWordCompleter;
-    const snippetCompleter = this._aceLangTools.snippetCompleter;
-    const textCompleter = this._aceLangTools.textCompleter;
-    this._aceLangTools.setCompleters([this._dplCompleter, keyWordCompleter, snippetCompleter, textCompleter]);
   }
 }
