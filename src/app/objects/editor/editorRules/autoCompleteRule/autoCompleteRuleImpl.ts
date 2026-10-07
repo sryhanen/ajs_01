@@ -75,17 +75,12 @@ export class AutoCompleteRuleImpl implements AutoCompleteRule {
     }
   }
 
-  setEditorLanguage(language: string): void {
-    if(!this._editor){
-      throw new Error('Editor is undefined, can not set editor language.');
-    }
-    this._editor.getSession().setMode(language);
-  }
-
-  applyTo(editor: Ace.Editor): void {
-    this._editor = editor;
-    this.initializeCompleters();
-    this.requestLanguageOnFirstRowChange(editor);
+  applyTo(editor:Ace.Editor): void {
+    const langTools = ace.require('ace/ext/language_tools');
+    const keyWordCompleter = langTools.keyWordCompleter;
+    const snippetCompleter = langTools.snippetCompleter;
+    const textCompleter = langTools.textCompleter;
+    editor.completers = [this._dplCompleter, keyWordCompleter, snippetCompleter, textCompleter];
   }
 
   private requestLanguageOnFirstRowChange(editor:Ace.Editor):void{
