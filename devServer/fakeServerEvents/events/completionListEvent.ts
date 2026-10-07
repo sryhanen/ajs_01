@@ -46,6 +46,7 @@
 import {WebSocket} from 'ws';
 import {FakeServerEvent} from '../fakeServerEvent';
 import {CompletionListServerResponse} from '../../../src/test/fakes/webSocketServerResponses/completionList/completionListServerResponse';
+import {Message} from '../../../src/app/objects/message/message';
 
 export default class CompletionListEvent implements FakeServerEvent{
   private readonly _webSocket:WebSocket;
@@ -60,7 +61,8 @@ export default class CompletionListEvent implements FakeServerEvent{
     return this._eventId;
   }
 
-  handle(): void {
+  handle(requestMessage: Message): void {
+    const paragraphId = requestMessage.dataAsWebSocketPayload().stringProperty('paragraphId');
     const completions = [
       {
         name: 'fakeCompletion1',
@@ -71,7 +73,7 @@ export default class CompletionListEvent implements FakeServerEvent{
         value: 'fakeCompletion2'
       },
     ];
-    const completionListResponse = new CompletionListServerResponse(completions);
+    const completionListResponse = new CompletionListServerResponse(completions, paragraphId);
     this._webSocket.send(completionListResponse.toJson());
   }
 }
