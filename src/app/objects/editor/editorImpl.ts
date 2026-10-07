@@ -59,32 +59,31 @@ import {RawEditorState} from './rawEditorState';
 import {EditorRule} from './editorRules/editorRule';
 import {AnnotationsRule} from './editorRules/annotationsRule/annotationsRule';
 import {AutoCommitRule} from './editorRules/autoCommitRule/autoCommitRule';
-import {AutoCompleteRule} from './editorRules/autoCompleteRule/autoCompleteRule';
+import {AutoCompleteRuleImpl} from './editorRules/autoCompleteRule/autoCompleteRuleImpl';
 import {EditorStateRule} from './editorRules/editorStateRule/editorStateRule';
 import {ExcludedCommandsRule} from './editorRules/excludedCommandsRule/excludedCommandsRule';
 import {HighlightsRule} from './editorRules/highlightsRule/highlightsRule';
 import {KeyBindingsRule} from './editorRules/keyBindingsRule/keyBindingsRule';
+import {AutoCompleteRule} from './editorRules/autoCompleteRule/autoCompleteRule';
 
 export class EditorImpl implements Editor {
   private readonly _requestable:Requestable;
   private readonly _editorRules:EditorRule[];
   private readonly _renderNode:Signal<RenderNode>;
-  private readonly _completions:WritableSignal<Ace.Completion[]>;
-  private readonly _editorLanguage:WritableSignal<string>;
   private readonly _responseEvents: Map<string, (message:Message) => void>;
+  private readonly _autoCompleteRule:AutoCompleteRule;
 
   constructor(requestable:Requestable, rawEditorState:RawEditorState) {
     this._requestable = requestable;
-    this._completions = signal([]);
-    this._editorLanguage = signal('ace/mode/text');
+    this._autoCompleteRule = new AutoCompleteRuleImpl(this);
     this._editorRules = [
       new AnnotationsRule(),
       new AutoCommitRule(this),
-      new AutoCompleteRule(this, this._completions, this._editorLanguage),
       new EditorStateRule(rawEditorState),
       new ExcludedCommandsRule(),
       new HighlightsRule(),
-      new KeyBindingsRule(this)
+      new KeyBindingsRule(this),
+      this._autoCompleteRule
     ];
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
       editorRules:this._editorRules
@@ -113,11 +112,11 @@ export class EditorImpl implements Editor {
   }
 
   applyCompletions(completions: Ace.Completion[]) {
-    this._completions.set(completions);
+    this._autoCompleteRule.setCompletions(completions);
   }
 
   setEditorLanguage(language: string): void {
-    this._editorLanguage.set(language);
+    this._autoCompleteRule.setEditorLanguage(language);
   }
 
   private editorSettingResponse(message:Message): void {

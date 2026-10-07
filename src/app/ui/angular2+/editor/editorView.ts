@@ -46,7 +46,7 @@
 import {
   AfterViewInit,
   Component,
-  ElementRef, inject, Injector,
+  ElementRef,
   input,
   OnDestroy,
   ViewChild
@@ -66,7 +66,6 @@ export class EditorView implements AfterViewInit, OnDestroy{
   @ViewChild('editorAnchor') editorAnchor: ElementRef;
   editorRules = input.required<EditorRule[]>();
   private _aceEditor: ace.Ace.Editor;
-  private injector = inject(Injector);
 
   ngAfterViewInit() {
     ace.config.set('basePath', '/');
@@ -75,7 +74,7 @@ export class EditorView implements AfterViewInit, OnDestroy{
     ace.config.set('workerPath', '/');
     this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
     this.editorRules().forEach(rule => {
-      rule.applyTo(this._aceEditor, this.injector);
+      rule.applyTo(this._aceEditor);
     });
   }
 

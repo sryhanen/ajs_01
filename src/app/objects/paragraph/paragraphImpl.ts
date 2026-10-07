@@ -76,7 +76,7 @@ export class ParagraphImpl implements Paragraph {
     this._output = new OutputImpl(this);
     const config = this._paragraphData.objectPropertyAsPayload('config');
     const rawEditorState:RawEditorState = {
-      disableEditor: config.booleanProperty('enabled'),
+      disableEditor: !config.booleanProperty('enabled'),
       fontSize: config.numberProperty('fontSize'),
       showLineNumbers: config.booleanProperty('lineNumbers'),
       textValue: this._paragraphData.stringProperty('text')

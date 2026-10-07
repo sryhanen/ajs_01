@@ -44,78 +44,9 @@
  * a licensee so wish it.
  */
 import {EditorRule} from '../editorRule';
-import ace, {Ace} from 'ace-builds';
-import {Requestable} from '../../../channel/requestable';
-import {effect, Injector, WritableSignal} from '@angular/core';
-import {AceCustomCompleterImpl} from './aceCustomCompleter/aceCustomCompleterImpl';
-import {AceCustomCompleter} from './aceCustomCompleter/aceCustomCompleter';
+import {Ace} from 'ace-builds';
 
-export class AutoCompleteRule implements EditorRule {
-  private readonly _requestable:Requestable;
-  private readonly _completions:WritableSignal<Ace.Completion[]>;
-  private readonly _editorLanguage:WritableSignal<string>;
-  private readonly _aceCustomCompleter:AceCustomCompleter;
-  private readonly _aceLangTools;
-
-  constructor(requestable:Requestable,completions:WritableSignal<Ace.Completion[]>, editorLanguage:WritableSignal<string>) {
-    this._requestable = requestable;
-    this._completions = completions;
-    this._editorLanguage = editorLanguage;
-    this._aceCustomCompleter = new AceCustomCompleterImpl();
-    this._aceLangTools = ace.require('ace/ext/language_tools');
-  }
-
-  applyTo(editor: Ace.Editor, injector: Injector): void {
-    this.initializeCompleters(injector);
-    this.requestAutoCompleteOnExecCommand(editor);
-    this.requestLanguageOnFirstRowChange(editor);
-    this.applyLanguageOnLanguageUpdate(editor, injector);
-  }
-
-  private requestAutoCompleteOnExecCommand(editor:Ace.Editor) {
-    editor.commands.on('exec', (eventData)=> {
-      if(eventData.command.name === 'startAutocomplete') {
-        const editorValue = editor.getValue();
-        this._requestable.request({
-          op: 'COMPLETION',
-          data: {
-            paragraphId: '', //Change required in the server
-            buf: editorValue,
-            cursor: editorValue.length,
-          },
-        });
-      }
-    });
-  }
-
-  private requestLanguageOnFirstRowChange(editor:Ace.Editor):void{
-    editor.on('change', (delta:ace.Ace.Delta)=> {
-      if(delta.start.row === 0) {
-        const editorValue = editor.getValue();
-        this._requestable.request({
-          op:'EDITOR_SETTING',
-          data:{
-            paragraphId:'',
-            paragraphText: editorValue
-          }
-        });
-      }
-    });
-  }
-
-  private initializeCompleters(injector: Injector):void {
-    const keyWordCompleter = this._aceLangTools.keyWordCompleter;
-    const snippetCompleter = this._aceLangTools.snippetCompleter;
-    const textCompleter = this._aceLangTools.textCompleter;
-    this._aceLangTools.setCompleters([this._aceCustomCompleter, keyWordCompleter, snippetCompleter, textCompleter]);
-    effect(() => {
-      this._aceCustomCompleter.applyCompletions(this._completions());
-    }, { injector });
-  }
-
-  private applyLanguageOnLanguageUpdate(editor:Ace.Editor, injector: Injector):void {
-    effect(() => {
-      editor.getSession().setMode(this._editorLanguage());
-    }, { injector });
-  }
+export interface AutoCompleteRule extends EditorRule {
+  setCompletions(completions: Ace.Completion[]): void;
+  setEditorLanguage(language: string): void;
 }

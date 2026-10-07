@@ -47,5 +47,5 @@ import {Ace} from 'ace-builds';
 import {Injector} from '@angular/core';
 
 export interface EditorRule {
-  applyTo(editor:Ace.Editor, injector?: Injector):void;
+  applyTo(editor:Ace.Editor):void;
 }
