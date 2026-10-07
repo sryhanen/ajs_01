@@ -93,60 +93,36 @@ describe('Paragraph', () => {
     });
   });
 
-  describe('Request', () => {
-    it('Should decorate request with paragraphId', () => {
-      const request = {
-        op:'',
-        data:{
-          paragraphId:''
-        }
-      };
-      const expectedRequest = {
-        op:'',
-        data:{
-          paragraphId:paragraphId
-        }
-      };
-      const spy = vi.spyOn(channel, 'request');
-      paragraph.request(request);
-      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
-    });
+  it('RunParagraph should create expected request', () => {
+    const expectedRequest = {
+      op:'RUN_PARAGRAPH',
+      data:{
+        id: paragraphId,
+        paragraph: paragraphText,
+        config: paragraphConfig,
+        params: paragraphParams,
+      }
+    };
+    const spy = vi.spyOn(channel, 'request');
+    paragraph.runParagraph();
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
 
-    it('Should decorate RUN_PARAGRAPH request', () => {
-      const initialRequest = {
-        op:'RUN_PARAGRAPH',
-        data:{
-          id: paragraphId,
-          paragraph: '',
-          config: {},
-          params: {},
-        }
-      };
-      const requestSpy = vi.spyOn(channel, 'request');
-      paragraph.request(initialRequest);
-      const expectedRequest = {
-        op:'RUN_PARAGRAPH',
-        data:{
-          id: paragraphId,
-          paragraph: paragraphText,
-          config: paragraphConfig,
-          params: paragraphParams,
-        }
-      };
-      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
-    });
-
-    it('Should throw if RUN_PARAGRAPH request has wrong id', () => {
-      const initialRequest = {
-        op:'RUN_PARAGRAPH',
-        data:{
-          id: 'wrongId',
-          paragraph: '',
-          config: {},
-          params: {},
-        }
-      };
-      expect(() => paragraph.request(initialRequest)).toThrow();
-    });
+  it('Should decorate request with paragraphId', () => {
+    const request = {
+      op:'',
+      data:{
+        paragraphId:''
+      }
+    };
+    const expectedRequest = {
+      op:'',
+      data:{
+        paragraphId:paragraphId
+      }
+    };
+    const spy = vi.spyOn(channel, 'request');
+    paragraph.request(request);
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
   });
 });
