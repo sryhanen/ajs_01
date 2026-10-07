@@ -111,21 +111,13 @@ export class EditorImpl implements Editor {
     }
   }
 
-  applyCompletions(completions: Ace.Completion[]) {
-    this._autoCompleteRule.applyCompletions(completions);
-  }
-
-  setEditorLanguage(language: string): void {
-    this._autoCompleteRule.setEditorLanguage(language);
-  }
-
   private editorSettingResponse(message:Message): void {
     const editorSettingMessage = new EditorSettingsMessageImpl(message);
-    editorSettingMessage.setEditorLanguage(this);
+    editorSettingMessage.setEditorLanguage(this._autoCompleteRule);
   }
 
   private completionListResponse(message:Message): void {
     const completionListMessage = new CompletionListMessageImpl(message);
-    completionListMessage.applyCompletions(this);
+    completionListMessage.applyCompletions(this._autoCompleteRule);
   }
 }

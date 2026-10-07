@@ -45,9 +45,5 @@
  */
 import {Printable} from '../rendering/printable/printable';
 import {Channel} from '../channel/channel';
-import {Ace} from 'ace-builds';
 
-export interface Editor extends Printable, Channel {
-  applyCompletions(completions: Ace.Completion[]):void;
-  setEditorLanguage(language: string): void;
-}
+export interface Editor extends Printable, Channel {}

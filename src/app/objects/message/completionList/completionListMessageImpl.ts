@@ -44,9 +44,9 @@
  * a licensee so wish it.
  */
 import {CompletionListMessage} from './completionListMessage';
-import {Editor} from '../../editor/editor';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
+import {AutoCompleteRule} from '../../editor/editorRules/autoCompleteRule/autoCompleteRule';
 
 export class CompletionListMessageImpl implements CompletionListMessage {
   private readonly _message:Message;
@@ -55,8 +55,8 @@ export class CompletionListMessageImpl implements CompletionListMessage {
     this._message = new TypedMessage('COMPLETION_LIST', message);
   }
 
-  applyCompletions(editor: Editor): void {
+  applyCompletions(autoCompleteRule:AutoCompleteRule): void {
     const completions = this._message.dataAsWebSocketPayload().arrayProperty<{name:string, value:string}>('completions');
-    editor.applyCompletions(completions);
+    autoCompleteRule.applyCompletions(completions);
   }
 }
