@@ -44,17 +44,11 @@
  * a licensee so wish it.
  */
 import {Editor} from './editor';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
-import {Ace} from 'ace-builds';
 import {Requestable} from '../channel/requestable';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {Message} from '../message/message';
-import {CompletionListMessageImpl} from '../message/completionList/completionListMessageImpl';
-import {EditorSettingsMessageImpl} from '../message/editorSettings/editorSettingsMessageImpl';
-import {WebSocketPayloadImpl} from '../webSocketPayload/webSocketPayloadImpl';
-import {MessageImpl} from '../message/messageImpl';
 import {RawEditorState} from './rawEditorState';
 import {EditorRule} from './editorRules/editorRule';
 import {AnnotationsRule} from './editorRules/annotationsRule/annotationsRule';
@@ -70,7 +64,6 @@ export class EditorImpl implements Editor {
   private readonly _requestable:Requestable;
   private readonly _editorRules:EditorRule[];
   private readonly _renderNode:Signal<RenderNode>;
-  private readonly _responseEvents: Map<string, (message:Message) => void>;
   private readonly _autoCompleteRule:AutoCompleteRule;
 
   constructor(requestable:Requestable, rawEditorState:RawEditorState) {
@@ -88,10 +81,6 @@ export class EditorImpl implements Editor {
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
       editorRules:this._editorRules
     }))));
-    this._responseEvents = new Map([
-      ['EDITOR_SETTING', (message) => this.editorSettingResponse(message)],
-      ['COMPLETION_LIST', (message) => this.completionListResponse(message)],
-    ]);
   }
 
   print(): Signal<RenderNode> {
@@ -103,21 +92,6 @@ export class EditorImpl implements Editor {
   }
 
   response(json: object): void {
-    const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    const eventId = message.operation();
-    if(this._responseEvents.has(eventId)){
-      const event = this._responseEvents.get(eventId);
-      event(message);
-    }
-  }
-
-  private editorSettingResponse(message:Message): void {
-    const editorSettingMessage = new EditorSettingsMessageImpl(message);
-    editorSettingMessage.setEditorLanguage(this._autoCompleteRule);
-  }
-
-  private completionListResponse(message:Message): void {
-    const completionListMessage = new CompletionListMessageImpl(message);
-    completionListMessage.applyCompletions(this._autoCompleteRule);
+    this._autoCompleteRule.response(json);
   }
 }
