@@ -56,10 +56,12 @@ export class DplCompleterImpl implements DplCompleter {
 
   constructor(requestable:Requestable) {
     this._requestable = requestable;
-    this._aceEditorCallback = () => {};
   }
 
   applyCompletions(completions:  Ace.Completion[]) {
+    if(!this._aceEditorCallback){
+      throw new Error('Cannot apply completions. Editor not linked to completions.');
+    }
     this._aceEditorCallback(null, completions);
   }
 
