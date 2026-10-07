@@ -91,7 +91,7 @@ export class ParagraphPayloadFactoryImpl implements ParagraphPayloadFactory {
       id: this._id,
       jobName: 'jobName',
       progress: progress,
-      settings: {forms: undefined, params: undefined},
+      settings: {forms: {}, params: {}},
       status: status,
       text: text,
       title: title,

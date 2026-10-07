@@ -80,7 +80,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   updateParagraph(paragraph: Paragraph): void {
     const paragraphId = paragraph.id();
     if(!this._paragraphs().has(paragraphId)){
-      throw new Error(`Paragraph with id $"${paragraphId}" is not part of paragraph collection.`);
+      throw new Error(`Paragraph with id "${paragraphId}" is not part of paragraph collection.`);
     }
     this._paragraphs.update(paragraphs => {
       paragraphs.set(paragraph.id(), paragraph);
