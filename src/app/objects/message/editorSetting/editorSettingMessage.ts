@@ -43,8 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {SyntaxLanguageRule} from '../../editor/editorRules/syntaxLanguageRule/syntaxLanguageRule';
+import {SyntaxLanguageSelectRule} from '../../editor/editorRules/syntaxLanguageSelectRule/syntaxLanguageSelectRule';
 
 export interface EditorSettingMessage {
-  setEditorLanguage(syntaxLanguageRule:SyntaxLanguageRule):void;
+  setEditorLanguage(syntaxLanguageRule:SyntaxLanguageSelectRule):void;
 }

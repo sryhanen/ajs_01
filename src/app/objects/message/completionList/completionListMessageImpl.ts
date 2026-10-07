@@ -46,7 +46,7 @@
 import {CompletionListMessage} from './completionListMessage';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
-import {DplCompleter} from '../../editor/editorRules/autoCompleteRule/dplCompleter/dplCompleter';
+import {DplCompleter} from '../../editor/editorRules/autoCompletionsRule/dplCompleter/dplCompleter';
 
 export class CompletionListMessageImpl implements CompletionListMessage {
   private readonly _message:Message;

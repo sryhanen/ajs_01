@@ -43,9 +43,53 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {EditorRule} from '../editorRule';
-import {Respondable} from '../../../channel/respondable';
+import ace, {Ace} from 'ace-builds';
+import {SyntaxLanguageSelectRule} from './syntaxLanguageSelectRule';
+import {Requestable} from '../../../channel/requestable';
+import {MessageImpl} from '../../../message/messageImpl';
+import {WebSocketPayloadImpl} from '../../../webSocketPayload/webSocketPayloadImpl';
+import {EditorSettingMessageImpl} from '../../../message/editorSetting/editorSettingMessageImpl';
 
-export interface SyntaxLanguageRule extends EditorRule, Respondable {
-  setEditorLanguage(language: string): void;
+export class SyntaxLanguageSelectRuleImpl implements SyntaxLanguageSelectRule {
+  private readonly _requestable:Requestable;
+  private _editor:Ace.Editor;
+
+  constructor(requestable:Requestable) {
+    this._requestable = requestable;
+  }
+
+  applyTo(editor: Ace.Editor): void {
+    this._editor = editor;
+    this.requestLanguageOnFirstRowChange(editor);
+  }
+
+  response(json: object): void {
+    const message = new MessageImpl(new WebSocketPayloadImpl(json));
+    if(message.operation() === 'EDITOR_SETTING') {
+      const editorSettingMessage = new EditorSettingMessageImpl(message);
+      editorSettingMessage.setEditorLanguage(this);
+    }
+  }
+
+  setEditorLanguage(language: string): void {
+    if(!this._editor){
+      throw new Error('Editor is undefined, can not set editor language.');
+    }
+    this._editor.getSession().setMode(language);
+  }
+
+  private requestLanguageOnFirstRowChange(editor:Ace.Editor):void{
+    editor.on('change', (delta:ace.Ace.Delta)=> {
+      if(delta.start.row === 0) {
+        const editorValue = editor.getValue();
+        this._requestable.request({
+          op:'EDITOR_SETTING',
+          data:{
+            paragraphId:'',
+            paragraphText: editorValue
+          }
+        });
+      }
+    });
+  }
 }

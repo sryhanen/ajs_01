@@ -47,7 +47,7 @@
 import {EditorSettingMessage} from './editorSettingMessage';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
-import {SyntaxLanguageRule} from '../../editor/editorRules/syntaxLanguageRule/syntaxLanguageRule';
+import {SyntaxLanguageSelectRule} from '../../editor/editorRules/syntaxLanguageSelectRule/syntaxLanguageSelectRule';
 
 export class EditorSettingMessageImpl implements EditorSettingMessage {
   private readonly _message:Message;
@@ -56,7 +56,7 @@ export class EditorSettingMessageImpl implements EditorSettingMessage {
     this._message = new TypedMessage('EDITOR_SETTING', message);
   }
 
-  setEditorLanguage(syntaxLanguageRule:SyntaxLanguageRule): void {
+  setEditorLanguage(syntaxLanguageRule:SyntaxLanguageSelectRule): void {
     const languagePayload = this._message.dataAsWebSocketPayload().objectPropertyAsPayload('editor').stringProperty('language');
     const language = `ace/mode/${languagePayload}`;
     syntaxLanguageRule.setEditorLanguage(language);

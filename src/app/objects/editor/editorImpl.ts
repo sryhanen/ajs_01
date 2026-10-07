@@ -53,26 +53,26 @@ import {RawEditorState} from './rawEditorState';
 import {EditorRule} from './editorRules/editorRule';
 import {AnnotationsRule} from './editorRules/annotationsRule/annotationsRule';
 import {AutoCommitRule} from './editorRules/autoCommitRule/autoCommitRule';
-import {AutoCompleteRuleImpl} from './editorRules/autoCompleteRule/autoCompleteRuleImpl';
+import {AutoCompletionsRuleImpl} from './editorRules/autoCompletionsRule/autoCompletionsRuleImpl';
 import {EditorStateRule} from './editorRules/editorStateRule/editorStateRule';
 import {ExcludedCommandsRule} from './editorRules/excludedCommandsRule/excludedCommandsRule';
 import {HighlightsRule} from './editorRules/highlightsRule/highlightsRule';
 import {KeyBindingsRule} from './editorRules/keyBindingsRule/keyBindingsRule';
-import {AutoCompleteRule} from './editorRules/autoCompleteRule/autoCompleteRule';
-import {SyntaxLanguageRule} from './editorRules/syntaxLanguageRule/syntaxLanguageRule';
-import {SyntaxLanguageRuleImpl} from './editorRules/syntaxLanguageRule/syntaxLanguageRuleImpl';
+import {AutoCompletionsRule} from './editorRules/autoCompletionsRule/autoCompletionsRule';
+import {SyntaxLanguageSelectRule} from './editorRules/syntaxLanguageSelectRule/syntaxLanguageSelectRule';
+import {SyntaxLanguageSelectRuleImpl} from './editorRules/syntaxLanguageSelectRule/syntaxLanguageSelectRuleImpl';
 
 export class EditorImpl implements Editor {
   private readonly _requestable:Requestable;
   private readonly _editorRules:EditorRule[];
   private readonly _renderNode:Signal<RenderNode>;
-  private readonly _autoCompleteRule:AutoCompleteRule;
-  private readonly _syntaxLanguageRule:SyntaxLanguageRule;
+  private readonly _autoCompleteRule:AutoCompletionsRule;
+  private readonly _syntaxLanguageSelectRule:SyntaxLanguageSelectRule;
 
   constructor(requestable:Requestable, rawEditorState:RawEditorState) {
     this._requestable = requestable;
-    this._autoCompleteRule = new AutoCompleteRuleImpl(this);
-    this._syntaxLanguageRule = new SyntaxLanguageRuleImpl(this);
+    this._autoCompleteRule = new AutoCompletionsRuleImpl(this);
+    this._syntaxLanguageSelectRule = new SyntaxLanguageSelectRuleImpl(this);
     this._editorRules = [
       new AnnotationsRule(),
       new AutoCommitRule(this),
@@ -81,7 +81,7 @@ export class EditorImpl implements Editor {
       new HighlightsRule(),
       new KeyBindingsRule(this),
       this._autoCompleteRule,
-      this._syntaxLanguageRule
+      this._syntaxLanguageSelectRule
     ];
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
       editorRules:this._editorRules
@@ -98,6 +98,6 @@ export class EditorImpl implements Editor {
 
   response(json: object): void {
     this._autoCompleteRule.response(json);
-    this._syntaxLanguageRule.response(json);
+    this._syntaxLanguageSelectRule.response(json);
   }
 }

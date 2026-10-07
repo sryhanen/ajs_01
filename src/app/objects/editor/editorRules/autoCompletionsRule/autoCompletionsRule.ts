@@ -43,28 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ace, {Ace} from 'ace-builds';
-import {Requestable} from '../../../channel/requestable';
-import {DplCompleterImpl} from './dplCompleter/dplCompleterImpl';
-import {DplCompleter} from './dplCompleter/dplCompleter';
-import {AutoCompleteRule} from './autoCompleteRule';
+import {EditorRule} from '../editorRule';
+import {Respondable} from '../../../channel/respondable';
 
-export class AutoCompleteRuleImpl implements AutoCompleteRule {
-  private readonly _dplCompleter:DplCompleter;
-
-  constructor(requestable:Requestable) {
-    this._dplCompleter = new DplCompleterImpl(requestable);
-  }
-
-  response(json: object): void {
-    this._dplCompleter.response(json);
-  }
-
-  applyTo(editor:Ace.Editor): void {
-    const langTools = ace.require('ace/ext/language_tools');
-    const keyWordCompleter = langTools.keyWordCompleter;
-    const snippetCompleter = langTools.snippetCompleter;
-    const textCompleter = langTools.textCompleter;
-    editor.completers = [this._dplCompleter, keyWordCompleter, snippetCompleter, textCompleter];
-  }
-}
+export interface AutoCompletionsRule extends EditorRule, Respondable {}
