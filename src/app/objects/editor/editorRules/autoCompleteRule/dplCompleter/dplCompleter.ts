@@ -44,7 +44,8 @@
  * a licensee so wish it.
  */
 import {Ace} from 'ace-builds';
+import {Respondable} from '../../../../channel/respondable';
 
-export interface AceCustomCompleter extends Ace.Completer {
+export interface DplCompleter extends Ace.Completer, Respondable {
   applyCompletions(completions:  Ace.Completion[]):void;
 }

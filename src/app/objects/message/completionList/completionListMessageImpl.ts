@@ -46,7 +46,7 @@
 import {CompletionListMessage} from './completionListMessage';
 import {Message} from '../message';
 import {TypedMessage} from '../typedMessage/typedMessage';
-import {AutoCompleteRule} from '../../editor/editorRules/autoCompleteRule/autoCompleteRule';
+import {DplCompleter} from '../../editor/editorRules/autoCompleteRule/dplCompleter/dplCompleter';
 
 export class CompletionListMessageImpl implements CompletionListMessage {
   private readonly _message:Message;
@@ -55,8 +55,8 @@ export class CompletionListMessageImpl implements CompletionListMessage {
     this._message = new TypedMessage('COMPLETION_LIST', message);
   }
 
-  applyCompletions(autoCompleteRule:AutoCompleteRule): void {
+  applyCompletions(dplCompleter:DplCompleter): void {
     const completions = this._message.dataAsWebSocketPayload().arrayProperty<{name:string, value:string}>('completions');
-    autoCompleteRule.applyCompletions(completions);
+    dplCompleter.applyCompletions(completions);
   }
 }

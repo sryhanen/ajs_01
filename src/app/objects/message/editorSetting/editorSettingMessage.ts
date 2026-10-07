@@ -45,6 +45,6 @@
  */
 import {AutoCompleteRule} from '../../editor/editorRules/autoCompleteRule/autoCompleteRule';
 
-export interface EditorSettingsMessage {
+export interface EditorSettingMessage {
   setEditorLanguage(autoCompleteRule:AutoCompleteRule):void;
 }

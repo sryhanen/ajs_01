@@ -44,10 +44,8 @@
  * a licensee so wish it.
  */
 import {EditorRule} from '../editorRule';
-import {Ace} from 'ace-builds';
 import {Respondable} from '../../../channel/respondable';
 
 export interface AutoCompleteRule extends EditorRule, Respondable {
-  applyCompletions(completions: Ace.Completion[]): void;
   setEditorLanguage(language: string): void;
 }

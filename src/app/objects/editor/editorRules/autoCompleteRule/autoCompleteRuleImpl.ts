@@ -45,43 +45,34 @@
  */
 import ace, {Ace} from 'ace-builds';
 import {Requestable} from '../../../channel/requestable';
-import {AceCustomCompleterImpl} from './aceCustomCompleter/aceCustomCompleterImpl';
-import {AceCustomCompleter} from './aceCustomCompleter/aceCustomCompleter';
+import {DplCompleterImpl} from './dplCompleter/dplCompleterImpl';
+import {DplCompleter} from './dplCompleter/dplCompleter';
 import {AutoCompleteRule} from './autoCompleteRule';
-import {Message} from '../../../message/message';
-import {EditorSettingsMessageImpl} from '../../../message/editorSettings/editorSettingsMessageImpl';
-import {CompletionListMessageImpl} from '../../../message/completionList/completionListMessageImpl';
+import {EditorSettingMessageImpl} from '../../../message/editorSetting/editorSettingMessageImpl';
 import {MessageImpl} from '../../../message/messageImpl';
 import {WebSocketPayloadImpl} from '../../../webSocketPayload/webSocketPayloadImpl';
 
 export class AutoCompleteRuleImpl implements AutoCompleteRule {
   private readonly _requestable:Requestable;
-  private readonly _aceCustomCompleter:AceCustomCompleter;
+  private readonly _dplCompleter:DplCompleter;
   private readonly _aceLangTools;
   private _editor:Ace.Editor;
-  private readonly _responseEvents: Map<string, (message:Message) => void>;
 
   constructor(requestable:Requestable) {
     this._requestable = requestable;
-    this._aceCustomCompleter = new AceCustomCompleterImpl(requestable);
+    this._dplCompleter = new DplCompleterImpl(requestable);
     this._aceLangTools = ace.require('ace/ext/language_tools');
-    this._responseEvents = new Map([
-      ['EDITOR_SETTING', (message) => this.editorSettingResponse(message)],
-      ['COMPLETION_LIST', (message) => this.completionListResponse(message)],
-    ]);
   }
 
   response(json: object): void {
     const message = new MessageImpl(new WebSocketPayloadImpl(json));
-    const eventId = message.operation();
-    if(this._responseEvents.has(eventId)){
-      const event = this._responseEvents.get(eventId);
-      event(message);
+    if(message.operation() === 'EDITOR_SETTING') {
+      const editorSettingMessage = new EditorSettingMessageImpl(message);
+      editorSettingMessage.setEditorLanguage(this);
     }
-  }
-
-  applyCompletions(completions: Ace.Completion[]): void {
-    this._aceCustomCompleter.applyCompletions(completions);
+    else{
+      this._dplCompleter.response(json);
+    }
   }
 
   setEditorLanguage(language: string): void {
@@ -116,16 +107,6 @@ export class AutoCompleteRuleImpl implements AutoCompleteRule {
     const keyWordCompleter = this._aceLangTools.keyWordCompleter;
     const snippetCompleter = this._aceLangTools.snippetCompleter;
     const textCompleter = this._aceLangTools.textCompleter;
-    this._aceLangTools.setCompleters([this._aceCustomCompleter, keyWordCompleter, snippetCompleter, textCompleter]);
-  }
-
-  private editorSettingResponse(message:Message): void {
-    const editorSettingMessage = new EditorSettingsMessageImpl(message);
-    editorSettingMessage.setEditorLanguage(this);
-  }
-
-  private completionListResponse(message:Message): void {
-    const completionListMessage = new CompletionListMessageImpl(message);
-    completionListMessage.applyCompletions(this);
+    this._aceLangTools.setCompleters([this._dplCompleter, keyWordCompleter, snippetCompleter, textCompleter]);
   }
 }

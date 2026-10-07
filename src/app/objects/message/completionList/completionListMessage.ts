@@ -43,8 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AutoCompleteRule} from '../../editor/editorRules/autoCompleteRule/autoCompleteRule';
+import {DplCompleter} from '../../editor/editorRules/autoCompleteRule/dplCompleter/dplCompleter';
 
 export interface CompletionListMessage {
-  applyCompletions(autoCompleteRule:AutoCompleteRule): void;
+  applyCompletions(dplCompleter:DplCompleter): void;
 }

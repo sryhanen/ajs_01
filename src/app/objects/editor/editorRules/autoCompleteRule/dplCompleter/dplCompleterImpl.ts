@@ -43,22 +43,44 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {DplCompleter} from './dplCompleter';
+import {Ace} from 'ace-builds';
+import {Requestable} from '../../../../channel/requestable';
+import {MessageImpl} from '../../../../message/messageImpl';
+import {WebSocketPayloadImpl} from '../../../../webSocketPayload/webSocketPayloadImpl';
+import {CompletionListMessageImpl} from '../../../../message/completionList/completionListMessageImpl';
 
-import {EditorSettingsMessage} from './editorSettingsMessage';
-import {Message} from '../message';
-import {TypedMessage} from '../typedMessage/typedMessage';
-import {AutoCompleteRule} from '../../editor/editorRules/autoCompleteRule/autoCompleteRule';
+export class DplCompleterImpl implements DplCompleter {
+  private readonly _requestable:Requestable;
+  private _aceEditorCallback: Ace.CompleterCallback;
 
-export class EditorSettingsMessageImpl implements EditorSettingsMessage {
-  private readonly _message:Message;
-
-  constructor(message:Message) {
-    this._message = new TypedMessage('EDITOR_SETTING', message);
+  constructor(requestable:Requestable) {
+    this._requestable = requestable;
+    this._aceEditorCallback = () => {};
   }
 
-  setEditorLanguage(autoCompleteRule:AutoCompleteRule): void {
-    const languagePayload = this._message.dataAsWebSocketPayload().objectPropertyAsPayload('editor').stringProperty('language');
-    const language = `ace/mode/${languagePayload}`;
-    autoCompleteRule.setEditorLanguage(language);
+  applyCompletions(completions:  Ace.Completion[]) {
+    this._aceEditorCallback(null, completions);
+  }
+
+  getCompletions(editor: Ace.Editor, session: Ace.EditSession, position: Ace.Point, prefix: string, callback: Ace.CompleterCallback): void {
+    const editorValue = editor.getValue();
+    this._requestable.request({
+      op: 'COMPLETION',
+      data: {
+        paragraphId: '', //Change required in the server
+        buf: editorValue,
+        cursor: editorValue.length,
+      },
+    });
+    this._aceEditorCallback = callback;
+  }
+
+  response(json: object): void {
+    const message = new MessageImpl(new WebSocketPayloadImpl(json));
+    if(message.operation() === 'COMPLETION_LIST') {
+      const completionListMessage = new CompletionListMessageImpl(message);
+      completionListMessage.applyCompletions(this);
+    }
   }
 }
