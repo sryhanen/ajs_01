@@ -57,11 +57,13 @@ describe('Paragraph', () => {
   const paragraphParams = {
     paramsValue:'params value1'
   };
+  const paragraphTitle = 'Paragraph title';
   let paragraphData: {
     config:object,
     settings:object,
     text:string,
     id:string,
+    title:string,
   };
   let channel: Channel;
   let paragraph: Paragraph;
@@ -72,7 +74,8 @@ describe('Paragraph', () => {
         params: paragraphParams,
       },
       text: paragraphText,
-      id:paragraphId
+      id:paragraphId,
+      title:paragraphTitle,
     };
     channel = new FakeChannel();
     paragraph = new ParagraphImpl(channel, paragraphData);
@@ -123,6 +126,35 @@ describe('Paragraph', () => {
     };
     const spy = vi.spyOn(channel, 'request');
     paragraph.request(request);
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
+
+  it('Should decorate commit paragraph request without overwriting text', () => {
+    const textValue = 'commit paragraph text value';
+    const commitParagraphRequest = {
+      op:'COMMIT_PARAGRAPH',
+      data:{
+        id: '',
+        noteId: '',
+        title: '',
+        paragraph: textValue,
+        config: '',
+        params: '',
+      }
+    };
+    const spy = vi.spyOn(channel, 'request');
+    paragraph.request(commitParagraphRequest);
+    const expectedRequest = {
+      op:'COMMIT_PARAGRAPH',
+      data:{
+        id: paragraphId,
+        noteId: '',
+        title: paragraphTitle,
+        paragraph: textValue,
+        config: paragraphConfig,
+        params: paragraphParams,
+      }
+    };
     expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
   });
 });

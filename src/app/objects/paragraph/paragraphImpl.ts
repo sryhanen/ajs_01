@@ -158,17 +158,16 @@ export class ParagraphImpl implements Paragraph {
   }
 
   private commitParagraphRequest(message:Message):void{
-   // const commitParagraphRequest = {
-   //   op:'COMMIT_PARAGRAPH',
-   //   data:{
-   //     id: '',
-   //     noteId: '',
-   //     title: '',
-   //     paragraph: editor.getValue(),
-   //     config: '',
-   //     params: '',
-   //   }
-   // };
-
+    const commitParagraphRequest = {
+      op:'COMMIT_PARAGRAPH',
+      data:{
+        ...message.data(),
+        id: this.id(),
+        title: this._paragraphData.stringProperty('title'),
+        config: this._paragraphData.objectProperty('config'),
+        params: this._paragraphData.objectPropertyAsPayload('settings').objectProperty('params'),
+      }
+    };
+    this._channel.request(commitParagraphRequest);
   }
 }
