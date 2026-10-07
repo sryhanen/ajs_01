@@ -57,7 +57,7 @@ export class AutoCompleteRuleImpl implements AutoCompleteRule {
 
   constructor(requestable:Requestable) {
     this._requestable = requestable;
-    this._aceCustomCompleter = new AceCustomCompleterImpl();
+    this._aceCustomCompleter = new AceCustomCompleterImpl(requestable);
     this._aceLangTools = ace.require('ace/ext/language_tools');
   }
 
@@ -75,24 +75,7 @@ export class AutoCompleteRuleImpl implements AutoCompleteRule {
   applyTo(editor: Ace.Editor): void {
     this._editor = editor;
     this.initializeCompleters();
-    this.requestAutoCompleteOnExecCommand(editor);
     this.requestLanguageOnFirstRowChange(editor);
-  }
-
-  private requestAutoCompleteOnExecCommand(editor:Ace.Editor) {
-    editor.commands.on('exec', (eventData)=> {
-      if(eventData.command.name === 'startAutocomplete') {
-        const editorValue = editor.getValue();
-        this._requestable.request({
-          op: 'COMPLETION',
-          data: {
-            paragraphId: '', //Change required in the server
-            buf: editorValue,
-            cursor: editorValue.length,
-          },
-        });
-      }
-    });
   }
 
   private requestLanguageOnFirstRowChange(editor:Ace.Editor):void{

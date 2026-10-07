@@ -45,11 +45,14 @@
  */
 import {AceCustomCompleter} from './aceCustomCompleter';
 import {Ace} from 'ace-builds';
+import {Requestable} from '../../../../channel/requestable';
 
 export class AceCustomCompleterImpl implements AceCustomCompleter {
+  private readonly _requestable:Requestable;
   private _aceEditorCallback: Ace.CompleterCallback;
 
-  constructor() {
+  constructor(requestable:Requestable) {
+    this._requestable = requestable;
     this._aceEditorCallback = () => {};
   }
 
@@ -58,6 +61,15 @@ export class AceCustomCompleterImpl implements AceCustomCompleter {
   }
 
   getCompletions(editor: Ace.Editor, session: Ace.EditSession, position: Ace.Point, prefix: string, callback: Ace.CompleterCallback): void {
+    const editorValue = editor.getValue();
+    this._requestable.request({
+      op: 'COMPLETION',
+      data: {
+        paragraphId: '', //Change required in the server
+        buf: editorValue,
+        cursor: editorValue.length,
+      },
+    });
     this._aceEditorCallback = callback;
   }
 }
