@@ -47,6 +47,6 @@ import {EditorRule} from '../editorRule';
 import {Ace} from 'ace-builds';
 
 export interface AutoCompleteRule extends EditorRule {
-  setCompletions(completions: Ace.Completion[]): void;
+  applyCompletions(completions: Ace.Completion[]): void;
   setEditorLanguage(language: string): void;
 }

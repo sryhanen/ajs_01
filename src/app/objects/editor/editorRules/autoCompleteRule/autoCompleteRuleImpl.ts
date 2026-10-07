@@ -61,7 +61,7 @@ export class AutoCompleteRuleImpl implements AutoCompleteRule {
     this._aceLangTools = ace.require('ace/ext/language_tools');
   }
 
-  setCompletions(completions: Ace.Completion[]): void {
+  applyCompletions(completions: Ace.Completion[]): void {
     this._aceCustomCompleter.applyCompletions(completions);
   }
 

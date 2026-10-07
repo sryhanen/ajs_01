@@ -112,7 +112,7 @@ export class EditorImpl implements Editor {
   }
 
   applyCompletions(completions: Ace.Completion[]) {
-    this._autoCompleteRule.setCompletions(completions);
+    this._autoCompleteRule.applyCompletions(completions);
   }
 
   setEditorLanguage(language: string): void {
