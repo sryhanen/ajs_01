@@ -73,7 +73,7 @@ export class EditorImpl implements Editor {
   private readonly _editorLanguage:WritableSignal<string>;
   private readonly _responseEvents: Map<string, (message:Message) => void>;
 
-  constructor(requestable:Requestable, rawEditorState:RawEditorState={disableEditor:false, fontSize:12, showLineNumbers:true, textValue:''}) {
+  constructor(requestable:Requestable, rawEditorState:RawEditorState) {
     this._requestable = requestable;
     this._completions = signal([]);
     this._editorLanguage = signal('ace/mode/text');

@@ -59,6 +59,7 @@ import {PropertyDecoratedMessage} from '../message/propertyDecoratedMessage/prop
 import {Message} from '../message/message';
 import {Editor} from '../editor/editor';
 import {EditorImpl} from '../editor/editorImpl';
+import {RawEditorState} from '../editor/rawEditorState';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _channel: Channel;
@@ -73,7 +74,14 @@ export class ParagraphImpl implements Paragraph {
     this._channel = channel;
     this._paragraphData = new WebSocketPayloadImpl(paragraph);
     this._output = new OutputImpl(this);
-    this._editor = new EditorImpl(this);
+    const config = this._paragraphData.objectPropertyAsPayload('config');
+    const rawEditorState:RawEditorState = {
+      disableEditor: config.booleanProperty('enabled'),
+      fontSize: config.numberProperty('fontSize'),
+      showLineNumbers: config.booleanProperty('lineNumbers'),
+      textValue: this._paragraphData.stringProperty('text')
+    };
+    this._editor = new EditorImpl(this, rawEditorState);
     this.initializeOutput(this._paragraphData, this._output);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
       output:this._output.print()(),
