@@ -75,8 +75,9 @@ export class ParagraphImpl implements Paragraph {
     this._paragraphData = new WebSocketPayloadImpl(paragraph);
     this._output = new OutputImpl(this);
     const config = this._paragraphData.objectPropertyAsPayload('config');
+    const paragraphStatus = this._paragraphData.stringProperty('status');
     const rawEditorState:RawEditorState = {
-      disableEditor: !config.booleanProperty('enabled'),
+      disableEditor: paragraphStatus === 'PENDING' || paragraphStatus === 'RUNNING',
       fontSize: config.numberProperty('fontSize'),
       showLineNumbers: config.booleanProperty('lineNumbers'),
       textValue: this._paragraphData.stringProperty('text')
