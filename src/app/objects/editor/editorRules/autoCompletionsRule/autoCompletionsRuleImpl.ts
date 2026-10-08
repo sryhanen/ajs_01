@@ -59,6 +59,7 @@ export class AutoCompletionsRuleImpl implements AutoCompletionsRule {
   }
 
   applyTo(editor: ace.Ace.Editor): void {
+    editor.setOption('enableBasicAutocompletion', true);
     const langTools = ace.require('ace/ext/language_tools');
     const keyWordCompleter = langTools.keyWordCompleter;
     const snippetCompleter = langTools.snippetCompleter;

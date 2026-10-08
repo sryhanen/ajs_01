@@ -65,9 +65,6 @@ export class EditorStateRule implements EditorRule {
     editor.renderer.setShowGutter(this._rawEditorState.showLineNumbers);
     editor.setShowFoldWidgets(false);
     editor.getSession().setUseWrapMode(true);
-    editor.setOptions({
-      maxLines: 30,
-      enableBasicAutocompletion: true,
-    });
+    editor.setOption('maxLines', 30);
   }
 }
