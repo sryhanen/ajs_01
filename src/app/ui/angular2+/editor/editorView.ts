@@ -57,7 +57,7 @@ import {EditorRule} from '../../../objects/editor/editorRules/editorRule';
 @Component({
   selector: 'editor',
   template: `
-    <div class="paragraph-editor">
+    <div class="paragraph-editor my-2">
       <pre #editorAnchor class="editor-container"></pre>
     </div>
   `
