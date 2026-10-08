@@ -43,26 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ace from 'ace-builds';
-import {DplCompleter} from './dplCompleter/dplCompleter';
 import {AutoCompletionsRule} from './autoCompletionsRule';
+import {AutoCompletionsRuleImpl} from './autoCompletionsRuleImpl';
+import {Requestable} from '../../../channel/requestable';
+import {FakeChannel} from '../../../../../test/fakes/channel/fakeChannel';
+import {DplCompleter} from './dplCompleter/dplCompleter';
+import {DplCompleterImpl} from './dplCompleter/dplCompleterImpl';
 
-export class AutoCompletionsRuleImpl implements AutoCompletionsRule {
-  private readonly _dplCompleter:DplCompleter;
+describe('AutoCompletionsRule unit test', () => {
+  const requestable:Requestable = new FakeChannel();
+  const dplCompleter:DplCompleter = new DplCompleterImpl(requestable);
+  const autoCompletionsRule:AutoCompletionsRule = new AutoCompletionsRuleImpl(dplCompleter);
 
-  constructor(dplCompleter:DplCompleter) {
-    this._dplCompleter = dplCompleter;
-  }
+  it('Should respond DplCompleter', () => {
+    const dplCompleterSpy = vi.spyOn(dplCompleter, 'response');
+    const response = {
+      op:'test',
+      data:{}
+    };
+    autoCompletionsRule.response(response);
+    expect(dplCompleterSpy).toHaveBeenCalledExactlyOnceWith(response);
+  });
 
-  response(json: object): void {
-    this._dplCompleter.response(json);
-  }
-
-  applyTo(editor: ace.Ace.Editor): void {
-    const langTools = ace.require('ace/ext/language_tools');
-    const keyWordCompleter = langTools.keyWordCompleter;
-    const snippetCompleter = langTools.snippetCompleter;
-    const textCompleter = langTools.textCompleter;
-    editor.completers = [this._dplCompleter, keyWordCompleter, snippetCompleter, textCompleter];
-  }
-}
+  // applyTo method cannot be tested due to the language tools import.
+  // const langTools = ace.require('ace/ext/language_tools');
+});

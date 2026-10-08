@@ -61,6 +61,7 @@ import {KeyBindingsRule} from './editorRules/keyBindingsRule/keyBindingsRule';
 import {AutoCompletionsRule} from './editorRules/autoCompletionsRule/autoCompletionsRule';
 import {SyntaxLanguageSelectRule} from './editorRules/syntaxLanguageSelectRule/syntaxLanguageSelectRule';
 import {SyntaxLanguageSelectRuleImpl} from './editorRules/syntaxLanguageSelectRule/syntaxLanguageSelectRuleImpl';
+import {DplCompleterImpl} from './editorRules/autoCompletionsRule/dplCompleter/dplCompleterImpl';
 
 export class EditorImpl implements Editor {
   private readonly _requestable:Requestable;
@@ -71,7 +72,7 @@ export class EditorImpl implements Editor {
 
   constructor(requestable:Requestable, rawEditorState:RawEditorState) {
     this._requestable = requestable;
-    this._autoCompleteRule = new AutoCompletionsRuleImpl(this);
+    this._autoCompleteRule = new AutoCompletionsRuleImpl(new DplCompleterImpl(this));
     this._syntaxLanguageSelectRule = new SyntaxLanguageSelectRuleImpl(this);
     this._editorRules = [
       new AnnotationsRule(),

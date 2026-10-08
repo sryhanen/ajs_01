@@ -43,26 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {AnnotationsRule} from './annotationsRule';
 import ace from 'ace-builds';
-import {DplCompleter} from './dplCompleter/dplCompleter';
-import {AutoCompletionsRule} from './autoCompletionsRule';
 
-export class AutoCompletionsRuleImpl implements AutoCompletionsRule {
-  private readonly _dplCompleter:DplCompleter;
+describe('AnnotationsRule unit test', () => {
+  const annotationsRule = new AnnotationsRule();
+  const aceEditor = ace.edit(document.createElement('div'));
+  annotationsRule.applyTo(aceEditor);
 
-  constructor(dplCompleter:DplCompleter) {
-    this._dplCompleter = dplCompleter;
-  }
-
-  response(json: object): void {
-    this._dplCompleter.response(json);
-  }
-
-  applyTo(editor: ace.Ace.Editor): void {
-    const langTools = ace.require('ace/ext/language_tools');
-    const keyWordCompleter = langTools.keyWordCompleter;
-    const snippetCompleter = langTools.snippetCompleter;
-    const textCompleter = langTools.textCompleter;
-    editor.completers = [this._dplCompleter, keyWordCompleter, snippetCompleter, textCompleter];
-  }
-}
+  it('Should add annotations for time-expensive query', () => {
+    const timeExpensiveQuery = 'index=*';
+    const annotationsBeforeValue = aceEditor.session.getAnnotations();
+    aceEditor.setValue(timeExpensiveQuery);
+    const annotationsAfterValue = aceEditor.session.getAnnotations();
+    expect(annotationsBeforeValue).toHaveLength(0);
+    expect(annotationsAfterValue).toHaveLength(1);
+  });
+});
