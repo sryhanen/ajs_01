@@ -91,6 +91,7 @@ export class ParagraphImpl implements Paragraph {
     this._paragraphIdFilter = new MessagePropertyEqualsFilter('paragraphId', this.id());
     this._requestEvents = new Map([
       ['COMMIT_PARAGRAPH', (message) => this.commitParagraphRequest(message)],
+      ['RUN_PARAGRAPH', () => this.runParagraph()]
     ]);
   }
 

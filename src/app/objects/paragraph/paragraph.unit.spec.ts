@@ -80,7 +80,7 @@ describe('Paragraph', () => {
   });
 
   it('RunParagraph should create expected request', () => {
-    const expectedRequest = {
+    const expectedRunParagraphRequest = {
       op:'RUN_PARAGRAPH',
       data:{
         id: paragraphId,
@@ -91,7 +91,25 @@ describe('Paragraph', () => {
     };
     const spy = vi.spyOn(channel, 'request');
     paragraph.runParagraph();
-    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRunParagraphRequest);
+  });
+
+  it('It decorate run paragraph request', () => {
+    const runParagraphRequest = {
+      op:'RUN_PARAGRAPH',
+    };
+    const spy = vi.spyOn(channel, 'request');
+    paragraph.request(runParagraphRequest);
+    const expectedRunParagraphRequest = {
+      op:'RUN_PARAGRAPH',
+      data:{
+        id: paragraphId,
+        paragraph: paragraphText,
+        config: paragraphPayload.config,
+        params: paragraphPayload.settings.params,
+      }
+    };
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRunParagraphRequest);
   });
 
   it('Should decorate request with paragraphId', () => {
