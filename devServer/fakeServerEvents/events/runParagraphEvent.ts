@@ -119,12 +119,9 @@ export default class RunParagraphEvent implements FakeServerEvent {
     const finalOutput= this._fakeOutputPayloadFactory.dataTablesOutputPayload(finalOutputData);
     const paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, finalOutput);
     messageQueue.push(paragraphOutputResponse.toJson());
-    messageQueue.push(new ParagraphServerResponse(
-      executedParagraph.withStatus('FINISHED').withProgress(100).withOutput(
-        {data: finalOutput, options: outputOptions, type:OutputType.dataTables, isAggregated:true}
-      )
-    ).toJson());
-    this.updateNotebook(executedParagraph);
+    const finalParagraph = executedParagraph.withStatus('FINISHED').withProgress(100).withOutput(finalOutput);
+    messageQueue.push(new ParagraphServerResponse(finalParagraph).toJson());
+    this.updateNotebook(finalParagraph);
     for(let i = 0; i < messageQueue.length; i++) {
       const timeout =  (i + 1) * 1000;
       setTimeout(() => {
