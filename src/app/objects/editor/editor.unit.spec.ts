@@ -65,7 +65,19 @@ describe('Editor unit test', () => {
   });
 
   it('Should print', () => {
-
+    const printed = editor.print()();
+    const inputs = printed.inputs()();
+    expect(printed.isStub()).toBe(false);
+    expect(inputs['editorRules']).toBeDefined();
   });
 
+  it('Should request channel', () => {
+    const request = {
+      op:'test',
+      data:{}
+    };
+    const requestSpy = vi.spyOn(requestable, 'request');
+    editor.request(request);
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
 });
