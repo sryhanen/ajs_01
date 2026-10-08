@@ -48,7 +48,7 @@ import {
   Component,
   ElementRef,
   input,
-  OnDestroy,
+  OnChanges,
   ViewChild
 } from '@angular/core';
 import ace from 'ace-builds';
@@ -62,7 +62,7 @@ import {EditorRule} from '../../../objects/editor/editorRules/editorRule';
     </div>
   `
 })
-export class EditorView implements AfterViewInit, OnDestroy{
+export class EditorView implements AfterViewInit, OnChanges{
   @ViewChild('editorAnchor') editorAnchor: ElementRef;
   editorRules = input.required<EditorRule[]>();
   private _aceEditor: ace.Ace.Editor;
@@ -72,13 +72,22 @@ export class EditorView implements AfterViewInit, OnDestroy{
     ace.config.set('modePath', '/');
     ace.config.set('themePath', '/');
     ace.config.set('workerPath', '/');
+    this.initializeEditor();
+  }
+
+  ngOnChanges() {
+    if(this._aceEditor){
+      this.editorAnchor.nativeElement.className = '';
+      this.editorAnchor.nativeElement.classList.add('editor-container');
+      this._aceEditor.destroy();
+      this.initializeEditor();
+    }
+  }
+
+  private initializeEditor():void{
     this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
     this.editorRules().forEach(rule => {
       rule.applyTo(this._aceEditor);
     });
-  }
-
-  ngOnDestroy() {
-    this._aceEditor.destroy();
   }
 }
