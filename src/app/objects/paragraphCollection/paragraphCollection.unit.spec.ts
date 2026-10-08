@@ -84,14 +84,8 @@ describe('ParagraphCollection unit test', () => {
   it('Should delegate EXECUTE_PARAGRAPH request', () => {
     const paragraphId = 'para1';
     const paragraphText = 'paragraph text';
-    const paragraphConfig = {test1:'test1'};
-    const paragraphSettings = {params:{test2:'test2'}};
-    paragraphCollection = new ParagraphCollectionImpl(channel, [{
-      id:paragraphId,
-      text:paragraphText,
-      config:paragraphConfig,
-      settings:paragraphSettings,
-    }]);
+    const paragraphPayload = new ParagraphPayloadFactoryImpl({id:paragraphId}).withText(paragraphText).toPayload();
+    paragraphCollection = new ParagraphCollectionImpl(channel, [paragraphPayload]);
     const executeParagraphRequest = {
       op:'EXECUTE_PARAGRAPH',
       data:{
@@ -105,8 +99,8 @@ describe('ParagraphCollection unit test', () => {
       data:{
         id:paragraphId,
         paragraph:paragraphText,
-        config:paragraphConfig,
-        params:paragraphSettings.params
+        config:paragraphPayload.config,
+        params:paragraphPayload.settings.params
       }
     };
     expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);

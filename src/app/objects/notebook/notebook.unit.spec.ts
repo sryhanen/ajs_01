@@ -47,37 +47,34 @@ import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {Notebook} from './notebook';
 import {NotebookImpl} from './notebookImpl';
+import {NotebookPayload} from '../../../test/fakes/notebook/notebookPayload';
+import {NotebookPayloadFactoryImpl} from '../../../test/fakes/notebook/notebookPayloadFactoryImpl';
 
 describe('Notebook unit test', () => {
   const notebookId = 'noteId';
-  const notebookParagraphs = [
-    {id:'paragraph1'}
-  ];
-  let notebookData: {id:string, paragraphs?: {id:string}[]};
+  let notebookPayload:NotebookPayload;
   let channel: Channel;
   let notebook: Notebook;
 
   beforeEach(() => {
-    notebookData = {
-      id: notebookId,
-      paragraphs:notebookParagraphs
-    };
+    const notebookPayloadFactory = new NotebookPayloadFactoryImpl({id:notebookId});
+    notebookPayload = notebookPayloadFactory.toPayload();
     channel = new FakeChannel();
   });
 
   describe('Birth', () => {
     it('Should have been initialized', () =>{
-      notebook = new NotebookImpl(channel, notebookData);
+      notebook = new NotebookImpl(channel, notebookPayload);
       expect(notebook).toBeInstanceOf(NotebookImpl);
     });
 
     it('Should have id', () => {
-      notebook = new NotebookImpl(channel, notebookData);
+      notebook = new NotebookImpl(channel, notebookPayload);
       expect(notebook.id()).toEqual(notebookId);
     });
 
     it('Should print', () => {
-      notebook = new NotebookImpl(channel, notebookData);
+      notebook = new NotebookImpl(channel, notebookPayload);
       const notebookPrinted = notebook.print()();
       expect(notebookPrinted.isStub()).toBe(false);
     });
@@ -87,7 +84,7 @@ describe('Notebook unit test', () => {
     let channelSpy;
     beforeEach(() => {
       channelSpy = vi.spyOn(channel, 'request');
-      notebook = new NotebookImpl(channel, notebookData);
+      notebook = new NotebookImpl(channel, notebookPayload);
     });
 
     it('Should decorate with noteId', () => {

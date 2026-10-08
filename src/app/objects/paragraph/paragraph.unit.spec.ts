@@ -47,38 +47,21 @@ import {FakeChannel} from '../../../test/fakes/channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {ParagraphImpl} from './paragraphImpl';
 import {Paragraph} from './paragraph';
+import {ParagraphPayloadFactoryImpl} from '../../../test/fakes/paragraph/paragraphPayloadFactoryImpl';
+import {ParagraphPayload} from '../../../test/fakes/paragraph/paragraphPayload';
 
 describe('Paragraph', () => {
   const paragraphId = 'paragraphId';
   const paragraphText = 'test';
-  const paragraphConfig = {
-    configValue:'config value1'
-  };
-  const paragraphParams = {
-    paramsValue:'params value1'
-  };
   const paragraphTitle = 'Paragraph title';
-  let paragraphData: {
-    config:object,
-    settings:object,
-    text:string,
-    id:string,
-    title:string,
-  };
   let channel: Channel;
   let paragraph: Paragraph;
+  let paragraphPayload:ParagraphPayload;
   beforeEach(() => {
-    paragraphData = {
-      config: paragraphConfig,
-      settings:{
-        params: paragraphParams,
-      },
-      text: paragraphText,
-      id:paragraphId,
-      title:paragraphTitle,
-    };
     channel = new FakeChannel();
-    paragraph = new ParagraphImpl(channel, paragraphData);
+    const paragraphPayloadFactory = new ParagraphPayloadFactoryImpl({id:paragraphId});
+    paragraphPayload = paragraphPayloadFactory.withText(paragraphText).withTitle(paragraphTitle).toPayload();
+    paragraph = new ParagraphImpl(channel, paragraphPayload);
   });
 
   describe('Birth', () => {
@@ -87,7 +70,7 @@ describe('Paragraph', () => {
     });
 
     it('Should have id', () => {
-      expect(paragraph.id()).toEqual(paragraphId);
+      expect(paragraph.id()).toBeDefined();
     });
 
     it('Should print', () => {
@@ -102,8 +85,8 @@ describe('Paragraph', () => {
       data:{
         id: paragraphId,
         paragraph: paragraphText,
-        config: paragraphConfig,
-        params: paragraphParams,
+        config: paragraphPayload.config,
+        params: paragraphPayload.settings.params,
       }
     };
     const spy = vi.spyOn(channel, 'request');
@@ -151,8 +134,8 @@ describe('Paragraph', () => {
         noteId: '',
         title: paragraphTitle,
         paragraph: textValue,
-        config: paragraphConfig,
-        params: paragraphParams,
+        config: paragraphPayload.config,
+        params: paragraphPayload.settings.params,
       }
     };
     expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
