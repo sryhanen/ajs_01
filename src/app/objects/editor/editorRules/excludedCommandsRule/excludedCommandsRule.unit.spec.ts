@@ -43,39 +43,18 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {EditorRule} from '../editorRule';
-import {Ace} from 'ace-builds';
-import {Requestable} from '../../../channel/requestable';
+import {ExcludedCommandsRule} from './excludedCommandsRule';
+import ace from 'ace-builds';
 
-export class KeyBindingsRule implements EditorRule {
-  private readonly _requestable:Requestable;
+describe('ExcludedCommandsRule unit test', () => {
+  const excludedCommandsRule = new ExcludedCommandsRule();
+  const editor = ace.edit(document.createElement('div'));
 
-  constructor(requestable:Requestable) {
-    this._requestable = requestable;
-  }
-
-  applyTo(editor: Ace.Editor): void {
-    editor.commands.bindKey('tab', 'startAutocomplete');
-    editor.commands.bindKey('ctrl-space', null);
-
-    const requestable = this._requestable;
-    editor.commands.addCommand({
-      name: 'Run paragraph',
-      bindKey: {
-        win: 'Shift-Enter',
-        mac: 'Shift-Enter'
-      },
-      exec: function() {
-        requestable.request({
-          op:'RUN_PARAGRAPH',
-          data: {
-            id: '',
-            paragraph: '',
-            config: {},
-            params: {},
-          },
-        });
-      }
-    });
-  }
-}
+  it('Should remove commands', () => {
+    excludedCommandsRule.applyTo(editor);
+    const editorCommands = editor.commands.commands;
+    expect(editorCommands['showSettingsMenu']).toBeUndefined();
+    expect(editorCommands['find']).toBeUndefined();
+    expect(editorCommands['replace']).toBeUndefined();
+  });
+});

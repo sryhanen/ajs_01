@@ -43,39 +43,36 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {EditorRule} from '../editorRule';
-import {Ace} from 'ace-builds';
-import {Requestable} from '../../../channel/requestable';
+import ace from 'ace-builds';
+import {HighlightsRule} from './highlightsRule';
 
-export class KeyBindingsRule implements EditorRule {
-  private readonly _requestable:Requestable;
+describe('HighlightsRule unit test', () => {
+  const highlightsRule = new HighlightsRule();
+  let editor:ace.Editor;
 
-  constructor(requestable:Requestable) {
-    this._requestable = requestable;
-  }
+  beforeEach(() => {
+    editor = ace.edit(document.createElement('div'));
+    highlightsRule.applyTo(editor);
+  });
 
-  applyTo(editor: Ace.Editor): void {
-    editor.commands.bindKey('tab', 'startAutocomplete');
-    editor.commands.bindKey('ctrl-space', null);
+  it('Should set highlights off by default', () => {
+    expect(editor.getHighlightActiveLine()).toBe(false);
+    expect(editor.getHighlightGutterLine()).toBe(false);
+  });
 
-    const requestable = this._requestable;
-    editor.commands.addCommand({
-      name: 'Run paragraph',
-      bindKey: {
-        win: 'Shift-Enter',
-        mac: 'Shift-Enter'
-      },
-      exec: function() {
-        requestable.request({
-          op:'RUN_PARAGRAPH',
-          data: {
-            id: '',
-            paragraph: '',
-            config: {},
-            params: {},
-          },
-        });
-      }
-    });
-  }
-}
+  it('Should set highlights on during focus', () => {
+    // eslint-disable-next-line
+    (editor as any)._emit('focus'); //use object internals to evoke the focus event due to absence of browser environment
+    expect(editor.getHighlightActiveLine()).toBe(true);
+    expect(editor.getHighlightGutterLine()).toBe(true);
+  });
+
+  it('Should set highlights off during blur', () => {
+    // eslint-disable-next-line
+    (editor as any)._emit('focus'); // use object internals to evoke the focus event due to absence of browser environment
+    // eslint-disable-next-line
+    (editor as any)._emit('blur'); // use object internals to evoke the focus event due to absence of browser environment
+    expect(editor.getHighlightActiveLine()).toBe(false);
+    expect(editor.getHighlightGutterLine()).toBe(false);
+  });
+});

@@ -43,39 +43,42 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {EditorRule} from '../editorRule';
-import {Ace} from 'ace-builds';
+import ace from 'ace-builds';
+import {KeyBindingsRule} from './keyBindingsRule';
 import {Requestable} from '../../../channel/requestable';
+import {FakeChannel} from '../../../../../test/fakes/channel/fakeChannel';
 
-export class KeyBindingsRule implements EditorRule {
-  private readonly _requestable:Requestable;
+describe('KeyBindingsRule unit test', () => {
+  const requestable:Requestable = new FakeChannel();
+  const keyBindingsRule = new KeyBindingsRule(requestable);
+  const editor = ace.edit(document.createElement('div'));
+  keyBindingsRule.applyTo(editor);
 
-  constructor(requestable:Requestable) {
-    this._requestable = requestable;
-  }
+  it('Should have key bindings', () => {
+    expect(editor.commands.commandKeyBinding['tab'][1]).toBe('startAutocomplete');
+    expect(editor.commands.commandKeyBinding['ctrl-space']).toBeUndefined();
+  });
 
-  applyTo(editor: Ace.Editor): void {
-    editor.commands.bindKey('tab', 'startAutocomplete');
-    editor.commands.bindKey('ctrl-space', null);
-
-    const requestable = this._requestable;
-    editor.commands.addCommand({
-      name: 'Run paragraph',
-      bindKey: {
-        win: 'Shift-Enter',
-        mac: 'Shift-Enter'
+  it('Should have custom key binding for running paragraph', () => {
+    const aceTextArea = editor.textInput.getElement();
+    const requestSpy = vi.spyOn(requestable, 'request');
+    aceTextArea.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Enter',
+      code: 'Enter',
+      keyCode: 13, // Ace editor seems to rely on keyCode
+      shiftKey: true,
+      bubbles: true
+    }));
+    const expectedRequest = {
+      op:'RUN_PARAGRAPH',
+      data: {
+        id: '',
+        paragraph: '',
+        config: {},
+        params: {},
       },
-      exec: function() {
-        requestable.request({
-          op:'RUN_PARAGRAPH',
-          data: {
-            id: '',
-            paragraph: '',
-            config: {},
-            params: {},
-          },
-        });
-      }
-    });
-  }
-}
+    };
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
+
+});
