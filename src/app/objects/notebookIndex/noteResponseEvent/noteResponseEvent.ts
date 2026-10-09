@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookIndex} from '../../../notebookIndex/notebookIndex';
+import {NotebookIndex} from '../notebookIndex';
 
 export interface NoteResponseEvent {
   renderNotebook(notebookIndex:NotebookIndex):void;

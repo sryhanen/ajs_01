@@ -43,25 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotesInfoResponseEvent} from './notesInfoResponseEvent';
-import {NotebookIndexCollection} from '../../../notebookIndexCollection/notebookIndexCollection';
-import {WebSocketResponse} from '../../response/webSocketResponse';
-import {TypedWebSocketResponse} from '../../response/typedWebSocketResponse/typedWebSocketResponse';
-import {NotebookIndexImpl} from '../../../notebookIndex/notebookIndexImpl';
+import {NoteResponseEvent} from './noteResponseEvent';
+import {NotebookIndex} from '../notebookIndex';
+import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
+import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
+import {NotebookImpl} from '../../notebook/notebookImpl';
 
-export class NotesInfoResponseEventImpl implements NotesInfoResponseEvent {
+export class NoteResponseEventImpl implements NoteResponseEvent {
   private readonly _webSocketResponse:WebSocketResponse;
 
-  constructor(message:WebSocketResponse) {
-    this._webSocketResponse = new TypedWebSocketResponse('NOTES_INFO', message);
+  constructor(webSocketResponse:WebSocketResponse) {
+    this._webSocketResponse = new TypedWebSocketResponse('NOTE', webSocketResponse);
   }
 
-  updateNotebookIndices(notebookIndexCollection: NotebookIndexCollection): void {
-    notebookIndexCollection.clear();
-    const notebookIndicesPayload = this._webSocketResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
-    notebookIndicesPayload.forEach(notebookIndexPayload => {
-      const notebookIndex = new NotebookIndexImpl(notebookIndexCollection, notebookIndexPayload);
-      notebookIndexCollection.addOrUpdate(notebookIndex);
-    });
+  renderNotebook(notebookIndex: NotebookIndex): void {
+    const receivedNotebookId = this._webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
+    if(receivedNotebookId === notebookIndex.id()){
+      const notebook = new NotebookImpl(notebookIndex, this._webSocketResponse.data());
+      notebookIndex.renderNotebook(notebook);
+    }
   }
 }

@@ -56,7 +56,7 @@ import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPaylo
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
 import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
-import {NoteResponseEventImpl} from '../webSocket/responseEvents/note/noteResponseEventImpl';
+import {NoteResponseEventImpl} from './noteResponseEvent/noteResponseEventImpl';
 
 export class NotebookIndexImpl implements NotebookIndex {
   private readonly _channel: Channel;

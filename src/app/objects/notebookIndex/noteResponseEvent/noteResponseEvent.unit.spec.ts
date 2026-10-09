@@ -45,13 +45,13 @@
  */
 
 import {NoteResponseEvent} from './noteResponseEvent';
-import {Channel} from '../../../channel/channel';
-import {FakeChannel} from '../../../channel/fakeChannel';
+import {Channel} from '../../channel/channel';
+import {FakeChannel} from '../../channel/fakeChannel';
 import {NoteResponseEventImpl} from './noteResponseEventImpl';
-import {WebSocketResponseImpl} from '../../response/webSocketResponseImpl';
-import {WebSocketPayloadImpl} from '../../webSocketPayload/webSocketPayloadImpl';
-import {NotebookIndexImpl} from '../../../notebookIndex/notebookIndexImpl';
-import {RenderNode} from '../../../rendering/renderNode/renderNode';
+import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {NotebookIndexImpl} from '../notebookIndexImpl';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
 
 describe('NoteResponseEvent unit test', () => {
   let channel: Channel;

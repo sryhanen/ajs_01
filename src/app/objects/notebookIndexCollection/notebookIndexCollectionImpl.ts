@@ -53,7 +53,7 @@ import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPaylo
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
-import {NotesInfoResponseEventImpl} from '../webSocket/responseEvents/notesInfo/notesInfoResponseEventImpl';
+import {NotesInfoResponseEventImpl} from './notesInfoResponseEvent/notesInfoResponseEventImpl';
 
 export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
   private readonly _channel:Channel;
