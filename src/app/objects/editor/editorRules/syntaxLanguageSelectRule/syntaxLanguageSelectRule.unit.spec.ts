@@ -43,44 +43,52 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {WsMessageListenerImpl} from './wsMessageListenerImpl';
+import ace from 'ace-builds';
+import {SyntaxLanguageSelectRule} from './syntaxLanguageSelectRule';
+import {SyntaxLanguageSelectRuleImpl} from './syntaxLanguageSelectRuleImpl';
+import {Requestable} from '../../../channel/requestable';
+import {FakeChannel} from '../../../channel/fakeChannel';
 
-describe('wsMessageListener service test', () => {
-  let listenerService;
-  let rootscope;
-  let $timeout;
-  const fakeData = 'foo bar';
+describe('SyntaxLanguageRule unit test', () => {
+  let requestable:Requestable;
+  let syntaxLanguageRule:SyntaxLanguageSelectRule;
+  let editor:ace.Editor;
+  const language = 'test-language';
 
-  beforeEach(angular.mock.inject(function(_wsMessageListener_, _$rootScope_, _$timeout_){
-    listenerService = _wsMessageListener_;
-    rootscope = _$rootScope_;
-    $timeout = _$timeout_;
-  }));
-
-  it('Should initialize', function() {
-    expect(listenerService).toBeInstanceOf(WsMessageListenerImpl);
+  beforeEach(() => {
+    requestable = new FakeChannel();
+    syntaxLanguageRule = new SyntaxLanguageSelectRuleImpl(requestable);
+    editor = ace.edit(document.createElement('div'));
   });
 
-  it('Expect message EDITOR_SETTINGS', async function() {
-    const result = listenerService.expectMessage('EDITOR_SETTINGS');
-    rootscope.$broadcast('editorSetting', fakeData);
-    await expectAsync(result).toBeResolvedTo(fakeData);
+  it('Should throw if setting has not been applied', () => {
+    expect(() => syntaxLanguageRule.setEditorLanguage(language)).toThrow();
   });
 
-  it('Expect message COMPLETION_LIST', async function() {
-    const result = listenerService.expectMessage('COMPLETION_LIST');
-    rootscope.$broadcast('completionList', fakeData);
-    await expectAsync(result).toBeResolvedTo(fakeData);
+  it('Should set editor language', () => {
+    syntaxLanguageRule.applyTo(editor);
+    const editorLanguageSpy = vi.spyOn(editor.getSession(), 'setMode');
+    syntaxLanguageRule.setEditorLanguage(language);
+    expect(editorLanguageSpy).toHaveBeenCalledExactlyOnceWith(language);
   });
 
-  it('Should throw error when not using hard-coded variables', function() {
-    expect(() => listenerService.expectMessage('NOT_HARD_CODED'))
-      .toThrow(new Error('Operation not defined: NOT_HARD_CODED'));
-  });
-
-  it('Should reject after timeout', async function() {
-    const result = listenerService.expectMessage('COMPLETION_LIST');
-    $timeout.flush();
-    await expectAsync(result).toBeRejectedWith('Message for COMPLETION_LIST rejected after timeout 1000ms.');
+  it('Should set editor language on editor setting response', () => {
+    syntaxLanguageRule.applyTo(editor);
+    const editorSettings = {
+      language: language,
+      editorOnDblClick: false,
+      completionKey: '',
+      completionSupport: true
+    };
+    const editorSettingResponse = {
+      op: 'EDITOR_SETTING',
+      data: {
+        editor:editorSettings,
+      }
+    };
+    const editorLanguageSpy = vi.spyOn(editor.getSession(), 'setMode');
+    syntaxLanguageRule.response(editorSettingResponse);
+    const expectedLanguage = 'ace/mode/test-language';
+    expect(editorLanguageSpy).toHaveBeenCalledExactlyOnceWith(expectedLanguage);
   });
 });

@@ -43,68 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ace from 'ace-builds';
-import {
-  AfterViewInit,
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  inject,
-} from '@angular/core';
-import {Editor} from './editor';
-import {ConfiguredEditor} from './configuration/configuredEditor';
-import {EditorCompletionsImpl} from './completions/editorCompletionsImpl';
-import {WebsocketMessageService} from '../shared/components/websocket/websocket-message.service';
-import {WsMessageListener} from '../shared/components/websocket/wsMessageListener';
-import {WsMessageListenerImpl} from '../shared/components/websocket/wsMessageListenerImpl';
-import {DefaultConfigurationImpl} from './configuration/defaultConfigurationImpl';
+import {EditorRule} from '../editorRule';
+import {Ace} from 'ace-builds';
 
-@Component({
-  selector: 'editor',
-  template: `
-    <pre class="editor-container" [id]='editorId'></pre>
-  `,
-})
-export class EditorComponent implements Editor, AfterViewInit{
-  private _websocketMessageService = inject(WebsocketMessageService);
-  private _wsMessageListenerService: WsMessageListener = inject(WsMessageListenerImpl);
-  private _editor: ConfiguredEditor;
-
-  ngAfterViewInit() {
-    const editor = ace.edit(this.editorId);
-    editor.setValue(this.editorContent);
-    const editorCompletions = new EditorCompletionsImpl(this.editorId, this._wsMessageListenerService, this._websocketMessageService);
-    this._editor = new DefaultConfigurationImpl(editor, this.changedContent, editorCompletions, this.onEditorFocus).apply();
+export class AnnotationsRule implements EditorRule {
+  applyTo(editor: Ace.Editor): void {
+    editor.on('change', ()=> {
+      const timeConsumingQuery = editor.find(/index\s*=\s*("\*"|\*)(\s|\||$)/);
+      if(timeConsumingQuery){
+        editor.getSession().setAnnotations([
+          {
+            row:timeConsumingQuery.start.row,
+            column:timeConsumingQuery.start.column,
+            text: 'The search query "index=*" can be time-consuming. Please consider using date-range filters to narrow down your search.',
+            type: 'error'
+          }
+        ]);
+      }
+      else{
+        editor.getSession().setAnnotations([]);
+      }
+    });
   }
-
-  @Input({ required: true }) editorId: string;
-
-  @Input() editorContent: string;
-
-  @Input()
-  set showGutter(value:boolean) {
-    if(this._editor){
-      this._editor.lineNumbers(value);
-    }
-  };
-
-  @Input()
-  set fontSize(value: number){
-    if(this._editor){
-      this._editor.setFontSize(value);
-    }
-  }
-
-  @Input()
-  set disableEdit(value:boolean) {
-    if(this._editor){
-      this._editor.readonly(value);
-    }
-  }
-
-  @Output() changedContent = new EventEmitter<string>();
-
-  @Output() onEditorFocus = new EventEmitter<boolean>();
 }
-

@@ -43,6 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface WsMessageListener {
-  expectMessage(operation:string): Promise<object>;
+import {Ace} from 'ace-builds';
+
+export interface EditorRule {
+  applyTo(editor:Ace.Editor):void;
 }

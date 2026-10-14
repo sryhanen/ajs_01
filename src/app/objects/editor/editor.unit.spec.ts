@@ -43,43 +43,42 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ace from 'ace-builds';
-import {WsMessageListener} from '../../shared/components/websocket/wsMessageListener';
-import {EditorCompletions} from './editorCompletions';
+import {Editor} from './editor';
+import {EditorImpl} from './editorImpl';
+import {Requestable} from '../channel/requestable';
+import {FakeChannel} from '../channel/fakeChannel';
 
-export class EditorCompletionsImpl implements EditorCompletions {
-  private _websocketMessageService;
-  private _wsMessageListenerService:WsMessageListener;
-  private readonly _paragraphId:string;
+describe('Editor unit test', () => {
+  let editor: Editor;
+  let requestable:Requestable;
+  const paragraphData = {
+    status:'',
+    text:'',
+    config:{
+      fontSize: 0,
+      lineNumbers: false,
+    }
+  };
 
-  constructor(paragraphId: string, wsMessageListenerService:WsMessageListener, websocketMessageService) {
-    this._paragraphId = paragraphId;
-    this._wsMessageListenerService = wsMessageListenerService;
-    this._websocketMessageService = websocketMessageService;
-  }
+  beforeEach(() => {
+    requestable = new FakeChannel();
+    editor = new EditorImpl(requestable, paragraphData);
+  });
 
-  async language(editorLanguage: string): Promise<string> {
-    this._websocketMessageService.getEditorSetting(this._paragraphId, editorLanguage);
-    const editorSettings = await this._wsMessageListenerService.expectMessage('EDITOR_SETTINGS') as {editor:{completionKey:string, completionSupport:boolean, editorOnDblClick:boolean, language:string}};
-    return`ace/mode/${editorSettings.editor.language}`;
-  }
+  it('Should print', () => {
+    const printed = editor.print()();
+    const inputs = printed.inputs()();
+    expect(printed.isStub()).toBe(false);
+    expect(inputs['editorRules']).toBeDefined();
+  });
 
-  async remoteCompleter(queryText:string): Promise<ace.Ace.Completer> {
-    this._websocketMessageService.completion(this._paragraphId, queryText, queryText.length);
-    const data = await this._wsMessageListenerService.expectMessage('COMPLETION_LIST') as {completions: {name:string, value:string}[]};
-    const completions: ace.Ace.Completion[] = data.completions.map(function(completion) {
-      return {
-        name: completion.name,
-        value: completion.value,
-        score: 300,
-      };
-    });
-
-    return {
-      getCompletions: function(editor, session, pos, prefix, callback) {
-        callback(null, completions);
-      }
+  it('Should request channel', () => {
+    const request = {
+      op:'test',
+      data:{}
     };
-  }
-
-}
+    const requestSpy = vi.spyOn(requestable, 'request');
+    editor.request(request);
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
+});

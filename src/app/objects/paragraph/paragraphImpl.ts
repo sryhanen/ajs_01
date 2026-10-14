@@ -56,23 +56,35 @@ import {WebSocketResponsePropertyEqualsFilter} from '../webSocket/response/webSo
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
 import {WebSocketRequestWithField} from '../webSocket/request/webSocketRequestWithField/webSocketRequestWithField';
 import {Requestable} from '../channel/requestable';
+import {EditorImpl} from '../editor/editorImpl';
+import {Editor} from '../editor/editor';
+import {WebSocketRequest} from '../webSocket/request/webSocketRequest';
+import {WebSocketRequestImpl} from '../webSocket/request/webSocketRequestImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
   private readonly _output: Output;
+  private readonly _editor:Editor;
   private readonly _paragraphData: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _paragraphIdFilter: WebSocketResponsePropertyEqualsFilter;
+  private readonly _requestEvents: Readonly<Record<string, (webSocketRequest:WebSocketRequest) => void>>;
 
   constructor(requestable: Requestable, paragraphData: object) {
     this._requestable = requestable;
-    this._paragraphData = new WebSocketPayloadImpl(paragraphData);
+    this._paragraphData = this.initializeParagraphData(paragraphData);
     this._output = this.initializedOutput(this._paragraphData);
+    this._editor = new EditorImpl(this, paragraphData);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
       output:this._output.print()(),
+      editor:this._editor.print()(),
       paragraphId:this.id()
     })));
     this._paragraphIdFilter = new WebSocketResponsePropertyEqualsFilter('paragraphId', this.id());
+    this._requestEvents = {
+      'COMMIT_PARAGRAPH': (webSocketRequest:WebSocketRequest) => this.handleCommitParagraphRequest(webSocketRequest),
+      'RUN_PARAGRAPH': () => this.run()
+    };
   }
 
   run(): void {
@@ -97,22 +109,30 @@ export class ParagraphImpl implements Paragraph {
   }
 
   request(json: object): void {
-    const message = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    const paragraphIdDecoratedWebSocketRequest = new WebSocketRequestWithField(message, 'paragraphId', this.id());
-    this._requestable.request({
-      op:paragraphIdDecoratedWebSocketRequest.operation(),
-      data:paragraphIdDecoratedWebSocketRequest.data()
-    });
+    const webSocketRequest = new WebSocketRequestImpl(new WebSocketPayloadImpl(json));
+    const eventName = webSocketRequest.operation();
+    if(eventName in this._requestEvents) {
+      this._requestEvents[eventName](webSocketRequest);
+    }
+    else{
+      const paragraphIdDecoratedWebSocketRequest = new WebSocketRequestWithField(webSocketRequest, 'paragraphId', this.id());
+      this._requestable.request({
+        op:paragraphIdDecoratedWebSocketRequest.operation(),
+        data:paragraphIdDecoratedWebSocketRequest.data()
+      });
+    }
   }
 
   response(json: object): void {
-    const message = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    const filteredResponse = this._paragraphIdFilter.filterResponse(message);
+    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    const filteredResponse = this._paragraphIdFilter.filterResponse(webSocketResponse);
     if(!filteredResponse.isStub()) {
-      this._output.response({
+      const responseMessage = {
         op:filteredResponse.operation(),
         data:filteredResponse.data()
-      });
+      };
+      this._output.response(responseMessage);
+      this._editor.response(responseMessage);
     }
   }
 
@@ -139,5 +159,26 @@ export class ParagraphImpl implements Paragraph {
         output.response(paragraphOutputResponse);
       }
     }
+  }
+
+  private handleCommitParagraphRequest(webSocketRequest:WebSocketRequest):void {
+    const commitParagraphRequest = {
+      op:'COMMIT_PARAGRAPH',
+      data:{
+        ...webSocketRequest.data(),
+        id: this.id(),
+        title: this._paragraphData.stringProperty('title'),
+        config: this._paragraphData.objectProperty('config'),
+        params: this._paragraphData.objectPropertyAsPayload('settings').objectProperty('params'),
+      }
+    };
+    this._requestable.request(commitParagraphRequest);
+  }
+
+  private initializeParagraphData(paragraphData: object):WebSocketPayload {
+    if(!('title' in paragraphData)) {
+      paragraphData['title'] = '';
+    }
+    return new WebSocketPayloadImpl(paragraphData);
   }
 }

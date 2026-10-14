@@ -43,8 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ConfiguredEditor} from './configuredEditor';
+import {EditorRule} from '../editorRule';
+import {Respondable} from '../../../channel/respondable';
 
-export interface DefaultConfiguration {
-  apply(): ConfiguredEditor;
-}
+export interface AutoCompletionsRule extends EditorRule, Respondable {}

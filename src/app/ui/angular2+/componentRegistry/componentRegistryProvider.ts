@@ -55,12 +55,13 @@ import {UPlotOutputView} from '../output/outputViews/uPlotOutputView/uPlotOutput
 import {OutputSwitcherView} from '../output/switcher/outputSwitcherView';
 import {OutputSwitcherButtonView} from '../output/switcher/switcherButton/outputSwitcherButtonView';
 import {OutputView} from '../output/outputView';
-import {NotebookIndexCollectionView} from '../notebookIndexCollection/notebookIndexCollectionView';
 import {NotebookView} from '../notebook/notebookView';
 import {ParagraphCollectionView} from '../paragraphCollection/paragraphCollectionView';
 import {ParagraphView} from '../paragraph/paragraphView';
 import {NotebookIndexView} from '../notebookIndex/notebookIndexView';
+import {EditorView} from '../editor/editorView';
 import {DplLogView} from '../dplLog/dplLogView';
+import {NotebookIndexCollectionView} from '../notebookIndexCollection/notebookIndexCollectionView';
 
 export const ComponentRegistryProvider: Provider = {
   provide: COMPONENT_REGISTRY,
@@ -79,6 +80,7 @@ export const ComponentRegistryProvider: Provider = {
     [RegisteredComponents.PARAGRAPH_VIEW, ParagraphView],
     [RegisteredComponents.OUTPUT_VIEW, OutputView],
     [RegisteredComponents.NOTEBOOK_INDEX_VIEW, NotebookIndexView],
-    [RegisteredComponents.DPL_LOG_VIEW, DplLogView]
+    [RegisteredComponents.DPL_LOG_VIEW, DplLogView],
+    [RegisteredComponents.EDITOR_VIEW, EditorView],
   ])
 };

@@ -43,8 +43,36 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface ConfiguredEditor {
-  readonly(value:boolean):void;
-  setFontSize(value:number):void;
-  lineNumbers(value:boolean):void;
-}
+import ace from 'ace-builds';
+import {HighlightsRule} from './highlightsRule';
+
+describe('HighlightsRule unit test', () => {
+  const highlightsRule = new HighlightsRule();
+  let editor:ace.Editor;
+
+  beforeEach(() => {
+    editor = ace.edit(document.createElement('div'));
+    highlightsRule.applyTo(editor);
+  });
+
+  it('Should set highlights off by default', () => {
+    expect(editor.getHighlightActiveLine()).toBe(false);
+    expect(editor.getHighlightGutterLine()).toBe(false);
+  });
+
+  it('Should set highlights on during focus', () => {
+    // eslint-disable-next-line
+    (editor as any)._emit('focus'); //use object internals to evoke the focus event due to absence of browser environment
+    expect(editor.getHighlightActiveLine()).toBe(true);
+    expect(editor.getHighlightGutterLine()).toBe(true);
+  });
+
+  it('Should set highlights off during blur', () => {
+    // eslint-disable-next-line
+    (editor as any)._emit('focus'); // use object internals to evoke the focus event due to absence of browser environment
+    // eslint-disable-next-line
+    (editor as any)._emit('blur'); // use object internals to evoke the focus event due to absence of browser environment
+    expect(editor.getHighlightActiveLine()).toBe(false);
+    expect(editor.getHighlightGutterLine()).toBe(false);
+  });
+});

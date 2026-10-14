@@ -43,9 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import ace from 'ace-builds';
+import {Printable} from '../rendering/printable/printable';
+import {Channel} from '../channel/channel';
 
-export interface EditorCompletions {
-  language(editorLanguage: string): Promise<string>;
-  remoteCompleter(queryText:string): Promise<ace.Ace.Completer>;
-}
+export interface Editor extends Printable, Channel {}

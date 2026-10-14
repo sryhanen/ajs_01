@@ -43,30 +43,60 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {render, screen} from '@testing-library/angular';
-import { EditorComponent } from './editor.component';
-import {createAngularTestingModule} from '@angular/upgrade/static/testing';
-import {WebsocketMessageService} from '../shared/components/websocket/websocket-message.service';
-import {WsMessageListenerImpl} from '../shared/components/websocket/wsMessageListenerImpl';
+import {Requestable} from '../../../../channel/requestable';
+import {DplCompleter} from './dplCompleter';
+import {DplCompleterImpl} from './dplCompleterImpl';
+import ace from 'ace-builds';
+import {FakeChannel} from '../../../../channel/fakeChannel';
 
-describe('EditorImpl', () => {
-  beforeEach(async () => {
-    await render(EditorComponent, {
-      imports: [
-        createAngularTestingModule(['zeppelinWebApp']),
-      ],
-      providers: [
-        { provide: WebsocketMessageService, useValue: {} },
-        { provide: WsMessageListenerImpl, useValue: {} }
-      ],
-      inputs:{
-        editorId:'editorId',
-      }
+describe('DplCompleter unit test', () => {
+  let requestable:Requestable;
+  let dplCompleter:DplCompleter;
+  let editor:ace.Editor;
+
+  beforeEach(() => {
+    editor = ace.edit(document.createElement('div'));
+    requestable = new FakeChannel();
+    dplCompleter = new DplCompleterImpl(requestable);
+  });
+
+  it('getCompletions should create completion request', () => {
+    const requestSpy = vi.spyOn(requestable, 'request');
+    dplCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
+    const expectedRequest = {
+      op: 'COMPLETION',
+      data: {
+        paragraphId: '',
+        buf: '',
+        cursor: 0,
+      },
+    };
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
+
+  describe('applyCompletions', () => {
+    it('Should throw if getCompletions has not been evoked', () => {
+      expect(() => dplCompleter.applyCompletions([])).toThrow();
+    });
+
+    it('Should apply completions', () => {
+      dplCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
+      const applyCompletionsSpy = vi.spyOn(dplCompleter, 'applyCompletions');
+      dplCompleter.applyCompletions([]);
+      expect(applyCompletionsSpy).toHaveReturned();
     });
   });
 
-  test('It should render', async () => {
-    const element = screen.getByRole('textbox');
-    expect(element).toBeTruthy();
+  it('Should apply completions on completion list response', () => {
+    dplCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
+    const applyCompletionsSpy = vi.spyOn(dplCompleter, 'applyCompletions');
+    const completionListResponse = {
+      op: 'COMPLETION_LIST',
+      data: {
+        completions: []
+      }
+    };
+    dplCompleter.response(completionListResponse);
+    expect(applyCompletionsSpy).toHaveReturned();
   });
 });
