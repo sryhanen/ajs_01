@@ -1,4 +1,4 @@
-<!--
+/*
  * Teragrep User Interface (ajs_01)
  * Copyright (C) 2019-2026 Suomen Kanuuna Oy
  *
@@ -34,7 +34,7 @@
  * Names of the licensors and authors may not be used for publicity purposes.
  *
  * No rights are granted for use of trade names, trademarks, or service marks
- * which are in The Program if any.
+ * which are in The Program if any.Record<DplLogKeyType, string>Record<DplLogKeyType, string>
  *
  * Licensee must indemnify licensors and authors for any liability that these
  * contractual assumptions impose on licensors and authors.
@@ -42,20 +42,55 @@
  * To the extent this program is licensed as part of the Commercial versions of
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
--->
-<div class="dpl-log">
-  <p>
-    <button
-      type="button"
-      class="btn btn-secondary btn-small my-2"
-      ng-click="showLog = !showLog" ng-init="showLog=false">
-      Show/Hide log
-    </button>
-  </p>
-  <div ng-hide="showLog == false" id="log" class="log-message">
-    <h3>Data Batch Status</h3>
-    <p class="batch-message">{{batchMsg}}</p>
-    <p>{{timeMsg}}</p>
-    <p class="overflow-auto">{{message}}</p>
-  </div>
-</div>
+ */
+import {fireEvent, render, screen} from '@testing-library/angular';
+import {DplLogView} from './dplLogView';
+import {DplLogKeyType} from '../../../objects/dplLog/dplLogKeys';
+
+describe('DplLogView functional test', () => {
+  let dplLog: Record<DplLogKeyType, string>;
+  const batchMessageValue = 'batch message value';
+  const timeMessageValue = 'time message value';
+  const messageValue = 'message value';
+  let toggleLogButton:HTMLElement;
+
+  beforeEach(async() => {
+    dplLog = {
+      'batchMsg': batchMessageValue,
+      'timeMsg': timeMessageValue,
+      'message': messageValue,
+    };
+    await render(DplLogView, {
+      inputs:{
+        dplLog: dplLog,
+      }
+    });
+    toggleLogButton = screen.getByRole('button');
+  });
+
+  it('Should have rendered', () => {
+    expect(screen.getByRole('log')).toBeDefined();
+    expect(toggleLogButton).toBeDefined();
+  });
+
+  it('Should have dplLog hidden', () => {
+    expect(() => screen.getByText(batchMessageValue)).toThrow();
+    expect(() => screen.getByText(timeMessageValue)).toThrow();
+    expect(() => screen.getByText(messageValue)).toThrow();
+  });
+
+  it('Should display dplLog after clicking toggle log button', () => {
+    fireEvent.click(toggleLogButton);
+    expect(screen.getByText(batchMessageValue)).toBeDefined();
+    expect(screen.getByText(timeMessageValue)).toBeDefined();
+    expect(screen.getByText(messageValue)).toBeDefined();
+  });
+
+  it('Should hide dplLog after clicking toggle log button', () => {
+    fireEvent.click(toggleLogButton);
+    fireEvent.click(toggleLogButton);
+    expect(() => screen.getByText(batchMessageValue)).toThrow();
+    expect(() => screen.getByText(timeMessageValue)).toThrow();
+    expect(() => screen.getByText(messageValue)).toThrow();
+  });
+});
