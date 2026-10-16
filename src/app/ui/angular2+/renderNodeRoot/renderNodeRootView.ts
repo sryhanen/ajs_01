@@ -61,26 +61,13 @@ import {NgComponentOutlet} from '@angular/common';
   template: `
     @if(!renderNode().isStub()){
       @let component = componentReference(renderNode().componentView());
-      <ng-container *ngComponentOutlet="component; inputs: componentInputs();"></ng-container>
+      @let inputs = renderNode().inputs()();
+      <ng-container *ngComponentOutlet="component; inputs: inputs;"></ng-container>
     }
   `
 })
 export class RenderNodeRootView {
   renderNode = input.required<RenderNode>();
-  containerId = input<string>('');
-
-  protected componentInputs = computed(() => {
-    let componentInputs = {};
-    if(!this.renderNode().isStub()){
-      componentInputs = {
-        ...this.renderNode().inputs()(),
-      };
-      if(this.containerId() !== ''){
-        componentInputs['containerId'] = this.containerId();
-      }
-    }
-    return componentInputs;
-  });
 
   private readonly componentRegistry = inject(COMPONENT_REGISTRY);
 

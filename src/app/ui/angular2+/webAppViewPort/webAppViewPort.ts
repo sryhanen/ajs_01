@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
+import {Component, computed} from '@angular/core';
 import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
 import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
 
@@ -53,10 +53,9 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
     RenderNodeRootView
   ],
   template: `
-    <render-node-host [renderNode]="renderNode()" [containerId]="containerId()"></render-node-host>
+    <render-node-host [renderNode]="renderNode()"></render-node-host>
   `
 })
 export class WebAppViewPort {
-  containerId= input.required<string>();
   protected renderNode = computed(() => webAppRoot.print()());
 }

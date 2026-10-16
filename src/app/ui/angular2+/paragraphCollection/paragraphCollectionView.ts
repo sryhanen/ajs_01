@@ -54,11 +54,10 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
   ],
   template: `
     @for(paragraph of paragraphs(); track $index){
-      <render-node-host [renderNode]="paragraph" [containerId]="containerId()"></render-node-host>
+      <render-node-host [renderNode]="paragraph"></render-node-host>
     }
   `
 })
 export class ParagraphCollectionView {
   paragraphs = input.required<RenderNode[]>();
-  containerId = input.required<string>();
 }

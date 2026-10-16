@@ -78,7 +78,6 @@ export class ParagraphImpl implements Paragraph {
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
       output:this._output.print()(),
       editor:this._editor.print()(),
-      paragraphId:this.id()
     })));
     this._paragraphIdFilter = new WebSocketResponsePropertyEqualsFilter('paragraphId', this.id());
     this._requestEvents = {
