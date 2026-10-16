@@ -14,7 +14,7 @@
 
 import angular from 'angular';
 import moment from 'moment';
-import {isParagraphRunning} from './paragraph/paragraph.status';
+import {isParagraphRunning} from './paragraph.status';
 import _ from 'lodash';
 import Paragraph from '../shared/interfaces/paragraph';
 

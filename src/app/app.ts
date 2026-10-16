@@ -43,7 +43,6 @@ const requiredModules = [
   'zeppelinWebApp.interpreter',
   'zeppelinWebApp.job',
   'zeppelinWebApp.jobManager',
-  'zeppelinWebApp.paragraph',
   'zeppelinWebApp.paragraphLink',
   'zeppelinWebApp.saveAs',
 

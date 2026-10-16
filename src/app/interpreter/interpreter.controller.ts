@@ -14,7 +14,7 @@
 
 import angular from 'angular';
 
-import {ParagraphStatus} from '../notebook/paragraph/paragraph.status';
+import {ParagraphStatus} from '../notebook/paragraph.status';
 import _ from 'lodash';
 
 angular.module('zeppelinWebApp.interpreter', []).controller('InterpreterCtrl', ['$rootScope', '$scope', '$http', 'baseUrlSrv', 'ToasterService', '$timeout', '$route', 'InterpreterPageService', 'InterpreterSettingService', InterpreterCtrl]);

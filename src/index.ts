@@ -45,9 +45,6 @@ require('./app/jobmanager/job/job.html');
 require('./app/jobmanager/jobmanager.html');
 require('./app/notebook/shortcut.html');
 
-require('./app/notebook/paragraph/paragraph-control.html');
-require('./app/notebook/paragraph/paragraph-progress-bar.html');
-require('./app/notebook/paragraph/paragraph.html');
 require('./app/notebook/revisions-comparator/revisions-comparator.html');
 require('./app/notebook/notebook-actionBar.html');
 require('./app/notebook/notebook.html');
@@ -68,9 +65,6 @@ import './app/interpreter/widget/number-widget.directive';
 import './app/credential/credential.controller';
 import './app/configuration/configuration.controller';
 import './app/notebook/revisions-comparator/revisions-comparator.component';
-import './app/notebook/paragraph/paragraph.controller';
-import './app/notebook/paragraph/clipboard.controller';
-import './app/notebook/paragraph/resizable.directive';
 
 import './app/notebook/save-as/save-as.service';
 import './app/notebook/elastic-input/elastic-input.controller';

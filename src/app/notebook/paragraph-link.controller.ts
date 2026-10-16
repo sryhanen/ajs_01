@@ -13,7 +13,7 @@
  */
 
 import angular from 'angular';
-import {isParagraphRunning} from './paragraph/paragraph.status';
+import {isParagraphRunning} from './paragraph.status';
 import Paragraph from '../shared/interfaces/paragraph';
 
 angular.module('zeppelinWebApp.paragraphLink', [

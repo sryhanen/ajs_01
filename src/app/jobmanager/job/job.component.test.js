@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphStatus} from '../../notebook/paragraph/paragraph.status';
+import {ParagraphStatus} from '../../notebook/paragraph.status';
 
 describe('JobComponent', () => {
   let $componentController;

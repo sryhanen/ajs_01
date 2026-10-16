@@ -14,7 +14,7 @@
 
 import angular from 'angular';
 import moment from 'moment';
-import {ParagraphStatus} from '../../notebook/paragraph/paragraph.status';
+import {ParagraphStatus} from '../../notebook/paragraph.status';
 import {getJobColorByStatus, getJobIconByStatus} from '../job-status';
 
 import './job.html';
