@@ -54,6 +54,7 @@ import {Paragraph} from '../paragraph';
 import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
 import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 import {ParagraphComponentInputs} from '../paragraphComponentInputs';
+import {ParagraphTitleImpl} from '../paragraphTitle/paragraphTitleImpl';
 
 export class ParagraphViewModeImpl implements ParagraphViewMode {
   private readonly _paragraphPayload: WebSocketPayload;
@@ -99,7 +100,7 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
     const showEditor = paragraphConfig.propertyExists('editorHide') ? !paragraphConfig.booleanProperty('editorHide'): true;
 
     return signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
-      title: showTitle ? this._paragraphPayload.stringProperty('title') : '',
+      paragraphTitle: showTitle ? new ParagraphTitleImpl(this._paragraphPayload.stringProperty('title'), this._paragraph).print()() : this._renderNodeStub,
       output: showOutput ? this._output.print()() : this._renderNodeStub,
       editor: showEditor ? this._editor.print()() : this._renderNodeStub,
     }))));

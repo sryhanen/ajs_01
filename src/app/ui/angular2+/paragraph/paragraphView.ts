@@ -50,19 +50,18 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
 @Component({
   selector: 'paragraph',
   imports: [
-    RenderNodeRootView
+    RenderNodeRootView,
   ],
   template: `
     <div class="paragraph paragraph-box paragraph-col">
-      @let titleText = title() !== '' ? title(): 'Untitled';
-      <h1>{{titleText}}</h1>
+      <render-node-host [renderNode]="paragraphTitle()"></render-node-host>
       <render-node-host [renderNode]="editor()"></render-node-host>
       <render-node-host [renderNode]="output()"></render-node-host>
     </div>
   `
 })
 export class ParagraphView{
-  title = input.required<string>();
+  paragraphTitle = input.required<RenderNode>();
   output = input.required<RenderNode>();
   editor = input.required<RenderNode>();
 }

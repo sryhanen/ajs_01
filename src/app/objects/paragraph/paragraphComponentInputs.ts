@@ -46,7 +46,7 @@
 import {RenderNode} from '../rendering/renderNode/renderNode';
 
 export type ParagraphComponentInputs = {
-  title:string,
+  paragraphTitle: RenderNode,
   output:RenderNode,
   editor:RenderNode
 };
