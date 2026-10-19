@@ -45,7 +45,7 @@
  */
 import {RenderNode} from '../rendering/renderNode/renderNode';
 
-export type ParagraphComponentInputs = {
+export type ParagraphViewInputs = {
   paragraphTitle: RenderNode,
   output:RenderNode,
   editor:RenderNode

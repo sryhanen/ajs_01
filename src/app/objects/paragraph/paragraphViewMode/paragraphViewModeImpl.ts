@@ -53,7 +53,7 @@ import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/regi
 import {Paragraph} from '../paragraph';
 import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
 import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
-import {ParagraphComponentInputs} from '../paragraphComponentInputs';
+import {ParagraphViewInputs} from '../paragraphViewInputs';
 import {ParagraphTitleImpl} from '../paragraphTitle/paragraphTitleImpl';
 
 export class ParagraphViewModeImpl implements ParagraphViewMode {
@@ -62,7 +62,7 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
   private readonly _editor: Editor;
   private readonly _output: Output;
   private readonly _renderNodeStub: RenderNode;
-  private readonly _renderNode: Signal<RenderNode<ParagraphComponentInputs>>;
+  private readonly _renderNode: Signal<RenderNode<ParagraphViewInputs>>;
 
   constructor(paragraphPayload: WebSocketPayload, paragraph:Paragraph, editor: Editor, output: Output) {
     this._paragraphPayload = paragraphPayload;
@@ -73,7 +73,7 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
     this._renderNode = this.initializeRenderNode();
   }
 
-  print(): Signal<RenderNode<ParagraphComponentInputs>> {
+  print(): Signal<RenderNode<ParagraphViewInputs>> {
     return this._renderNode;
   }
 
@@ -93,7 +93,7 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
     //paragraph.config.title: boolean
   }
 
-  private initializeRenderNode(): Signal<RenderNode<ParagraphComponentInputs>> {
+  private initializeRenderNode(): Signal<RenderNode<ParagraphViewInputs>> {
     const paragraphConfig = this._paragraphPayload.objectPropertyAsPayload('config');
     const showTitle = paragraphConfig.propertyExists('title') ? paragraphConfig.booleanProperty('title'): false;
     const showOutput = paragraphConfig.propertyExists('tableHide') ? !paragraphConfig.booleanProperty('tableHide'): true;

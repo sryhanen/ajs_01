@@ -44,13 +44,13 @@
  * a licensee so wish it.
  */
 import {Printable} from '../../rendering/printable/printable';
-import {ParagraphComponentInputs} from '../paragraphComponentInputs';
+import {ParagraphViewInputs} from '../paragraphViewInputs';
 
 /**
  * ParagraphViewMode is responsible for printing paragraph according to the current paragraph state.
  * It provides visibility control over displayed elements.
  */
-export interface ParagraphViewMode extends Printable<ParagraphComponentInputs> {
+export interface ParagraphViewMode extends Printable<ParagraphViewInputs> {
   toggleEditor(shouldDisplay:boolean):void;
   toggleLineNumbers(shouldDisplay:boolean):void;
   toggleOutput(shouldDisplay:boolean):void;

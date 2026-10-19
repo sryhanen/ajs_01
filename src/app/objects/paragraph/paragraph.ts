@@ -45,9 +45,9 @@
  */
 import {Channel} from '../channel/channel';
 import {Printable} from '../rendering/printable/printable';
-import {ParagraphComponentInputs} from './paragraphComponentInputs';
+import {ParagraphViewInputs} from './paragraphViewInputs';
 
-export interface Paragraph extends Channel, Printable<ParagraphComponentInputs> {
+export interface Paragraph extends Channel, Printable<ParagraphViewInputs> {
   id(): string;
   run():void;
 }

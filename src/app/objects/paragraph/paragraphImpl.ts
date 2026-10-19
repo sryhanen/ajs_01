@@ -60,7 +60,7 @@ import {WebSocketRequest} from '../webSocket/request/webSocketRequest';
 import {WebSocketRequestImpl} from '../webSocket/request/webSocketRequestImpl';
 import {ParagraphViewMode} from './paragraphViewMode/paragraphViewMode';
 import {ParagraphViewModeImpl} from './paragraphViewMode/paragraphViewModeImpl';
-import {ParagraphComponentInputs} from './paragraphComponentInputs';
+import {ParagraphViewInputs} from './paragraphViewInputs';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
@@ -97,7 +97,7 @@ export class ParagraphImpl implements Paragraph {
     this._requestable.request(runParagraphRequest);
   }
 
-  print(): Signal<RenderNode<ParagraphComponentInputs>> {
+  print(): Signal<RenderNode<ParagraphViewInputs>> {
     return this._viewMode.print();
   }
 
