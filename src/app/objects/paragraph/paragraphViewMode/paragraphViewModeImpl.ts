@@ -53,6 +53,7 @@ import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/regi
 import {Paragraph} from '../paragraph';
 import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
 import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
+import {ParagraphComponentInputs} from '../paragraphComponentInputs';
 
 export class ParagraphViewModeImpl implements ParagraphViewMode {
   private readonly _paragraphPayload: WebSocketPayload;
@@ -60,7 +61,7 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
   private readonly _editor: Editor;
   private readonly _output: Output;
   private readonly _renderNodeStub: RenderNode;
-  private readonly _renderNode: Signal<RenderNode>;
+  private readonly _renderNode: Signal<RenderNode<ParagraphComponentInputs>>;
 
   constructor(paragraphPayload: WebSocketPayload, paragraph:Paragraph, editor: Editor, output: Output) {
     this._paragraphPayload = paragraphPayload;
@@ -71,7 +72,7 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
     this._renderNode = this.initializeRenderNode();
   }
 
-  print(): Signal<RenderNode> {
+  print(): Signal<RenderNode<ParagraphComponentInputs>> {
     return this._renderNode;
   }
 
@@ -87,7 +88,7 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
   toggleTitle(shouldDisplay: boolean): void {
   }
 
-  private initializeRenderNode(): Signal<RenderNode> {
+  private initializeRenderNode(): Signal<RenderNode<ParagraphComponentInputs>> {
     return signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
       title:'',
       output:this._output.print()(),
