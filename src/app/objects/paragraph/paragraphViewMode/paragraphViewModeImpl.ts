@@ -77,22 +77,31 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
   }
 
   toggleEditor(shouldDisplay: boolean): void {
+    //paragraph.config.editorHide: boolean
   }
 
   toggleLineNumbers(shouldDisplay: boolean): void {
+    //paragraph.config.lineNumbers: boolean
   }
 
   toggleOutput(shouldDisplay: boolean): void {
+    //paragraph.config.tableHide: boolean
   }
 
   toggleTitle(shouldDisplay: boolean): void {
+    //paragraph.config.title: boolean
   }
 
   private initializeRenderNode(): Signal<RenderNode<ParagraphComponentInputs>> {
+    const paragraphConfig = this._paragraphPayload.objectPropertyAsPayload('config');
+    const showTitle = paragraphConfig.propertyExists('title') ? paragraphConfig.booleanProperty('title'): false;
+    const showOutput = paragraphConfig.propertyExists('tableHide') ? !paragraphConfig.booleanProperty('tableHide'): true;
+    const showEditor = paragraphConfig.propertyExists('editorHide') ? !paragraphConfig.booleanProperty('editorHide'): true;
+
     return signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
-      title:'',
-      output:this._output.print()(),
-      editor:this._editor.print()(),
+      title: showTitle ? this._paragraphPayload.stringProperty('title') : '',
+      output: showOutput ? this._output.print()() : this._renderNodeStub,
+      editor: showEditor ? this._editor.print()() : this._renderNodeStub,
     }))));
   }
 }
