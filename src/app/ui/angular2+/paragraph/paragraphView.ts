@@ -60,6 +60,7 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
   `
 })
 export class ParagraphView{
+  title = input.required<string>();
   output = input.required<RenderNode>();
   editor = input.required<RenderNode>();
 }

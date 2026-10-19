@@ -48,10 +48,8 @@ import {Output} from '../output/output';
 import {OutputImpl} from '../output/outputImpl';
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {signal, Signal} from '@angular/core';
-import { RenderNode } from '../rendering/renderNode/renderNode';
-import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {Signal} from '@angular/core';
+import {RenderNode} from '../rendering/renderNode/renderNode';
 import {WebSocketResponsePropertyEqualsFilter} from '../webSocket/response/webSocketResponseFilter/webSocketResponsePropertyEqualsFilter';
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
 import {WebSocketRequestWithField} from '../webSocket/request/webSocketRequestWithField/webSocketRequestWithField';
@@ -60,25 +58,24 @@ import {EditorImpl} from '../editor/editorImpl';
 import {Editor} from '../editor/editor';
 import {WebSocketRequest} from '../webSocket/request/webSocketRequest';
 import {WebSocketRequestImpl} from '../webSocket/request/webSocketRequestImpl';
+import {ParagraphViewMode} from './paragraphViewMode/paragraphViewMode';
+import {ParagraphViewModeImpl} from './paragraphViewMode/paragraphViewModeImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
   private readonly _output: Output;
   private readonly _editor:Editor;
-  private readonly _paragraphData: WebSocketPayload;
-  private readonly _renderNode: Signal<RenderNode>;
+  private readonly _viewMode:ParagraphViewMode;
+  private readonly _paragraphPayload: WebSocketPayload;
   private readonly _paragraphIdFilter: WebSocketResponsePropertyEqualsFilter;
   private readonly _requestEvents: Readonly<Record<string, (webSocketRequest:WebSocketRequest) => void>>;
 
   constructor(requestable: Requestable, paragraphData: object) {
     this._requestable = requestable;
-    this._paragraphData = this.initializeParagraphData(paragraphData);
-    this._output = this.initializedOutput(this._paragraphData);
+    this._paragraphPayload = this.initializeParagraphData(paragraphData);
+    this._output = this.initializedOutput(this._paragraphPayload);
     this._editor = new EditorImpl(this, paragraphData);
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
-      output:this._output.print()(),
-      editor:this._editor.print()(),
-    })));
+    this._viewMode = new ParagraphViewModeImpl(this._paragraphPayload, this, this._editor, this._output);
     this._paragraphIdFilter = new WebSocketResponsePropertyEqualsFilter('paragraphId', this.id());
     this._requestEvents = {
       'COMMIT_PARAGRAPH': (webSocketRequest:WebSocketRequest) => this.handleCommitParagraphRequest(webSocketRequest),
@@ -91,20 +88,20 @@ export class ParagraphImpl implements Paragraph {
       op:'RUN_PARAGRAPH',
       data: {
         id: this.id(),
-        paragraph: this._paragraphData.stringProperty('text'),
-        config: this._paragraphData.objectProperty('config'),
-        params: this._paragraphData.objectPropertyAsPayload('settings').objectProperty('params'),
-      },
+        paragraph: this._paragraphPayload.stringProperty('text'),
+        config: this._paragraphPayload.objectProperty('config'),
+        params: this._paragraphPayload.objectPropertyAsPayload('settings').objectProperty('params'),
+      }
     };
     this._requestable.request(runParagraphRequest);
   }
 
   print(): Signal<RenderNode> {
-    return this._renderNode;
+    return this._viewMode.print();
   }
 
   id(): string {
-    return this._paragraphData.stringProperty('id');
+    return this._paragraphPayload.stringProperty('id');
   }
 
   request(json: object): void {
@@ -166,9 +163,9 @@ export class ParagraphImpl implements Paragraph {
       data:{
         ...webSocketRequest.data(),
         id: this.id(),
-        title: this._paragraphData.stringProperty('title'),
-        config: this._paragraphData.objectProperty('config'),
-        params: this._paragraphData.objectPropertyAsPayload('settings').objectProperty('params'),
+        title: this._paragraphPayload.stringProperty('title'),
+        config: this._paragraphPayload.objectProperty('config'),
+        params: this._paragraphPayload.objectPropertyAsPayload('settings').objectProperty('params'),
       }
     };
     this._requestable.request(commitParagraphRequest);
