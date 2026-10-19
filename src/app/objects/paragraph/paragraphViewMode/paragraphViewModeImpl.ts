@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {ParagraphViewMode} from './paragraphViewMode';
-import {computed, signal, Signal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
 import {Output} from '../../output/output';
 import {Editor} from '../../editor/editor';
@@ -61,6 +61,10 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
   private readonly _paragraph:Paragraph;
   private readonly _editor: Editor;
   private readonly _output: Output;
+  private readonly _titleIsVisible:WritableSignal<boolean>;
+  private readonly _outputIsVisible:WritableSignal<boolean>;
+  private readonly _editorIsVisible:WritableSignal<boolean>;
+  private readonly _lineNumbersAreVisible:WritableSignal<boolean>;
   private readonly _renderNodeStub: RenderNode;
   private readonly _renderNode: Signal<RenderNode<ParagraphViewInputs>>;
 
@@ -69,6 +73,11 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
     this._paragraph = paragraph;
     this._editor = editor;
     this._output = output;
+    const paragraphConfig = paragraphPayload.objectPropertyAsPayload('config');
+    this._titleIsVisible = signal(paragraphConfig.propertyExists('title') ? paragraphConfig.booleanProperty('title'): false);
+    this._outputIsVisible = signal(paragraphConfig.propertyExists('tableHide') ? !paragraphConfig.booleanProperty('tableHide'): true);
+    this._editorIsVisible = signal(paragraphConfig.propertyExists('editorHide') ? !paragraphConfig.booleanProperty('editorHide'): true);
+    this._lineNumbersAreVisible = signal(paragraphConfig.propertyExists('lineNumbers')? paragraphConfig.booleanProperty('lineNumbers'): true);
     this._renderNodeStub = new RenderNodeStub();
     this._renderNode = this.initializeRenderNode();
   }
@@ -78,7 +87,14 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
   }
 
   toggleEditor(shouldDisplay: boolean): void {
-    //paragraph.config.editorHide: boolean
+    this._editorIsVisible.set(shouldDisplay);
+    this._paragraph.request({
+      op:'TOGGLE_EDITOR',
+      data:{
+        paragraphId:'',
+        editorIsVisible:shouldDisplay
+      }
+    });
   }
 
   toggleLineNumbers(shouldDisplay: boolean): void {
@@ -94,15 +110,17 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
   }
 
   private initializeRenderNode(): Signal<RenderNode<ParagraphViewInputs>> {
-    const paragraphConfig = this._paragraphPayload.objectPropertyAsPayload('config');
-    const showTitle = paragraphConfig.propertyExists('title') ? paragraphConfig.booleanProperty('title'): false;
-    const showOutput = paragraphConfig.propertyExists('tableHide') ? !paragraphConfig.booleanProperty('tableHide'): true;
-    const showEditor = paragraphConfig.propertyExists('editorHide') ? !paragraphConfig.booleanProperty('editorHide'): true;
-
     return signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
-      paragraphTitle: showTitle ? new ParagraphTitleImpl(this._paragraphPayload.stringProperty('title'), this._paragraph).print()() : this._renderNodeStub,
-      output: showOutput ? this._output.print()() : this._renderNodeStub,
-      editor: showEditor ? this._editor.print()() : this._renderNodeStub,
+      paragraphViewModeControls: new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW_MODE_CONTROLS_VIEW, computed(() => ({
+        paragraphViewMode:this,
+        editorIsVisible: this._editorIsVisible(),
+        outputIsVisible: this._outputIsVisible(),
+        titleIsVisible: this._titleIsVisible(),
+        lineNumbersAreVisible: this._lineNumbersAreVisible(),
+      }))),
+      paragraphTitle: this._titleIsVisible() ? new ParagraphTitleImpl(this._paragraphPayload.stringProperty('title'), this._paragraph).print()() : this._renderNodeStub,
+      output: this._outputIsVisible() ? this._output.print()() : this._renderNodeStub,
+      editor: this._editorIsVisible() ? this._editor.print()() : this._renderNodeStub,
     }))));
   }
 }
