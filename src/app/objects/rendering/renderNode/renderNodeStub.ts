@@ -46,7 +46,7 @@
 import {RenderNode} from './renderNode';
 import {Signal} from '@angular/core';
 
-export class RenderNodeStub implements RenderNode {
+export class RenderNodeStub<T extends Record<string, unknown> = Record<string, unknown>> implements RenderNode {
   isStub():boolean{
     return true;
   }
@@ -55,7 +55,7 @@ export class RenderNodeStub implements RenderNode {
     throw new Error('RenderNodeStub: Method not implemented.');
   }
 
-  inputs(): Signal<Record<string, unknown>> {
+  inputs(): Signal<T> {
     throw new Error('RenderNodeStub: Method not implemented.');
   }
 }

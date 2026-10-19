@@ -46,11 +46,11 @@
 import {RenderNode} from './renderNode';
 import {Signal} from '@angular/core';
 
-export class RenderNodeImpl implements RenderNode {
+export class RenderNodeImpl<T extends Record<string, unknown> = Record<string, unknown>> implements RenderNode {
   private readonly _componentView: string;
-  private readonly _inputs: Signal<Record<string, unknown>>;
+  private readonly _inputs: Signal<T>;
 
-  constructor(componentView: string, inputs:Signal<Record<string, unknown>>) {
+  constructor(componentView: string, inputs:Signal<T>) {
     this._componentView = componentView;
     this._inputs = inputs;
   }
@@ -59,7 +59,7 @@ export class RenderNodeImpl implements RenderNode {
     return this._componentView;
   }
 
-  inputs(): Signal<Record<string, unknown>> {
+  inputs(): Signal<T> {
     return this._inputs;
   }
 

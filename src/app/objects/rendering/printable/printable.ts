@@ -47,6 +47,6 @@
 import {Signal} from '@angular/core';
 import {RenderNode} from '../renderNode/renderNode';
 
-export interface Printable {
-  print(): Signal<RenderNode>;
+export interface Printable<T extends Record<string, unknown> = Record<string, unknown>> {
+  print(): Signal<RenderNode<T>>;
 }

@@ -46,7 +46,7 @@
 import {Signal} from '@angular/core';
 import Stubable from '../../../shared/interfaces/stubable';
 
-export interface RenderNode extends Stubable{
+export interface RenderNode<T extends Record<string, unknown> = Record<string, unknown>> extends Stubable{
   componentView(): string;
-  inputs(): Signal<Record<string, unknown>>;
+  inputs(): Signal<T>;
 }
