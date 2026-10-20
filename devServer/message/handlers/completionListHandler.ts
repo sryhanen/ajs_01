@@ -45,19 +45,18 @@
  */
 import {WebSocket} from 'ws';
 import {Handler} from './handler';
-import {CompletionMessage} from '../../interfaces/receiveMessage';
 import {receiveOperation, sendOperation} from '../webSocketOperations';
-import {CompletionListMessage} from '../../interfaces/sendMessage';
 
-export default class CompletionListHandler implements Handler<CompletionMessage>{
+export default class CompletionListHandler implements Handler<object>{
   operation(){
     return receiveOperation.completion;
   };
 
-  execute(message:CompletionMessage, client: WebSocket): void {
-    const msg: CompletionListMessage = {
+  execute(message:object, client: WebSocket): void {
+    const msg = {
       op: sendOperation.completionList,
       data: {
+        paragraphId:message['data']['paragraphId'],
         completions:[
           {
             name: 'angular',
@@ -68,7 +67,6 @@ export default class CompletionListHandler implements Handler<CompletionMessage>
             value: 'angularBind'
           },
         ],
-        id:message.data.id,
       },
     };
     client.send(JSON.stringify(msg));
