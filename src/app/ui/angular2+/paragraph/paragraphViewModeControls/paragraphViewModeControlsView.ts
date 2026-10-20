@@ -46,14 +46,23 @@
 import {Component, input} from '@angular/core';
 import {ParagraphViewMode} from '../../../../objects/paragraph/paragraphViewMode/paragraphViewMode';
 import {ToggleEditorButtonView} from './toggleEditorButton/toggleEditorButtonView';
+import {ToggleOutputButtonViewMode} from './toggleOutputButton/toggleOutputButtonView';
+import {ToggleTitleButtonView} from './toggleTitleButton/toggleTitleButtonView';
+import {ToggleLineNumbersButtonView} from './toggleLineNumbersButton/toggleLineNumbersButtonView';
 
 @Component({
   selector: 'paragraph-view-mode-controls',
   imports: [
-    ToggleEditorButtonView
+    ToggleEditorButtonView,
+    ToggleOutputButtonViewMode,
+    ToggleTitleButtonView,
+    ToggleLineNumbersButtonView
   ],
   template: `
     <toggle-editor-button [editorIsVisible]="editorIsVisible()" (editorVisibilityChanged)="paragraphViewMode().toggleEditor($event)"></toggle-editor-button>
+    <toggle-output-button [outputIsVisible]="outputIsVisible()" (outputIsVisibleChange)="paragraphViewMode().toggleOutput($event)"></toggle-output-button>
+    <toggle-title-button [titleIsVisible]="titleIsVisible()" (titleIsVisibleChange)="paragraphViewMode().toggleTitle($event)"></toggle-title-button>
+    <toggle-line-numbers-button [lineNumbersAreVisible]="lineNumbersAreVisible()" (lineNumbersAreVisibleChange)="paragraphViewMode().toggleLineNumbers($event)"></toggle-line-numbers-button>
   `
 })
 export class ParagraphViewModeControlsView {
