@@ -80,7 +80,7 @@ export class OutputImpl implements Output {
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _output:WritableSignal<RenderNode>;
   private readonly _renderNodeStub:RenderNode;
-  private readonly _dplLog: DplLog;
+  private readonly _dplLog: WritableSignal<DplLog>;
 
   constructor(requestable:Requestable) {
     this._requestable = requestable;
@@ -99,12 +99,12 @@ export class OutputImpl implements Output {
     this._outputSwitcher = new OutputSwitcherImpl(buttons.flat());
     this._previousParagraphOutputRequest = new WebSocketRequestStub();
     this._output = signal(new RenderNodeStub());
-    this._dplLog = new DplLogImpl();
+    this._dplLog = signal(new DplLogImpl());
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.OUTPUT_VIEW, computed(() => ({
       interpreterErrorListener: this._interpreterErrorListener.print()(),
       outputSwitcher: this._showSwitcher() ? this._outputSwitcher.print()() : this._renderNodeStub,
       output: this._output(),
-      dplLog: this._dplLog.print()(),
+      dplLog: this._dplLog().print()(),
     }))));
   }
 
@@ -127,12 +127,14 @@ export class OutputImpl implements Output {
       this.handleParagraphOutputResponse(webSocketResponse);
     }
     else{
-      this._dplLog.response(json);
+      this._dplLog().response(json);
     }
   }
 
   clear():void{
     this._output.set(this._renderNodeStub);
+    this._showSwitcher.set(false);
+    this._dplLog.set(new DplLogImpl());
   }
 
   private receivedOutputIsValid(paragraphOutputResponse:WebSocketResponse):boolean{
