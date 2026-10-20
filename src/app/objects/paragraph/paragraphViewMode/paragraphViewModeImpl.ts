@@ -55,6 +55,7 @@ import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayloa
 import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 import {ParagraphViewInputs} from '../paragraphViewInputs';
 import {ParagraphTitleImpl} from '../paragraphTitle/paragraphTitleImpl';
+import {ParagraphViewModeControlsViewInputs} from './paragraphViewModeControlsViewInputs';
 
 export class ParagraphViewModeImpl implements ParagraphViewMode {
   private readonly _paragraphPayload: WebSocketPayload;
@@ -98,26 +99,49 @@ export class ParagraphViewModeImpl implements ParagraphViewMode {
   }
 
   toggleLineNumbers(shouldDisplay: boolean): void {
-    //paragraph.config.lineNumbers: boolean
+    this._lineNumbersAreVisible.set(shouldDisplay);
+    this._paragraph.request({
+      op:'TOGGLE_LINE_NUMBERS',
+      data:{
+        paragraphId:'',
+        lineNumbersAreVisible:shouldDisplay
+      }
+    });
   }
 
   toggleOutput(shouldDisplay: boolean): void {
-    //paragraph.config.tableHide: boolean
+    this._outputIsVisible.set(shouldDisplay);
+    this._paragraph.request({
+      op:'TOGGLE_OUTPUT',
+      data:{
+        paragraphId:'',
+        outputIsVisible:shouldDisplay
+      }
+    });
   }
 
   toggleTitle(shouldDisplay: boolean): void {
-    //paragraph.config.title: boolean
+    this._titleIsVisible.set(shouldDisplay);
+    this._paragraph.request({
+      op:'TOGGLE_TITLE',
+      data:{
+        paragraphId:'',
+        titleIsVisible:shouldDisplay
+      }
+    });
   }
 
   private initializeRenderNode(): Signal<RenderNode<ParagraphViewInputs>> {
+    const paragraphViewModeControls:RenderNode<ParagraphViewModeControlsViewInputs> = new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW_MODE_CONTROLS_VIEW, computed(() => ({
+      paragraphViewMode: this,
+      editorIsVisible: this._editorIsVisible(),
+      outputIsVisible: this._outputIsVisible(),
+      titleIsVisible: this._titleIsVisible(),
+      lineNumbersAreVisible: this._lineNumbersAreVisible(),
+    })));
+
     return signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
-      paragraphViewModeControls: new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW_MODE_CONTROLS_VIEW, computed(() => ({
-        paragraphViewMode:this,
-        editorIsVisible: this._editorIsVisible(),
-        outputIsVisible: this._outputIsVisible(),
-        titleIsVisible: this._titleIsVisible(),
-        lineNumbersAreVisible: this._lineNumbersAreVisible(),
-      }))),
+      paragraphViewModeControls: paragraphViewModeControls,
       paragraphTitle: this._titleIsVisible() ? new ParagraphTitleImpl(this._paragraphPayload.stringProperty('title'), this._paragraph).print()() : this._renderNodeStub,
       output: this._outputIsVisible() ? this._output.print()() : this._renderNodeStub,
       editor: this._editorIsVisible() ? this._editor.print()() : this._renderNodeStub,
