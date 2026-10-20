@@ -59,7 +59,7 @@ import {ParagraphTitle} from '../../../../objects/paragraph/paragraphTitle/parag
         {{titleText()}}
       </h3>
       <button class="bg-transparent border-0 p-0" (click)="openEditModal()">
-        <i class="fa-solid fa-pen-to-square"></i>
+        <i class="fa-solid fa-pen-to-square" title="Edit paragraph title" aria-label="Edit paragraph title"></i>
       </button>
     </div>
 
