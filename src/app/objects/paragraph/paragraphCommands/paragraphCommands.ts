@@ -45,8 +45,9 @@
  */
 import {Requestable} from '../../channel/requestable';
 import {Printable} from '../../rendering/printable/printable';
+import {ParagraphCommandsViewInputs} from './paragraphCommandsViewInputs';
 
 /**
  * ParagraphCommands are responsible for rendering a group of paragraph-specific commands, such as Run or Clone.
  */
-export interface ParagraphCommands extends Printable, Requestable{}
+export interface ParagraphCommands extends Printable<ParagraphCommandsViewInputs>, Requestable{}

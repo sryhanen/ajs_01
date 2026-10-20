@@ -63,6 +63,8 @@ import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {ParagraphTitle} from './paragraphTitle/paragraphTitle';
 import {ParagraphTitleImpl} from './paragraphTitle/paragraphTitleImpl';
+import {ParagraphCommands} from './paragraphCommands/paragraphCommands';
+import {ParagraphCommandsImpl} from './paragraphCommands/paragraphCommandsImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
@@ -84,7 +86,9 @@ export class ParagraphImpl implements Paragraph {
       'RUN_PARAGRAPH': () => this.run()
     };
     const paragraphTitle:ParagraphTitle = new ParagraphTitleImpl(this._paragraphPayload.stringProperty('title'), this);
+    const paragraphCommands:ParagraphCommands = new ParagraphCommandsImpl(this, this._editor, this._output);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
+      paragraphCommands: paragraphCommands.print()(),
       paragraphTitle: paragraphTitle.print()(),
       output: this._output.print()(),
       editor: this._editor.print()()
