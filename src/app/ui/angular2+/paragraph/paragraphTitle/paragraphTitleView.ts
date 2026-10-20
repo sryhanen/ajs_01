@@ -55,22 +55,26 @@ import * as bootstrap from 'bootstrap';
   ],
   template: `
     @let titleText = paragraphTitle() !== '' ? paragraphTitle() : 'Untitled';
-    <div class="paragraph-title-inactive">
-      {{ titleText }}
+    <div class="d-flex align-items-center gap-3">
+      <h3 class="text-uppercase mb-0">
+        {{ titleText }}
+      </h3>
       <button class="bg-transparent border-0 p-0" (click)="openEditModal()">
         <i class="fa-solid fa-pen-to-square"></i>
       </button>
     </div>
 
     <div #editModal class="modal" tabindex="-1">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Rename Paragraph</h5>
+            <h5 class="modal-title text-uppercase">Rename Paragraph</h5>
           </div>
           <div class="modal-body">
-            <label>Paragraph title</label>
-            <input type="text">
+            <div  class="d-flex align-items-center gap-4">
+              <label>Paragraph title</label>
+              <input type="text">
+            </div>
           </div>
           <div class="modal-footer">
             <button class="btn btn-secondary" (click)="cancelEditing()">Cancel</button>
