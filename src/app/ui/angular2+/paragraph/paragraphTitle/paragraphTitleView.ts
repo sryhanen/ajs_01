@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, ElementRef, input, model, signal, ViewChild} from '@angular/core';
+import {Component, computed, ElementRef, input, model, ViewChild} from '@angular/core';
 import {UpdateCallback} from '../../../../objects/paragraph/paragraphTitle/updateCallback';
 import {FormsModule, NgModel} from '@angular/forms';
 import * as bootstrap from 'bootstrap';
@@ -54,10 +54,9 @@ import * as bootstrap from 'bootstrap';
     FormsModule
   ],
   template: `
-    @let titleText = paragraphTitle() !== '' ? paragraphTitle() : 'Untitled';
     <div class="d-flex align-items-center gap-3">
       <h3 class="text-uppercase mb-0">
-        {{ titleText }}
+        {{titleText()}}
       </h3>
       <button class="bg-transparent border-0 p-0" (click)="openEditModal()">
         <i class="fa-solid fa-pen-to-square"></i>
@@ -73,12 +72,12 @@ import * as bootstrap from 'bootstrap';
           <div class="modal-body">
             <div  class="d-flex align-items-center gap-4">
               <label>Paragraph title</label>
-              <input type="text">
+              <input class="me-2 mb-2" type="text" [(ngModel)]="paragraphTitle" #titleModel="ngModel">
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-secondary" (click)="cancelEditing()">Cancel</button>
-            <button class="btn btn-primary">Save</button>
+            <button class="btn btn-secondary" (click)="cancelEditing(titleModel)" type="reset">Cancel</button>
+            <button class="btn btn-primary" (click)="commitParagraphTitle()" type="submit">Save</button>
           </div>
         </div>
       </div>
@@ -88,7 +87,9 @@ import * as bootstrap from 'bootstrap';
 export class ParagraphTitleView {
   paragraphTitle = model.required<string>();
   updateCallback = input.required<UpdateCallback>();
+  titleText = computed(() => this.paragraphTitle() !== '' ? this.paragraphTitle() : 'Untitled');
   @ViewChild('editModal') modalElement!: ElementRef;
+  private originalTitleText:string;
   private modalInstance!: bootstrap.Modal;
 
   openEditModal() {
@@ -96,9 +97,16 @@ export class ParagraphTitleView {
       this.modalInstance = new bootstrap.Modal(this.modalElement.nativeElement);
     }
     this.modalInstance.show();
+    this.originalTitleText = this.paragraphTitle();
   }
 
-  cancelEditing():void{
+  cancelEditing(model: NgModel):void{
+    model.reset(this.originalTitleText);
+    this.closeEditModal();
+  }
+
+  commitParagraphTitle():void{
+    this.updateCallback()(this.paragraphTitle());
     this.closeEditModal();
   }
 
