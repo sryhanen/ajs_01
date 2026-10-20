@@ -45,12 +45,12 @@
  */
 import {Component, input} from '@angular/core';
 import {ParagraphViewMode} from '../../../../objects/paragraph/paragraphViewMode/paragraphViewMode';
-import {ToggleEditorButton} from './toggleEditorButton/toggleEditorButton';
+import {ToggleEditorButtonView} from './toggleEditorButton/toggleEditorButtonView';
 
 @Component({
   selector: 'paragraph-view-mode-controls',
   imports: [
-    ToggleEditorButton
+    ToggleEditorButtonView
   ],
   template: `
     <toggle-editor-button [editorIsVisible]="editorIsVisible()" (editorVisibilityChanged)="paragraphViewMode().toggleEditor($event)"></toggle-editor-button>

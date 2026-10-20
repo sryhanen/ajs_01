@@ -55,7 +55,7 @@ import {Component, computed, model, output} from '@angular/core';
     </button>
   `
 })
-export class ToggleEditorButton {
+export class ToggleEditorButtonView {
   editorIsVisible = model.required<boolean>();
   editorVisibilityChanged = output<boolean>();
 
