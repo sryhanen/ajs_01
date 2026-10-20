@@ -72,7 +72,7 @@ import * as bootstrap from 'bootstrap';
           <div class="modal-body">
             <div  class="d-flex align-items-center gap-4">
               <label>Paragraph title</label>
-              <input class="me-2 mb-2" type="text" [(ngModel)]="paragraphTitle" #titleModel="ngModel">
+              <input class="me-2 mb-2" type="text" [(ngModel)]="paragraphTitleModel" #titleModel="ngModel">
             </div>
           </div>
           <div class="modal-footer">
@@ -88,8 +88,8 @@ export class ParagraphTitleView {
   paragraphTitle = model.required<string>();
   updateCallback = input.required<UpdateCallback>();
   titleText = computed(() => this.paragraphTitle() !== '' ? this.paragraphTitle() : 'Untitled');
+  paragraphTitleModel = model('');
   @ViewChild('editModal') modalElement!: ElementRef;
-  private originalTitleText:string;
   private modalInstance!: bootstrap.Modal;
 
   openEditModal() {
@@ -97,16 +97,16 @@ export class ParagraphTitleView {
       this.modalInstance = new bootstrap.Modal(this.modalElement.nativeElement);
     }
     this.modalInstance.show();
-    this.originalTitleText = this.paragraphTitle();
+    this.paragraphTitleModel.set(this.paragraphTitle());
   }
 
   cancelEditing(model: NgModel):void{
-    model.reset(this.originalTitleText);
+    model.reset(this.paragraphTitle());
     this.closeEditModal();
   }
 
   commitParagraphTitle():void{
-    this.updateCallback()(this.paragraphTitle());
+    this.updateCallback()(this.paragraphTitleModel());
     this.closeEditModal();
   }
 
