@@ -54,16 +54,6 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
   ],
   template: `
     <div class="paragraph paragraph-box paragraph-col">
-      <div class="control d-flex align-items-center">
-        <div class="flex-fill d-flex align-items-center">
-          <div class="responsive-col d-flex align-items-center">
-            <render-node-host [renderNode]="paragraphViewModeControls()"></render-node-host>
-          </div>
-          <div class="ms-auto d-flex align-items-center">
-            Right corner
-          </div>
-        </div>
-      </div>
       <render-node-host [renderNode]="paragraphTitle()"></render-node-host>
       <render-node-host [renderNode]="editor()"></render-node-host>
       <render-node-host [renderNode]="output()"></render-node-host>
@@ -71,7 +61,6 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
   `
 })
 export class ParagraphView{
-  paragraphViewModeControls = input.required<RenderNode>();
   paragraphTitle = input.required<RenderNode>();
   output = input.required<RenderNode>();
   editor = input.required<RenderNode>();

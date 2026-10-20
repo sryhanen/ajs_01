@@ -43,10 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, model, signal} from '@angular/core';
+import {Component, ElementRef, input, model, signal, ViewChild} from '@angular/core';
 import {UpdateCallback} from '../../../../objects/paragraph/paragraphTitle/updateCallback';
-import {Requestable} from '../../../../objects/channel/requestable';
 import {FormsModule, NgModel} from '@angular/forms';
+import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'paragraph-title',
@@ -54,53 +54,53 @@ import {FormsModule, NgModel} from '@angular/forms';
     FormsModule
   ],
   template: `
-    @if (!isEditing()) {
-      @let titleText = paragraphTitle() !== '' ? paragraphTitle() : 'Untitled';
-      <button class="bg-transparent border-0 p-0" (click)="startEditing()">
-        <div class="paragraph-title-inactive">
-          {{ titleText }}
-        </div>
+    @let titleText = paragraphTitle() !== '' ? paragraphTitle() : 'Untitled';
+    <div class="paragraph-title-inactive">
+      {{ titleText }}
+      <button class="bg-transparent border-0 p-0" (click)="openEditModal()">
+        <i class="fa-solid fa-pen-to-square"></i>
       </button>
-    } @else {
-      <div>
-        <input class="me-2 mb-2" type="text" [(ngModel)]="paragraphTitle" #titleModel="ngModel"/>
-        <button class="bg-transparent border-0 p-0 me-2" (click)="updateTitle()" type="submit"
-                aria-label="Save changes">
-          <i class="paragraph-control fas fa-check fa-lg"></i>
-        </button>
-        <button class="bg-transparent border-0 p-0" (click)="cancelChanges(titleModel)" type="reset"
-                aria-label="Revert changes">
-          <i class="paragraph-control fas fa-times fa-lg"></i>
-        </button>
+    </div>
+
+    <div #editModal class="modal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Rename Paragraph</h5>
+          </div>
+          <div class="modal-body">
+            <label>Paragraph title</label>
+            <input type="text">
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="cancelEditing()">Cancel</button>
+            <button class="btn btn-primary">Save</button>
+          </div>
+        </div>
       </div>
-    }
+    </div>
   `
 })
 export class ParagraphTitleView {
   paragraphTitle = model.required<string>();
   updateCallback = input.required<UpdateCallback>();
+  @ViewChild('editModal') modalElement!: ElementRef;
+  private modalInstance!: bootstrap.Modal;
 
-  requestable = input.required<Requestable>();
-  isEditing = signal(false);
-  private originalTitle:string;
-
-
-  protected startEditing()  {
-    this.originalTitle = this.paragraphTitle();
-    this.isEditing.set(true);
+  openEditModal() {
+    if (!this.modalInstance) {
+      this.modalInstance = new bootstrap.Modal(this.modalElement.nativeElement);
+    }
+    this.modalInstance.show();
   }
 
-  protected stopEditing() {
-    this.isEditing.set(false);
+  cancelEditing():void{
+    this.closeEditModal();
   }
 
-  protected cancelChanges(model: NgModel): void {
-    model.reset(this.originalTitle);
-    this.stopEditing();
-  }
-
-  protected updateTitle():void {
-    this.updateCallback()(this.paragraphTitle());
-    this.stopEditing();
+  private closeEditModal() {
+    if (this.modalInstance) {
+      this.modalInstance.hide();
+    }
   }
 }

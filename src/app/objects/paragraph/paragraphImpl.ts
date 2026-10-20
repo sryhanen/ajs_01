@@ -48,7 +48,7 @@ import {Output} from '../output/output';
 import {OutputImpl} from '../output/outputImpl';
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {Signal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {WebSocketResponsePropertyEqualsFilter} from '../webSocket/response/webSocketResponseFilter/webSocketResponsePropertyEqualsFilter';
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
@@ -58,30 +58,37 @@ import {EditorImpl} from '../editor/editorImpl';
 import {Editor} from '../editor/editor';
 import {WebSocketRequest} from '../webSocket/request/webSocketRequest';
 import {WebSocketRequestImpl} from '../webSocket/request/webSocketRequestImpl';
-import {ParagraphViewMode} from './paragraphViewMode/paragraphViewMode';
-import {ParagraphViewModeImpl} from './paragraphViewMode/paragraphViewModeImpl';
 import {ParagraphViewInputs} from './paragraphViewInputs';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {ParagraphTitle} from './paragraphTitle/paragraphTitle';
+import {ParagraphTitleImpl} from './paragraphTitle/paragraphTitleImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
   private readonly _output: Output;
   private readonly _editor:Editor;
-  private readonly _viewMode:ParagraphViewMode;
   private readonly _paragraphPayload: WebSocketPayload;
   private readonly _paragraphIdFilter: WebSocketResponsePropertyEqualsFilter;
   private readonly _requestEvents: Readonly<Record<string, (webSocketRequest:WebSocketRequest) => void>>;
+  private readonly _renderNode: Signal<RenderNode<ParagraphViewInputs>>;
 
   constructor(requestable: Requestable, paragraphData: object) {
     this._requestable = requestable;
     this._paragraphPayload = this.initializeParagraphData(paragraphData);
     this._output = this.initializedOutput(this._paragraphPayload);
     this._editor = new EditorImpl(this, paragraphData);
-    this._viewMode = new ParagraphViewModeImpl(this._paragraphPayload, this, this._editor, this._output);
     this._paragraphIdFilter = new WebSocketResponsePropertyEqualsFilter('paragraphId', this.id());
     this._requestEvents = {
       'COMMIT_PARAGRAPH': (webSocketRequest:WebSocketRequest) => this.handleCommitParagraphRequest(webSocketRequest),
       'RUN_PARAGRAPH': () => this.run()
     };
+    const paragraphTitle:ParagraphTitle = new ParagraphTitleImpl(this._paragraphPayload.stringProperty('title'), this);
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
+      paragraphTitle: paragraphTitle.print()(),
+      output: this._output.print()(),
+      editor: this._editor.print()()
+    }))));
   }
 
   run(): void {
@@ -98,7 +105,7 @@ export class ParagraphImpl implements Paragraph {
   }
 
   print(): Signal<RenderNode<ParagraphViewInputs>> {
-    return this._viewMode.print();
+    return this._renderNode;
   }
 
   id(): string {
