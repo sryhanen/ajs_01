@@ -131,6 +131,10 @@ export class OutputImpl implements Output {
     }
   }
 
+  clear():void{
+    this._output.set(this._renderNodeStub);
+  }
+
   private receivedOutputIsValid(paragraphOutputResponse:WebSocketResponse):boolean{
     const receivedOutputType = paragraphOutputResponse.dataAsWebSocketPayload().objectPropertyAsPayload('output').stringProperty('type');
     const requestedOutputType = new WebSocketPayloadImpl(this._previousParagraphOutputRequest.data()).stringProperty('type');

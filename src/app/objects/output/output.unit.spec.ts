@@ -267,4 +267,24 @@ describe('Output unit test', () => {
     expect(dplLogBeforeResponse.isStub()).toBe(true);
     expect(dplLogAfterResponse.isStub()).toBe(false);
   });
+
+  it('Should clear output', () => {
+    output = new OutputImpl(requestable);
+    const outputResponse = {
+      op:'PARAGRAPH_OUTPUT',
+      data:{
+        output:{
+          type: OutputType.text,
+          data:'',
+          isAggregated:false
+        }
+      }
+    };
+    output.response(outputResponse);
+    const outputBeforeClear = output.print()().inputs()()['output'] as RenderNode;
+    output.clear();
+    const outputAfterClear = output.print()().inputs()()['output'] as RenderNode;
+    expect(outputBeforeClear.isStub()).toBe(false);
+    expect(outputAfterClear.isStub()).toBe(true);
+  });
 });
