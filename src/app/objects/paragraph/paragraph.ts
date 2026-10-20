@@ -50,4 +50,5 @@ import {ParagraphViewInputs} from './paragraphViewInputs';
 export interface Paragraph extends Channel, Printable<ParagraphViewInputs> {
   id(): string;
   run():void;
+  clone():void;
 }

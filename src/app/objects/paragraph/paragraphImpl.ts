@@ -91,6 +91,16 @@ export class ParagraphImpl implements Paragraph {
     }))));
   }
 
+  clone(): void {
+    const copyParagraphRequest = {
+      op:'COPY_PARAGRAPH',
+      data:{
+        paragraphId:this.id(),
+      }
+    };
+    this._requestable.request(copyParagraphRequest);
+  }
+
   run(): void {
     const runParagraphRequest = {
       op:'RUN_PARAGRAPH',

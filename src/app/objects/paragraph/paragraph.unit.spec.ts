@@ -180,4 +180,16 @@ describe('Paragraph', () => {
     };
     expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
   });
+
+  it('Should clone paragraph', () => {
+    const requestSpy = vi.spyOn(channel, 'request');
+    paragraph.clone();
+    const expectedRequest = {
+      op:'COPY_PARAGRAPH',
+      data:{
+        paragraphId:paragraphId,
+      }
+    };
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
 });
