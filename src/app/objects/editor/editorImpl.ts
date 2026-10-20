@@ -61,13 +61,16 @@ import {AutoCompletionsRule} from './editorRules/autoCompletionsRule/autoComplet
 import {SyntaxLanguageSelectRule} from './editorRules/syntaxLanguageSelectRule/syntaxLanguageSelectRule';
 import {SyntaxLanguageSelectRuleImpl} from './editorRules/syntaxLanguageSelectRule/syntaxLanguageSelectRuleImpl';
 import {DplCompleterImpl} from './editorRules/autoCompletionsRule/dplCompleter/dplCompleterImpl';
+import ace from 'ace-builds';
+import {EditorViewInputs} from './editorViewInputs';
 
 export class EditorImpl implements Editor {
   private readonly _requestable:Requestable;
   private readonly _editorRules:EditorRule[];
-  private readonly _renderNode:Signal<RenderNode>;
+  private readonly _renderNode:Signal<RenderNode<EditorViewInputs>>;
   private readonly _autoCompleteRule:AutoCompletionsRule;
   private readonly _syntaxLanguageSelectRule:SyntaxLanguageSelectRule;
+  private readonly _editor:ace.Ace.Editor;
 
   constructor(requestable:Requestable, paragraphData:object) {
     this._requestable = requestable;
@@ -83,12 +86,14 @@ export class EditorImpl implements Editor {
       this._autoCompleteRule,
       this._syntaxLanguageSelectRule
     ];
+    this._editor = ace.edit(document.createElement('pre'));
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
+      editor:this._editor,
       editorRules:this._editorRules
     }))));
   }
 
-  print(): Signal<RenderNode> {
+  print(): Signal<RenderNode<EditorViewInputs>> {
     return this._renderNode;
   }
 
@@ -99,5 +104,9 @@ export class EditorImpl implements Editor {
   response(json: object): void {
     this._autoCompleteRule.response(json);
     this._syntaxLanguageSelectRule.response(json);
+  }
+
+  clear() {
+    this._editor.setValue('', -1);
   }
 }

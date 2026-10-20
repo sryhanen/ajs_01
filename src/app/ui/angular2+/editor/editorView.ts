@@ -48,7 +48,7 @@ import {
   Component,
   ElementRef,
   input,
-  OnChanges,
+  OnChanges, OnDestroy,
   ViewChild
 } from '@angular/core';
 import ace from 'ace-builds';
@@ -57,15 +57,14 @@ import {EditorRule} from '../../../objects/editor/editorRules/editorRule';
 @Component({
   selector: 'editor',
   template: `
-    <div class="paragraph-editor my-2">
-      <pre #editorAnchor class="editor-container"></pre>
+    <div class="paragraph-editor my-2" #editorAnchor>
     </div>
   `
 })
-export class EditorView implements AfterViewInit, OnChanges{
-  @ViewChild('editorAnchor') editorAnchor: ElementRef;
+export class EditorView implements AfterViewInit, OnChanges, OnDestroy {
+  editor = input.required<ace.Ace.Editor>();
   editorRules = input.required<EditorRule[]>();
-  private _aceEditor: ace.Ace.Editor;
+  @ViewChild('editorAnchor') editorAnchor: ElementRef;
 
   ngAfterViewInit() {
     ace.config.set('basePath', '/');
@@ -76,18 +75,20 @@ export class EditorView implements AfterViewInit, OnChanges{
   }
 
   ngOnChanges() {
-    if(this._aceEditor){
-      this.editorAnchor.nativeElement.className = '';
-      this.editorAnchor.nativeElement.classList.add('editor-container');
-      this._aceEditor.destroy();
-      this.initializeEditor();
-    }
+    this.initializeEditor();
+  }
+
+  ngOnDestroy(): void {
+    this.editor().destroy();
   }
 
   private initializeEditor():void{
-    this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
-    this.editorRules().forEach(rule => {
-      rule.applyTo(this._aceEditor);
-    });
+    if(this.editorAnchor){
+      this.editorRules().forEach(rule => {
+        rule.applyTo(this.editor());
+      });
+      this.editorAnchor.nativeElement.innerHTML = '';
+      this.editorAnchor.nativeElement.appendChild(this.editor().container);
+    }
   }
 }

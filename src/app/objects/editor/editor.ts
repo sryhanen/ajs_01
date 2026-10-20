@@ -45,5 +45,8 @@
  */
 import {Printable} from '../rendering/printable/printable';
 import {Channel} from '../channel/channel';
+import {EditorViewInputs} from './editorViewInputs';
 
-export interface Editor extends Printable, Channel {}
+export interface Editor extends Printable<EditorViewInputs>, Channel {
+  clear(): void;
+}

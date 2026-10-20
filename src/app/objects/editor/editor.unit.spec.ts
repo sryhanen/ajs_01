@@ -47,6 +47,8 @@ import {Editor} from './editor';
 import {EditorImpl} from './editorImpl';
 import {Requestable} from '../channel/requestable';
 import {FakeChannel} from '../channel/fakeChannel';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import ace from 'ace-builds';
 
 describe('Editor unit test', () => {
   let editor: Editor;
@@ -69,6 +71,8 @@ describe('Editor unit test', () => {
     const printed = editor.print()();
     const inputs = printed.inputs()();
     expect(printed.isStub()).toBe(false);
+    expect(printed.componentView()).toEqual(RegisteredComponents.EDITOR_VIEW);
+    expect(inputs['editor']).toBeDefined();
     expect(inputs['editorRules']).toBeDefined();
   });
 
@@ -80,5 +84,17 @@ describe('Editor unit test', () => {
     const requestSpy = vi.spyOn(requestable, 'request');
     editor.request(request);
     expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
+
+  it('Should clear', () => {
+    const printed = editor.print()();
+    const editorInstance = printed.inputs()()['editor'] as ace.Ace.Editor;
+    const initialValue = 'some value';
+    editorInstance.setValue(initialValue);
+    const valueBeforeClear = editorInstance.getValue();
+    editor.clear();
+    const valueAfterClear = editorInstance.getValue();
+    expect(valueBeforeClear).toEqual(initialValue);
+    expect(valueAfterClear).toEqual('');
   });
 });
