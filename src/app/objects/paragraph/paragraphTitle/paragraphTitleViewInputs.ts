@@ -43,9 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {UpdateCallback} from './updateCallback';
+import {ParagraphTitle} from './paragraphTitle';
 
 export type ParagraphTitleViewInputs = {
-  paragraphTitle:string,
-  updateCallback:UpdateCallback
+  paragraphTitle:ParagraphTitle
 };

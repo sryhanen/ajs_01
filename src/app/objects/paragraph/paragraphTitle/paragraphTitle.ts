@@ -44,12 +44,13 @@
  * a licensee so wish it.
  */
 import {Printable} from '../../rendering/printable/printable';
-import {UpdateCallback} from './updateCallback';
 import {ParagraphTitleViewInputs} from './paragraphTitleViewInputs';
+import {Signal} from '@angular/core';
 
 /**
  * ParagraphTitle displays and updates the title of a paragraph.
  */
 export interface ParagraphTitle extends Printable<ParagraphTitleViewInputs>{
-  update: UpdateCallback;
+  asStringSignal():Signal<string>;
+  update(newValue: string): void;
 }

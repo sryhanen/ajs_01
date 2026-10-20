@@ -60,13 +60,16 @@ export class ParagraphTitleImpl implements ParagraphTitle {
     this._title = signal(title);
     this._requestable = requestable;
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_TITLE_VIEW, computed(() => ({
-      paragraphTitle:this._title(),
-      updateCallback: (newValue) => this.update(newValue)
+      paragraphTitle:this,
     }))));
   }
 
   print(): Signal<RenderNode<ParagraphTitleViewInputs>> {
     return this._renderNode;
+  }
+
+  asStringSignal(): Signal<string> {
+    return this._title;
   }
 
   update(newValue: string): void {

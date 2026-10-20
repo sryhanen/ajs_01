@@ -44,9 +44,9 @@
  * a licensee so wish it.
  */
 import {Component, computed, ElementRef, input, model, ViewChild} from '@angular/core';
-import {UpdateCallback} from '../../../../objects/paragraph/paragraphTitle/updateCallback';
 import {FormsModule, NgModel} from '@angular/forms';
 import * as bootstrap from 'bootstrap';
+import {ParagraphTitle} from '../../../../objects/paragraph/paragraphTitle/paragraphTitle';
 
 @Component({
   selector: 'paragraph-title',
@@ -85,9 +85,9 @@ import * as bootstrap from 'bootstrap';
   `
 })
 export class ParagraphTitleView {
-  paragraphTitle = model.required<string>();
-  updateCallback = input.required<UpdateCallback>();
-  titleText = computed(() => this.paragraphTitle() !== '' ? this.paragraphTitle() : 'Untitled');
+  paragraphTitle = input.required<ParagraphTitle>();
+  paragraphTitleValue = computed(() => this.paragraphTitle().asStringSignal()());
+  titleText = computed(() => this.paragraphTitleValue() !== '' ? this.paragraphTitleValue() : 'Untitled');
   paragraphTitleModel = model('');
   @ViewChild('editModal') modalElement!: ElementRef;
   private modalInstance!: bootstrap.Modal;
@@ -97,16 +97,16 @@ export class ParagraphTitleView {
       this.modalInstance = new bootstrap.Modal(this.modalElement.nativeElement);
     }
     this.modalInstance.show();
-    this.paragraphTitleModel.set(this.paragraphTitle());
+    this.paragraphTitleModel.set(this.paragraphTitleValue());
   }
 
   cancelEditing(model: NgModel):void{
-    model.reset(this.paragraphTitle());
+    model.reset(this.paragraphTitleValue());
     this.closeEditModal();
   }
 
   commitParagraphTitle():void{
-    this.updateCallback()(this.paragraphTitleModel());
+    this.paragraphTitle().update(this.paragraphTitleModel());
     this.closeEditModal();
   }
 
