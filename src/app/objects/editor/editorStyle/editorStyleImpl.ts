@@ -54,6 +54,8 @@ import ace from 'ace-builds';
 import {Requestable} from '../../channel/requestable';
 import {LineNumberVisibility} from './editorStyles/lineNumberVisibility/lineNumberVisibility';
 import {LineNumberVisibilityImpl} from './editorStyles/lineNumberVisibility/lineNumberVisibilityImpl';
+import {FontSize} from './editorStyles/fontSize/fontSize';
+import {FontSizeImpl} from './editorStyles/fontSize/fontSizeImpl';
 
 export class EditorStyleImpl implements EditorStyle {
   private readonly _requestable:Requestable;
@@ -63,8 +65,10 @@ export class EditorStyleImpl implements EditorStyle {
     this._requestable = requestable;
     const paragraphPayload = new WebSocketPayloadImpl(paragraphData);
     const lineNumberVisibility:LineNumberVisibility = new LineNumberVisibilityImpl(this, editor, paragraphPayload);
+    const fontSize:FontSize = new FontSizeImpl(this, editor, paragraphPayload);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_STYLE_VIEW, computed(() => ({
-      lineNumberVisibility:lineNumberVisibility.print()()
+      lineNumberVisibility:lineNumberVisibility.print()(),
+      fontSize: fontSize.print()()
     }))));
   }
 

@@ -63,11 +63,14 @@ import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
         <li>
           <render-node-host [renderNode]="lineNumberVisibility()"></render-node-host>
         </li>
+        <li>
+          <render-node-host [renderNode]="fontSize()"></render-node-host>
+        </li>
       </ul>
     </div>
   `
 })
 export class EditorStyleView {
   lineNumberVisibility = input.required<RenderNode>();
-
+  fontSize = input.required<RenderNode>();
 }

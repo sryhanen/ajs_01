@@ -68,6 +68,7 @@ import {EditorStyleView} from '../editor/editorStyle/editorStyleView';
 import {
   LineNumberVisibilityView
 } from '../editor/editorStyle/editorStyles/lineNumberVisibility/lineNumberVisibilityView';
+import {FontSizeSelectView} from '../editor/editorStyle/editorStyles/fontSizeSelect/fontSizeSelectView';
 
 export const ComponentRegistryProvider: Provider = {
   provide: COMPONENT_REGISTRY,
@@ -91,6 +92,7 @@ export const ComponentRegistryProvider: Provider = {
     [RegisteredComponents.DPL_LOG_VIEW, DplLogView],
     [RegisteredComponents.EDITOR_VIEW, EditorView],
     [RegisteredComponents.EDITOR_STYLE_VIEW, EditorStyleView],
-    [RegisteredComponents.EDITOR_LINE_NUMBER_VISIBILITY_VIEW, LineNumberVisibilityView]
+    [RegisteredComponents.EDITOR_LINE_NUMBER_VISIBILITY_VIEW, LineNumberVisibilityView],
+    [RegisteredComponents.EDITOR_FONT_SIZE_SELECT_VIEW, FontSizeSelectView]
   ])
 };
