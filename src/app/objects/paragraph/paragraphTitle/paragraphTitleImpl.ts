@@ -50,6 +50,8 @@ import {ParagraphTitleViewInputs} from './paragraphTitleViewInputs';
 import {Requestable} from '../../channel/requestable';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
+import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 export class ParagraphTitleImpl implements ParagraphTitle {
   private readonly _title:WritableSignal<string>;
@@ -65,7 +67,11 @@ export class ParagraphTitleImpl implements ParagraphTitle {
   }
 
   response(json: object): void {
-    throw new Error('Method not implemented.');
+    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    if(webSocketResponse.operation() === 'PARAGRAPH_TITLE'){
+      const newTitle = webSocketResponse.dataAsWebSocketPayload().stringProperty('title');
+      this._title.set(newTitle);
+    }
   }
 
   print(): Signal<RenderNode<ParagraphTitleViewInputs>> {
@@ -79,10 +85,10 @@ export class ParagraphTitleImpl implements ParagraphTitle {
   update(newValue: string): void {
     this._title.set(newValue);
     this._requestable.request({
-      op:'TITLE_UPDATED',
+      op:'PARAGRAPH_TITLE',
       data:{
         paragraphId:'',
-        newValue:newValue
+        title:newValue
       }
     });
   }

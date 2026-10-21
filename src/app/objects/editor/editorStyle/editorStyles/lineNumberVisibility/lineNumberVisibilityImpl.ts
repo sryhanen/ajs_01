@@ -51,6 +51,8 @@ import {WebSocketPayload} from '../../../../webSocket/webSocketPayload/webSocket
 import {RenderNodeImpl} from '../../../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../../../ui/angular2+/componentRegistry/registeredComponents';
 import ace from 'ace-builds';
+import {WebSocketResponseImpl} from '../../../../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../../../../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 export class LineNumberVisibilityImpl implements LineNumberVisibility {
   private readonly _requestable:Requestable;
@@ -70,7 +72,11 @@ export class LineNumberVisibilityImpl implements LineNumberVisibility {
   }
 
   response(json: object): void {
-      throw new Error('Method not implemented.');
+    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    if(webSocketResponse.operation() === 'EDITOR_LINE_NUMBER_VISIBILITY'){
+      const lineNumbersAreVisible = webSocketResponse.dataAsWebSocketPayload().booleanProperty('isVisible');
+      this._lineNumbers.set(lineNumbersAreVisible);
+    }
   }
 
   asSignal(): Signal<boolean> {

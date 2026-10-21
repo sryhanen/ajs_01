@@ -51,6 +51,8 @@ import ace from 'ace-builds';
 import {WebSocketPayload} from '../../../../webSocket/webSocketPayload/webSocketPayload';
 import {RegisteredComponents} from '../../../../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../../../../rendering/renderNode/renderNodeImpl';
+import {WebSocketResponseImpl} from '../../../../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../../../../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 export class FontSizeImpl implements FontSize {
   private readonly _requestable:Requestable;
@@ -61,8 +63,9 @@ export class FontSizeImpl implements FontSize {
   constructor(requestable:Requestable, editor:ace.Ace.Editor, paragraphPayload:WebSocketPayload) {
     this._requestable = requestable;
     this._editor = editor;
+    const defaultFontSize = 12;
     const config = paragraphPayload.objectPropertyAsPayload('config');
-    const fontSizeValue = config.propertyExists('fontSize') ? config.numberProperty('fontSize') : 12;
+    const fontSizeValue = config.propertyExists('fontSize') ? config.numberProperty('fontSize') : defaultFontSize;
     this._fontSize = signal(fontSizeValue);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_FONT_SIZE_SELECT_VIEW, computed(() => ({
       fontSize:this
@@ -70,7 +73,11 @@ export class FontSizeImpl implements FontSize {
   }
 
   response(json: object): void {
-      throw new Error('Method not implemented.');
+    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    if(webSocketResponse.operation() === 'EDITOR_FONT_SIZE'){
+      const fontSize = webSocketResponse.dataAsWebSocketPayload().numberProperty('fontSize');
+      this._fontSize.set(fontSize);
+    }
   }
 
   asSignal(): Signal<number> {
