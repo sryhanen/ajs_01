@@ -51,6 +51,6 @@ import {Signal} from '@angular/core';
  * ParagraphTitle displays and updates the title of a paragraph.
  */
 export interface ParagraphTitle extends Printable<ParagraphTitleViewInputs>{
-  asStringSignal():Signal<string>;
+  asSignal():Signal<string>;
   update(newValue: string): void;
 }

@@ -43,17 +43,31 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component} from '@angular/core';
+import {Component, input} from '@angular/core';
+import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
 
 @Component({
   selector: 'editor-style',
+  imports: [
+    RenderNodeRootView
+  ],
   template: `
-    <button class="btn btn-sm bg-light border border-2 border-bottom-0 ms-auto d-flex px-2 pt-1"
-            aria-label="Editor Settings">
-      <i class="fa-solid fa-gear"></i>
-    </button>
+    <div>
+      <button class="btn btn-sm bg-light border border-2 border-bottom-0 ms-auto d-flex px-2 pt-1"
+              aria-label="Editor Settings"
+              data-bs-toggle="dropdown">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+        <li>
+          <render-node-host [renderNode]="lineNumberVisibility()"></render-node-host>
+        </li>
+      </ul>
+    </div>
   `
 })
 export class EditorStyleView {
+  lineNumberVisibility = input.required<RenderNode>();
 
 }

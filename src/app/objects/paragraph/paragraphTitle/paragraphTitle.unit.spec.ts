@@ -57,7 +57,7 @@ describe('ParagraphTitle unit test', () => {
     const initialTitle = 'some initial title text';
     requestable = new FakeChannel();
     paragraphTitle = new ParagraphTitleImpl(initialTitle, requestable);
-    const signalStringValue = paragraphTitle.asStringSignal()();
+    const signalStringValue = paragraphTitle.asSignal()();
     expect(signalStringValue).toEqual(initialTitle);
   });
 
@@ -65,10 +65,10 @@ describe('ParagraphTitle unit test', () => {
     const initialTitle = 'some initial title text';
     requestable = new FakeChannel();
     paragraphTitle = new ParagraphTitleImpl(initialTitle, requestable);
-    const initialTitleValue = paragraphTitle.asStringSignal()();
+    const initialTitleValue = paragraphTitle.asSignal()();
     const newTitle = 'new title';
     paragraphTitle.update(newTitle);
-    const updatedTitle = paragraphTitle.asStringSignal()();
+    const updatedTitle = paragraphTitle.asSignal()();
     expect(initialTitleValue).toEqual(initialTitle);
     expect(updatedTitle).toEqual(newTitle);
   });

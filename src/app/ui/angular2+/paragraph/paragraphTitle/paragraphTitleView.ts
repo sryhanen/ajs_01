@@ -86,7 +86,7 @@ import {ParagraphTitle} from '../../../../objects/paragraph/paragraphTitle/parag
 })
 export class ParagraphTitleView {
   paragraphTitle = input.required<ParagraphTitle>();
-  paragraphTitleValue = computed(() => this.paragraphTitle().asStringSignal()());
+  paragraphTitleValue = computed(() => this.paragraphTitle().asSignal()());
   titleText = computed(() => this.paragraphTitleValue() !== '' ? this.paragraphTitleValue() : 'Untitled');
   paragraphTitleModel = model('');
   @ViewChild('editModal') modalElement!: ElementRef;

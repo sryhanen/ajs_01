@@ -52,19 +52,19 @@ import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 import ace from 'ace-builds';
 import {Requestable} from '../../channel/requestable';
+import {LineNumberVisibility} from './editorStyles/lineNumberVisibility/lineNumberVisibility';
+import {LineNumberVisibilityImpl} from './editorStyles/lineNumberVisibility/lineNumberVisibilityImpl';
 
 export class EditorStyleImpl implements EditorStyle {
   private readonly _requestable:Requestable;
-  private readonly _editor:ace.Ace.Editor;
-  private readonly _paragraphPayload:WebSocketPayload;
   private readonly _renderNode:Signal<RenderNode>;
 
   constructor(requestable:Requestable, editor:ace.Ace.Editor, paragraphData:object) {
     this._requestable = requestable;
-    this._editor = editor;
-    this._paragraphPayload = new WebSocketPayloadImpl(paragraphData);
+    const paragraphPayload = new WebSocketPayloadImpl(paragraphData);
+    const lineNumberVisibility:LineNumberVisibility = new LineNumberVisibilityImpl(this, editor, paragraphPayload);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_STYLE_VIEW, computed(() => ({
-
+      lineNumberVisibility:lineNumberVisibility.print()()
     }))));
   }
 
@@ -73,5 +73,6 @@ export class EditorStyleImpl implements EditorStyle {
   }
 
   request(json: object): void {
+    this._requestable.request(json);
   }
 }

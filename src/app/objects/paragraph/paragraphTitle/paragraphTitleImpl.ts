@@ -68,7 +68,7 @@ export class ParagraphTitleImpl implements ParagraphTitle {
     return this._renderNode;
   }
 
-  asStringSignal(): Signal<string> {
+  asSignal(): Signal<string> {
     return this._title;
   }
 
