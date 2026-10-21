@@ -57,7 +57,12 @@ import {EditorRule} from '../../../objects/editor/editorRules/editorRule';
 @Component({
   selector: 'editor',
   template: `
-    <div class="paragraph-editor my-2" #editorAnchor>
+    <div>
+        <button class="btn btn-sm bg-light border border-2 border-bottom-0 ms-auto d-flex px-2 pt-1"
+          aria-label="Editor Settings">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      <div class="paragraph-editor mb-2" #editorAnchor></div>
     </div>
   `
 })
