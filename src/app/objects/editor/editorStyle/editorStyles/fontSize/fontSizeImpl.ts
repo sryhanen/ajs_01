@@ -69,6 +69,10 @@ export class FontSizeImpl implements FontSize {
     }))));
   }
 
+  response(json: object): void {
+      throw new Error('Method not implemented.');
+  }
+
   asSignal(): Signal<number> {
     return this._fontSize;
   }

@@ -46,7 +46,6 @@
 import {EditorStyle} from './editorStyle';
 import {computed, signal, Signal} from '@angular/core';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
@@ -60,15 +59,17 @@ import {FontSizeImpl} from './editorStyles/fontSize/fontSizeImpl';
 export class EditorStyleImpl implements EditorStyle {
   private readonly _requestable:Requestable;
   private readonly _renderNode:Signal<RenderNode>;
+  private readonly _lineNumberVisibility:LineNumberVisibility;
+  private readonly _fontSize:FontSize;
 
   constructor(requestable:Requestable, editor:ace.Ace.Editor, paragraphData:object) {
     this._requestable = requestable;
     const paragraphPayload = new WebSocketPayloadImpl(paragraphData);
-    const lineNumberVisibility:LineNumberVisibility = new LineNumberVisibilityImpl(this, editor, paragraphPayload);
-    const fontSize:FontSize = new FontSizeImpl(this, editor, paragraphPayload);
+    this._lineNumberVisibility = new LineNumberVisibilityImpl(this, editor, paragraphPayload);
+    this._fontSize = new FontSizeImpl(this, editor, paragraphPayload);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_STYLE_VIEW, computed(() => ({
-      lineNumberVisibility:lineNumberVisibility.print()(),
-      fontSize: fontSize.print()()
+      lineNumberVisibility:this._lineNumberVisibility.print()(),
+      fontSize:this._fontSize.print()()
     }))));
   }
 
@@ -78,5 +79,10 @@ export class EditorStyleImpl implements EditorStyle {
 
   request(json: object): void {
     this._requestable.request(json);
+  }
+
+  response(json: object): void {
+    this._fontSize.response(json);
+    this._lineNumberVisibility.response(json);
   }
 }

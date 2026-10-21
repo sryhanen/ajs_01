@@ -70,6 +70,7 @@ export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
   private readonly _output: Output;
   private readonly _editor:Editor;
+  private readonly _paragraphTitle:ParagraphTitle;
   private readonly _paragraphPayload: WebSocketPayload;
   private readonly _paragraphIdFilter: WebSocketResponsePropertyEqualsFilter;
   private readonly _requestEvents: Readonly<Record<string, (webSocketRequest:WebSocketRequest) => void>>;
@@ -85,11 +86,11 @@ export class ParagraphImpl implements Paragraph {
       'COMMIT_PARAGRAPH': (webSocketRequest:WebSocketRequest) => this.handleCommitParagraphRequest(webSocketRequest),
       'RUN_PARAGRAPH': () => this.run()
     };
-    const paragraphTitle:ParagraphTitle = new ParagraphTitleImpl(this._paragraphPayload.stringProperty('title'), this);
+    this._paragraphTitle = new ParagraphTitleImpl(this._paragraphPayload.stringProperty('title'), this);
     const paragraphCommands:ParagraphCommands = new ParagraphCommandsImpl(this, this._editor, this._output);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
       paragraphCommands: paragraphCommands.print()(),
-      paragraphTitle: paragraphTitle.print()(),
+      paragraphTitle: this._paragraphTitle.print()(),
       output: this._output.print()(),
       editor: this._editor.print()()
     }))));
@@ -151,6 +152,7 @@ export class ParagraphImpl implements Paragraph {
       };
       this._output.response(responseMessage);
       this._editor.response(responseMessage);
+      this._paragraphTitle.response(responseMessage);
     }
   }
 

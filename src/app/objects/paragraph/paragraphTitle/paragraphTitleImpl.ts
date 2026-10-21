@@ -64,6 +64,10 @@ export class ParagraphTitleImpl implements ParagraphTitle {
     }))));
   }
 
+  response(json: object): void {
+    throw new Error('Method not implemented.');
+  }
+
   print(): Signal<RenderNode<ParagraphTitleViewInputs>> {
     return this._renderNode;
   }

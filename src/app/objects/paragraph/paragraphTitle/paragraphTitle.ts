@@ -46,11 +46,12 @@
 import {Printable} from '../../rendering/printable/printable';
 import {ParagraphTitleViewInputs} from './paragraphTitleViewInputs';
 import {Signal} from '@angular/core';
+import {Respondable} from '../../channel/respondable';
 
 /**
  * ParagraphTitle displays and updates the title of a paragraph.
  */
-export interface ParagraphTitle extends Printable<ParagraphTitleViewInputs>{
+export interface ParagraphTitle extends Printable<ParagraphTitleViewInputs>, Respondable{
   asSignal():Signal<string>;
   update(newValue: string): void;
 }

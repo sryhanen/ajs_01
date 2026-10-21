@@ -45,11 +45,12 @@
  */
 import {Printable} from '../../../../rendering/printable/printable';
 import {Signal} from '@angular/core';
+import {Respondable} from '../../../../channel/respondable';
 
 /**
  * LineNumberVisibility allows configuration for Ace Editors line number visibility.
  */
-export interface LineNumberVisibility extends Printable{
+export interface LineNumberVisibility extends Printable, Respondable{
   asSignal(): Signal<boolean>;
   toggle(isVisible:boolean):void;
 }

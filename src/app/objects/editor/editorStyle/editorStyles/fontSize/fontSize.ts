@@ -45,11 +45,12 @@
  */
 import {Printable} from '../../../../rendering/printable/printable';
 import {Signal} from '@angular/core';
+import {Respondable} from '../../../../channel/respondable';
 
 /**
  * Fontsize allows configuration for Ace Editors font-size
  */
-export interface FontSize extends Printable{
+export interface FontSize extends Printable, Respondable{
   asSignal(): Signal<number>;
   update(fontSize:number):void;
 }

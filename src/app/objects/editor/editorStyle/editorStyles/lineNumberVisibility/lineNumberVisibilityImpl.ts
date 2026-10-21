@@ -69,6 +69,10 @@ export class LineNumberVisibilityImpl implements LineNumberVisibility {
     }))));
   }
 
+  response(json: object): void {
+      throw new Error('Method not implemented.');
+  }
+
   asSignal(): Signal<boolean> {
     return this._lineNumbers;
   }

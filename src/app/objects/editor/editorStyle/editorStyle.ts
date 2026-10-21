@@ -44,9 +44,9 @@
  * a licensee so wish it.
  */
 import {Printable} from '../../rendering/printable/printable';
-import {Requestable} from '../../channel/requestable';
+import {Channel} from '../../channel/channel';
 
 /**
  * Editor style displays and allows the configuration for editor-related style settings.
  */
-export interface EditorStyle extends Requestable, Printable{}
+export interface EditorStyle extends Channel, Printable{}
