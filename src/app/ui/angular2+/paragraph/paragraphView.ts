@@ -55,10 +55,10 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
   template: `
     <div class="paragraph paragraph-box paragraph-col py-4">
       <render-node-host [renderNode]="paragraphTitle()"></render-node-host>
+      <render-node-host [renderNode]="editor()"></render-node-host>
       <hr>
       <render-node-host [renderNode]="paragraphCommands()"></render-node-host>
       <hr>
-      <render-node-host [renderNode]="editor()"></render-node-host>
       <render-node-host [renderNode]="output()"></render-node-host>
     </div>
   `
