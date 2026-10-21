@@ -52,19 +52,24 @@ import {Output} from '../../../../objects/output/output';
   selector:'paragraph-commands',
   template: `
     <div class="d-flex gap-3 align-items-center">
-      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary" aria-label="Run paragraph" (click)="paragraph().run()">
+      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+              aria-label="Run paragraph" title="Run paragraph" (click)="paragraph().run()">
         <i class="fa-solid fa-play"></i>
       </button>
-      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary" aria-label="Clear output" (click)="editor().clear()">
+      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+              aria-label="Clear output" title="Clear output" (click)="editor().clear()">
         <i class="fa-solid fa-eraser"></i>
       </button>
-      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary" aria-label="Clone paragraph" (click)="paragraph().clone()">
+      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+              aria-label="Clone paragraph" title="Clone paragraph" (click)="paragraph().clone()">
         <i class="fa-solid fa-copy"></i>
       </button>
-      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary" aria-label="Link to paragraph" >
+      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+              aria-label="Link to paragraph" title="Link to paragraph">
         <i class="fa-solid fa-link"></i>
       </button>
-      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary" aria-label="Clear output" (click)="output().clear()">
+      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+              aria-label="Clear output" title="Clear output" (click)="output().clear()">
         <i class="fa-solid fa-trash"></i>
       </button>
     </div>
