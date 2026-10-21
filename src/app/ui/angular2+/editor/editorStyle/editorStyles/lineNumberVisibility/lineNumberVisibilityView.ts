@@ -57,6 +57,7 @@ import {FormsModule} from '@angular/forms';
   template: `
     <div class="form-check form-switch">
       <input class="form-check-input" type="checkbox" role="switch" id="visibilityToggle" [(ngModel)]="isVisible" (change)="toggleVisibility()">
+      <div class="ms-auto"></div>
       <label class="form-check-label" for="visibilityToggle">Toggle line visibility</label>
     </div>
   `

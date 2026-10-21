@@ -53,13 +53,17 @@ import {FormsModule} from '@angular/forms';
     FormsModule
   ],
   template: `
-    <select [(ngModel)]="selectedFontSize" (change)="setFontSize()">
-      @for (fontSizeOption of fontSizeOptions; track $index) {
-        <option [label]="fontSizeOption" [ngValue]="fontSizeOption"
-                [selected]="selectedFontSize() === fontSizeOption"></option>
-      }
-    </select>
-
+    <div class="d-flex align-items-center gap-2">
+      <label for="fontSizeSelect">Font size</label>
+      <div class="ms-auto"></div>
+      <select id="fontSizeSelect" class="form-select w-40" [(ngModel)]="selectedFontSize" (change)="setFontSize()">
+        @for (fontSizeOption of fontSizeOptions; track $index) {
+          <option [label]="fontSizeOption" [ngValue]="fontSizeOption"
+                  [selected]="selectedFontSize() === fontSizeOption">
+          </option>
+        }
+      </select>
+    </div>
   `
 })
 export class FontSizeSelectView implements OnInit {

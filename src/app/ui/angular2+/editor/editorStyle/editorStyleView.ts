@@ -59,7 +59,7 @@ import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
               data-bs-toggle="dropdown">
         <i class="fa-solid fa-gear"></i>
       </button>
-      <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm px-2 py-2">
         <li>
           <render-node-host [renderNode]="lineNumberVisibility()"></render-node-host>
         </li>
