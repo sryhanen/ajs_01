@@ -64,6 +64,7 @@ import {DplLogView} from '../dplLog/dplLogView';
 import {NotebookIndexCollectionView} from '../notebookIndexCollection/notebookIndexCollectionView';
 import {ParagraphTitleView} from '../paragraph/paragraphTitle/paragraphTitleView';
 import {ParagraphCommandsView} from '../paragraph/paragraphCommands/paragraphCommandsView';
+import {EditorStyleView} from '../editor/editorStyle/editorStyleView';
 
 export const ComponentRegistryProvider: Provider = {
   provide: COMPONENT_REGISTRY,
@@ -86,5 +87,6 @@ export const ComponentRegistryProvider: Provider = {
     [RegisteredComponents.NOTEBOOK_INDEX_VIEW, NotebookIndexView],
     [RegisteredComponents.DPL_LOG_VIEW, DplLogView],
     [RegisteredComponents.EDITOR_VIEW, EditorView],
+    [RegisteredComponents.EDITOR_STYLE_VIEW, EditorStyleView],
   ])
 };

@@ -44,23 +44,32 @@
  * a licensee so wish it.
  */
 import {EditorStyle} from './editorStyle';
-import {Signal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
-import {Editor} from '../editor';
 import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
+import ace from 'ace-builds';
+import {Requestable} from '../../channel/requestable';
 
 export class EditorStyleImpl implements EditorStyle {
-  private readonly _editor:Editor;
+  private readonly _requestable:Requestable;
+  private readonly _editor:ace.Ace.Editor;
   private readonly _paragraphPayload:WebSocketPayload;
+  private readonly _renderNode:Signal<RenderNode>;
 
-  constructor(editor:Editor, paragraphData:object) {
+  constructor(requestable:Requestable, editor:ace.Ace.Editor, paragraphData:object) {
+    this._requestable = requestable;
     this._editor = editor;
     this._paragraphPayload = new WebSocketPayloadImpl(paragraphData);
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_STYLE_VIEW, computed(() => ({
+
+    }))));
   }
 
   print(): Signal<RenderNode> {
-    return undefined;
+    return this._renderNode;
   }
 
   request(json: object): void {

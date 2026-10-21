@@ -63,6 +63,8 @@ import {SyntaxLanguageSelectRuleImpl} from './editorRules/syntaxLanguageSelectRu
 import {DplCompleterImpl} from './editorRules/autoCompletionsRule/dplCompleter/dplCompleterImpl';
 import ace from 'ace-builds';
 import {EditorViewInputs} from './editorViewInputs';
+import {EditorStyle} from './editorStyle/editorStyle';
+import {EditorStyleImpl} from './editorStyle/editorStyleImpl';
 
 export class EditorImpl implements Editor {
   private readonly _requestable:Requestable;
@@ -87,9 +89,11 @@ export class EditorImpl implements Editor {
       this._syntaxLanguageSelectRule
     ];
     this._editor = ace.edit(document.createElement('pre'));
+    const editorStyle:EditorStyle = new EditorStyleImpl(this, this._editor, paragraphData);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
       editor:this._editor,
-      editorRules:this._editorRules
+      editorRules:this._editorRules,
+      editorStyle:editorStyle.print()()
     }))));
   }
 

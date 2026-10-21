@@ -53,15 +53,17 @@ import {
 } from '@angular/core';
 import ace from 'ace-builds';
 import {EditorRule} from '../../../objects/editor/editorRules/editorRule';
+import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
 
 @Component({
   selector: 'editor',
+  imports: [
+    RenderNodeRootView
+  ],
   template: `
     <div>
-        <button class="btn btn-sm bg-light border border-2 border-bottom-0 ms-auto d-flex px-2 pt-1"
-          aria-label="Editor Settings">
-          <i class="fa-solid fa-gear"></i>
-        </button>
+      <render-node-host [renderNode]="editorStyle()"></render-node-host>
       <div class="paragraph-editor mb-2" #editorAnchor></div>
     </div>
   `
@@ -69,6 +71,7 @@ import {EditorRule} from '../../../objects/editor/editorRules/editorRule';
 export class EditorView implements AfterViewInit, OnChanges, OnDestroy {
   editor = input.required<ace.Ace.Editor>();
   editorRules = input.required<EditorRule[]>();
+  editorStyle = input.required<RenderNode>();
   @ViewChild('editorAnchor') editorAnchor: ElementRef;
 
   ngAfterViewInit() {
