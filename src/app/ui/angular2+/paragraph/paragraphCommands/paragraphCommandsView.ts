@@ -87,6 +87,7 @@ export class ParagraphCommandsView {
   editor = input.required<Editor>();
   output = input.required<Output>();
   paragraph = input.required<Paragraph>();
+  disableCommands = input.required<boolean>();
 
   @ViewChild('copyLinkToast') copyLinkToast!: ElementRef;
 

@@ -59,7 +59,7 @@ export class ParagraphCommandsImpl implements ParagraphCommands{
   private readonly _output:Output;
   private readonly _renderNode: Signal<RenderNode<ParagraphCommandsViewInputs>>;
 
-  constructor(paragraph:Paragraph, editor:Editor, output:Output) {
+  constructor(paragraph:Paragraph, editor:Editor, output:Output, disableCommands:boolean) {
     this._paragraph = paragraph;
     this._editor = editor;
     this._output = output;
@@ -67,6 +67,7 @@ export class ParagraphCommandsImpl implements ParagraphCommands{
       editor: this._editor,
       output: this._output,
       paragraph: this._paragraph,
+      disableCommands:disableCommands
     }))));
   }
 
