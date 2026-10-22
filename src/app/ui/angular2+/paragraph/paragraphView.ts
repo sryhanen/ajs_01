@@ -53,12 +53,17 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
     RenderNodeRootView,
   ],
   template: `
-    <div class="paragraph paragraph-box paragraph-col py-4" [id]="paragraphId()">
+    <div class="paragraph paragraph-box paragraph-col py-4">
       <render-node-host [renderNode]="paragraphTitle()"></render-node-host>
       <render-node-host [renderNode]="editor()"></render-node-host>
       <hr>
       <render-node-host [renderNode]="paragraphCommands()"></render-node-host>
       <hr>
+      @if(showLoader()){
+        <div class="progress mb-3" role="progressbar" aria-label="Animated striped example">
+          <div class="progress-bar progress-bar-striped progress-bar-animated w-100"></div>
+        </div>
+      }
       <render-node-host [renderNode]="output()"></render-node-host>
     </div>
   `
@@ -69,4 +74,5 @@ export class ParagraphView{
   paragraphTitle = input.required<RenderNode>();
   output = input.required<RenderNode>();
   editor = input.required<RenderNode>();
+  showLoader = input.required<boolean>();
 }

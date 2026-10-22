@@ -52,7 +52,7 @@ import * as bootstrap from 'bootstrap';
 @Component({
   selector:'paragraph-commands',
   template: `
-    <div class="d-flex gap-3 align-items-center">
+    <div class="d-flex gap-3 align-items-center" [id]="paragraph().id()">
       @if(!disableCommands()){
         <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
                 aria-label="Run paragraph" title="Run paragraph" (click)="paragraph().run()">

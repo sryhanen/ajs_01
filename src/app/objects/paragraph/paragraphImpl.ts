@@ -87,13 +87,15 @@ export class ParagraphImpl implements Paragraph {
       'RUN_PARAGRAPH': () => this.run()
     };
     this._paragraphTitle = new ParagraphTitleImpl(this._paragraphPayload.stringProperty('title'), this);
-    const paragraphCommands:ParagraphCommands = new ParagraphCommandsImpl(this, this._editor, this._output, this.shouldDisableCommands(this._paragraphPayload));
+    const paragraphIsRunning = this.paragraphIsRunning(this._paragraphPayload);
+    const paragraphCommands:ParagraphCommands = new ParagraphCommandsImpl(this, this._editor, this._output, paragraphIsRunning);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
       paragraphId:this.id(),
       paragraphCommands: paragraphCommands.print()(),
       paragraphTitle: this._paragraphTitle.print()(),
       output: this._output.print()(),
-      editor: this._editor.print()()
+      editor: this._editor.print()(),
+      showLoader: paragraphIsRunning
     }))));
   }
 
@@ -213,7 +215,7 @@ export class ParagraphImpl implements Paragraph {
     return new WebSocketPayloadImpl(paragraphData);
   }
 
-  private shouldDisableCommands(paragraphPayload: WebSocketPayload):boolean {
+  private paragraphIsRunning(paragraphPayload: WebSocketPayload):boolean {
     const paragraphStatus = paragraphPayload.stringProperty('status');
     return paragraphStatus === 'RUNNING'  || paragraphStatus === 'PENDING';
   }

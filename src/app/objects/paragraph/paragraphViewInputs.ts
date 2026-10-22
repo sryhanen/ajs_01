@@ -50,5 +50,6 @@ export type ParagraphViewInputs = {
   paragraphCommands: RenderNode,
   paragraphTitle: RenderNode,
   output:RenderNode,
-  editor:RenderNode
+  editor:RenderNode,
+  showLoader:boolean,
 };
