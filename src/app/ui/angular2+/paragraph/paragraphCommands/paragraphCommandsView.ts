@@ -53,26 +53,38 @@ import * as bootstrap from 'bootstrap';
   selector:'paragraph-commands',
   template: `
     <div class="d-flex gap-3 align-items-center">
-      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
-              aria-label="Run paragraph" title="Run paragraph" (click)="paragraph().run()">
-        <i class="fa-solid fa-play"></i>
-      </button>
-      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
-              aria-label="Clear output" title="Clear output" (click)="editor().clear()">
-        <i class="fa-solid fa-eraser"></i>
-      </button>
-      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
-              aria-label="Clone paragraph" title="Clone paragraph" (click)="paragraph().clone()">
-        <i class="fa-solid fa-copy"></i>
-      </button>
-      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
-              aria-label="Link to paragraph" title="Link to paragraph" (click)="pasteParagraphLink()">
-        <i class="fa-solid fa-link"></i>
-      </button>
-      <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
-              aria-label="Clear output" title="Clear output" (click)="output().clear()">
-        <i class="fa-solid fa-trash"></i>
-      </button>
+      @if(!disableCommands()){
+        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+                aria-label="Run paragraph" title="Run paragraph" (click)="paragraph().run()">
+          <i class="fa-solid fa-play"></i>
+        </button>
+      }
+      @else{
+        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+                aria-label="Cancel paragraph run" title="Cancel paragraph run">
+          <i class="fa-solid fa-pause"></i>
+        </button>
+      }
+      <fieldset [disabled]="disableCommands()">
+        <div class="d-flex gap-3 align-items-center">
+        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+                aria-label="Clear editor" title="Clear editor" (click)="editor().clear()">
+          <i class="fa-solid fa-eraser"></i>
+        </button>
+        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+                aria-label="Clone paragraph" title="Clone paragraph" (click)="paragraph().clone()">
+          <i class="fa-solid fa-copy"></i>
+        </button>
+        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+                aria-label="Link to paragraph" title="Link to paragraph" (click)="pasteParagraphLink()">
+          <i class="fa-solid fa-link"></i>
+        </button>
+        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+                aria-label="Clear output" title="Clear output" (click)="output().clear()">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+        </div>
+      </fieldset>
     </div>
     <div class="position-relative">
       <div #copyLinkToast class="toast position-fixed bottom-0 end-0 p-3" style="z-index:9999" role="alert" aria-atomic="true">
