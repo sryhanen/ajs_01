@@ -89,6 +89,7 @@ export class ParagraphImpl implements Paragraph {
     this._paragraphTitle = new ParagraphTitleImpl(this._paragraphPayload.stringProperty('title'), this);
     const paragraphCommands:ParagraphCommands = new ParagraphCommandsImpl(this, this._editor, this._output);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
+      paragraphId:this.id(),
       paragraphCommands: paragraphCommands.print()(),
       paragraphTitle: this._paragraphTitle.print()(),
       output: this._output.print()(),

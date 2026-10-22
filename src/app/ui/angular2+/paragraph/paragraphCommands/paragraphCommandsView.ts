@@ -43,10 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, ElementRef, input, ViewChild} from '@angular/core';
 import {Editor} from '../../../../objects/editor/editor';
 import {Paragraph} from '../../../../objects/paragraph/paragraph';
 import {Output} from '../../../../objects/output/output';
+import * as bootstrap from 'bootstrap';
 
 @Component({
   selector:'paragraph-commands',
@@ -65,7 +66,7 @@ import {Output} from '../../../../objects/output/output';
         <i class="fa-solid fa-copy"></i>
       </button>
       <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
-              aria-label="Link to paragraph" title="Link to paragraph">
+              aria-label="Link to paragraph" title="Link to paragraph" (click)="pasteParagraphLink()">
         <i class="fa-solid fa-link"></i>
       </button>
       <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
@@ -73,10 +74,30 @@ import {Output} from '../../../../objects/output/output';
         <i class="fa-solid fa-trash"></i>
       </button>
     </div>
+    <div class="position-relative">
+      <div #copyLinkToast class="toast position-fixed bottom-0 end-0 p-3" style="z-index:9999" role="alert" aria-atomic="true">
+        <div class="toast-body">
+          Paragraph link added to clipboard.
+        </div>
+      </div>
+    </div>
   `
 })
 export class ParagraphCommandsView {
   editor = input.required<Editor>();
   output = input.required<Output>();
   paragraph = input.required<Paragraph>();
+
+  @ViewChild('copyLinkToast') copyLinkToast!: ElementRef;
+
+  protected async pasteParagraphLink(): Promise<void>{
+    const baseUrl = window.location.href;
+    const urlWithParagraphLink = `${baseUrl}#${this.paragraph().id()}`;
+    await navigator.clipboard.writeText(urlWithParagraphLink);
+    const toast = new bootstrap.Toast(this.copyLinkToast.nativeElement,{
+      delay:1000,
+      autohide:true
+    });
+    toast.show();
+  }
 }

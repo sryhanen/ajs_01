@@ -165,6 +165,16 @@ angular.module('zeppelinWebApp', requiredModules)
       $rootScope.ticket = undefined;
     }
     angular.element('#pre-loader').fadeOut();
+  }]).run(['$rootScope', '$location', '$anchorScroll', '$timeout',
+  function($rootScope, $location, $anchorScroll, $timeout) {
+    $rootScope.$on('$viewContentLoaded', function() {
+      if ($location.hash()) {
+        $timeout(function() {
+          $anchorScroll();
+        }, 100);
+      }
+    });
+
   }])
   .constant('TRASH_FOLDER_ID', '~Trash');
 

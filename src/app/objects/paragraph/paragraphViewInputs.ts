@@ -46,6 +46,7 @@
 import {RenderNode} from '../rendering/renderNode/renderNode';
 
 export type ParagraphViewInputs = {
+  paragraphId:string,
   paragraphCommands: RenderNode,
   paragraphTitle: RenderNode,
   output:RenderNode,
