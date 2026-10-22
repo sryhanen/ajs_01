@@ -192,4 +192,16 @@ describe('Paragraph', () => {
     };
     expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
   });
+
+  it('Should cancel paragraph run', () => {
+    const requestSpy = vi.spyOn(channel, 'request');
+    paragraph.cancelRun();
+    const expectedRequest = {
+      op: 'CANCEL_PARAGRAPH',
+      data: {
+        id: paragraphId
+      }
+    };
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
 });

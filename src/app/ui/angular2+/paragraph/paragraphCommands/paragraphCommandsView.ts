@@ -61,7 +61,7 @@ import * as bootstrap from 'bootstrap';
       }
       @else{
         <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
-                aria-label="Cancel paragraph run" title="Cancel paragraph run">
+                aria-label="Cancel paragraph run" title="Cancel paragraph run" (click)="paragraph().cancelRun()">
           <i class="fa-solid fa-pause"></i>
         </button>
       }

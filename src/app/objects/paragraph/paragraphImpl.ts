@@ -97,6 +97,16 @@ export class ParagraphImpl implements Paragraph {
     }))));
   }
 
+  cancelRun(): void {
+    const cancelParagraphRequest = {
+      op: 'CANCEL_PARAGRAPH',
+      data: {
+        id: this.id()
+      }
+    };
+    this._requestable.request(cancelParagraphRequest);
+  }
+
   clone(): void {
     const copyParagraphRequest = {
       op:'COPY_PARAGRAPH',
