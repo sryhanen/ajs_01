@@ -44,63 +44,37 @@
  * a licensee so wish it.
  */
 import {Notebook} from './notebook';
-import {Channel} from '../channel/channel';
-import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
-import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
-import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
-import {signal, Signal} from '@angular/core';
+import {Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
-import {WebSocketResponseFilter} from '../webSocket/response/webSocketResponseFilter/webSocketResponseFilter';
-import {WebSocketRequestWithField} from '../webSocket/request/webSocketRequestWithField/webSocketRequestWithField';
-import {WebSocketResponsePropertyEqualsFilter} from '../webSocket/response/webSocketResponseFilter/webSocketResponsePropertyEqualsFilter';
-import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
-import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {NotebookBehavior} from './behavior/notebookBehavior';
+import {NotebookChannel} from './channel/notebookChannel';
+import {PrintableNotebook} from './printable/printableNotebook';
 
 export class NotebookImpl implements Notebook {
-  private readonly _channel: Channel;
-  private readonly _notebook: WebSocketPayload;
-  private readonly _paragraphCollection: ParagraphCollection;
-  private readonly _renderNode: Signal<RenderNode>;
-  private readonly _noteIdFilter:WebSocketResponseFilter;
+  private readonly _notebookBehavior:NotebookBehavior;
+  private readonly _notebookChannel:NotebookChannel;
+  private readonly _printableNotebook:PrintableNotebook;
 
-  constructor(channel: Channel, notebook: object) {
-    this._channel = channel;
-    this._notebook = new WebSocketPayloadImpl(notebook);
-    this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.arrayProperty('paragraphs'));
-    this._noteIdFilter = new WebSocketResponsePropertyEqualsFilter('noteId', this.id());
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, signal({
-      paragraphCollection: this._paragraphCollection.print()()
-    })));
+  constructor(notebookBehavior:NotebookBehavior, notebookChannel:NotebookChannel, printableNotebook:PrintableNotebook) {
+    this._notebookBehavior = notebookBehavior;
+    this._notebookChannel = notebookChannel;
+    this._printableNotebook = printableNotebook;
   }
 
   print(): Signal<RenderNode> {
-    return this._renderNode;
+    return this._printableNotebook.print();
   }
 
   id(): string {
-    return this._notebook.stringProperty('id');
+    return this._notebookBehavior.id();
   }
 
   request(json: object): void {
-    const message = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    const noteIdDecoratedRequest = new WebSocketRequestWithField(message, 'noteId', this.id());
-    this._channel.request({
-      op:noteIdDecoratedRequest.operation(),
-      data:noteIdDecoratedRequest.data()
-    });
+    this._notebookChannel.request(json);
   }
 
   response(json: object): void {
-    const message = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    const filteredMessage = this._noteIdFilter.filterResponse(message);
-    if(!filteredMessage.isStub()){
-      this._paragraphCollection.response({
-        op:filteredMessage.operation(),
-        data:filteredMessage.data()
-      });
-    }
+    this._notebookChannel.response(json);
   }
 
   isStub(): boolean {

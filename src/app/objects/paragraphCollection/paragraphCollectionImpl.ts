@@ -171,4 +171,8 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     const paragraphId  = paragraphRemovedResponse.dataAsWebSocketPayload().stringProperty('id');
     this.remove(paragraphId);
   }
+
+  isStub(): boolean {
+    return false;
+  }
 }

@@ -50,16 +50,21 @@ import {Requestable} from '../../channel/requestable';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookImpl} from '../../notebook/notebookImpl';
-import {WritableSignal} from '@angular/core';
+import {signal, Signal} from '@angular/core';
 import {Notebook} from '../../notebook/notebook';
 import {NotebookIndexBehavior} from '../behavior/notebookIndexBehavior';
+import {NotebookBehaviorImpl} from '../../notebook/behavior/notebookBehaviorImpl';
+import {ParagraphCollectionImpl} from '../../paragraphCollection/paragraphCollectionImpl';
+import {NotebookChannel} from '../../notebook/channel/notebookChannel';
+import {ParagraphCollectionStub} from '../../paragraphCollection/paragraphCollectionStub';
+import {PrintableNotebook} from '../../notebook/printable/printableNotebook';
 
 export class NotebookIndexChannel implements Channel {
   private readonly _requestable: Requestable;
-  private readonly _openedNotebook: WritableSignal<Notebook>;
+  private readonly _openedNotebook: Signal<Notebook>;
   private readonly _notebookIndexBehavior: NotebookIndexBehavior;
 
-  constructor(requestable: Requestable, openedNotebook: WritableSignal<Notebook>, notebookIndexBehavior:NotebookIndexBehavior) {
+  constructor(requestable: Requestable, openedNotebook: Signal<Notebook>, notebookIndexBehavior:NotebookIndexBehavior) {
     this._requestable = requestable;
     this._openedNotebook = openedNotebook;
     this._notebookIndexBehavior = notebookIndexBehavior;
@@ -83,7 +88,15 @@ export class NotebookIndexChannel implements Channel {
     const noteResponse = new TypedWebSocketResponse('NOTE', webSocketResponse);
     const receivedNotebookId = noteResponse.dataAsWebSocketPayload().stringProperty('id');
     if(receivedNotebookId === this._notebookIndexBehavior.id()){
-      const notebook = new NotebookImpl(this, noteResponse.data());
+      const notebookState = noteResponse.dataAsWebSocketPayload();
+      const notebookBehavior = new NotebookBehaviorImpl(notebookState);
+      const paragraphCollectionSignal = signal(new ParagraphCollectionStub());
+      const notebookChannel = new NotebookChannel(this, paragraphCollectionSignal, notebookState.stringProperty('id'));
+      const notebookParagraphs = notebookState.arrayProperty<object>('paragraphs');
+      const paragraphCollection = new ParagraphCollectionImpl(notebookChannel, notebookParagraphs);
+      const printableNotebook= new PrintableNotebook(paragraphCollection);
+      paragraphCollectionSignal.set(paragraphCollection);
+      const notebook = new NotebookImpl(notebookBehavior, notebookChannel, printableNotebook);
       this._notebookIndexBehavior.open(notebook);
     }
   }
