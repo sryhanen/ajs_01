@@ -43,37 +43,30 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphCollection} from './paragraphCollection';
-import {Signal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
-import {Paragraph} from '../paragraph/paragraph';
+import {Requestable} from '../../channel/requestable';
+import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {WritableSignal} from '@angular/core';
+import {Paragraph} from '../../paragraph/paragraph';
 
-export class ParagraphCollectionStub implements ParagraphCollection {
-  isStub(): boolean {
-    return true;
-  }
+export class RequestableParagraphCollection implements Requestable {
+  private readonly _requestable: Requestable;
+  private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
 
-  add(paragraph: Paragraph, index: number): void {
-    throw new Error('ParagraphCollectionStub, method not implemented');
-  }
-
-  print(): Signal<RenderNode> {
-    throw new Error('ParagraphCollectionStub, method not implemented');
-  }
-
-  remove(paragraphId: string): void {
-    throw new Error('ParagraphCollectionStub, method not implemented');
+  constructor(requestable: Requestable, paragraphs: WritableSignal<Map<string,  Paragraph>>) {
+    this._requestable = requestable;
+    this._paragraphs = paragraphs;
   }
 
   request(json: object): void {
-    throw new Error('ParagraphCollectionStub, method not implemented');
-  }
-
-  response(json: object): void {
-    throw new Error('ParagraphCollectionStub, method not implemented');
-  }
-
-  update(paragraph: Paragraph): void {
-    throw new Error('ParagraphCollectionStub, method not implemented');
+    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    if(webSocketResponse.operation() === 'EXECUTE_PARAGRAPH') {
+      const executableParagraphId = webSocketResponse.dataAsWebSocketPayload().stringProperty('paragraphId');
+      const executableParagraph = this._paragraphs().get(executableParagraphId);
+      executableParagraph.run();
+    }
+    else{
+      this._requestable.request(json);
+    }
   }
 }

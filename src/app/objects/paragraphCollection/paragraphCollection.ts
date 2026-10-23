@@ -46,9 +46,8 @@
 import {Channel} from '../channel/channel';
 import {Printable} from '../rendering/printable/printable';
 import {Paragraph} from '../paragraph/paragraph';
-import Stubable from '../../shared/interfaces/stubable';
 
-export interface ParagraphCollection extends Channel, Printable, Stubable {
+export interface ParagraphCollection extends Channel, Printable {
   update(paragraph:Paragraph): void;
   add(paragraph: Paragraph, index:number): void;
   remove(paragraphId:string):void;

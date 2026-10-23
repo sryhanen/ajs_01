@@ -45,134 +45,47 @@
  */
 import {Paragraph} from '../paragraph/paragraph';
 import {ParagraphCollection} from './paragraphCollection';
-import {ParagraphImpl} from '../paragraph/paragraphImpl';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
-import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
-import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
-import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {ParagraphCollectionBehavior} from './behavior/paragraphCollectionBehavior';
 import {Requestable} from '../channel/requestable';
-import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
+import {Respondable} from '../channel/respondable';
+import {Printable} from '../rendering/printable/printable';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
+  private readonly _paragraphCollectionBehavior: ParagraphCollectionBehavior;
   private readonly _requestable: Requestable;
-  private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
-  private readonly _renderNode: Signal<RenderNode>;
-  private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
+  private readonly _respondable: Respondable;
+  private readonly _printable: Printable;
 
-  constructor(requestable: Requestable, paragraphs: object[]) {
+  constructor(paragraphCollectionBehavior: ParagraphCollectionBehavior, requestable: Requestable, respondable: Respondable, printable: Printable) {
+    this._paragraphCollectionBehavior = paragraphCollectionBehavior;
     this._requestable = requestable;
-    this._paragraphs = this.initializedParagraphs(paragraphs);
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, computed(() => ({
-      paragraphs: Array.from(this._paragraphs().values()).map(paragraph => paragraph.print()()),
-    }))));
-    this._responseEvents = {
-      'PARAGRAPH':(webSocketResponse) => this.handleParagraphResponse(webSocketResponse),
-      'PARAGRAPH_ADDED': (webSocketResponse) => this.handleParagraphAddedResponse(webSocketResponse),
-      'PARAGRAPH_REMOVED': (webSocketResponse) => this.handleParagraphRemovedResponse(webSocketResponse)
-    };
+    this._respondable = respondable;
+    this._printable = printable;
   }
 
   add(paragraph:Paragraph, index:number): void {
-    if(index < 0 || index > 0 && index > this._paragraphs().size){
-      throw new Error(`Invalid index "${index}" provided.`);
-    }
-    const paragraphId = paragraph.id();
-    if(this._paragraphs().has(paragraphId)){
-      throw new Error(`Paragraph with id "${paragraphId}" already exists.`);
-    }
-    const paragraphsAsArray = Array.from(this._paragraphs().values());
-    paragraphsAsArray.splice(index, 0, paragraph);
-    this._paragraphs.set(new Map(paragraphsAsArray.map(paragraph => [paragraph.id(), paragraph])));
+    this._paragraphCollectionBehavior.add(paragraph, index);
   }
 
   update(paragraph: Paragraph): void {
-    const paragraphId = paragraph.id();
-    if(!this._paragraphs().has(paragraphId)){
-      throw new Error(`Paragraph "${paragraphId}" does not exist.`);
-    }
-    this._paragraphs.update(paragraphs => {
-      paragraphs.set(paragraph.id(), paragraph);
-      return paragraphs;
-    });
+    this._paragraphCollectionBehavior.update(paragraph);
   }
 
   remove(paragraphId: string): void {
-    if(!this._paragraphs().has(paragraphId)){
-      throw new Error(`Paragraph "${paragraphId}" does not exist.`);
-    }
-    this._paragraphs.update(paragraphs => {
-      paragraphs.delete(paragraphId);
-      return paragraphs;
-    });
+    this._paragraphCollectionBehavior.remove(paragraphId);
   }
 
-
   print(): Signal<RenderNode> {
-    return this._renderNode;
+    return this._printable.print();
   }
 
   request(json: object): void {
-    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    if(webSocketResponse.operation() === 'EXECUTE_PARAGRAPH') {
-      this.executeParagraphRequest(webSocketResponse);
-    }
-    else{
-      this._requestable.request(json);
-    }
+    this._requestable.request(json);
   }
 
   response(json: object): void {
-    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    const eventName = webSocketResponse.operation();
-    if(eventName in this._responseEvents) {
-      this._responseEvents[eventName](webSocketResponse);
-    }
-    else{
-      this._paragraphs().forEach(paragraph => paragraph.response(json));
-    }
-  }
-
-  private initializedParagraphs(paragraphs: object[]): WritableSignal<Map<string,  Paragraph>> {
-    const paragraphMap = new Map<string, Paragraph>();
-    paragraphs.forEach(paragraphData => {
-      const paragraph = new ParagraphImpl(this, paragraphData);
-      paragraphMap.set(paragraph.id(), paragraph);
-    });
-    return signal(paragraphMap, {
-      equal: () => false
-    });
-  }
-
-  private executeParagraphRequest(webSocketResponse:WebSocketResponse):void {
-    const executableParagraphId = webSocketResponse.dataAsWebSocketPayload().stringProperty('paragraphId');
-    const executableParagraph = this._paragraphs().get(executableParagraphId);
-    executableParagraph.run();
-  }
-
-  private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphResponse = new TypedWebSocketResponse('PARAGRAPH', webSocketResponse);
-    const paragraph = new ParagraphImpl(this, paragraphResponse.data());
-    this.update(paragraph);
-  }
-
-  private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphAddedResponse = new TypedWebSocketResponse('PARAGRAPH_ADDED', webSocketResponse);
-    const responseData = paragraphAddedResponse.dataAsWebSocketPayload();
-    const paragraph = new ParagraphImpl(this, responseData.objectProperty('paragraph'));
-    const index = responseData.numberProperty('index');
-    this.add(paragraph, index);
-  }
-
-  private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphRemovedResponse = new TypedWebSocketResponse('PARAGRAPH_REMOVED', webSocketResponse);
-    const paragraphId  = paragraphRemovedResponse.dataAsWebSocketPayload().stringProperty('id');
-    this.remove(paragraphId);
-  }
-
-  isStub(): boolean {
-    return false;
+    this._respondable.response(json);
   }
 }

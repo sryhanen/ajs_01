@@ -50,7 +50,7 @@ import {Requestable} from '../../channel/requestable';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookImpl} from '../../notebook/notebookImpl';
-import {Signal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {Notebook} from '../../notebook/notebook';
 import {NotebookIndexBehavior} from '../behavior/notebookIndexBehavior';
 import {NotebookBehaviorImpl} from '../../notebook/behavior/notebookBehaviorImpl';
@@ -58,6 +58,12 @@ import {ParagraphCollectionImpl} from '../../paragraphCollection/paragraphCollec
 import {PrintableNotebook} from '../../notebook/printable/printableNotebook';
 import {RequestableNotebook} from '../../notebook/channel/requestableNotebook';
 import {RespondableNotebook} from '../../notebook/channel/respondableNotebook';
+import {ParagraphCollectionBehaviorImpl} from '../../paragraphCollection/behavior/paragraphCollectionBehaviorImpl';
+import {Paragraph} from '../../paragraph/paragraph';
+import {RequestableParagraphCollection} from '../../paragraphCollection/channel/requestableParagraphCollection';
+import {RespondableParagraphCollection} from '../../paragraphCollection/channel/respondableParagraphCollection';
+import {ParagraphImpl} from '../../paragraph/paragraphImpl';
+import {PrintableParagraphCollection} from '../../paragraphCollection/printable/printableParagraphCollection';
 
 export class NotebookIndexChannel implements Channel {
   private readonly _requestable: Requestable;
@@ -93,11 +99,27 @@ export class NotebookIndexChannel implements Channel {
       const notebookParagraphs = notebookState.arrayProperty<object>('paragraphs');
       const notebookId = notebookState.stringProperty('id');
       const requestableNotebook = new RequestableNotebook(this, notebookId);
-      const paragraphCollection = new ParagraphCollectionImpl(requestableNotebook, notebookParagraphs);
+      const paragraphs: WritableSignal<Map<string, Paragraph>> = signal(new Map());
+      const paragraphCollectionBehavior = new ParagraphCollectionBehaviorImpl(paragraphs);
+      const requestableParagraphCollection = new RequestableParagraphCollection(requestableNotebook, paragraphs);
+      const respondableParagraphCollection = new RespondableParagraphCollection(paragraphCollectionBehavior, computed(() => Array.from(paragraphs().values())), requestableParagraphCollection);
+      const printableParagraphCollection = new PrintableParagraphCollection(paragraphs);
+      const paragraphCollection = new ParagraphCollectionImpl(paragraphCollectionBehavior, requestableParagraphCollection, respondableParagraphCollection, printableParagraphCollection);
+      paragraphs.set(this.initializedParagraphs(notebookParagraphs,requestableParagraphCollection));
       const respondableNotebook = new RespondableNotebook(paragraphCollection, notebookId);
       const printableNotebook = new PrintableNotebook(paragraphCollection);
       const notebook = new NotebookImpl(notebookBehavior,printableNotebook, respondableNotebook, requestableNotebook);
       this._notebookIndexBehavior.open(notebook);
     }
+  }
+
+
+  private initializedParagraphs(paragraphs: object[], requestable:Requestable): Map<string,  Paragraph> {
+    const paragraphMap = new Map<string, Paragraph>();
+    paragraphs.forEach(paragraphData => {
+      const paragraph = new ParagraphImpl(requestable, paragraphData);
+      paragraphMap.set(paragraph.id(), paragraph);
+    });
+    return paragraphMap;
   }
 }
