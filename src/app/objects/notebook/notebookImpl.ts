@@ -47,18 +47,21 @@ import {Notebook} from './notebook';
 import {Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookBehavior} from './behavior/notebookBehavior';
-import {NotebookChannel} from './channel/notebookChannel';
 import {PrintableNotebook} from './printable/printableNotebook';
+import {Respondable} from '../channel/respondable';
+import {Requestable} from '../channel/requestable';
 
 export class NotebookImpl implements Notebook {
   private readonly _notebookBehavior:NotebookBehavior;
-  private readonly _notebookChannel:NotebookChannel;
   private readonly _printableNotebook:PrintableNotebook;
+  private readonly _respondableNotebook:Respondable;
+  private readonly _requestableNotebook:Requestable;
 
-  constructor(notebookBehavior:NotebookBehavior, notebookChannel:NotebookChannel, printableNotebook:PrintableNotebook) {
+  constructor(notebookBehavior:NotebookBehavior, printableNotebook:PrintableNotebook, respondableNotebook:Respondable, requestableNotebook:Requestable) {
     this._notebookBehavior = notebookBehavior;
-    this._notebookChannel = notebookChannel;
     this._printableNotebook = printableNotebook;
+    this._respondableNotebook = respondableNotebook;
+    this._requestableNotebook = requestableNotebook;
   }
 
   print(): Signal<RenderNode> {
@@ -70,11 +73,11 @@ export class NotebookImpl implements Notebook {
   }
 
   request(json: object): void {
-    this._notebookChannel.request(json);
+    this._requestableNotebook.request(json);
   }
 
   response(json: object): void {
-    this._notebookChannel.response(json);
+    this._respondableNotebook.response(json);
   }
 
   isStub(): boolean {

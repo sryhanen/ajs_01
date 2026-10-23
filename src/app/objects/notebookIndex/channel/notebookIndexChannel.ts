@@ -50,14 +50,14 @@ import {Requestable} from '../../channel/requestable';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookImpl} from '../../notebook/notebookImpl';
-import {signal, Signal} from '@angular/core';
+import {Signal} from '@angular/core';
 import {Notebook} from '../../notebook/notebook';
 import {NotebookIndexBehavior} from '../behavior/notebookIndexBehavior';
 import {NotebookBehaviorImpl} from '../../notebook/behavior/notebookBehaviorImpl';
 import {ParagraphCollectionImpl} from '../../paragraphCollection/paragraphCollectionImpl';
-import {NotebookChannel} from '../../notebook/channel/notebookChannel';
-import {ParagraphCollectionStub} from '../../paragraphCollection/paragraphCollectionStub';
 import {PrintableNotebook} from '../../notebook/printable/printableNotebook';
+import {RequestableNotebook} from '../../notebook/channel/requestableNotebook';
+import {RespondableNotebook} from '../../notebook/channel/respondableNotebook';
 
 export class NotebookIndexChannel implements Channel {
   private readonly _requestable: Requestable;
@@ -90,13 +90,13 @@ export class NotebookIndexChannel implements Channel {
     if(receivedNotebookId === this._notebookIndexBehavior.id()){
       const notebookState = noteResponse.dataAsWebSocketPayload();
       const notebookBehavior = new NotebookBehaviorImpl(notebookState);
-      const paragraphCollectionSignal = signal(new ParagraphCollectionStub());
-      const notebookChannel = new NotebookChannel(this, paragraphCollectionSignal, notebookState.stringProperty('id'));
       const notebookParagraphs = notebookState.arrayProperty<object>('paragraphs');
-      const paragraphCollection = new ParagraphCollectionImpl(notebookChannel, notebookParagraphs);
-      const printableNotebook= new PrintableNotebook(paragraphCollection);
-      paragraphCollectionSignal.set(paragraphCollection);
-      const notebook = new NotebookImpl(notebookBehavior, notebookChannel, printableNotebook);
+      const notebookId = notebookState.stringProperty('id');
+      const requestableNotebook = new RequestableNotebook(this, notebookId);
+      const paragraphCollection = new ParagraphCollectionImpl(requestableNotebook, notebookParagraphs);
+      const respondableNotebook = new RespondableNotebook(paragraphCollection, notebookId);
+      const printableNotebook = new PrintableNotebook(paragraphCollection);
+      const notebook = new NotebookImpl(notebookBehavior,printableNotebook, respondableNotebook, requestableNotebook);
       this._notebookIndexBehavior.open(notebook);
     }
   }

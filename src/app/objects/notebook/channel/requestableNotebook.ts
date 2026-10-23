@@ -43,27 +43,18 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../channel/channel';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketRequestWithField} from '../../webSocket/request/webSocketRequestWithField/webSocketRequestWithField';
-import {ParagraphCollection} from '../../paragraphCollection/paragraphCollection';
-import {WebSocketResponseFilter} from '../../webSocket/response/webSocketResponseFilter/webSocketResponseFilter';
 import {Requestable} from '../../channel/requestable';
-import {WebSocketResponsePropertyEqualsFilter} from '../../webSocket/response/webSocketResponseFilter/webSocketResponsePropertyEqualsFilter';
-import {Signal} from '@angular/core';
 
-export class NotebookChannel implements Channel{
+export class RequestableNotebook implements Requestable{
   private readonly _requestable: Requestable;
-  private readonly _paragraphCollection: Signal<ParagraphCollection>;
-  private readonly _noteIdFilter:WebSocketResponseFilter;
   private readonly _notebookId:string;
 
-  constructor(requestable: Requestable, paragraphCollection: Signal<ParagraphCollection>, notebookId:string) {
+  constructor(requestable: Requestable, notebookId:string) {
     this._requestable = requestable;
-    this._paragraphCollection = paragraphCollection;
     this._notebookId = notebookId;
-    this._noteIdFilter = new WebSocketResponsePropertyEqualsFilter('noteId', this._notebookId);
   }
 
   request(json: object): void {
@@ -73,16 +64,5 @@ export class NotebookChannel implements Channel{
       op:noteIdDecoratedRequest.operation(),
       data:noteIdDecoratedRequest.data()
     });
-  }
-
-  response(json: object): void {
-    const message = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    const filteredMessage = this._noteIdFilter.filterResponse(message);
-    if(!filteredMessage.isStub() && !this._paragraphCollection().isStub()){
-      this._paragraphCollection().response({
-        op:filteredMessage.operation(),
-        data:filteredMessage.data()
-      });
-    }
   }
 }
