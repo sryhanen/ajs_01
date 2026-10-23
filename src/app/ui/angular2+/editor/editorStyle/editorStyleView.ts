@@ -54,7 +54,7 @@ import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
   ],
   template: `
     <div>
-      <button class="btn btn-sm bg-light border border-2 border-bottom-0 ms-auto d-flex px-2 pt-1"
+      <button class="btn btn-secondary btn-sm bg-light border border-2 border-bottom-0 ms-auto d-flex px-2 pt-1"
               aria-label="Editor Settings"
               data-bs-toggle="dropdown">
         <i class="fa-solid fa-gear"></i>

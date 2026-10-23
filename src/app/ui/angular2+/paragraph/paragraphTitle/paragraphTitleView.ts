@@ -55,10 +55,10 @@ import {ParagraphTitle} from '../../../../objects/paragraph/paragraphTitle/parag
   ],
   template: `
     <div class="d-flex align-items-center gap-3">
-      <h3 class="text-uppercase mb-0">
+      <p class="fs-4 fw-bold mb-0">
         {{titleText()}}
-      </h3>
-      <button class="bg-transparent border-0 p-0" (click)="openEditModal()">
+      </p>
+      <button class="btn btn-secondary bg-transparent border-0 p-0" (click)="openEditModal()">
         <i class="fa-solid fa-pen-to-square" title="Edit paragraph title" aria-label="Edit paragraph title"></i>
       </button>
     </div>

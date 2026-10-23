@@ -54,34 +54,34 @@ import * as bootstrap from 'bootstrap';
   template: `
     <div class="d-flex gap-3 align-items-center" [id]="paragraph().id()">
       @if(!disableCommands()){
-        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+        <button class="btn btn-link bg-transparent border-0 shadow-none p-0 text-secondary"
                 aria-label="Run paragraph" title="Run paragraph" (click)="paragraph().run()">
-          <i class="fa-solid fa-play"></i>
+          <i class="fas fa-solid fa-play"></i>
         </button>
       }
       @else{
-        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+        <button class="btn btn-link bg-transparent border-0 shadow-none p-0 text-secondary"
                 aria-label="Cancel paragraph run" title="Cancel paragraph run" (click)="paragraph().cancelRun()">
-          <i class="fa-solid fa-pause"></i>
+          <i class="fas fa-solid fa-pause"></i>
         </button>
       }
       <fieldset [disabled]="disableCommands()">
         <div class="d-flex gap-3 align-items-center">
-        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+        <button class="btn btn-link bg-transparent border-0 shadow-none p-0 text-secondary"
                 aria-label="Clear editor" title="Clear editor" (click)="editor().clear()">
-          <i class="fa-solid fa-eraser"></i>
+          <i class="fas fa-solid fa-eraser"></i>
         </button>
-        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+        <button class="btn btn-link bg-transparent border-0 shadow-none p-0 text-secondary"
                 aria-label="Clone paragraph" title="Clone paragraph" (click)="paragraph().clone()">
-          <i class="fa-solid fa-copy"></i>
+          <i class="fas fa-solid fa-copy"></i>
         </button>
-        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+        <button class="btn btn-link bg-transparent border-0 shadow-none p-0 text-secondary"
                 aria-label="Link to paragraph" title="Link to paragraph" (click)="pasteParagraphLink()">
-          <i class="fa-solid fa-link"></i>
+          <i class="fas fa-solid fa-link"></i>
         </button>
-        <button class="btn bg-transparent border-0 shadow-none p-0 text-secondary"
+        <button class="btn btn-link bg-transparent border-0 shadow-none p-0 text-secondary"
                 aria-label="Clear output" title="Clear output" (click)="output().clear()">
-          <i class="fa-solid fa-trash"></i>
+          <i class="fas fa-solid fa-trash"></i>
         </button>
         </div>
       </fieldset>

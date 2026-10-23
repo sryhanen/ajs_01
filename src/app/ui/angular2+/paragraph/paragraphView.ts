@@ -54,7 +54,10 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
   ],
   template: `
     <div class="paragraph paragraph-box paragraph-col py-4">
-      <render-node-host [renderNode]="paragraphTitle()"></render-node-host>
+      <div class="d-flex gap-3 align-items-center">
+        <render-node-host [renderNode]="paragraphTitle()"></render-node-host>
+        <p class="ms-auto fw-light">ID:{{paragraphId()}}</p>
+      </div>
       <render-node-host [renderNode]="editor()"></render-node-host>
       <hr>
       <render-node-host [renderNode]="paragraphCommands()"></render-node-host>
