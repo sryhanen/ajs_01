@@ -45,9 +45,6 @@
  */
 import {Channel} from '../channel/channel';
 import {Printable} from '../rendering/printable/printable';
-import {NotebookIndex} from '../notebookIndex/notebookIndex';
+import {NotebookIndexCollectionBehavior} from './behavior/notebookIndexCollectionBehavior';
 
-export interface NotebookIndexCollection extends Channel, Printable{
-  add(notebookIndex:NotebookIndex):void;
-  clear():void;
-}
+export interface NotebookIndexCollection extends Channel, Printable, NotebookIndexCollectionBehavior{}

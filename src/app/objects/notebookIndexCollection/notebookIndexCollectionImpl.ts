@@ -45,73 +45,40 @@
  */
 import {NotebookIndexCollection} from './notebookIndexCollection';
 import {Channel} from '../channel/channel';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
-import {NotebookIndex} from '../notebookIndex/notebookIndex';
-import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
-import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
-import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
-import {NotebookIndexImpl} from '../notebookIndex/notebookIndexImpl';
+import {Signal} from '@angular/core';
+import { NotebookIndex } from '../notebookIndex/notebookIndex';
+import { RenderNode } from '../rendering/renderNode/renderNode';
+import {NotebookIndexCollectionBehavior} from './behavior/notebookIndexCollectionBehavior';
+import {Printable} from '../rendering/printable/printable';
 
-export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
-  private readonly _channel:Channel;
-  private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
-  private readonly _renderNode:Signal<RenderNode>;
+export class NotebookIndexCollectionImpl implements NotebookIndexCollection {
+  private readonly _notebookIndexCollectionChannel: Channel;
+  private readonly _notebookIndexCollectionBehaviour: NotebookIndexCollectionBehavior;
+  private readonly _printableNotebookIndexCollection:Printable;
 
-  constructor(channel:Channel) {
-    this._channel = channel;
-    this._notebookIndices = signal(new Map(), {equal:() => false});
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
-      notebookIndices: Array.from(this._notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
-    }))));
-  }
-
-  add(notebookIndex: NotebookIndex): void {
-    const notebookId = notebookIndex.id();
-    if(this._notebookIndices().has(notebookId)){
-      throw new Error(`NotebookIndex "${notebookId}" already exists.`);
-    }
-    this._notebookIndices.update(notebookIndices => {
-      notebookIndices.set(notebookIndex.id(), notebookIndex);
-      return notebookIndices;
-    });
-  }
-
-  clear(): void {
-    this._notebookIndices.update(notebookIndices  => {
-      notebookIndices.clear();
-      return notebookIndices;
-    });
-  }
-
-  print(): Signal<RenderNode> {
-    return this._renderNode;
-  }
-
-  request(data: object): void {
-    this._channel.request(data);
+  constructor(notebookIndexCollectionChannel: Channel, notebookIndexCollectionBehaviour: NotebookIndexCollectionBehavior,printableNotebookIndexCollection:Printable) {
+    this._notebookIndexCollectionChannel = notebookIndexCollectionChannel;
+    this._notebookIndexCollectionBehaviour = notebookIndexCollectionBehaviour;
+    this._printableNotebookIndexCollection = printableNotebookIndexCollection;
   }
 
   response(json: object): void {
-    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    if(webSocketResponse.operation() === 'NOTES_INFO'){
-      this.handleNotesInfoResponse(webSocketResponse);
-    }
-    else{
-      this._notebookIndices().forEach(notebookIndex => notebookIndex.response(json));
-    }
+    this._notebookIndexCollectionChannel.response(json);
   }
 
-  private handleNotesInfoResponse(webSocketResponse:WebSocketResponse):void{
-    const notesInfoResponse = new TypedWebSocketResponse('NOTES_INFO', webSocketResponse);
-    const notebookIndicesPayload = notesInfoResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
-    this.clear();
-    notebookIndicesPayload.forEach(notebookIndexPayload => {
-      const notebookIndex = new NotebookIndexImpl(this, notebookIndexPayload);
-      this.add(notebookIndex);
-    });
+  request(json: object): void {
+    this._notebookIndexCollectionChannel.request(json);
+  }
+
+  print(): Signal<RenderNode> {
+    return this._printableNotebookIndexCollection.print();
+  }
+
+  add(notebookIndex: NotebookIndex): void {
+    this._notebookIndexCollectionBehaviour.add(notebookIndex);
+  }
+
+  clear(): void {
+    this._notebookIndexCollectionBehaviour.clear();
   }
 }

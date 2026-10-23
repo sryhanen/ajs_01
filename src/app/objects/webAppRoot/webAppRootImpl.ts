@@ -51,6 +51,14 @@ import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
 import {signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
+import {NotebookIndexCollectionChannel} from '../notebookIndexCollection/channel/notebookIndexCollectionChannel';
+import {NotebookIndexCollectionBehavior} from '../notebookIndexCollection/behavior/notebookIndexCollectionBehavior';
+import {
+  NotebookIndexCollectionBehaviorImpl
+} from '../notebookIndexCollection/behavior/notebookIndexCollectionBehaviorImpl';
+import {NotebookIndex} from '../notebookIndex/notebookIndex';
+import {PrintableNotebookIndexCollection} from '../notebookIndexCollection/printable/printableNotebookIndexCollection';
+import {Printable} from '../rendering/printable/printable';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;
@@ -80,7 +88,11 @@ class WebAppRootImpl implements WebAppRoot {
     if(this._hasInitialized){
       return;
     }
-    this.notebookCollection = new NotebookIndexCollectionImpl(this);
+    const notebookIndices:WritableSignal<Map<string, NotebookIndex>> = signal(new Map(), {equal: () => false});
+    const notebookIndexCollectionBehaviour:NotebookIndexCollectionBehavior = new NotebookIndexCollectionBehaviorImpl(notebookIndices);
+    const notebookIndexCollectionChannel:Channel = new NotebookIndexCollectionChannel(this, notebookIndices, notebookIndexCollectionBehaviour);
+    const printableNotebookIndexCollection:Printable = new PrintableNotebookIndexCollection(notebookIndices);
+    this.notebookCollection = new NotebookIndexCollectionImpl(notebookIndexCollectionChannel, notebookIndexCollectionBehaviour, printableNotebookIndexCollection);
     this._printSignal.set(this._notebookCollection().print()());
     this.webSocket = new WebSocketChannel(this, webSocketService);
     this._hasInitialized = true;
