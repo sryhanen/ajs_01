@@ -7,12 +7,10 @@ import {NotebookIndex} from '../../notebookIndex/notebookIndex';
 
 export class PrintableNotebookIndexCollection implements Printable {
   private readonly _renderNode:Signal<RenderNode>;
-  private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
 
   constructor(notebookIndices: WritableSignal<Map<string, NotebookIndex>>) {
-    this._notebookIndices = notebookIndices;
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
-      notebookIndices: Array.from(this._notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
+      notebookIndices: Array.from(notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
     }))));
   }
 

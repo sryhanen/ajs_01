@@ -43,65 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
+import { Signal } from '@angular/core';
+import { RenderNode } from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from './notebookIndex';
-import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
-import {Notebook} from '../notebook/notebook';
-import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {NotebookStub} from '../notebook/notebookStub';
+import {NotebookIndexBehavior} from './behavior/notebookIndexBehavior';
+import {Printable} from '../rendering/printable/printable';
 import {Channel} from '../channel/channel';
-import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
-import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
-import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
-import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
-import {NotebookImpl} from '../notebook/notebookImpl';
 
 export class NotebookIndexImpl implements NotebookIndex {
-  private readonly _channel: Channel;
-  private readonly _notebookIndexData:WebSocketPayload;
-  private readonly _renderNode: Signal<RenderNode>;
-  private readonly _notebook: WritableSignal<Notebook>;
+  private readonly _notebookIndexBehavior:NotebookIndexBehavior;
+  private readonly _notebookIndexChannel:Channel;
+  private readonly _printableNotebookIndex:Printable;
 
-  constructor(channel: Channel, notebookIndexData:object) {
-    this._channel = channel;
-    this._notebookIndexData = new WebSocketPayloadImpl(notebookIndexData);
-    this._notebook = signal(new NotebookStub());
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
-      notebook: this._notebook().isStub() ? new RenderNodeStub() : this._notebook().print()()
-    }))));
+  constructor(notebookIndexBehavior:NotebookIndexBehavior, notebookIndexChannel:Channel, printableNotebookIndex:Printable) {
+    this._notebookIndexBehavior = notebookIndexBehavior;
+    this._notebookIndexChannel = notebookIndexChannel;
+    this._printableNotebookIndex = printableNotebookIndex;
   }
 
-  request(json: object): void {
-    this._channel.request(json);
-  }
-
-  response(json: object): void {
-    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    if(webSocketResponse.operation() === 'NOTE'){
-      this.handleNoteResponseEvent(webSocketResponse);
-    }
-    else if(!this._notebook().isStub()){
-      this._notebook().response(json);
-    }
-  }
-
-  id():string {
-    return this._notebookIndexData.stringProperty('id');
+  id(): string {
+    return this._notebookIndexBehavior.id();
   }
 
   print(): Signal<RenderNode> {
-    return this._renderNode;
+    return this._printableNotebookIndex.print();
   }
 
-  private handleNoteResponseEvent(webSocketResponse: WebSocketResponse): void {
-    const noteResponse = new TypedWebSocketResponse('NOTE', webSocketResponse);
-    const receivedNotebookId = noteResponse.dataAsWebSocketPayload().stringProperty('id');
-    if(receivedNotebookId === this.id()){
-      const notebook = new NotebookImpl(this, noteResponse.data());
-      this._notebook.set(notebook);
-    }
+  response(json: object): void {
+    this._notebookIndexChannel.response(json);
+  }
+
+  request(json: object): void {
+    this._notebookIndexChannel.request(json);
   }
 }

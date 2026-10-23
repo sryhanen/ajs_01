@@ -4,9 +4,14 @@ import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPa
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
-import {WritableSignal} from '@angular/core';
+import {signal, WritableSignal} from '@angular/core';
 import {NotebookIndex} from '../../notebookIndex/notebookIndex';
 import {NotebookIndexCollectionBehavior} from '../behavior/notebookIndexCollectionBehavior';
+import {NotebookIndexBehaviorImpl} from '../../notebookIndex/behavior/notebookIndexBehaviorImpl';
+import {NotebookIndexBehavior} from '../../notebookIndex/behavior/notebookIndexBehavior';
+import {NotebookStub} from '../../notebook/notebookStub';
+import {NotebookIndexChannel} from '../../notebookIndex/channel/notebookIndexChannel';
+import {PrintableNotebookIndex} from '../../notebookIndex/printable/printableNotebookIndex';
 
 export class NotebookIndexCollectionChannel implements Channel {
   private readonly _channel:Channel;
@@ -38,7 +43,11 @@ export class NotebookIndexCollectionChannel implements Channel {
     const notebookIndicesPayload = notesInfoResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
     this._notebookIndexCollectionBehavior.clear();
     notebookIndicesPayload.forEach(notebookIndexPayload => {
-      const notebookIndex = new NotebookIndexImpl(this, notebookIndexPayload);
+      const openedNotebook = signal(new NotebookStub());
+      const notebookIndexBehavior:NotebookIndexBehavior = new NotebookIndexBehaviorImpl(new WebSocketPayloadImpl(notebookIndexPayload), openedNotebook);
+      const notebookIndexChannel = new NotebookIndexChannel(this, openedNotebook, notebookIndexBehavior);
+      const printableNotebookIndex = new PrintableNotebookIndex(openedNotebook);
+      const notebookIndex = new NotebookIndexImpl(notebookIndexBehavior, notebookIndexChannel, printableNotebookIndex);
       this._notebookIndexCollectionBehavior.add(notebookIndex);
     });
   }

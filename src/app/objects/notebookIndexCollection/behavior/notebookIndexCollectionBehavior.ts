@@ -45,6 +45,9 @@
  */
 import {NotebookIndex} from '../../notebookIndex/notebookIndex';
 
+/**
+ * NotebookIndexCollection allows clearing the collection and adding NotebookIndices to the collection
+ */
 export interface NotebookIndexCollectionBehavior {
   add(notebookIndex:NotebookIndex):void;
   clear():void;
