@@ -54,14 +54,6 @@ export class ParagraphCollectionBehaviorImpl implements ParagraphCollectionBehav
     this._paragraphs = paragraphs;
   }
 
-  runParagraph(paragraphId: string) {
-    if(!this._paragraphs().has(paragraphId)){
-      throw new RangeError(`Paragraph "${paragraphId}" does not exists."`);
-    }
-    const paragraphToRun = this._paragraphs().get(paragraphId);
-    paragraphToRun.run();
-  }
-
   add(paragraph:Paragraph, index:number): void {
     if(index < 0 || index > 0 && index > this._paragraphs().size){
       throw new Error(`Invalid index "${index}" provided.`);

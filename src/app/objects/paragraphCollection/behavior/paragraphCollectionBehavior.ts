@@ -49,5 +49,4 @@ export interface ParagraphCollectionBehavior {
   update(paragraph:Paragraph): void;
   add(paragraph: Paragraph, index:number): void;
   remove(paragraphId:string):void;
-  runParagraph(paragraphId:string):void;
 }

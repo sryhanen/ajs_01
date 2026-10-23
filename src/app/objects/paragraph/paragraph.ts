@@ -45,8 +45,6 @@
  */
 import {Channel} from '../channel/channel';
 import {Printable} from '../rendering/printable/printable';
+import {ParagraphBehavior} from './behavior/paragraphBehavior';
 
-export interface Paragraph extends Channel, Printable {
-  id(): string;
-  run():void;
-}
+export interface Paragraph extends Channel, Printable, ParagraphBehavior {}

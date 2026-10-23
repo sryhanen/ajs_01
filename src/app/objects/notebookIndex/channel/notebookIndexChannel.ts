@@ -64,6 +64,13 @@ import {RequestableParagraphCollection} from '../../paragraphCollection/channel/
 import {RespondableParagraphCollection} from '../../paragraphCollection/channel/respondableParagraphCollection';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
 import {PrintableParagraphCollection} from '../../paragraphCollection/printable/printableParagraphCollection';
+import {ParagraphBehaviorImpl} from '../../paragraph/behavior/paragraphBehaviorImpl';
+import {RequestableParagraph} from '../../paragraph/channel/requestableParagraph';
+import {RespondableParagraph} from '../../paragraph/channel/respondableParagraph';
+import {Output} from '../../output/output';
+import {OutputImpl} from '../../output/outputImpl';
+import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
+import {PrintableParagraph} from '../../paragraph/printable/printableParagraph';
 
 export class NotebookIndexChannel implements Channel {
   private readonly _requestable: Requestable;
@@ -113,13 +120,43 @@ export class NotebookIndexChannel implements Channel {
     }
   }
 
-
   private initializedParagraphs(paragraphs: object[], requestable:Requestable): Map<string,  Paragraph> {
     const paragraphMap = new Map<string, Paragraph>();
     paragraphs.forEach(paragraphData => {
-      const paragraph = new ParagraphImpl(requestable, paragraphData);
+      const paragraphBehavior = new ParagraphBehaviorImpl(requestable, new WebSocketPayloadImpl(paragraphData));
+      const paragraphId = paragraphBehavior.id();
+      const requestableParagraph = new RequestableParagraph(requestable, paragraphId);
+      const paragraphOutput = this.initializedOutput(new WebSocketPayloadImpl(paragraphData), requestableParagraph);
+      const respondableParagraph = new RespondableParagraph(paragraphOutput, paragraphId);
+      const printableParagraph = new PrintableParagraph(paragraphOutput, paragraphId);
+      const paragraph = new ParagraphImpl(paragraphBehavior, requestableParagraph, respondableParagraph, printableParagraph);
       paragraphMap.set(paragraph.id(), paragraph);
     });
     return paragraphMap;
+  }
+
+  private initializedOutput(paragraphData: WebSocketPayload, requestable:Requestable): Output {
+    const output = new OutputImpl(requestable);
+    this.createOutputResponseIfOutputExists(paragraphData, output);
+    return output;
+  }
+
+  private createOutputResponseIfOutputExists(paragraphData: WebSocketPayload, output:Output):void{
+    if (paragraphData.propertyExists('output')) {
+      const paragraphOutput = paragraphData.objectProperty('output');
+      if (paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined) {
+        console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
+      } else {
+        const paragraphOutputResponse = {
+          op: 'PARAGRAPH_OUTPUT',
+          data: {
+            noteId: '',
+            paragraphId: paragraphData.stringProperty('id'),
+            output: paragraphOutput,
+          }
+        };
+        output.response(paragraphOutputResponse);
+      }
+    }
   }
 }
