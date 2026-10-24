@@ -93,7 +93,7 @@ export class RespondableParagraphCollection implements Respondable {
   private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphAddedResponse = new TypedWebSocketResponse('PARAGRAPH_ADDED', webSocketResponse);
     const responseData = paragraphAddedResponse.dataAsWebSocketPayload();
-    const paragraph = this._paragraphBuilder.paragraph(paragraphAddedResponse.dataAsWebSocketPayload(), this._requestable);
+    const paragraph = this._paragraphBuilder.paragraph(responseData.objectPropertyAsPayload('paragraph'), this._requestable);
     const index = responseData.numberProperty('index');
     this._paragraphCollectionBehavior.add(paragraph, index);
   }

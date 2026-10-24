@@ -82,7 +82,7 @@ export class NotebookBuilderImpl implements NotebookBuilder {
   }
 
   private initializedParagraphCollection(requestable:Requestable, notebookState:WebSocketPayload):ParagraphCollection {
-    const paragraphs: WritableSignal<Map<string, Paragraph>> = signal(new Map());
+    const paragraphs: WritableSignal<Map<string, Paragraph>> = signal(new Map(), {equal:() => false});
     const paragraphCollectionBehavior = new ParagraphCollectionBehaviorImpl(paragraphs);
     const requestableParagraphCollection = new RequestableParagraphCollection(requestable, paragraphs);
     const respondables = computed(() => Array.from(paragraphs().values()));
