@@ -49,21 +49,23 @@ import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseI
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
-import {ParagraphImpl} from '../../paragraph/paragraphImpl';
 import {ParagraphCollectionBehavior} from '../behavior/paragraphCollectionBehavior';
 import {Requestable} from '../../channel/requestable';
 import {Signal} from '@angular/core';
+import {ParagraphBuilder} from '../../paragraphBuilder/paragraphBuilder';
 
 export class RespondableParagraphCollection implements Respondable {
   private readonly _paragraphCollectionBehavior: ParagraphCollectionBehavior;
   private readonly _respondables: Signal<Respondable[]>;
   private readonly _requestable: Requestable;
   private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
+  private readonly _paragraphBuilder: ParagraphBuilder;
 
-  constructor(paragraphCollectionBehavior:ParagraphCollectionBehavior, respondables:Signal<Respondable[]>, requestable:Requestable) {
+  constructor(paragraphCollectionBehavior:ParagraphCollectionBehavior, respondables:Signal<Respondable[]>, requestable:Requestable, paragraphBuilder: ParagraphBuilder) {
     this._paragraphCollectionBehavior = paragraphCollectionBehavior;
     this._respondables = respondables;
     this._requestable = requestable;
+    this._paragraphBuilder = paragraphBuilder;
     this._responseEvents = {
       'PARAGRAPH':(webSocketResponse) => this.handleParagraphResponse(webSocketResponse),
       'PARAGRAPH_ADDED': (webSocketResponse) => this.handleParagraphAddedResponse(webSocketResponse),
@@ -78,20 +80,20 @@ export class RespondableParagraphCollection implements Respondable {
       this._responseEvents[eventName](webSocketResponse);
     }
     else{
-      this._respondables().forEach(paragraph => paragraph.response(json));
+      this._respondables().forEach(respondable => respondable.response(json));
     }
   }
 
   private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphResponse = new TypedWebSocketResponse('PARAGRAPH', webSocketResponse);
-    const paragraph = new ParagraphImpl(this._requestable, paragraphResponse.data());
+    const paragraph = this._paragraphBuilder.paragraph(paragraphResponse.dataAsWebSocketPayload(), this._requestable);
     this._paragraphCollectionBehavior.update(paragraph);
   }
 
   private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphAddedResponse = new TypedWebSocketResponse('PARAGRAPH_ADDED', webSocketResponse);
     const responseData = paragraphAddedResponse.dataAsWebSocketPayload();
-    const paragraph = new ParagraphImpl(this._requestable, responseData.objectProperty('paragraph'));
+    const paragraph = this._paragraphBuilder.paragraph(paragraphAddedResponse.dataAsWebSocketPayload(), this._requestable);
     const index = responseData.numberProperty('index');
     this._paragraphCollectionBehavior.add(paragraph, index);
   }

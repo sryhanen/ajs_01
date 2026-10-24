@@ -49,38 +49,22 @@ import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPa
 import {Requestable} from '../../channel/requestable';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
-import {NotebookImpl} from '../../notebook/notebookImpl';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {Signal} from '@angular/core';
 import {Notebook} from '../../notebook/notebook';
 import {NotebookIndexBehavior} from '../behavior/notebookIndexBehavior';
-import {NotebookBehaviorImpl} from '../../notebook/behavior/notebookBehaviorImpl';
-import {ParagraphCollectionImpl} from '../../paragraphCollection/paragraphCollectionImpl';
-import {PrintableNotebook} from '../../notebook/printable/printableNotebook';
-import {RequestableNotebook} from '../../notebook/channel/requestableNotebook';
-import {RespondableNotebook} from '../../notebook/channel/respondableNotebook';
-import {ParagraphCollectionBehaviorImpl} from '../../paragraphCollection/behavior/paragraphCollectionBehaviorImpl';
-import {Paragraph} from '../../paragraph/paragraph';
-import {RequestableParagraphCollection} from '../../paragraphCollection/channel/requestableParagraphCollection';
-import {RespondableParagraphCollection} from '../../paragraphCollection/channel/respondableParagraphCollection';
-import {ParagraphImpl} from '../../paragraph/paragraphImpl';
-import {PrintableParagraphCollection} from '../../paragraphCollection/printable/printableParagraphCollection';
-import {ParagraphBehaviorImpl} from '../../paragraph/behavior/paragraphBehaviorImpl';
-import {RequestableParagraph} from '../../paragraph/channel/requestableParagraph';
-import {RespondableParagraph} from '../../paragraph/channel/respondableParagraph';
-import {Output} from '../../output/output';
-import {OutputImpl} from '../../output/outputImpl';
-import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
-import {PrintableParagraph} from '../../paragraph/printable/printableParagraph';
+import {NotebookBuilder} from '../../notebookBuilder/notebookBuilder';
 
 export class NotebookIndexChannel implements Channel {
   private readonly _requestable: Requestable;
   private readonly _openedNotebook: Signal<Notebook>;
   private readonly _notebookIndexBehavior: NotebookIndexBehavior;
+  private readonly _notebookBuilder:NotebookBuilder;
 
-  constructor(requestable: Requestable, openedNotebook: Signal<Notebook>, notebookIndexBehavior:NotebookIndexBehavior) {
+  constructor(requestable: Requestable, openedNotebook: Signal<Notebook>, notebookIndexBehavior:NotebookIndexBehavior, notebookBuilder:NotebookBuilder) {
     this._requestable = requestable;
     this._openedNotebook = openedNotebook;
     this._notebookIndexBehavior = notebookIndexBehavior;
+    this._notebookBuilder = notebookBuilder;
   }
 
   request(json: object): void {
@@ -99,64 +83,11 @@ export class NotebookIndexChannel implements Channel {
 
   private handleNoteResponseEvent(webSocketResponse: WebSocketResponse): void {
     const noteResponse = new TypedWebSocketResponse('NOTE', webSocketResponse);
-    const receivedNotebookId = noteResponse.dataAsWebSocketPayload().stringProperty('id');
+    const notebookState = noteResponse.dataAsWebSocketPayload();
+    const receivedNotebookId = notebookState.stringProperty('id');
     if(receivedNotebookId === this._notebookIndexBehavior.id()){
-      const notebookState = noteResponse.dataAsWebSocketPayload();
-      const notebookBehavior = new NotebookBehaviorImpl(notebookState);
-      const notebookParagraphs = notebookState.arrayProperty<object>('paragraphs');
-      const notebookId = notebookState.stringProperty('id');
-      const requestableNotebook = new RequestableNotebook(this, notebookId);
-      const paragraphs: WritableSignal<Map<string, Paragraph>> = signal(new Map());
-      const paragraphCollectionBehavior = new ParagraphCollectionBehaviorImpl(paragraphs);
-      const requestableParagraphCollection = new RequestableParagraphCollection(requestableNotebook, paragraphs);
-      const respondableParagraphCollection = new RespondableParagraphCollection(paragraphCollectionBehavior, computed(() => Array.from(paragraphs().values())), requestableParagraphCollection);
-      const printableParagraphCollection = new PrintableParagraphCollection(paragraphs);
-      const paragraphCollection = new ParagraphCollectionImpl(paragraphCollectionBehavior, requestableParagraphCollection, respondableParagraphCollection, printableParagraphCollection);
-      paragraphs.set(this.initializedParagraphs(notebookParagraphs,requestableParagraphCollection));
-      const respondableNotebook = new RespondableNotebook(paragraphCollection, notebookId);
-      const printableNotebook = new PrintableNotebook(paragraphCollection);
-      const notebook = new NotebookImpl(notebookBehavior,printableNotebook, respondableNotebook, requestableNotebook);
+      const notebook = this._notebookBuilder.notebook(notebookState, this._requestable);
       this._notebookIndexBehavior.open(notebook);
-    }
-  }
-
-  private initializedParagraphs(paragraphs: object[], requestable:Requestable): Map<string,  Paragraph> {
-    const paragraphMap = new Map<string, Paragraph>();
-    paragraphs.forEach(paragraphData => {
-      const paragraphBehavior = new ParagraphBehaviorImpl(requestable, new WebSocketPayloadImpl(paragraphData));
-      const paragraphId = paragraphBehavior.id();
-      const requestableParagraph = new RequestableParagraph(requestable, paragraphId);
-      const paragraphOutput = this.initializedOutput(new WebSocketPayloadImpl(paragraphData), requestableParagraph);
-      const respondableParagraph = new RespondableParagraph(paragraphOutput, paragraphId);
-      const printableParagraph = new PrintableParagraph(paragraphOutput, paragraphId);
-      const paragraph = new ParagraphImpl(paragraphBehavior, requestableParagraph, respondableParagraph, printableParagraph);
-      paragraphMap.set(paragraph.id(), paragraph);
-    });
-    return paragraphMap;
-  }
-
-  private initializedOutput(paragraphData: WebSocketPayload, requestable:Requestable): Output {
-    const output = new OutputImpl(requestable);
-    this.createOutputResponseIfOutputExists(paragraphData, output);
-    return output;
-  }
-
-  private createOutputResponseIfOutputExists(paragraphData: WebSocketPayload, output:Output):void{
-    if (paragraphData.propertyExists('output')) {
-      const paragraphOutput = paragraphData.objectProperty('output');
-      if (paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined) {
-        console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
-      } else {
-        const paragraphOutputResponse = {
-          op: 'PARAGRAPH_OUTPUT',
-          data: {
-            noteId: '',
-            paragraphId: paragraphData.stringProperty('id'),
-            output: paragraphOutput,
-          }
-        };
-        output.response(paragraphOutputResponse);
-      }
     }
   }
 }

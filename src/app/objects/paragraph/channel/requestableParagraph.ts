@@ -54,6 +54,7 @@ export class RequestableParagraph implements Requestable {
 
   constructor(requestable: Requestable, paragraphId:string) {
     this._requestable = requestable;
+    this._paragraphId = paragraphId;
   }
 
   request(json: object): void {

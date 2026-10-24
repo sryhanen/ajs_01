@@ -12,6 +12,8 @@ import {NotebookIndexBehavior} from '../../notebookIndex/behavior/notebookIndexB
 import {NotebookStub} from '../../notebook/notebookStub';
 import {NotebookIndexChannel} from '../../notebookIndex/channel/notebookIndexChannel';
 import {PrintableNotebookIndex} from '../../notebookIndex/printable/printableNotebookIndex';
+import {NotebookBuilderImpl} from '../../notebookBuilder/notebookBuilderImpl';
+import {ParagraphBuilderImpl} from '../../paragraphBuilder/paragraphBuilderImpl';
 
 export class NotebookIndexCollectionChannel implements Channel {
   private readonly _channel:Channel;
@@ -45,7 +47,8 @@ export class NotebookIndexCollectionChannel implements Channel {
     notebookIndicesPayload.forEach(notebookIndexPayload => {
       const openedNotebook = signal(new NotebookStub());
       const notebookIndexBehavior:NotebookIndexBehavior = new NotebookIndexBehaviorImpl(new WebSocketPayloadImpl(notebookIndexPayload), openedNotebook);
-      const notebookIndexChannel = new NotebookIndexChannel(this, openedNotebook, notebookIndexBehavior);
+      const notebookBuilder = new NotebookBuilderImpl(new ParagraphBuilderImpl());
+      const notebookIndexChannel = new NotebookIndexChannel(this, openedNotebook, notebookIndexBehavior, notebookBuilder);
       const printableNotebookIndex = new PrintableNotebookIndex(openedNotebook);
       const notebookIndex = new NotebookIndexImpl(notebookIndexBehavior, notebookIndexChannel, printableNotebookIndex);
       this._notebookIndexCollectionBehavior.add(notebookIndex);
