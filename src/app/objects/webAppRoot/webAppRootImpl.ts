@@ -53,6 +53,10 @@ import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {Respondable} from '../channel/respondable';
+import {
+  NotebookIndexCollectionResponse
+} from '../notebookIndexCollection/notebookIndexCollectionResponse/notebookIndexCollectionResponse';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;
@@ -66,6 +70,16 @@ class WebAppRootImpl implements WebAppRoot {
   }
   private get notebookCollection(): Signal<NotebookIndexCollection>{
     return this._notebookCollection;
+  }
+
+  private _respondable:WritableSignal<Respondable>;
+  private set respondable(value: Respondable){
+    if(this._respondable === undefined){
+      this._respondable = signal(value);
+    }
+  }
+  private get respondable(): Signal<Respondable>{
+    return this._respondable;
   }
 
   private _webSocket: Channel;
@@ -87,6 +101,7 @@ class WebAppRootImpl implements WebAppRoot {
       notebookIndices:Array.from(notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
     })));
     this.notebookCollection = new NotebookIndexCollectionImpl(this, notebookIndices, signal(renderNode));
+    this.respondable = new NotebookIndexCollectionResponse(this.notebookCollection(), computed(() => Array.from(notebookIndices().values())));
     this._printSignal.set(this._notebookCollection().print()());
     this.webSocket = new WebSocketChannel(this, webSocketService);
     this._hasInitialized = true;
@@ -110,7 +125,7 @@ class WebAppRootImpl implements WebAppRoot {
     if(!this._hasInitialized){
       throw new Error('WebAppRoot not initialized');
     }
-    this.notebookCollection().response(data);
+    this.respondable().response(data);
     this._printSignal.set(this._notebookCollection().print()());
   }
 }

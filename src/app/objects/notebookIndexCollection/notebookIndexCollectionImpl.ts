@@ -44,19 +44,10 @@
  * a licensee so wish it.
  */
 import {NotebookIndexCollection} from './notebookIndexCollection';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from '../notebookIndex/notebookIndex';
 import {Requestable} from '../channel/requestable';
-import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
-import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
-import {NotebookIndexImpl} from '../notebookIndex/notebookIndexImpl';
-import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
-import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {NotebookStub} from '../notebook/notebookStub';
-import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
   private readonly _requestable:Requestable;
@@ -93,30 +84,5 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
 
   request(requestMessage: object): void {
     this._requestable.request(requestMessage);
-  }
-
-  response(json: object): void {
-    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    if(webSocketResponse.operation() === 'NOTES_INFO'){
-      this.handleNotesInfoResponse(webSocketResponse);
-    }
-    else{
-      this._notebookIndices().forEach(notebookIndex => notebookIndex.response(json));
-    }
-  }
-
-  private handleNotesInfoResponse(webSocketResponse:WebSocketResponse):void{
-    const notesInfoResponse = new TypedWebSocketResponse('NOTES_INFO', webSocketResponse);
-    const notebookIndicesPayload = notesInfoResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
-    this.clear();
-    notebookIndicesPayload.forEach(notebookIndexPayload => {
-      const notebookIndexState = new WebSocketPayloadImpl(notebookIndexPayload);
-      const notebook = signal(new NotebookStub());
-      const renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
-        notebook: notebook().isStub() ? new RenderNodeStub() : notebook().print()()
-      }))));
-      const notebookIndex = new NotebookIndexImpl(this, notebookIndexState, notebook, renderNode);
-      this.add(notebookIndex);
-    });
   }
 }
