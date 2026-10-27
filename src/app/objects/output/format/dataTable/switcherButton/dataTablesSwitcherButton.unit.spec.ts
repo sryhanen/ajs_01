@@ -44,11 +44,11 @@
  * a licensee so wish it.
  */
 import {DataTableSwitcherButton} from './dataTablesSwitcherButton';
-import {FakeChannel} from '../../../../channel/fakeChannel';
+import {ChannelFake} from '../../../../../../test/fakes/client/channel/channelFake';
 import {Requestable} from '../../../../channel/requestable';
 
 describe('DataTables SwitcherButton unit test', () => {
-  const requestable:Requestable = new FakeChannel();
+  const requestable:Requestable = new ChannelFake();
   const dataTablesSwitcherButton = new DataTableSwitcherButton(requestable);
 
   describe('Birth', () => {

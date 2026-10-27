@@ -44,11 +44,11 @@
  * a licensee so wish it.
  */
 import {signal} from '@angular/core';
-import {FakeComponentRegistry} from './fakeComponentRegistry';
-import {RenderNodeImpl} from '../../app/objects/rendering/renderNode/renderNodeImpl';
+import {ComponentRegistryFake} from '../componentRegistry/componentRegistryFake';
+import {RenderNodeImpl} from '../../../../app/objects/rendering/renderNode/renderNodeImpl';
 
-export class FakeRenderNode extends RenderNodeImpl {
+export class RenderNodeFake extends RenderNodeImpl {
   constructor() {
-    super(FakeComponentRegistry.FAKE_COMPONENT, signal({}));
+    super(ComponentRegistryFake.FAKE_COMPONENT, signal({}));
   }
 }

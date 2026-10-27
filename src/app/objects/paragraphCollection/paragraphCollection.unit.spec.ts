@@ -45,7 +45,7 @@
  */
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphCollectionImpl} from './paragraphCollectionImpl';
-import {FakeChannel} from '../channel/fakeChannel';
+import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
 import {Requestable} from '../channel/requestable';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
 
@@ -53,7 +53,7 @@ describe('ParagraphCollection unit test', () => {
   let requestable: Requestable;
   let paragraphCollection: ParagraphCollection;
   beforeEach(() => {
-    requestable = new FakeChannel();
+    requestable = new ChannelFake();
     paragraphCollection = new ParagraphCollectionImpl(requestable, []);
   });
 

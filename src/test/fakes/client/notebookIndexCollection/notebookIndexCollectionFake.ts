@@ -43,6 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export enum FakeComponentRegistry {
-  FAKE_COMPONENT = 'FAKE_COMPONENT'
+import {NotebookIndexCollection} from '../../../../app/objects/notebookIndexCollection/notebookIndexCollection';
+import {signal, Signal} from '@angular/core';
+import {RenderNode} from '../../../../app/objects/rendering/renderNode/renderNode';
+import {RenderNodeFake} from '../renderNode/renderNodeFake';
+
+export class NotebookIndexCollectionFake implements NotebookIndexCollection {
+  private readonly _renderNodeFake:Signal<RenderNode>;
+
+  constructor() {
+    this._renderNodeFake = signal(new RenderNodeFake());
+  }
+
+  add(): void {}
+
+  clear(): void {}
+
+  print(): Signal<RenderNode> {
+    return this._renderNodeFake;
+  }
+
+  request(json: object): void {}
+
+  response(json: object): void {}
 }

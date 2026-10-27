@@ -45,11 +45,11 @@
  */
 import {AngularObject} from './angularObject';
 import {AngularObjectImpl} from './angularObjectImpl';
-import {FakeChannel} from '../channel/fakeChannel';
+import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
 import {Mock} from 'vitest';
 
 describe('AngularObject', () => {
-  const channel = new FakeChannel();
+  const channel = new ChannelFake();
   const name = 'Object 1';
   const value = 'test';
   const noteId = 'noteId';

@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Output} from './output';
-import {FakeChannel} from '../channel/fakeChannel';
+import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
 import {OutputImpl} from './outputImpl';
 import {Requestable} from '../channel/requestable';
 import {OutputType} from './outputType';
@@ -56,7 +56,7 @@ describe('Output unit test', () => {
   let output:Output;
 
   beforeEach(() => {
-    requestable = new FakeChannel();
+    requestable = new ChannelFake();
     output = new OutputImpl(requestable);
   });
 

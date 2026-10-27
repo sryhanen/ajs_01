@@ -47,11 +47,11 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {UPlotOutputView} from './uPlotOutputView';
 import {By} from '@angular/platform-browser';
 import {uPlotFormatImpl} from '../../../../../objects/output/format/uPlot/uPlotFormatImpl';
-import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
+import {ChannelFake} from '../../../../../../test/fakes/client/channel/channelFake';
 
 describe('UPlotOutputView integration test', () => {
   let fixture: ComponentFixture<UPlotOutputView>;
-  const uPlotFormat = new uPlotFormatImpl(new FakeChannel());
+  const uPlotFormat = new uPlotFormatImpl(new ChannelFake());
 
   beforeEach(async () => {
     fixture = TestBed.createComponent(UPlotOutputView);

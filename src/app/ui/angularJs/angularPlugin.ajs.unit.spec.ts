@@ -47,7 +47,7 @@ import {AngularPluginAjs} from './angularPlugin.ajs';
 import {AngularObjectImpl} from '../../objects/angularObject/angularObjectImpl';
 import {Requestable} from '../../objects/channel/requestable';
 import {Mock} from 'vitest';
-import {FakeChannel} from '../../objects/channel/fakeChannel';
+import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
 
 describe('AngularPluginAjs', () => {
   const $element = [
@@ -72,7 +72,7 @@ describe('AngularPluginAjs', () => {
       $watchCollection: watchCollectionSpy,
     };
     angularPluginAjs = new AngularPluginAjs($compile,$scope,$element);
-    requestable = new FakeChannel();
+    requestable = new ChannelFake();
     angularPluginAjs.requestable = requestable;
   });
 
@@ -84,7 +84,7 @@ describe('AngularPluginAjs', () => {
 
   describe('AngularJs component lifecycle $postLink-hook ', () => {
     const template = '<h1>Test Template</h1>';
-    const channel = new FakeChannel();
+    const channel = new ChannelFake();
     const angularObject1 =  new AngularObjectImpl(channel, {name: 'SomeVariable1', object: 'test data1',}, '');
     const angularObject2 =  new AngularObjectImpl(channel, {name: 'SomeVariable2', object: 'test data2',}, '');
     beforeEach(() => {

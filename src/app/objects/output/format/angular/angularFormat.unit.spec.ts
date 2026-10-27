@@ -45,10 +45,10 @@
  */
 import {AngularFormatImpl} from './angularFormatImpl';
 import {Requestable} from '../../../channel/requestable';
-import {FakeChannel} from '../../../channel/fakeChannel';
+import {ChannelFake} from '../../../../../test/fakes/client/channel/channelFake';
 
 describe('AngularFormat unit test', () => {
-  const requestable:Requestable = new FakeChannel();
+  const requestable:Requestable = new ChannelFake();
   let angularFormat: AngularFormatImpl;
 
   beforeEach(() => {

@@ -43,92 +43,124 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
 import {NotebookIndexCollection} from './notebookIndexCollection';
-import {FakeChannel} from '../channel/fakeChannel';
+import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
 import {NotebookIndexCollectionImpl} from './notebookIndexCollectionImpl';
-import {NotebookIndexImpl} from '../notebookIndex/notebookIndexImpl';
+import {Respondable} from '../channel/respondable';
+import {Requestable} from '../channel/requestable';
+import {computed, Signal, signal, WritableSignal} from '@angular/core';
+import {RenderNode} from '../rendering/renderNode/renderNode';
+import {NotebookIndex} from '../notebookIndex/notebookIndex';
+import {NotebookIndexFake} from '../../../test/fakes/client/notebookIndex/notebookIndexFake';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {ComponentRegistryFake} from '../../../test/fakes/client/componentRegistry/componentRegistryFake';
+import {RenderNodeFake} from '../../../test/fakes/client/renderNode/renderNodeFake';
+import {NotesInfoServerResponse} from '../../../test/fakes/server/webSocketResponses/notesInfo/notesInfoServerResponse';
 
 describe('NotebookIndexCollection unit test', () => {
-  let channel: Channel;
+  let requestable: Requestable;
+  let notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
+  let renderNodeFake:Signal<RenderNode>;
   let notebookIndexCollection: NotebookIndexCollection;
 
-  beforeEach(() => {
-    channel = new FakeChannel();
-    notebookIndexCollection = new NotebookIndexCollectionImpl(channel);
-  });
 
-  it('Should print', () => {
-    const notebookCollectionPrinted = notebookIndexCollection.print()();
-    expect(notebookCollectionPrinted.isStub()).toBe(false);
-    expect(notebookCollectionPrinted.inputs()()['notebookIndices']).toEqual([]);
-  });
-
-  it('Should request channel', () => {
-    const channelSpy = vi.spyOn(channel, 'request');
-    const request = {
-      op:'test',
-      data:{}
-    };
-    notebookIndexCollection.request(request);
-    expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-  });
-
-  it('Should add notebookIndex', () => {
-    const notebookIndex = new NotebookIndexImpl(channel, {id:'notebookId'});
+  it('Should add', () => {
+    requestable = new ChannelFake();
+    notebookIndices = signal(new Map(), {equal:() => false});
+    renderNodeFake = signal(new RenderNodeImpl(ComponentRegistryFake.FAKE_COMPONENT, computed(() => ({
+      notebookIndicesSize: notebookIndices().size
+    }))));
+    notebookIndexCollection = new NotebookIndexCollectionImpl(requestable, notebookIndices, renderNodeFake);
+    const notebookIndex = new NotebookIndexFake('note1');
     notebookIndexCollection.add(notebookIndex);
-    const notebookCollectionPrinted = notebookIndexCollection.print()();
-    expect(notebookCollectionPrinted.inputs()()['notebookIndices']).toHaveLength(1);
+    const notebookIndicesSize = notebookIndexCollection.print()().inputs()()['notebookIndicesSize'];
+    expect(notebookIndicesSize).toEqual(1);
   });
 
-  it('Should throw if notebookIndex exists', () => {
-    const notebookIndex = new NotebookIndexImpl(channel, {id:'notebookId'});
+  it('Should not allow duplicate indices', () => {
+    requestable = new ChannelFake();
+    notebookIndices = signal(new Map(), {equal:() => false});
+    renderNodeFake = signal(new RenderNodeImpl(ComponentRegistryFake.FAKE_COMPONENT, computed(() => ({
+      notebookIndicesSize: notebookIndices().size
+    }))));
+    notebookIndexCollection = new NotebookIndexCollectionImpl(requestable, notebookIndices, renderNodeFake);
+    const notebookIndex = new NotebookIndexFake('note1');
     notebookIndexCollection.add(notebookIndex);
     expect(() => notebookIndexCollection.add(notebookIndex)).toThrow();
   });
 
-  it('Should remove all NotebookIndices', () => {
-    notebookIndexCollection.add(new NotebookIndexImpl(channel, {id:'notebookId1'}));
-    notebookIndexCollection.add(new NotebookIndexImpl(channel, {id:'notebookId2'}));
-    notebookIndexCollection.add(new NotebookIndexImpl(channel, {id:'notebookId3'}));
-    const notebookCollectionPrinted = notebookIndexCollection.print()();
-    const notebookIndicesInitially = notebookCollectionPrinted.inputs()()['notebookIndices'];
+  it('Should clear', () => {
+    requestable = new ChannelFake();
+    const fakeIndex = new NotebookIndexFake('note1');
+    notebookIndices = signal(new Map([[fakeIndex.id(), fakeIndex]]), {equal:() => false});
+    renderNodeFake = signal(new RenderNodeImpl(ComponentRegistryFake.FAKE_COMPONENT, computed(() => ({
+      notebookIndicesSize: notebookIndices().size
+    }))));
+    notebookIndexCollection = new NotebookIndexCollectionImpl(requestable, notebookIndices, renderNodeFake);
+    const indicesSizeBeforeClear = notebookIndexCollection.print()().inputs()()['notebookIndicesSize'];
     notebookIndexCollection.clear();
-    const notebookIndicesAfterRemove = notebookCollectionPrinted.inputs()()['notebookIndices'];
-    expect(notebookIndicesInitially).toHaveLength(3);
-    expect(notebookIndicesAfterRemove).toEqual([]);
+    const indicesSizeAfterClear = notebookIndexCollection.print()().inputs()()['notebookIndicesSize'];
+    expect(indicesSizeBeforeClear).toEqual(1);
+    expect(indicesSizeAfterClear).toEqual(0);
   });
 
-  it('Should update NotebookIndices on NOTES_INFO response', () => {
-    const notesInfoResponse = {
-      op:'NOTES_INFO',
-      data:{
-        notes:[
-          {id:'notebookId1'},
-          {id:'notebookId2'},
-          {id:'notebookId3'},
-        ]
-      }
-    };
-    notebookIndexCollection.response(notesInfoResponse);
-    const notebookCollectionPrinted = notebookIndexCollection.print()();
-    const notebookIndicesAfterResponse = notebookCollectionPrinted.inputs()()['notebookIndices'];
-    expect(notebookIndicesAfterResponse).toHaveLength(3);
-  });
-
-  it('Should respond to notebookIndices', () => {
-    const notebookIndex1 = new NotebookIndexImpl(channel, {id:'notebookId1'});
-    const notebookIndex2 = new NotebookIndexImpl(channel, {id:'notebookId2'});
-    notebookIndexCollection.add(notebookIndex1);
-    notebookIndexCollection.add(notebookIndex2);
-    const notebookIndex1Spy = vi.spyOn(notebookIndex1, 'response');
-    const notebookIndex2Spy = vi.spyOn(notebookIndex2, 'response');
-    const response = {
-      op:'test',
+  it('Should request requestable', () => {
+    requestable = new ChannelFake();
+    notebookIndices = signal(new Map(), {equal:() => false});
+    renderNodeFake = signal(new RenderNodeFake());
+    notebookIndexCollection = new NotebookIndexCollectionImpl(requestable, notebookIndices, renderNodeFake);
+    const request = {
+      op:'',
       data:{}
     };
+    const requestSpy = vi.spyOn(requestable, 'request');
+    notebookIndexCollection.request(request);
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
+
+  it('Should respond notebookIndices', () => {
+    requestable = new ChannelFake();
+    const fakeNotebookIndex1 = new NotebookIndexFake('note1');
+    const fakeNotebookIndex2 = new NotebookIndexFake('note2');
+    notebookIndices = signal(new Map([
+      [fakeNotebookIndex1.id(), fakeNotebookIndex1],
+      [fakeNotebookIndex2.id(), fakeNotebookIndex2],
+    ]), {equal:() => false});
+    renderNodeFake = signal(new RenderNodeFake());
+    notebookIndexCollection = new NotebookIndexCollectionImpl(requestable, notebookIndices, renderNodeFake);
+    const response = {
+      op:'',
+      data:{}
+    };
+    const fakeNotebookIndex1ResponseSpy = vi.spyOn(fakeNotebookIndex1, 'response');
+    const fakeNotebookIndex2ResponseSpy = vi.spyOn(fakeNotebookIndex2, 'response');
     notebookIndexCollection.response(response);
-    expect(notebookIndex1Spy).toHaveBeenCalledExactlyOnceWith(response);
-    expect(notebookIndex2Spy).toHaveBeenCalledExactlyOnceWith(response);
+    expect(fakeNotebookIndex1ResponseSpy).toHaveBeenCalledExactlyOnceWith(response);
+    expect(fakeNotebookIndex2ResponseSpy).toHaveBeenCalledExactlyOnceWith(response);
+  });
+
+  it('Should print', () => {
+    requestable = new ChannelFake();
+    notebookIndices = signal(new Map(), {equal:() => false});
+    renderNodeFake = signal(new RenderNodeFake());
+    notebookIndexCollection = new NotebookIndexCollectionImpl(requestable, notebookIndices, renderNodeFake);
+    expect(notebookIndexCollection.print()()).toEqual(renderNodeFake());
+  });
+
+  it('Should add notebookIndices on NOTES_INFO response', () => {
+    requestable = new ChannelFake();
+    notebookIndices = signal(new Map(), {equal:() => false});
+    renderNodeFake = signal(new RenderNodeImpl(ComponentRegistryFake.FAKE_COMPONENT, computed(() => ({
+      notebookIndicesSize: notebookIndices().size
+    }))));
+    notebookIndexCollection = new NotebookIndexCollectionImpl(requestable, notebookIndices, renderNodeFake);
+    const notesInfoData = [
+      {id: 'note1', isTrash: false, name: 'note1', path: ''},
+      {id: 'note2', isTrash: false, name: 'note2', path: ''},
+    ];
+    const notesInfoServerResponse = new NotesInfoServerResponse(notesInfoData);
+    notebookIndexCollection.response(notesInfoServerResponse.toObject());
+    const notebookIndicesSize =notebookIndexCollection.print()().inputs()()['notebookIndicesSize'];
+    expect(notebookIndicesSize).toEqual(2);
   });
 });

@@ -46,10 +46,10 @@
 import {DataTablesOutputView} from './dataTablesOutputView';
 import {DataTablesFormatImpl} from '../../../../../objects/output/format/dataTable/dataTablesFormatImpl';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {FakeChannel} from '../../../../../objects/channel/fakeChannel';
+import {ChannelFake} from '../../../../../../test/fakes/client/channel/channelFake';
 
 describe('DataTablesOutputView functional test', () => {
-  const dataTablesFormat = new DataTablesFormatImpl(new FakeChannel());
+  const dataTablesFormat = new DataTablesFormatImpl(new ChannelFake());
   let fixture:ComponentFixture<DataTablesOutputView>;
   const initialDataTablesData = {
     data:[

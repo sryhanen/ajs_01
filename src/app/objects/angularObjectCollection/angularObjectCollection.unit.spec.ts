@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {FakeChannel} from '../channel/fakeChannel';
+import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
 import {AngularObjectCollection} from './angularObjectCollection';
 import {AngularObjectCollectionImpl} from './angularObjectCollectionImpl';
 import {Requestable} from '../channel/requestable';
@@ -54,7 +54,7 @@ describe('angularObjectCollection', () => {
   let requestable:Requestable;
 
   beforeEach(() => {
-    requestable = new FakeChannel();
+    requestable = new ChannelFake();
     angularObjectCollection = new AngularObjectCollectionImpl(requestable);
   });
 

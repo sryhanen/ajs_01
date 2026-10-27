@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Channel} from '../../channel/channel';
-import {FakeChannel} from '../../channel/fakeChannel';
+import {ChannelFake} from '../../../../test/fakes/client/channel/channelFake';
 import {WebSocketChannel} from './webSocketChannel';
 import {WebSocketService} from '../service/webSocketService';
 import {FakeWebSocketService} from '../service/fakeWebSocketService';
@@ -55,7 +55,7 @@ describe('WebSocketChannel', () => {
   let webSocketChannel:Channel;
 
   beforeEach(() => {
-    channel = new FakeChannel();
+    channel = new ChannelFake();
     webSocketService = new FakeWebSocketService();
     webSocketChannel = new WebSocketChannel(channel, webSocketService);
   });

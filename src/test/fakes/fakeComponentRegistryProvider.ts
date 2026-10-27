@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {FakeComponent} from './fakeComponent';
-import {FakeComponentRegistry} from './fakeComponentRegistry';
+import {ComponentRegistryFake} from './client/componentRegistry/componentRegistryFake';
 import {COMPONENT_REGISTRY} from '../../app/ui/angular2+/componentRegistry/componentRegistry';
 
-export const FakeComponentRegistryProvider = {provide: COMPONENT_REGISTRY, useValue:new Map([[FakeComponentRegistry.FAKE_COMPONENT, FakeComponent]])};
+export const FakeComponentRegistryProvider = {provide: COMPONENT_REGISTRY, useValue:new Map([[ComponentRegistryFake.FAKE_COMPONENT, FakeComponent]])};

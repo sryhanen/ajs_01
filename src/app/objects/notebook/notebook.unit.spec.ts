@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {FakeChannel} from '../channel/fakeChannel';
+import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
 import {Channel} from '../channel/channel';
 import {Notebook} from './notebook';
 import {NotebookImpl} from './notebookImpl';
@@ -62,7 +62,7 @@ describe('Notebook unit test', () => {
       id: notebookId,
       paragraphs:notebookParagraphs
     };
-    channel = new FakeChannel();
+    channel = new ChannelFake();
   });
 
   describe('Birth', () => {

@@ -44,29 +44,25 @@
  * a licensee so wish it.
  */
 import {NotebookIndexCollection} from './notebookIndexCollection';
-import {Channel} from '../channel/channel';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from '../notebookIndex/notebookIndex';
-import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
-import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {Requestable} from '../channel/requestable';
 import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookIndexImpl} from '../notebookIndex/notebookIndexImpl';
+import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
-  private readonly _channel:Channel;
+  private readonly _requestable:Requestable;
   private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
   private readonly _renderNode:Signal<RenderNode>;
 
-  constructor(channel:Channel) {
-    this._channel = channel;
-    this._notebookIndices = signal(new Map(), {equal:() => false});
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
-      notebookIndices: Array.from(this._notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
-    }))));
+  constructor(requestable:Requestable, notebookIndices: WritableSignal<Map<string, NotebookIndex>>, renderNode:Signal<RenderNode>) {
+    this._requestable = requestable;
+    this._notebookIndices = notebookIndices;
+    this._renderNode = renderNode;
   }
 
   add(notebookIndex: NotebookIndex): void {
@@ -91,8 +87,8 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
     return this._renderNode;
   }
 
-  request(data: object): void {
-    this._channel.request(data);
+  request(requestMessage: object): void {
+    this._requestable.request(requestMessage);
   }
 
   response(json: object): void {

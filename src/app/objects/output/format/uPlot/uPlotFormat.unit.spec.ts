@@ -47,13 +47,13 @@ import {uPlotFormatImpl} from './uPlotFormatImpl';
 import {OutputFormat} from '../outputFormat';
 import uPlot from 'uplot';
 import {Requestable} from '../../../channel/requestable';
-import {FakeChannel} from '../../../channel/fakeChannel';
+import {ChannelFake} from '../../../../../test/fakes/client/channel/channelFake';
 
 describe('uPlotFormat unit test', () => {
   let requestable:Requestable;
   let uPlotFormat: OutputFormat;
   beforeEach(() => {
-    requestable = new FakeChannel();
+    requestable = new ChannelFake();
     uPlotFormat = new uPlotFormatImpl(requestable);
   });
 

@@ -47,7 +47,7 @@ import {NotebookIndex} from './notebookIndex';
 import {NotebookIndexImpl} from './notebookIndexImpl';
 import {Channel} from '../channel/channel';
 import {RenderNode} from '../rendering/renderNode/renderNode';
-import {FakeChannel} from '../channel/fakeChannel';
+import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
 
 describe('NotebookIndex', () => {
   let notebookIndex: NotebookIndex;
@@ -62,7 +62,7 @@ describe('NotebookIndex', () => {
   };
 
   beforeEach(() => {
-    channel = new FakeChannel();
+    channel = new ChannelFake();
     notebookIndex = new NotebookIndexImpl(channel, notebookIndexData);
   });
 

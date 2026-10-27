@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {FakeChannel} from '../channel/fakeChannel';
+import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
 import {Channel} from '../channel/channel';
 import {ParagraphImpl} from './paragraphImpl';
 import {Paragraph} from './paragraph';
@@ -74,7 +74,7 @@ describe('Paragraph', () => {
       text: paragraphText,
       id:paragraphId
     };
-    channel = new FakeChannel();
+    channel = new ChannelFake();
     paragraph = new ParagraphImpl(channel, paragraphData);
   });
 

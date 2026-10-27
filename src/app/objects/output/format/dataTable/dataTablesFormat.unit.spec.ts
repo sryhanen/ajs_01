@@ -46,7 +46,7 @@
 import {DataTablesFormatImpl} from './dataTablesFormatImpl';
 import {PaginatedDataTablesData} from './paginatedDataTablesData';
 import {DataTablesOptions} from './dataTablesOptions';
-import {FakeChannel} from '../../../channel/fakeChannel';
+import {ChannelFake} from '../../../../../test/fakes/client/channel/channelFake';
 import {Requestable} from '../../../channel/requestable';
 
 describe('DataTablesFormat unit test', () => {
@@ -54,7 +54,7 @@ describe('DataTablesFormat unit test', () => {
   let dataTablesFormat:DataTablesFormatImpl;
 
   beforeEach(() => {
-    requestable = new FakeChannel();
+    requestable = new ChannelFake();
     dataTablesFormat = new DataTablesFormatImpl(requestable);
   });
 

@@ -43,9 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from './channel';
+import {NotebookIndex} from '../../../../app/objects/notebookIndex/notebookIndex';
+import {signal, Signal} from '@angular/core';
+import {RenderNode} from '../../../../app/objects/rendering/renderNode/renderNode';
+import {RenderNodeFake} from '../renderNode/renderNodeFake';
 
-export class FakeChannel implements Channel {
+export class NotebookIndexFake implements NotebookIndex {
+  private readonly _renderNodeFake:Signal<RenderNode>;
+  private readonly _id:string;
+
+  constructor(id:string) {
+    this._renderNodeFake = signal(new RenderNodeFake());
+    this._id = id;
+  }
+
+  id(): string {
+    return this._id;
+  }
+
+  print(): Signal<RenderNode> {
+    return this._renderNodeFake;
+  }
+
   request(json: object): void {}
 
   response(json: object): void {}

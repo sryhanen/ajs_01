@@ -46,14 +46,14 @@
 import {DataTablesAjaxImpl} from './dataTablesAjaxImpl';
 import {DataTablesAjax} from './dataTablesAjax';
 import {Requestable} from '../../../../../channel/requestable';
-import {FakeChannel} from '../../../../../channel/fakeChannel';
+import {ChannelFake} from '../../../../../../../test/fakes/client/channel/channelFake';
 
 describe('Ajax', () => {
   let requestable:Requestable;
   let dataTablesAjax:DataTablesAjax;
 
   beforeEach(() => {
-    requestable = new FakeChannel();
+    requestable = new ChannelFake();
     dataTablesAjax = new DataTablesAjaxImpl(requestable);
   });
 
