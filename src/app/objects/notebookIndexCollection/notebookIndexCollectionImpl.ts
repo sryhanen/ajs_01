@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {NotebookIndexCollection} from './notebookIndexCollection';
-import {Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from '../notebookIndex/notebookIndex';
 import {Requestable} from '../channel/requestable';
@@ -53,6 +53,10 @@ import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketRespon
 import {NotebookIndexImpl} from '../notebookIndex/notebookIndexImpl';
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {NotebookStub} from '../notebook/notebookStub';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
   private readonly _requestable:Requestable;
@@ -106,7 +110,12 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
     const notebookIndicesPayload = notesInfoResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
     this.clear();
     notebookIndicesPayload.forEach(notebookIndexPayload => {
-      const notebookIndex = new NotebookIndexImpl(this, notebookIndexPayload);
+      const notebookIndexState = new WebSocketPayloadImpl(notebookIndexPayload);
+      const notebook = signal(new NotebookStub());
+      const renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
+        notebook: notebook().isStub() ? new RenderNodeStub() : notebook().print()()
+      }))));
+      const notebookIndex = new NotebookIndexImpl(this, notebookIndexState, notebook, renderNode);
       this.add(notebookIndex);
     });
   }

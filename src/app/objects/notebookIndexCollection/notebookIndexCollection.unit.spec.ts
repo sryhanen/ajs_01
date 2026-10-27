@@ -46,7 +46,6 @@
 import {NotebookIndexCollection} from './notebookIndexCollection';
 import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
 import {NotebookIndexCollectionImpl} from './notebookIndexCollectionImpl';
-import {Respondable} from '../channel/respondable';
 import {Requestable} from '../channel/requestable';
 import {computed, Signal, signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';

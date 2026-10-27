@@ -43,39 +43,34 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from './notebookIndex';
-import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 import {Notebook} from '../notebook/notebook';
-import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {NotebookStub} from '../notebook/notebookStub';
-import {Channel} from '../channel/channel';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
 import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookImpl} from '../notebook/notebookImpl';
+import {Requestable} from '../channel/requestable';
 
 export class NotebookIndexImpl implements NotebookIndex {
-  private readonly _channel: Channel;
-  private readonly _notebookIndexData:WebSocketPayload;
+  private readonly _requestable:Requestable;
+  private readonly _notebookIndexState:WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _notebook: WritableSignal<Notebook>;
 
-  constructor(channel: Channel, notebookIndexData:object) {
-    this._channel = channel;
-    this._notebookIndexData = new WebSocketPayloadImpl(notebookIndexData);
-    this._notebook = signal(new NotebookStub());
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
-      notebook: this._notebook().isStub() ? new RenderNodeStub() : this._notebook().print()()
-    }))));
+  constructor(requestable:Requestable, notebookIndexState:WebSocketPayload, notebook: WritableSignal<Notebook>, renderNode: Signal<RenderNode>) {
+    this._requestable = requestable;
+    this._notebookIndexState = notebookIndexState;
+    this.validateNotebookBelongsToThisIndex(notebook());
+    this._notebook = notebook;
+    this._renderNode = renderNode;
   }
 
   request(json: object): void {
-    this._channel.request(json);
+    this._requestable.request(json);
   }
 
   response(json: object): void {
@@ -88,12 +83,26 @@ export class NotebookIndexImpl implements NotebookIndex {
     }
   }
 
+  openNotebook(notebook:Notebook):void {
+    this.validateNotebookBelongsToThisIndex(notebook);
+    this._notebook.set(notebook);
+  }
+
   id():string {
-    return this._notebookIndexData.stringProperty('id');
+    return this._notebookIndexState.stringProperty('id');
   }
 
   print(): Signal<RenderNode> {
     return this._renderNode;
+  }
+
+  private validateNotebookBelongsToThisIndex(notebook:Notebook):void {
+    if(!notebook.isStub()){
+      const notebookId = notebook.id();
+      if(notebook.id() !== this.id()){
+        throw new RangeError(`Notebook "${notebookId}" does not belong to this index.`);
+      }
+    }
   }
 
   private handleNoteResponseEvent(webSocketResponse: WebSocketResponse): void {

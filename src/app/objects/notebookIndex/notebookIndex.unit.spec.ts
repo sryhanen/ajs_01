@@ -45,51 +45,135 @@
  */
 import {NotebookIndex} from './notebookIndex';
 import {NotebookIndexImpl} from './notebookIndexImpl';
-import {Channel} from '../channel/channel';
+import {Requestable} from '../channel/requestable';
+import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {Notebook} from '../notebook/notebook';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
+import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {NotebookStub} from '../notebook/notebookStub';
+import {RenderNodeFake} from '../../../test/fakes/client/renderNode/renderNodeFake';
+import {NotebookFake} from '../../../test/fakes/client/notebook/notebookFake';
+import {NoteServerResponse} from '../../../test/fakes/server/webSocketResponses/note/noteServerResponse';
+import {ServerNotebookFakeImpl} from '../../../test/fakes/server/notebook/serverNotebookFakeImpl';
+import {IdFakeImpl} from '../../../test/fakes/server/id/idFakeImpl';
+import {response} from 'express';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {ComponentRegistryFake} from '../../../test/fakes/client/componentRegistry/componentRegistryFake';
+import Stubable from '../../shared/interfaces/stubable';
 
 describe('NotebookIndex', () => {
   let notebookIndex: NotebookIndex;
-  let channel:Channel;
-  const fakeMessage = {
-    op:'test',
-    data:{}
-  };
-  const notebookId = 'notebookId';
-  const notebookIndexData ={
-    id:notebookId
-  };
+  let requestable:Requestable;
+  let notebookIndexState:WebSocketPayload;
+  let notebook:WritableSignal<Notebook>;
+  let renderNode:Signal<RenderNode>;
 
-  beforeEach(() => {
-    channel = new ChannelFake();
-    notebookIndex = new NotebookIndexImpl(channel, notebookIndexData);
+  it('Should validate given notebook', () => {
+    const notebookIndexId = 'notebookIndexId';
+    requestable = new ChannelFake();
+    notebookIndexState = new WebSocketPayloadImpl({id:notebookIndexId});
+    const notebookId = 'notebookId';
+    notebook = signal(new NotebookFake(notebookId));
+    renderNode = signal(new RenderNodeFake());
+    expect(() => new NotebookIndexImpl(requestable, notebookIndexState, notebook, renderNode)).toThrow();
   });
 
   it('Should have id', () => {
-    expect(notebookIndex.id()).toEqual(notebookId);
+    requestable = new ChannelFake();
+    const id = 'notebook';
+    notebookIndexState = new WebSocketPayloadImpl({id:id});
+    notebook = signal(new NotebookFake(id));
+    renderNode = signal(new RenderNodeFake());
+    notebookIndex = new NotebookIndexImpl(requestable, notebookIndexState, notebook, renderNode);
+    expect(notebookIndex.id()).toEqual(id);
   });
 
   it('Should print', () => {
-    const printed = notebookIndex.print()();
-    const inputs = printed.inputs()();
-    expect(printed.isStub()).toBe(false);
-    expect((inputs['notebook'] as RenderNode).isStub()).toBe(true);
+    requestable = new ChannelFake();
+    notebookIndexState = new WebSocketPayloadImpl({});
+    notebook = signal(new NotebookStub());
+    renderNode = signal(new RenderNodeFake());
+    notebookIndex = new NotebookIndexImpl(requestable, notebookIndexState, notebook, renderNode);
+    expect(notebookIndex.print()()).toEqual(renderNode());
   });
 
-  it('Should request channel', () => {
-    const channelSpy = vi.spyOn(channel, 'request');
-    notebookIndex.request(fakeMessage);
-    expect(channelSpy).toHaveBeenCalledExactlyOnceWith(fakeMessage);
+  it('Should respond notebook', () => {
+    requestable = new ChannelFake();
+    const id = 'notebook';
+    notebookIndexState = new WebSocketPayloadImpl({id:id});
+    notebook = signal(new NotebookFake(id));
+    renderNode = signal(new RenderNodeFake());
+    notebookIndex = new NotebookIndexImpl(requestable, notebookIndexState, notebook, renderNode);
+    const response = {
+      op:'',
+      data:{}
+    };
+    const notebookSpy = vi.spyOn(notebook(), 'response');
+    notebookIndex.response(response);
+    expect(notebookSpy).toHaveBeenCalledExactlyOnceWith(response);
   });
 
-  it('Should render note after NOTE response', () => {
-    notebookIndex.response({
-      op:'NOTE',
-      data:{id:notebookId, paragraphs:[]}
-    });
-    const printed = notebookIndex.print()();
-    const inputs = printed.inputs()();
-    expect((inputs['notebook'] as RenderNode).isStub()).toBe(false);
+  it('Should open notebook', () => {
+    const notebookIndexId = 'notebookIndexId';
+    requestable = new ChannelFake();
+    notebookIndexState = new WebSocketPayloadImpl({id:notebookIndexId});
+    notebook = signal(new NotebookStub());
+    renderNode = signal(new RenderNodeFake());
+    notebookIndex = new NotebookIndexImpl(requestable, notebookIndexState, notebook, renderNode);
+    const openedNotebook = new NotebookFake(notebookIndexId);
+    notebookIndex.openNotebook(openedNotebook);
+    const response = {
+      op:'',
+      data:{}
+    };
+    const openedNotebookSpy = vi.spyOn(openedNotebook, 'response');
+    notebookIndex.response(response);
+    expect(openedNotebookSpy).toHaveBeenCalledExactlyOnceWith(response);
+  });
+
+  it('Should validate notebook to open', () => {
+    const notebookIndexId = 'notebookIndexId';
+    requestable = new ChannelFake();
+    notebookIndexState = new WebSocketPayloadImpl({id:notebookIndexId});
+    notebook = signal(new NotebookStub());
+    renderNode = signal(new RenderNodeFake());
+    notebookIndex = new NotebookIndexImpl(requestable, notebookIndexState, notebook, renderNode);
+    const notebookId = 'notebookId';
+    const openedNotebook = new NotebookFake(notebookId);
+    expect(() => notebookIndex.openNotebook(openedNotebook)).toThrow();
+  });
+
+  it('Should request requestable', () => {
+    requestable = new ChannelFake();
+    notebookIndexState = new WebSocketPayloadImpl({});
+    notebook = signal(new NotebookStub());
+    renderNode = signal(new RenderNodeFake());
+    notebookIndex = new NotebookIndexImpl(requestable, notebookIndexState, notebook, renderNode);
+    const request = {
+      op:'',
+      data:{}
+    };
+    const requestableSpy = vi.spyOn(requestable, 'request');
+    notebookIndex.request(request);
+    expect(requestableSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
+
+  it('Should open notebook on NOTE server response', () => {
+    requestable = new ChannelFake();
+    const notebookIndexId = 'notebookIndexId';
+    notebookIndexState = new WebSocketPayloadImpl({id:notebookIndexId});
+    notebook = signal(new NotebookStub());
+    renderNode = signal(new RenderNodeImpl(ComponentRegistryFake.FAKE_COMPONENT, computed(() => ({
+      notebookIsStub:notebook().isStub()
+    }))));
+    notebookIndex = new NotebookIndexImpl(requestable, notebookIndexState, notebook, renderNode);
+    const noteServerResponse = new NoteServerResponse(new ServerNotebookFakeImpl(new IdFakeImpl(notebookIndexId)).notebookState());
+    const notebookIsStubBeforeResponse = notebookIndex.print()().inputs()()['notebookIsStub'];
+    notebookIndex.response(noteServerResponse.toObject());
+    const notebookIsStubAfterResponse = notebookIndex.print()().inputs()()['notebookIsStub'];
+    expect(notebookIsStubBeforeResponse).toBe(true);
+    expect(notebookIsStubAfterResponse).toBe(false);
   });
 });
