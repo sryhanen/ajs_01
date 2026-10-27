@@ -47,15 +47,12 @@ import {NotebookIndexCollection} from './notebookIndexCollection';
 import {Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from '../notebookIndex/notebookIndex';
-import {Requestable} from '../channel/requestable';
 
 export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
-  private readonly _requestable:Requestable;
   private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
   private readonly _renderNode:Signal<RenderNode>;
 
-  constructor(requestable:Requestable, notebookIndices: WritableSignal<Map<string, NotebookIndex>>, renderNode:Signal<RenderNode>) {
-    this._requestable = requestable;
+  constructor(notebookIndices: WritableSignal<Map<string, NotebookIndex>>, renderNode:Signal<RenderNode>) {
     this._notebookIndices = notebookIndices;
     this._renderNode = renderNode;
   }
@@ -80,9 +77,5 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
 
   print(): Signal<RenderNode> {
     return this._renderNode;
-  }
-
-  request(requestMessage: object): void {
-    this._requestable.request(requestMessage);
   }
 }

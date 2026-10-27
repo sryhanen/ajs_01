@@ -45,9 +45,8 @@
  */
 import {Printable} from '../rendering/printable/printable';
 import {NotebookIndex} from '../notebookIndex/notebookIndex';
-import {Requestable} from '../channel/requestable';
 
-export interface NotebookIndexCollection extends Requestable, Printable{
+export interface NotebookIndexCollection extends Printable{
   add(notebookIndex:NotebookIndex):void;
   clear():void;
 }

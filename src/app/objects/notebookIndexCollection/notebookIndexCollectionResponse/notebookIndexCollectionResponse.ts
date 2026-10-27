@@ -55,14 +55,17 @@ import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
+import {Requestable} from '../../channel/requestable';
 
 export class NotebookIndexCollectionResponse implements Respondable {
   private readonly _notebookIndexCollection: NotebookIndexCollection;
   private readonly _respondables: Signal<Respondable[]>;
+  private readonly _requestable: Requestable;
 
-  constructor(notebookIndexCollection: NotebookIndexCollection, respondables: Signal<Respondable[]>) {
+  constructor(notebookIndexCollection: NotebookIndexCollection, respondables: Signal<Respondable[]>, requestable:Requestable) {
     this._notebookIndexCollection = notebookIndexCollection;
     this._respondables = respondables;
+    this._requestable = requestable;
   }
 
   response(json: object) {
@@ -85,7 +88,7 @@ export class NotebookIndexCollectionResponse implements Respondable {
       const renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
         notebook: notebook().isStub() ? new RenderNodeStub() : notebook().print()()
       }))));
-      const notebookIndex = new NotebookIndexImpl(this._notebookIndexCollection, notebookIndexState, notebook, renderNode);
+      const notebookIndex = new NotebookIndexImpl(this._requestable, notebookIndexState, notebook, renderNode);
       this._notebookIndexCollection.add(notebookIndex);
     });
   }
