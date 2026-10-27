@@ -45,7 +45,7 @@
  */
 import {Respondable} from '../../channel/respondable';
 import {NotebookIndexCollection} from '../notebookIndexCollection';
-import {computed, signal, Signal} from '@angular/core';
+import {computed, signal, WritableSignal} from '@angular/core';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
@@ -56,13 +56,14 @@ import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/regi
 import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
 import {Requestable} from '../../channel/requestable';
+import {NotebookIndexResponse} from '../../notebookIndex/notebookIndexResponse/notebookIndexResponse';
 
 export class NotebookIndexCollectionResponse implements Respondable {
   private readonly _notebookIndexCollection: NotebookIndexCollection;
-  private readonly _respondables: Signal<Respondable[]>;
+  private readonly _respondables: WritableSignal<Respondable[]>;
   private readonly _requestable: Requestable;
 
-  constructor(notebookIndexCollection: NotebookIndexCollection, respondables: Signal<Respondable[]>, requestable:Requestable) {
+  constructor(notebookIndexCollection: NotebookIndexCollection, respondables: WritableSignal<Respondable[]>, requestable:Requestable) {
     this._notebookIndexCollection = notebookIndexCollection;
     this._respondables = respondables;
     this._requestable = requestable;
@@ -82,14 +83,20 @@ export class NotebookIndexCollectionResponse implements Respondable {
     const notesInfoResponse = new TypedWebSocketResponse('NOTES_INFO', webSocketResponse);
     const notebookIndicesPayload = notesInfoResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
     this._notebookIndexCollection.clear();
+    this._respondables.set([]);
     notebookIndicesPayload.forEach(notebookIndexPayload => {
       const notebookIndexState = new WebSocketPayloadImpl(notebookIndexPayload);
       const notebook = signal(new NotebookStub());
       const renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
         notebook: notebook().isStub() ? new RenderNodeStub() : notebook().print()()
       }))));
-      const notebookIndex = new NotebookIndexImpl(this._requestable, notebookIndexState, notebook, renderNode);
+      const notebookIndex = new NotebookIndexImpl(notebookIndexState, notebook, renderNode);
       this._notebookIndexCollection.add(notebookIndex);
+      const notebookIndexResponse = new NotebookIndexResponse(notebook, this._requestable, notebookIndex);
+      this._respondables.update(respondables => {
+        respondables.push(notebookIndexResponse);
+        return respondables;
+      });
     });
   }
 }

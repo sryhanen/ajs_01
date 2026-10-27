@@ -57,6 +57,7 @@ import {
   NotebookIndexCollectionResponse
 } from '../notebookIndexCollection/notebookIndexCollectionResponse/notebookIndexCollectionResponse';
 import {Printable} from '../rendering/printable/printable';
+import {NotebookIndex} from '../notebookIndex/notebookIndex';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;
@@ -96,13 +97,13 @@ class WebAppRootImpl implements WebAppRoot {
     if(this._hasInitialized){
       return;
     }
-    const notebookIndices = signal(new Map(), {equal:() => false});
+    const notebookIndices:WritableSignal<Map<string, NotebookIndex>> = signal(new Map(), {equal:() => false});
     const renderNode = new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
       notebookIndices:Array.from(notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
     })));
     const notebookIndexCollection = new NotebookIndexCollectionImpl(notebookIndices, signal(renderNode));
     this.printable = notebookIndexCollection;
-    const respondables = computed(() => Array.from(notebookIndices().values()));
+    const respondables:WritableSignal<Respondable[]> = signal([]);
     this.respondable = new NotebookIndexCollectionResponse(notebookIndexCollection, respondables, this);
     this._printSignal.set(this._printable().print()());
     this.webSocket = new WebSocketChannel(this, webSocketService);
