@@ -43,10 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
 import {Printable} from '../rendering/printable/printable';
 import Stubable from '../../shared/interfaces/stubable';
 
-export interface Notebook extends Channel, Printable, Stubable{
+export interface Notebook extends Printable, Stubable{
   id(): string;
 }

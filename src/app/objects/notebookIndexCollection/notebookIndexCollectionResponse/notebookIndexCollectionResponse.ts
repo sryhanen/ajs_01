@@ -57,6 +57,7 @@ import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
 import {Requestable} from '../../channel/requestable';
 import {NotebookIndexResponse} from '../../notebookIndex/notebookIndexResponse/notebookIndexResponse';
+import {NotebookResponseStub} from '../../notebook/notebookResponse/notebookResponseStub';
 
 export class NotebookIndexCollectionResponse implements Respondable {
   private readonly _notebookIndexCollection: NotebookIndexCollection;
@@ -89,7 +90,8 @@ export class NotebookIndexCollectionResponse implements Respondable {
       const notebook = signal(new NotebookStub());
       const notebookIndex = new NotebookIndexImpl(notebookIndexState, notebook);
       this._notebookIndexCollection.add(notebookIndex);
-      const notebookIndexResponse = new NotebookIndexResponse(notebook, this._requestable, notebookIndex);
+      const notebookResponse = signal(new NotebookResponseStub());
+      const notebookIndexResponse = new NotebookIndexResponse(notebookResponse, this._requestable, notebookIndex);
       this._respondables.update(respondables => {
         respondables.push(notebookIndexResponse);
         return respondables;

@@ -48,7 +48,7 @@ import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseI
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketRequestWithField} from '../../webSocket/request/webSocketRequestWithField/webSocketRequestWithField';
 
-export class NotebookRequestDecorator implements Requestable {
+export class NotebookRequest implements Requestable {
   private readonly _requestable: Requestable;
   private readonly _notebookId:string;
 

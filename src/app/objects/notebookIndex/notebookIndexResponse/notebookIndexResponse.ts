@@ -44,30 +44,26 @@
  * a licensee so wish it.
  */
 import {Respondable} from '../../channel/respondable';
-import {Notebook} from '../../notebook/notebook';
-import {signal, Signal} from '@angular/core';
+import {WritableSignal} from '@angular/core';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
-import {NotebookRequestDecorator} from '../../notebook/notebookRequestDecorator/notebookRequestDecorator';
+import {NotebookRequest} from '../../notebook/notebookRequest/notebookRequest';
 import {ParagraphCollectionImpl} from '../../paragraphCollection/paragraphCollectionImpl';
-import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 import {NotebookImpl} from '../../notebook/notebookImpl';
 import {Requestable} from '../../channel/requestable';
-import Stubable from '../../../shared/interfaces/stubable';
 import {NotebookIndex} from '../notebookIndex';
-
-type RespondableAndStubable = Respondable & Stubable;
+import {NotebookResponseImpl} from '../../notebook/notebookResponse/notebookResponseImpl';
+import {NotebookResponse} from '../../notebook/notebookResponse/notebookResponse';
 
 export class NotebookIndexResponse implements Respondable{
-  private readonly _respondableAndStubable: Signal<RespondableAndStubable>;
+  private readonly _notebookResponse: WritableSignal<NotebookResponse>;
   private readonly _requestable: Requestable;
   private readonly _notebookIndex:NotebookIndex;
 
-  constructor(respondableAndStubable: Signal<RespondableAndStubable>, requestable: Requestable, notebookIndex:NotebookIndex) {
-    this._respondableAndStubable = respondableAndStubable;
+  constructor(notebookResponse: WritableSignal<NotebookResponse>, requestable: Requestable, notebookIndex:NotebookIndex) {
+    this._notebookResponse = notebookResponse;
     this._requestable = requestable;
     this._notebookIndex = notebookIndex;
   }
@@ -77,8 +73,8 @@ export class NotebookIndexResponse implements Respondable{
     if(webSocketResponse.operation() === 'NOTE'){
       this.handleNoteResponseEvent(webSocketResponse);
     }
-    else if(!this._respondableAndStubable().isStub()){
-      this._respondableAndStubable().response(json);
+    else if(!this._notebookResponse().isStub()){
+      this._notebookResponse().response(json);
     }
   }
 
@@ -87,12 +83,11 @@ export class NotebookIndexResponse implements Respondable{
     const notebookState = noteResponse.dataAsWebSocketPayload();
     const receivedNotebookId= notebookState.stringProperty('id');
     if(receivedNotebookId === this._notebookIndex.id()){
-      const notebookRequestDecorator = new NotebookRequestDecorator(this._requestable, receivedNotebookId);
-      const paragraphCollection = new ParagraphCollectionImpl(notebookRequestDecorator, notebookState.arrayProperty('paragraphs'));
-      const renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, signal({
-        paragraphCollection: paragraphCollection.print()()
-      })));
-      const notebook = new NotebookImpl(this._requestable, paragraphCollection, notebookState, renderNode);
+      const notebookRequest = new NotebookRequest(this._requestable, receivedNotebookId);
+      const paragraphCollection = new ParagraphCollectionImpl(notebookRequest, notebookState.arrayProperty('paragraphs'));
+      const notebook = new NotebookImpl(notebookState, paragraphCollection);
+      const notebookResponse = new NotebookResponseImpl(paragraphCollection, notebookState.stringProperty('id'));
+      this._notebookResponse.set(notebookResponse);
       this._notebookIndex.openNotebook(notebook);
     }
   }

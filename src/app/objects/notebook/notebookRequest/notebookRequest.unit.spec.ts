@@ -43,18 +43,18 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookRequestDecorator} from './notebookRequestDecorator';
+import {NotebookRequest} from './notebookRequest';
 import {Requestable} from '../../channel/requestable';
 import {ChannelFake} from '../../../../test/fakes/client/channel/channelFake';
 
-describe('NotebookRequestDecorator', () => {
+describe('NotebookRequest unit test', () => {
   let notebookRequestDecorator: Requestable;
   let requestable: Requestable;
 
   it('Should decorate request with noteId', () => {
     requestable = new ChannelFake();
     const notebookId = 'notebookId';
-    notebookRequestDecorator = new NotebookRequestDecorator(requestable, notebookId);
+    notebookRequestDecorator = new NotebookRequest(requestable, notebookId);
     const requestBeforeDecoration = {
       op:'',
       data:{

@@ -44,29 +44,22 @@
  * a licensee so wish it.
  */
 import {Notebook} from './notebook';
-import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
-import {Signal} from '@angular/core';
+import {signal, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
-import {WebSocketResponseFilter} from '../webSocket/response/webSocketResponseFilter/webSocketResponseFilter';
-import {WebSocketResponsePropertyEqualsFilter} from '../webSocket/response/webSocketResponseFilter/webSocketResponsePropertyEqualsFilter';
-import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
-import {Requestable} from '../channel/requestable';
-import {Respondable} from '../channel/respondable';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 
 export class NotebookImpl implements Notebook {
-  private readonly _requestable: Requestable;
-  private readonly _respondable: Respondable;
   private readonly _notebookState: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
-  private readonly _noteIdFilter:WebSocketResponseFilter;
 
-  constructor(requestable: Requestable, respondable:Respondable, notebookState: WebSocketPayload, renderNode: Signal<RenderNode>) {
-    this._requestable = requestable;
-    this._respondable = respondable;
+  constructor(notebookState: WebSocketPayload, paragraphCollection: ParagraphCollection) {
     this._notebookState = notebookState;
-    this._renderNode = renderNode;
-    this._noteIdFilter = new WebSocketResponsePropertyEqualsFilter('noteId', this.id());
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, signal({
+      paragraphCollection: paragraphCollection.print()()
+    })));
   }
 
   print(): Signal<RenderNode> {
@@ -75,21 +68,6 @@ export class NotebookImpl implements Notebook {
 
   id(): string {
     return this._notebookState.stringProperty('id');
-  }
-
-  request(json: object): void {
-    this._requestable.request(json);
-  }
-
-  response(json: object): void {
-    const message = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    const filteredMessage = this._noteIdFilter.filterResponse(message);
-    if(!filteredMessage.isStub()){
-      this._respondable.response({
-        op:filteredMessage.operation(),
-        data:filteredMessage.data()
-      });
-    }
   }
 
   isStub(): boolean {
