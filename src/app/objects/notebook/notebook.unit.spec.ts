@@ -43,77 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
-import {Channel} from '../channel/channel';
 import {Notebook} from './notebook';
+import {Requestable} from '../channel/requestable';
+import {Respondable} from '../channel/respondable';
+import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
+import {signal, Signal} from '@angular/core';
+import {RenderNode} from '../rendering/renderNode/renderNode';
+import {ChannelFake} from '../../../test/fakes/client/channel/channelFake';
+import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {RenderNodeFake} from '../../../test/fakes/client/renderNode/renderNodeFake';
 import {NotebookImpl} from './notebookImpl';
 
 describe('Notebook unit test', () => {
-  const notebookId = 'noteId';
-  const notebookParagraphs = [
-    {id:'paragraph1'}
-  ];
-  let notebookData: {id:string, paragraphs?: {id:string}[]};
-  let channel: Channel;
   let notebook: Notebook;
+  let requestable: Requestable;
+  let respondable:Respondable;
+  let notebookState: WebSocketPayload;
+  let renderNode: Signal<RenderNode>;
 
-  beforeEach(() => {
-    notebookData = {
-      id: notebookId,
-      paragraphs:notebookParagraphs
-    };
-    channel = new ChannelFake();
+  it('Should print', () => {
+    requestable = new ChannelFake();
+    respondable = new ChannelFake();
+    notebookState = new WebSocketPayloadImpl({});
+    renderNode = signal(new RenderNodeFake());
+    notebook = new NotebookImpl(requestable, respondable, notebookState, renderNode);
+    expect(notebook.print()()).toEqual(renderNode());
   });
 
-  describe('Birth', () => {
-    it('Should have been initialized', () =>{
-      notebook = new NotebookImpl(channel, notebookData);
-      expect(notebook).toBeInstanceOf(NotebookImpl);
-    });
 
-    it('Should have id', () => {
-      notebook = new NotebookImpl(channel, notebookData);
-      expect(notebook.id()).toEqual(notebookId);
-    });
-
-    it('Should print', () => {
-      notebook = new NotebookImpl(channel, notebookData);
-      const notebookPrinted = notebook.print()();
-      expect(notebookPrinted.isStub()).toBe(false);
-    });
-  });
-
-  describe('Request', () => {
-    let channelSpy;
-    beforeEach(() => {
-      channelSpy = vi.spyOn(channel, 'request');
-      notebook = new NotebookImpl(channel, notebookData);
-    });
-
-    it('Should decorate with noteId', () => {
-      const request = {
-        op:'',
-        data:{
-          noteId: ''
-        }
-      };
-      const decoratedRequest = {
-        op:'',
-        data:{
-          noteId: notebookId,
-        }
-      };
-      notebook.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(decoratedRequest);
-    });
-
-    it('Should request channel', () => {
-      const request = {
-        op:'',
-        data:{}
-      };
-      notebook.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
-  });
 });

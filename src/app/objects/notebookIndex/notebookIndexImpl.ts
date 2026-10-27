@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Signal, WritableSignal} from '@angular/core';
+import {signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from './notebookIndex';
 import {Notebook} from '../notebook/notebook';
@@ -54,6 +54,10 @@ import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookImpl} from '../notebook/notebookImpl';
 import {Requestable} from '../channel/requestable';
+import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectionImpl';
+import {NotebookRequestDecorator} from '../notebook/notebookRequestDecorator/notebookRequestDecorator';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class NotebookIndexImpl implements NotebookIndex {
   private readonly _requestable:Requestable;
@@ -107,9 +111,15 @@ export class NotebookIndexImpl implements NotebookIndex {
 
   private handleNoteResponseEvent(webSocketResponse: WebSocketResponse): void {
     const noteResponse = new TypedWebSocketResponse('NOTE', webSocketResponse);
-    const receivedNotebookId = noteResponse.dataAsWebSocketPayload().stringProperty('id');
+    const notebookState =noteResponse.dataAsWebSocketPayload();
+    const receivedNotebookId = notebookState.stringProperty('id');
     if(receivedNotebookId === this.id()){
-      const notebook = new NotebookImpl(this, noteResponse.data());
+      const notebookRequestDecorator = new NotebookRequestDecorator(this, receivedNotebookId);
+      const paragraphCollection = new ParagraphCollectionImpl(notebookRequestDecorator, notebookState.arrayProperty('paragraphs'));
+      const renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, signal({
+        paragraphCollection: paragraphCollection.print()()
+      })));
+      const notebook = new NotebookImpl(this, paragraphCollection, notebookState, renderNode);
       this._notebook.set(notebook);
     }
   }
