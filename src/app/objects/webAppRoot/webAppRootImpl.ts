@@ -45,7 +45,6 @@
  */
 import {Channel} from '../channel/channel';
 import {WebSocketChannel} from '../webSocket/channel/webSocketChannel';
-import {NotebookIndexCollection} from '../notebookIndexCollection/notebookIndexCollection';
 import {NotebookIndexCollectionImpl} from '../notebookIndexCollection/notebookIndexCollectionImpl';
 import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
@@ -57,19 +56,20 @@ import {Respondable} from '../channel/respondable';
 import {
   NotebookIndexCollectionResponse
 } from '../notebookIndexCollection/notebookIndexCollectionResponse/notebookIndexCollectionResponse';
+import {Printable} from '../rendering/printable/printable';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;
   private readonly _printSignal: WritableSignal<RenderNode> = signal(undefined);
 
-  private _notebookCollection: WritableSignal<NotebookIndexCollection>;
-  private set notebookCollection(value: NotebookIndexCollection){
-    if(this._notebookCollection === undefined){
-      this._notebookCollection = signal(value);
+  private _printable: WritableSignal<Printable>;
+  private set printable(value: Printable){
+    if(this._printable === undefined){
+      this._printable = signal(value);
     }
   }
-  private get notebookCollection(): Signal<NotebookIndexCollection>{
-    return this._notebookCollection;
+  private get printable(): Signal<Printable>{
+    return this._printable;
   }
 
   private _respondable:WritableSignal<Respondable>;
@@ -100,9 +100,10 @@ class WebAppRootImpl implements WebAppRoot {
     const renderNode = new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
       notebookIndices:Array.from(notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
     })));
-    this.notebookCollection = new NotebookIndexCollectionImpl(this, notebookIndices, signal(renderNode));
-    this.respondable = new NotebookIndexCollectionResponse(this.notebookCollection(), computed(() => Array.from(notebookIndices().values())));
-    this._printSignal.set(this._notebookCollection().print()());
+    const notebookIndexCollection = new NotebookIndexCollectionImpl(this, notebookIndices, signal(renderNode));
+    this.printable = notebookIndexCollection;
+    this.respondable = new NotebookIndexCollectionResponse(notebookIndexCollection, computed(() => Array.from(notebookIndices().values())));
+    this._printSignal.set(this._printable().print()());
     this.webSocket = new WebSocketChannel(this, webSocketService);
     this._hasInitialized = true;
   }
@@ -126,7 +127,7 @@ class WebAppRootImpl implements WebAppRoot {
       throw new Error('WebAppRoot not initialized');
     }
     this.respondable().response(data);
-    this._printSignal.set(this._notebookCollection().print()());
+    this._printSignal.set(this.printable().print()());
   }
 }
 
