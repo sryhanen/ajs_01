@@ -98,10 +98,7 @@ class WebAppRootImpl implements WebAppRoot {
       return;
     }
     const notebookIndices:WritableSignal<Map<string, NotebookIndex>> = signal(new Map(), {equal:() => false});
-    const renderNode = new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
-      notebookIndices:Array.from(notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
-    })));
-    const notebookIndexCollection = new NotebookIndexCollectionImpl(notebookIndices, signal(renderNode));
+    const notebookIndexCollection = new NotebookIndexCollectionImpl(notebookIndices);
     this.printable = notebookIndexCollection;
     const respondables:WritableSignal<Respondable[]> = signal([]);
     this.respondable = new NotebookIndexCollectionResponse(notebookIndexCollection, respondables, this);

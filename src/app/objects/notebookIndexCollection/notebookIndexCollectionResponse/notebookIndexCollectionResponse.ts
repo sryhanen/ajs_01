@@ -87,10 +87,7 @@ export class NotebookIndexCollectionResponse implements Respondable {
     notebookIndicesPayload.forEach(notebookIndexPayload => {
       const notebookIndexState = new WebSocketPayloadImpl(notebookIndexPayload);
       const notebook = signal(new NotebookStub());
-      const renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
-        notebook: notebook().isStub() ? new RenderNodeStub() : notebook().print()()
-      }))));
-      const notebookIndex = new NotebookIndexImpl(notebookIndexState, notebook, renderNode);
+      const notebookIndex = new NotebookIndexImpl(notebookIndexState, notebook);
       this._notebookIndexCollection.add(notebookIndex);
       const notebookIndexResponse = new NotebookIndexResponse(notebook, this._requestable, notebookIndex);
       this._respondables.update(respondables => {

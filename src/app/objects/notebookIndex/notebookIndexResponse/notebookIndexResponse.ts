@@ -84,8 +84,8 @@ export class NotebookIndexResponse implements Respondable{
 
   private handleNoteResponseEvent(webSocketResponse: WebSocketResponse): void {
     const noteResponse = new TypedWebSocketResponse('NOTE', webSocketResponse);
-    const notebookState =noteResponse.dataAsWebSocketPayload();
-    const receivedNotebookId = notebookState.stringProperty('id');
+    const notebookState = noteResponse.dataAsWebSocketPayload();
+    const receivedNotebookId= notebookState.stringProperty('id');
     if(receivedNotebookId === this._notebookIndex.id()){
       const notebookRequestDecorator = new NotebookRequestDecorator(this._requestable, receivedNotebookId);
       const paragraphCollection = new ParagraphCollectionImpl(notebookRequestDecorator, notebookState.arrayProperty('paragraphs'));

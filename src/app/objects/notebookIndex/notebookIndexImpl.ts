@@ -43,22 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from './notebookIndex';
 import {Notebook} from '../notebook/notebook';
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class NotebookIndexImpl implements NotebookIndex {
   private readonly _notebookIndexState:WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _notebook: WritableSignal<Notebook>;
 
-  constructor(notebookIndexState:WebSocketPayload, notebook: WritableSignal<Notebook>, renderNode: Signal<RenderNode>) {
+  constructor(notebookIndexState:WebSocketPayload, openNotebook: WritableSignal<Notebook>) {
     this._notebookIndexState = notebookIndexState;
-    this.validateNotebookBelongsToThisIndex(notebook());
-    this._notebook = notebook;
-    this._renderNode = renderNode;
+    this.validateNotebookBelongsToThisIndex(openNotebook());
+    this._notebook = openNotebook;
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
+      notebook: openNotebook().isStub() ? new RenderNodeStub() : openNotebook().print()()
+    }))));
   }
 
   openNotebook(notebook:Notebook):void {

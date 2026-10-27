@@ -44,17 +44,21 @@
  * a licensee so wish it.
  */
 import {NotebookIndexCollection} from './notebookIndexCollection';
-import {Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from '../notebookIndex/notebookIndex';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
   private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
   private readonly _renderNode:Signal<RenderNode>;
 
-  constructor(notebookIndices: WritableSignal<Map<string, NotebookIndex>>, renderNode:Signal<RenderNode>) {
+  constructor(notebookIndices: WritableSignal<Map<string, NotebookIndex>>) {
     this._notebookIndices = notebookIndices;
-    this._renderNode = renderNode;
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
+      notebookIndices:Array.from(notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
+    }))));
   }
 
   add(notebookIndex: NotebookIndex): void {
