@@ -44,29 +44,25 @@
  * a licensee so wish it.
  */
 import {Respondable} from '../../channel/respondable';
-import {NotebookIndexCollection} from '../notebookIndexCollection';
-import {computed, signal, WritableSignal} from '@angular/core';
+import {signal} from '@angular/core';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookStub} from '../../notebook/notebookStub';
-import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
-import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
 import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
 import {Requestable} from '../../channel/requestable';
 import {NotebookIndexResponse} from '../../notebookIndex/notebookIndexResponse/notebookIndexResponse';
 import {NotebookResponseStub} from '../../notebook/notebookResponse/notebookResponseStub';
+import {TreeNodeTree} from '../../treeNode/treeNodeTree/treeNodeTree';
+import {TreeNodeImpl} from '../../treeNode/treeNodeImpl';
 
 export class NotebookIndexCollectionResponse implements Respondable {
-  private readonly _notebookIndexCollection: NotebookIndexCollection;
-  private readonly _respondables: WritableSignal<Respondable[]>;
+  private readonly _treeNodeTree:TreeNodeTree;
   private readonly _requestable: Requestable;
 
-  constructor(notebookIndexCollection: NotebookIndexCollection, respondables: WritableSignal<Respondable[]>, requestable:Requestable) {
-    this._notebookIndexCollection = notebookIndexCollection;
-    this._respondables = respondables;
+  constructor(treeNodeTree:TreeNodeTree, requestable:Requestable) {
+    this._treeNodeTree = treeNodeTree;
     this._requestable = requestable;
   }
 
@@ -76,26 +72,21 @@ export class NotebookIndexCollectionResponse implements Respondable {
       this.handleNotesInfoResponse(webSocketResponse);
     }
     else{
-      this._respondables().forEach(respondable => respondable.response(json));
+      Array.from(this._treeNodeTree.nodes()()).forEach(respondable => respondable.response(json));
     }
   }
 
   private handleNotesInfoResponse(webSocketResponse:WebSocketResponse):void{
-    const notesInfoResponse = new TypedWebSocketResponse('NOTES_INFO', webSocketResponse);
-    const notebookIndicesPayload = notesInfoResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
-    this._notebookIndexCollection.clear();
-    this._respondables.set([]);
+    const notebookIndicesPayload = webSocketResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
+    this._treeNodeTree.clear();
     notebookIndicesPayload.forEach(notebookIndexPayload => {
       const notebookIndexState = new WebSocketPayloadImpl(notebookIndexPayload);
       const notebook = signal(new NotebookStub());
       const notebookIndex = new NotebookIndexImpl(notebookIndexState, notebook);
-      this._notebookIndexCollection.add(notebookIndex);
       const notebookResponse = signal(new NotebookResponseStub());
       const notebookIndexResponse = new NotebookIndexResponse(notebookResponse, this._requestable, notebookIndex);
-      this._respondables.update(respondables => {
-        respondables.push(notebookIndexResponse);
-        return respondables;
-      });
+      const treeNode = new TreeNodeImpl(this._requestable, notebookIndexResponse, notebookIndex, notebookIndex.id());
+      this._treeNodeTree.add(treeNode);
     });
   }
 }

@@ -48,39 +48,26 @@ import {WebSocketChannel} from '../webSocket/channel/webSocketChannel';
 import {NotebookIndexCollectionImpl} from '../notebookIndexCollection/notebookIndexCollectionImpl';
 import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
-import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {Respondable} from '../channel/respondable';
 import {
   NotebookIndexCollectionResponse
 } from '../notebookIndexCollection/notebookIndexCollectionResponse/notebookIndexCollectionResponse';
-import {Printable} from '../rendering/printable/printable';
-import {NotebookIndex} from '../notebookIndex/notebookIndex';
+import {TreeNodeTreeImpl} from '../treeNode/treeNodeTree/treeNodeTreeImpl';
+import {TreeNodeImpl} from '../treeNode/treeNodeImpl';
+import {TreeNode} from '../treeNode/treeNode';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;
-  private readonly _printSignal: WritableSignal<RenderNode> = signal(undefined);
 
-  private _printable: WritableSignal<Printable>;
-  private set printable(value: Printable){
-    if(this._printable === undefined){
-      this._printable = signal(value);
+  private _treeNode: TreeNode;
+  private set treeNode(value: TreeNode){
+    if(this._treeNode === undefined){
+      this._treeNode = value;
     }
   }
-  private get printable(): Signal<Printable>{
-    return this._printable;
-  }
-
-  private _respondable:WritableSignal<Respondable>;
-  private set respondable(value: Respondable){
-    if(this._respondable === undefined){
-      this._respondable = signal(value);
-    }
-  }
-  private get respondable(): Signal<Respondable>{
-    return this._respondable;
+  private get treeNode(): TreeNode{
+    return this._treeNode;
   }
 
   private _webSocket: Channel;
@@ -97,12 +84,11 @@ class WebAppRootImpl implements WebAppRoot {
     if(this._hasInitialized){
       return;
     }
-    const notebookIndices:WritableSignal<Map<string, NotebookIndex>> = signal(new Map(), {equal:() => false});
-    const notebookIndexCollection = new NotebookIndexCollectionImpl(notebookIndices);
-    this.printable = notebookIndexCollection;
-    const respondables:WritableSignal<Respondable[]> = signal([]);
-    this.respondable = new NotebookIndexCollectionResponse(notebookIndexCollection, respondables, this);
-    this._printSignal.set(this._printable().print()());
+    const treeNodeTree = new TreeNodeTreeImpl();
+    const notebookIndexCollection = new NotebookIndexCollectionImpl(treeNodeTree);
+    const notebookIndexCollectionResponse = new NotebookIndexCollectionResponse(treeNodeTree, this);
+    treeNodeTree.add(new TreeNodeImpl(this, notebookIndexCollectionResponse, notebookIndexCollection, 'notebookIndexCollection'));
+    this.treeNode = Array.from(treeNodeTree.nodes()())[0];
     this.webSocket = new WebSocketChannel(this, webSocketService);
     this._hasInitialized = true;
   }
@@ -111,7 +97,7 @@ class WebAppRootImpl implements WebAppRoot {
     if(!this._hasInitialized){
       throw new Error('WebAppRoot not initialized');
     }
-    return this._printSignal;
+    return this.treeNode.print();
   }
 
   request(data: object): void {
@@ -125,8 +111,7 @@ class WebAppRootImpl implements WebAppRoot {
     if(!this._hasInitialized){
       throw new Error('WebAppRoot not initialized');
     }
-    this.respondable().response(data);
-    this._printSignal.set(this.printable().print()());
+    this.treeNode.response(data);
   }
 }
 

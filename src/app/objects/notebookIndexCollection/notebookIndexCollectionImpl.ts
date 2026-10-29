@@ -43,40 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {NotebookIndexCollection} from './notebookIndexCollection';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
-import {NotebookIndex} from '../notebookIndex/notebookIndex';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {Printable} from '../rendering/printable/printable';
+import {TreeNodeTree} from '../treeNode/treeNodeTree/treeNodeTree';
 
-export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
-  private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
+export class NotebookIndexCollectionImpl implements Printable{
+  private readonly _treeNodeTree:TreeNodeTree;
   private readonly _renderNode:Signal<RenderNode>;
 
-  constructor(notebookIndices: WritableSignal<Map<string, NotebookIndex>>) {
-    this._notebookIndices = notebookIndices;
+  constructor(treeNodeTree:TreeNodeTree) {
+    this._treeNodeTree = treeNodeTree;
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
-      notebookIndices:Array.from(notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
+      notebookIndices:Array.from(this._treeNodeTree.nodes()()).map(notebookIndex => notebookIndex.print()())
     }))));
-  }
-
-  add(notebookIndex: NotebookIndex): void {
-    const notebookId = notebookIndex.id();
-    if(this._notebookIndices().has(notebookId)){
-      throw new Error(`NotebookIndex "${notebookId}" already exists.`);
-    }
-    this._notebookIndices.update(notebookIndices => {
-      notebookIndices.set(notebookIndex.id(), notebookIndex);
-      return notebookIndices;
-    });
-  }
-
-  clear(): void {
-    this._notebookIndices.update(notebookIndices  => {
-      notebookIndices.clear();
-      return notebookIndices;
-    });
   }
 
   print(): Signal<RenderNode> {
