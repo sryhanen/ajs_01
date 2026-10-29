@@ -43,12 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../channel/channel';
 import {Printable} from '../rendering/printable/printable';
 import {Paragraph} from '../paragraph/paragraph';
 
-export interface ParagraphCollection extends Channel, Printable {
+export interface ParagraphCollection extends Printable {
   update(paragraph:Paragraph): void;
   add(paragraph: Paragraph, index:number): void;
   remove(paragraphId:string):void;
+  run(paragraphId:string):void;
 }

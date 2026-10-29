@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Respondable} from '../../channel/respondable';
-import {WritableSignal} from '@angular/core';
+import {computed, signal, WritableSignal} from '@angular/core';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
@@ -56,6 +56,15 @@ import {Requestable} from '../../channel/requestable';
 import {NotebookIndex} from '../notebookIndex';
 import {NotebookResponseImpl} from '../../notebook/notebookResponse/notebookResponseImpl';
 import {NotebookResponse} from '../../notebook/notebookResponse/notebookResponse';
+import {
+  ParagraphCollectionRequest
+} from '../../paragraphCollection/paragraphCollectionRequest/paragraphCollectionRequest';
+import {
+  ParagraphCollectionResponse
+} from '../../paragraphCollection/paragraphCollectionResponse/paragraphCollectionResponse';
+import {Paragraph} from '../../paragraph/paragraph';
+import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
+import {ParagraphImpl} from '../../paragraph/paragraphImpl';
 
 export class NotebookIndexResponse implements Respondable{
   private readonly _notebookResponse: WritableSignal<NotebookResponse>;
@@ -84,11 +93,25 @@ export class NotebookIndexResponse implements Respondable{
     const receivedNotebookId= notebookState.stringProperty('id');
     if(receivedNotebookId === this._notebookIndex.id()){
       const notebookRequest = new NotebookRequest(this._requestable, receivedNotebookId);
-      const paragraphCollection = new ParagraphCollectionImpl(notebookRequest, notebookState.arrayProperty('paragraphs'));
+      const paragraphs: WritableSignal<Map<string, Paragraph>> = signal(new Map(), {equal:() => false});
+      const paragraphCollection =  new ParagraphCollectionImpl(paragraphs);
+      const paragraphCollectionRequest = new ParagraphCollectionRequest(notebookRequest, paragraphCollection);
+      paragraphs.set(this.initializedParagraphs(notebookState, paragraphCollectionRequest));
+      const paragraphCollectionResponse = new ParagraphCollectionResponse(computed(() => Array.from(paragraphs().values())), paragraphCollectionRequest, paragraphCollection);
       const notebook = new NotebookImpl(notebookState, paragraphCollection);
-      const notebookResponse = new NotebookResponseImpl(paragraphCollection, notebookState.stringProperty('id'));
+      const notebookResponse = new NotebookResponseImpl(paragraphCollectionResponse, notebookState.stringProperty('id'));
       this._notebookResponse.set(notebookResponse);
       this._notebookIndex.openNotebook(notebook);
     }
+  }
+
+  private initializedParagraphs(notebookState:WebSocketPayload, requestable:Requestable): Map<string,  Paragraph> {
+    const paragraphMap = new Map<string, Paragraph>();
+    const paragraphs = notebookState.arrayProperty<object>('paragraphs');
+    paragraphs.forEach(paragraphData => {
+      const paragraph = new ParagraphImpl(requestable, paragraphData);
+      paragraphMap.set(paragraph.id(), paragraph);
+    });
+    return paragraphMap;
   }
 }
