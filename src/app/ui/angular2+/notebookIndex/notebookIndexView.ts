@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, OnInit} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
 import {Printable} from '../../../objects/rendering/printable/printable';
 
@@ -58,11 +58,7 @@ import {Printable} from '../../../objects/rendering/printable/printable';
     }
   `
 })
-export class NotebookIndexView implements OnInit {
+export class NotebookIndexView {
   containerId = input.required<string>();
   notebook = input<Printable>();
-
-  ngOnInit() {
-    console.debug('Notebook input:', this.notebook());
-  }
 }
