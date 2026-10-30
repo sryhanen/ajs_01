@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, input, OnInit} from '@angular/core';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
 
@@ -61,4 +61,5 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
 export class ParagraphCollectionView {
   paragraphs = input.required<RenderNode[]>();
   containerId = input.required<string>();
+
 }

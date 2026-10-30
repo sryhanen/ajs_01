@@ -50,6 +50,16 @@ import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
+import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
+import {TreeNode} from '../treeNode/treeNode';
+import {TreeNodeImpl} from '../treeNode/treeNodeImpl';
+import {TreeNodeBranchImpl} from '../treeNode/treeNodeBranch/treeNodeBranchImpl';
+import {ParagraphRequest} from '../paragraph/paragraphRequest/paragraphRequest';
+import {OutputImpl} from '../output/outputImpl';
+import {computed, signal} from '@angular/core';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {Output} from '../output/output';
 
 export class ParagraphCollection implements Respondable {
   private readonly _requestable: Requestable;
@@ -78,19 +88,54 @@ export class ParagraphCollection implements Respondable {
   }
 
   private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraph = new ParagraphImpl(this._requestable, webSocketResponse.data());
-    this._paragraphCollectionBranch.update(paragraph);
+    const paragraphState = webSocketResponse.dataAsWebSocketPayload();
+    this._paragraphCollectionBranch.update(this.createParagraphNode(paragraphState, this._requestable));
   }
 
   private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
     const responseData = webSocketResponse.dataAsWebSocketPayload();
-    const paragraph = new ParagraphImpl(this._requestable, responseData.objectProperty('paragraph'));
+    const paragraphState = responseData.objectPropertyAsPayload('paragraph');
     const index = responseData.numberProperty('index');
-    this._paragraphCollectionBranch.add(paragraph, index);
+    this._paragraphCollectionBranch.add(this.createParagraphNode(paragraphState, this._requestable), index);
   }
 
   private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphId  = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
     this._paragraphCollectionBranch.remove(paragraphId);
+  }
+
+  private createParagraphNode(paragraphState:WebSocketPayload, requestable:Requestable):TreeNode {
+    const paragraphBranch = new TreeNodeBranchImpl();
+    const paragraph = new ParagraphImpl(requestable, paragraphState, paragraphBranch);
+    const paragraphId = paragraphState.stringProperty('id');
+    const paragraphRequest = new ParagraphRequest(requestable, paragraphId);
+    const output = new OutputImpl(paragraphRequest);
+    const outputNode = new TreeNodeImpl(paragraphRequest, output, output.print(), 'output');
+    paragraphBranch.add(outputNode, 0);
+    this.createOutputResponseIfOutputExists(paragraphState, output);
+    const paragraphView = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
+      ...paragraphBranch.nodes()(),
+      paragraphId:paragraphId
+    }))));
+    return new TreeNodeImpl(paragraphRequest, paragraph, paragraphView, paragraphId);
+  }
+
+  private createOutputResponseIfOutputExists(paragraphState: WebSocketPayload, output:Output):void{
+    if (paragraphState.propertyExists('output')) {
+      const paragraphOutput = paragraphState.objectProperty('output');
+      if (paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined) {
+        console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
+      } else {
+        const paragraphOutputResponse = {
+          op: 'PARAGRAPH_OUTPUT',
+          data: {
+            noteId: '',
+            paragraphId: paragraphState.stringProperty('id'),
+            output: paragraphOutput,
+          }
+        };
+        output.response(paragraphOutputResponse);
+      }
+    }
   }
 }

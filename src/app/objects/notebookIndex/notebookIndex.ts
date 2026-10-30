@@ -66,6 +66,9 @@ import {TreeNodeImpl} from '../treeNode/treeNodeImpl';
 import {TreeNodeBranchImpl} from '../treeNode/treeNodeBranch/treeNodeBranchImpl';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {ParagraphRequest} from '../paragraph/paragraphRequest/paragraphRequest';
+import {OutputImpl} from '../output/outputImpl';
+import {Output} from '../output/output';
 
 export class NotebookIndex implements Respondable{
   private readonly _notebookResponse: WritableSignal<Notebook>;
@@ -116,9 +119,41 @@ export class NotebookIndex implements Respondable{
 
   private initializedParagraphNodes(notebookState:WebSocketPayload, requestable:Requestable, paragraphCollectionBranch:TreeNodeBranch): void {
     const paragraphs = notebookState.arrayProperty<object>('paragraphs');
-    paragraphs.forEach((paragraphState, index) => {
-      const paragraph = new ParagraphImpl(requestable, paragraphState);
-      paragraphCollectionBranch.add(paragraph, index);
+    paragraphs.forEach((paragraphData, index) => {
+      const paragraphState = new WebSocketPayloadImpl(paragraphData);
+      const paragraphBranch = new TreeNodeBranchImpl();
+      const paragraph = new ParagraphImpl(requestable, paragraphState, paragraphBranch);
+      const paragraphId = paragraphState.stringProperty('id');
+      const paragraphRequest = new ParagraphRequest(requestable, paragraphId);
+      const output = new OutputImpl(paragraphRequest);
+      const outputNode = new TreeNodeImpl(paragraphRequest, output, output.print(), 'output');
+      paragraphBranch.add(outputNode, 0);
+      this.createOutputResponseIfOutputExists(paragraphState, output);
+      const paragraphView = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
+        ...paragraphBranch.nodes()(),
+        paragraphId:paragraphId
+      }))));
+      const paragraphNode = new TreeNodeImpl(paragraphRequest, paragraph, paragraphView, paragraphId);
+      paragraphCollectionBranch.add(paragraphNode, index);
     });
+  }
+
+  private createOutputResponseIfOutputExists(paragraphState: WebSocketPayload, output:Output):void{
+    if (paragraphState.propertyExists('output')) {
+      const paragraphOutput = paragraphState.objectProperty('output');
+      if (paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined) {
+        console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
+      } else {
+        const paragraphOutputResponse = {
+          op: 'PARAGRAPH_OUTPUT',
+          data: {
+            noteId: '',
+            paragraphId: paragraphState.stringProperty('id'),
+            output: paragraphOutput,
+          }
+        };
+        output.response(paragraphOutputResponse);
+      }
+    }
   }
 }

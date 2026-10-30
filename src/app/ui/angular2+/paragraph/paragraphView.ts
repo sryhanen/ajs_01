@@ -44,8 +44,8 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
-import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
+import {Printable} from '../../../objects/rendering/printable/printable';
 
 @Component({
   selector: 'paragraph',
@@ -54,12 +54,12 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
   ],
   template: `
     @if(containerId() === paragraphId()){
-      <render-node-host [renderNode]="output()"></render-node-host>
+      <render-node-host [renderNode]="output().print()()"></render-node-host>
     }
   `
 })
-export class ParagraphView{
-  output = input.required<RenderNode>();
+export class ParagraphView {
+  output = input.required<Printable>();
   paragraphId = input.required<string>();
   containerId = input.required<string>();
 }
