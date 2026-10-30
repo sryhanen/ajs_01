@@ -55,13 +55,11 @@ import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
 export class NotebookIndexImpl implements NotebookIndex {
   private readonly _notebookIndexState:WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
-  private readonly _treeNodeBranch:TreeNodeBranch;
 
-  constructor(notebookIndexState:WebSocketPayload, treeNodeBranch:TreeNodeBranch) {
+  constructor(notebookIndexState:WebSocketPayload, notebookIndexBranch:TreeNodeBranch) {
     this._notebookIndexState = notebookIndexState;
-    this._treeNodeBranch = treeNodeBranch;
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
-      notebook: this._treeNodeBranch.nodes()().length > 0 ? this._treeNodeBranch.nodes()()[0].print()() : new RenderNodeStub()
+      notebook: notebookIndexBranch.nodes()().length > 0 ? notebookIndexBranch.nodes()()[0].print()() : new RenderNodeStub()
     }))));
   }
 

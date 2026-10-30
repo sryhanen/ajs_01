@@ -56,7 +56,6 @@ export class ParagraphCollectionResponse implements Respondable {
   private readonly _paragraphCollectionBranch:TreeNodeBranch;
   private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
 
-
   constructor(requestable: Requestable, paragraphCollectionBranch:TreeNodeBranch) {
     this._requestable = requestable;
     this._paragraphCollectionBranch = paragraphCollectionBranch;

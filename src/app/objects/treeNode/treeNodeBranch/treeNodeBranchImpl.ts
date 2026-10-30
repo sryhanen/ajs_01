@@ -46,7 +46,6 @@
 import {TreeNodeBranch} from './treeNodeBranch';
 import {TreeNode} from '../treeNode';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {tree} from 'd3';
 
 export class TreeNodeBranchImpl implements TreeNodeBranch {
   private readonly _treeNodeBranch:WritableSignal<Map<string, TreeNode>>;

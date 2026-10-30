@@ -70,13 +70,13 @@ import {TreeNodeBranchImpl} from '../../treeNode/treeNodeBranch/treeNodeBranchIm
 export class NotebookIndexResponse implements Respondable{
   private readonly _notebookResponse: WritableSignal<NotebookResponse>;
   private readonly _requestable: Requestable;
-  private readonly _notebookIndex:TreeNodeBranch;
+  private readonly _notebookIndexBranch:TreeNodeBranch;
   private readonly _notebookIndexId:string;
 
-  constructor(notebookResponse: WritableSignal<NotebookResponse>, requestable: Requestable, treeNodeBranch:TreeNodeBranch, notebookIndexId:string) {
+  constructor(notebookResponse: WritableSignal<NotebookResponse>, requestable: Requestable, notebookIndexBranch:TreeNodeBranch, notebookIndexId:string) {
     this._notebookResponse = notebookResponse;
     this._requestable = requestable;
-    this._notebookIndex = treeNodeBranch;
+    this._notebookIndexBranch = notebookIndexBranch;
     this._notebookIndexId = notebookIndexId;
   }
 
@@ -108,7 +108,7 @@ export class NotebookIndexResponse implements Respondable{
       const notebookResponse = new NotebookResponseImpl(paragraphCollectionResponse, notebookState.stringProperty('id'));
       this._notebookResponse.set(notebookResponse);
       const notebookNode = new TreeNodeImpl(this._requestable, notebookResponse, notebook, notebook.id());
-      this._notebookIndex.add(notebookNode,0);
+      this._notebookIndexBranch.add(notebookNode,0);
     }
   }
 

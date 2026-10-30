@@ -50,16 +50,15 @@ import {RenderNode} from '../rendering/renderNode/renderNode';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
-import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class NotebookImpl implements Notebook {
   private readonly _notebookState: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
 
-  constructor(notebookState: WebSocketPayload, treeNodeBranch: TreeNodeBranch) {
+  constructor(notebookState: WebSocketPayload, notebookBranch: TreeNodeBranch) {
     this._notebookState = notebookState;
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, computed(() => ({
-      paragraphCollection: treeNodeBranch.nodes()().length > 0 ? treeNodeBranch.nodes()()[0].print()() : new RenderNodeStub()
+      paragraphCollection: notebookBranch.nodes()()[0].print()()
     }))));
   }
 

@@ -51,13 +51,11 @@ import {Printable} from '../rendering/printable/printable';
 import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
 
 export class NotebookIndexCollectionImpl implements Printable{
-  private readonly _treeNodeBranch:TreeNodeBranch;
   private readonly _renderNode:Signal<RenderNode>;
 
-  constructor(treeNodeBranch:TreeNodeBranch) {
-    this._treeNodeBranch = treeNodeBranch;
+  constructor(notebookIndexCollectionBranch:TreeNodeBranch) {
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
-      notebookIndices: this._treeNodeBranch.nodes()().map(notebookIndex => notebookIndex.print()())
+      notebookIndices: notebookIndexCollectionBranch.nodes()().map(notebookIndex => notebookIndex.print()())
     }))));
   }
 

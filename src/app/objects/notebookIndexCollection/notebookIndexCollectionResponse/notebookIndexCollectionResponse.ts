@@ -57,11 +57,11 @@ import {TreeNodeImpl} from '../../treeNode/treeNodeImpl';
 import {TreeNodeBranchImpl} from '../../treeNode/treeNodeBranch/treeNodeBranchImpl';
 
 export class NotebookIndexCollectionResponse implements Respondable {
-  private readonly _notebookIndexCollection:TreeNodeBranch;
+  private readonly _notebookIndexCollectionBranch:TreeNodeBranch;
   private readonly _requestable: Requestable;
 
-  constructor(treeNodeBranch:TreeNodeBranch, requestable:Requestable) {
-    this._notebookIndexCollection = treeNodeBranch;
+  constructor(notebookIndexCollectionBranch:TreeNodeBranch, requestable:Requestable) {
+    this._notebookIndexCollectionBranch = notebookIndexCollectionBranch;
     this._requestable = requestable;
   }
 
@@ -71,13 +71,13 @@ export class NotebookIndexCollectionResponse implements Respondable {
       this.handleNotesInfoResponse(webSocketResponse);
     }
     else{
-      Array.from(this._notebookIndexCollection.nodes()()).forEach(respondable => respondable.response(json));
+      Array.from(this._notebookIndexCollectionBranch.nodes()()).forEach(respondable => respondable.response(json));
     }
   }
 
   private handleNotesInfoResponse(webSocketResponse:WebSocketResponse):void{
     const notebookIndicesPayload = webSocketResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
-    this._notebookIndexCollection.clear();
+    this._notebookIndexCollectionBranch.clear();
     notebookIndicesPayload.forEach((notebookIndexPayload, index) => {
       const notebookIndexState = new WebSocketPayloadImpl(notebookIndexPayload);
       const notebookIndexBranch = new TreeNodeBranchImpl();
@@ -85,7 +85,7 @@ export class NotebookIndexCollectionResponse implements Respondable {
       const notebookResponse = signal(new NotebookResponseStub());
       const notebookIndexResponse = new NotebookIndexResponse(notebookResponse, this._requestable, notebookIndexBranch, notebookIndex.id());
       const treeNode = new TreeNodeImpl(this._requestable, notebookIndexResponse, notebookIndex, notebookIndex.id());
-      this._notebookIndexCollection.add(treeNode, index);
+      this._notebookIndexCollectionBranch.add(treeNode, index);
     });
   }
 }
