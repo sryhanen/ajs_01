@@ -44,24 +44,20 @@
  * a licensee so wish it.
  */
 import {Requestable} from '../../channel/requestable';
-import {ParagraphCollection} from '../paragraphCollection';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 
 export class ParagraphCollectionRequest implements Requestable {
   private readonly _requestable: Requestable;
-  private readonly _paragraphCollection: ParagraphCollection;
 
-  constructor(requestable: Requestable, paragraphCollection: ParagraphCollection) {
+  constructor(requestable: Requestable) {
     this._requestable = requestable;
-    this._paragraphCollection = paragraphCollection;
   }
 
   request(json: object) {
     const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
     if(webSocketResponse.operation() === 'EXECUTE_PARAGRAPH') {
-      const paragraphId = webSocketResponse.dataAsWebSocketPayload().stringProperty('paragraphId');
-      this._paragraphCollection.run(paragraphId);
+      console.error('EXECUTE PARAGRAPH NOT IMPLEMENTED');
     }
     else{
       this._requestable.request(json);

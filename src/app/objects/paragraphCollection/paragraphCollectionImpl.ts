@@ -43,63 +43,20 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Paragraph} from '../paragraph/paragraph';
-import {ParagraphCollection} from './paragraphCollection';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
+import {Printable} from '../rendering/printable/printable';
 
-export class ParagraphCollectionImpl implements ParagraphCollection {
-  private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
+export class ParagraphCollectionImpl implements Printable {
   private readonly _renderNode: Signal<RenderNode>;
 
-  constructor(paragraphs: WritableSignal<Map<string,  Paragraph>>) {
-    this._paragraphs = paragraphs;
+  constructor(paragraphCollectionBranch:TreeNodeBranch) {
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, computed(() => ({
-      paragraphs: Array.from(this._paragraphs().values()).map(paragraph => paragraph.print()()),
+      paragraphs: paragraphCollectionBranch.nodes()().map(node => node.print()()),
     }))));
-  }
-
-  run(paragraphId:string):void {
-    if(!this._paragraphs().has(paragraphId)) {
-      throw new RangeError(`Paragraph "${paragraphId}" not in collection.`);
-    }
-    this._paragraphs().get(paragraphId).run();
-  }
-
-  add(paragraph:Paragraph, index:number): void {
-    if(index < 0 || index > 0 && index > this._paragraphs().size){
-      throw new Error(`Invalid index "${index}" provided.`);
-    }
-    const paragraphId = paragraph.id();
-    if(this._paragraphs().has(paragraphId)){
-      throw new Error(`Paragraph with id "${paragraphId}" already exists.`);
-    }
-    const paragraphsAsArray = Array.from(this._paragraphs().values());
-    paragraphsAsArray.splice(index, 0, paragraph);
-    this._paragraphs.set(new Map(paragraphsAsArray.map(paragraph => [paragraph.id(), paragraph])));
-  }
-
-  update(paragraph: Paragraph): void {
-    const paragraphId = paragraph.id();
-    if(!this._paragraphs().has(paragraphId)){
-      throw new Error(`Paragraph "${paragraphId}" does not exist.`);
-    }
-    this._paragraphs.update(paragraphs => {
-      paragraphs.set(paragraph.id(), paragraph);
-      return paragraphs;
-    });
-  }
-
-  remove(paragraphId: string): void {
-    if(!this._paragraphs().has(paragraphId)){
-      throw new Error(`Paragraph "${paragraphId}" does not exist.`);
-    }
-    this._paragraphs.update(paragraphs => {
-      paragraphs.delete(paragraphId);
-      return paragraphs;
-    });
   }
 
   print(): Signal<RenderNode> {

@@ -45,21 +45,22 @@
  */
 import {Notebook} from './notebook';
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
-import {signal, Signal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
+import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
+import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 
 export class NotebookImpl implements Notebook {
   private readonly _notebookState: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
 
-  constructor(notebookState: WebSocketPayload, paragraphCollection: ParagraphCollection) {
+  constructor(notebookState: WebSocketPayload, treeNodeBranch: TreeNodeBranch) {
     this._notebookState = notebookState;
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, signal({
-      paragraphCollection: paragraphCollection.print()()
-    })));
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, computed(() => ({
+      paragraphCollection: treeNodeBranch.nodes()().length > 0 ? treeNodeBranch.nodes()()[0].print()() : new RenderNodeStub()
+    }))));
   }
 
   print(): Signal<RenderNode> {

@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Respondable} from '../../channel/respondable';
-import {computed, signal, WritableSignal} from '@angular/core';
+import {WritableSignal} from '@angular/core';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
@@ -53,7 +53,6 @@ import {NotebookRequest} from '../../notebook/notebookRequest/notebookRequest';
 import {ParagraphCollectionImpl} from '../../paragraphCollection/paragraphCollectionImpl';
 import {NotebookImpl} from '../../notebook/notebookImpl';
 import {Requestable} from '../../channel/requestable';
-import {NotebookIndex} from '../notebookIndex';
 import {NotebookResponseImpl} from '../../notebook/notebookResponse/notebookResponseImpl';
 import {NotebookResponse} from '../../notebook/notebookResponse/notebookResponse';
 import {
@@ -62,19 +61,23 @@ import {
 import {
   ParagraphCollectionResponse
 } from '../../paragraphCollection/paragraphCollectionResponse/paragraphCollectionResponse';
-import {Paragraph} from '../../paragraph/paragraph';
 import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
+import {TreeNodeBranch} from '../../treeNode/treeNodeBranch/treeNodeBranch';
+import {TreeNodeImpl} from '../../treeNode/treeNodeImpl';
+import {TreeNodeBranchImpl} from '../../treeNode/treeNodeBranch/treeNodeBranchImpl';
 
 export class NotebookIndexResponse implements Respondable{
   private readonly _notebookResponse: WritableSignal<NotebookResponse>;
   private readonly _requestable: Requestable;
-  private readonly _notebookIndex:NotebookIndex;
+  private readonly _notebookIndex:TreeNodeBranch;
+  private readonly _notebookIndexId:string;
 
-  constructor(notebookResponse: WritableSignal<NotebookResponse>, requestable: Requestable, notebookIndex:NotebookIndex) {
+  constructor(notebookResponse: WritableSignal<NotebookResponse>, requestable: Requestable, treeNodeBranch:TreeNodeBranch, notebookIndexId:string) {
     this._notebookResponse = notebookResponse;
     this._requestable = requestable;
-    this._notebookIndex = notebookIndex;
+    this._notebookIndex = treeNodeBranch;
+    this._notebookIndexId = notebookIndexId;
   }
 
   response(json: object): void {
@@ -91,27 +94,29 @@ export class NotebookIndexResponse implements Respondable{
     const noteResponse = new TypedWebSocketResponse('NOTE', webSocketResponse);
     const notebookState = noteResponse.dataAsWebSocketPayload();
     const receivedNotebookId= notebookState.stringProperty('id');
-    if(receivedNotebookId === this._notebookIndex.id()){
+    if(receivedNotebookId === this._notebookIndexId){
       const notebookRequest = new NotebookRequest(this._requestable, receivedNotebookId);
-      const paragraphs: WritableSignal<Map<string, Paragraph>> = signal(new Map(), {equal:() => false});
-      const paragraphCollection =  new ParagraphCollectionImpl(paragraphs);
-      const paragraphCollectionRequest = new ParagraphCollectionRequest(notebookRequest, paragraphCollection);
-      paragraphs.set(this.initializedParagraphs(notebookState, paragraphCollectionRequest));
-      const paragraphCollectionResponse = new ParagraphCollectionResponse(computed(() => Array.from(paragraphs().values())), paragraphCollectionRequest, paragraphCollection);
-      const notebook = new NotebookImpl(notebookState, paragraphCollection);
+      const paragraphCollectionBranch = new TreeNodeBranchImpl();
+      const paragraphCollection = new ParagraphCollectionImpl(paragraphCollectionBranch);
+      const paragraphCollectionRequest = new ParagraphCollectionRequest(notebookRequest);
+      this.initializedParagraphNodes(notebookState, paragraphCollectionRequest, paragraphCollectionBranch);
+      const paragraphCollectionResponse = new ParagraphCollectionResponse(paragraphCollectionRequest, paragraphCollectionBranch);
+      const notebookBranch = new TreeNodeBranchImpl();
+      const paragraphCollectionNode = new TreeNodeImpl(notebookRequest, paragraphCollectionResponse, paragraphCollection, 'paragraphCollection');
+      notebookBranch.add(paragraphCollectionNode,0);
+      const notebook = new NotebookImpl(notebookState, notebookBranch);
       const notebookResponse = new NotebookResponseImpl(paragraphCollectionResponse, notebookState.stringProperty('id'));
       this._notebookResponse.set(notebookResponse);
-      this._notebookIndex.openNotebook(notebook);
+      const notebookNode = new TreeNodeImpl(this._requestable, notebookResponse, notebook, notebook.id());
+      this._notebookIndex.add(notebookNode,0);
     }
   }
 
-  private initializedParagraphs(notebookState:WebSocketPayload, requestable:Requestable): Map<string,  Paragraph> {
-    const paragraphMap = new Map<string, Paragraph>();
+  private initializedParagraphNodes(notebookState:WebSocketPayload, requestable:Requestable, paragraphCollectionBranch:TreeNodeBranch): void {
     const paragraphs = notebookState.arrayProperty<object>('paragraphs');
-    paragraphs.forEach(paragraphData => {
-      const paragraph = new ParagraphImpl(requestable, paragraphData);
-      paragraphMap.set(paragraph.id(), paragraph);
+    paragraphs.forEach((paragraphState, index) => {
+      const paragraph = new ParagraphImpl(requestable, paragraphState);
+      paragraphCollectionBranch.add(paragraph, index);
     });
-    return paragraphMap;
   }
 }

@@ -46,6 +46,7 @@
 import {TreeNodeBranch} from './treeNodeBranch';
 import {TreeNode} from '../treeNode';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {tree} from 'd3';
 
 export class TreeNodeBranchImpl implements TreeNodeBranch {
   private readonly _treeNodeBranch:WritableSignal<Map<string, TreeNode>>;
@@ -56,11 +57,31 @@ export class TreeNodeBranchImpl implements TreeNodeBranch {
     this._nodes = computed(() => Array.from(this._treeNodeBranch().values()));
   }
 
-  add(treeNode: TreeNode): void {
-    this._treeNodeBranch.update(treeBranch => {
-      treeBranch.set(treeNode.id(), treeNode);
-      return treeBranch;
+  update(treeNode: TreeNode): void {
+    this._treeNodeBranch.update(treeNodeBranch => {
+      treeNodeBranch.set(treeNode.id(), treeNode);
+      return treeNodeBranch;
     });
+  }
+
+  remove(treeNodeId: string): void {
+    this._treeNodeBranch.update(treeNodeBranch => {
+      treeNodeBranch.delete(treeNodeId);
+      return treeNodeBranch;
+    });
+  }
+
+  add(treeNode: TreeNode, index:number): void {
+    if(index < 0 || index > 0 && index > this._treeNodeBranch().size){
+      throw new Error(`Invalid index "${index}" provided.`);
+    }
+    const treeNodeId = treeNode.id();
+    if(this._treeNodeBranch().has(treeNodeId)){
+      throw new Error(`Node "${treeNodeId}" already exists.`);
+    }
+    const treeNodesAsArray = Array.from(this._treeNodeBranch().values());
+    treeNodesAsArray.splice(index, 0, treeNode);
+    this._treeNodeBranch.set(new Map(treeNodesAsArray.map(treeNode => [treeNode.id(), treeNode])));
   }
 
   clear(): void {

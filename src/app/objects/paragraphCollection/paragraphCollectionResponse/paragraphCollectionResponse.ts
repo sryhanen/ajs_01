@@ -49,20 +49,17 @@ import {Requestable} from '../../channel/requestable';
 import {ParagraphImpl} from '../../paragraph/paragraphImpl';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {Signal} from '@angular/core';
-import {ParagraphCollection} from '../paragraphCollection';
+import {TreeNodeBranch} from '../../treeNode/treeNodeBranch/treeNodeBranch';
 
 export class ParagraphCollectionResponse implements Respondable {
-  private readonly _respondables: Signal<Respondable[]>;
   private readonly _requestable: Requestable;
-  private readonly _paragraphCollection: ParagraphCollection;
+  private readonly _paragraphCollectionBranch:TreeNodeBranch;
   private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
 
 
-  constructor(respondables: Signal<Respondable[]>, requestable: Requestable, paragraphCollection: ParagraphCollection) {
-    this._respondables = respondables;
+  constructor(requestable: Requestable, paragraphCollectionBranch:TreeNodeBranch) {
     this._requestable = requestable;
-    this._paragraphCollection = paragraphCollection;
+    this._paragraphCollectionBranch = paragraphCollectionBranch;
     this._responseEvents = {
       'PARAGRAPH':(webSocketResponse) => this.handleParagraphResponse(webSocketResponse),
       'PARAGRAPH_ADDED': (webSocketResponse) => this.handleParagraphAddedResponse(webSocketResponse),
@@ -77,24 +74,24 @@ export class ParagraphCollectionResponse implements Respondable {
       this._responseEvents[eventName](webSocketResponse);
     }
     else{
-      this._respondables().forEach(respondable => respondable.response(json));
+      this._paragraphCollectionBranch.nodes()().forEach(paragraphNode => paragraphNode.response(json));
     }
   }
 
   private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
     const paragraph = new ParagraphImpl(this._requestable, webSocketResponse.data());
-    this._paragraphCollection.update(paragraph);
+    this._paragraphCollectionBranch.update(paragraph);
   }
 
   private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
     const responseData = webSocketResponse.dataAsWebSocketPayload();
     const paragraph = new ParagraphImpl(this._requestable, responseData.objectProperty('paragraph'));
     const index = responseData.numberProperty('index');
-    this._paragraphCollection.add(paragraph, index);
+    this._paragraphCollectionBranch.add(paragraph, index);
   }
 
   private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphId  = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
-    this._paragraphCollection.remove(paragraphId);
+    this._paragraphCollectionBranch.remove(paragraphId);
   }
 }

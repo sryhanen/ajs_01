@@ -57,11 +57,11 @@ import {TreeNodeImpl} from '../../treeNode/treeNodeImpl';
 import {TreeNodeBranchImpl} from '../../treeNode/treeNodeBranch/treeNodeBranchImpl';
 
 export class NotebookIndexCollectionResponse implements Respondable {
-  private readonly _treeNodeBranch:TreeNodeBranch;
+  private readonly _notebookIndexCollection:TreeNodeBranch;
   private readonly _requestable: Requestable;
 
   constructor(treeNodeBranch:TreeNodeBranch, requestable:Requestable) {
-    this._treeNodeBranch = treeNodeBranch;
+    this._notebookIndexCollection = treeNodeBranch;
     this._requestable = requestable;
   }
 
@@ -71,21 +71,21 @@ export class NotebookIndexCollectionResponse implements Respondable {
       this.handleNotesInfoResponse(webSocketResponse);
     }
     else{
-      Array.from(this._treeNodeBranch.nodes()()).forEach(respondable => respondable.response(json));
+      Array.from(this._notebookIndexCollection.nodes()()).forEach(respondable => respondable.response(json));
     }
   }
 
   private handleNotesInfoResponse(webSocketResponse:WebSocketResponse):void{
     const notebookIndicesPayload = webSocketResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
-    this._treeNodeBranch.clear();
-    notebookIndicesPayload.forEach(notebookIndexPayload => {
+    this._notebookIndexCollection.clear();
+    notebookIndicesPayload.forEach((notebookIndexPayload, index) => {
       const notebookIndexState = new WebSocketPayloadImpl(notebookIndexPayload);
       const notebookIndexBranch = new TreeNodeBranchImpl();
       const notebookIndex = new NotebookIndexImpl(notebookIndexState, notebookIndexBranch);
       const notebookResponse = signal(new NotebookResponseStub());
       const notebookIndexResponse = new NotebookIndexResponse(notebookResponse, this._requestable, notebookIndexBranch, notebookIndex.id());
       const treeNode = new TreeNodeImpl(this._requestable, notebookIndexResponse, notebookIndex, notebookIndex.id());
-      this._treeNodeBranch.add(treeNode);
+      this._notebookIndexCollection.add(treeNode, index);
     });
   }
 }

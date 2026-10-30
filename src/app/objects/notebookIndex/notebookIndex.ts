@@ -44,9 +44,7 @@
  * a licensee so wish it.
  */
 import {Printable} from '../rendering/printable/printable';
-import {Notebook} from '../notebook/notebook';
 
 export interface NotebookIndex extends Printable{
   id():string;
-  openNotebook(notebook:Notebook):void;
 }

@@ -48,6 +48,8 @@ import {Signal} from '@angular/core';
 
 export interface TreeNodeBranch {
   nodes():Signal<TreeNode[]>;
-  add(treeNode:TreeNode):void;
+  add(treeNode:TreeNode, index:number):void;
+  update(treeNode:TreeNode):void;
+  remove(treeNodeId:string):void;
   clear():void;
 }

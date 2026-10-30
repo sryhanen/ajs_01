@@ -43,32 +43,26 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from './notebookIndex';
-import {Notebook} from '../notebook/notebook';
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
+import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
 
 export class NotebookIndexImpl implements NotebookIndex {
   private readonly _notebookIndexState:WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
-  private readonly _notebook: WritableSignal<Notebook>;
+  private readonly _treeNodeBranch:TreeNodeBranch;
 
-  constructor(notebookIndexState:WebSocketPayload, openNotebook: WritableSignal<Notebook>) {
+  constructor(notebookIndexState:WebSocketPayload, treeNodeBranch:TreeNodeBranch) {
     this._notebookIndexState = notebookIndexState;
-    this.validateNotebookBelongsToThisIndex(openNotebook());
-    this._notebook = openNotebook;
+    this._treeNodeBranch = treeNodeBranch;
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
-      notebook: openNotebook().isStub() ? new RenderNodeStub() : openNotebook().print()()
+      notebook: this._treeNodeBranch.nodes()().length > 0 ? this._treeNodeBranch.nodes()()[0].print()() : new RenderNodeStub()
     }))));
-  }
-
-  openNotebook(notebook:Notebook):void {
-    this.validateNotebookBelongsToThisIndex(notebook);
-    this._notebook.set(notebook);
   }
 
   id():string {
@@ -77,14 +71,5 @@ export class NotebookIndexImpl implements NotebookIndex {
 
   print(): Signal<RenderNode> {
     return this._renderNode;
-  }
-
-  private validateNotebookBelongsToThisIndex(notebook:Notebook):void {
-    if(!notebook.isStub()){
-      const notebookId = notebook.id();
-      if(notebook.id() !== this.id()){
-        throw new RangeError(`Notebook "${notebookId}" does not belong to this index.`);
-      }
-    }
   }
 }
