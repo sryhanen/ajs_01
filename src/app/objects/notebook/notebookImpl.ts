@@ -57,9 +57,7 @@ export class NotebookImpl implements Notebook {
 
   constructor(notebookState: WebSocketPayload, notebookBranch: TreeNodeBranch) {
     this._notebookState = notebookState;
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, computed(() => ({
-      paragraphCollection: notebookBranch.nodes()()[0].print()()
-    }))));
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, computed(() => notebookBranch.nodes()())));
   }
 
   print(): Signal<RenderNode> {

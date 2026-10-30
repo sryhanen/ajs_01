@@ -73,7 +73,7 @@ export class ParagraphCollectionResponse implements Respondable {
       this._responseEvents[eventName](webSocketResponse);
     }
     else{
-      this._paragraphCollectionBranch.nodes()().forEach(paragraphNode => paragraphNode.response(json));
+      Object.values(this._paragraphCollectionBranch.nodes()()).forEach(paragraphNode => paragraphNode.response(json));
     }
   }
 

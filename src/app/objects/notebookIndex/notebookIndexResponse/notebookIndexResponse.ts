@@ -107,8 +107,8 @@ export class NotebookIndexResponse implements Respondable{
       const notebook = new NotebookImpl(notebookState, notebookBranch);
       const notebookResponse = new NotebookResponseImpl(paragraphCollectionResponse, notebookState.stringProperty('id'));
       this._notebookResponse.set(notebookResponse);
-      const notebookNode = new TreeNodeImpl(this._requestable, notebookResponse, notebook, notebook.id());
-      this._notebookIndexBranch.add(notebookNode,0);
+      const notebookNode = new TreeNodeImpl(this._requestable, notebookResponse, notebook, 'notebook');
+      this._notebookIndexBranch.update(notebookNode);
     }
   }
 

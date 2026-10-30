@@ -71,7 +71,7 @@ export class NotebookIndexCollectionResponse implements Respondable {
       this.handleNotesInfoResponse(webSocketResponse);
     }
     else{
-      Array.from(this._notebookIndexCollectionBranch.nodes()()).forEach(respondable => respondable.response(json));
+      Object.values(this._notebookIndexCollectionBranch.nodes()()).forEach(respondable => respondable.response(json));
     }
   }
 

@@ -55,7 +55,7 @@ export class NotebookIndexCollectionImpl implements Printable{
 
   constructor(notebookIndexCollectionBranch:TreeNodeBranch) {
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
-      notebookIndices: notebookIndexCollectionBranch.nodes()().map(notebookIndex => notebookIndex.print()())
+      notebookIndices: Object.values(notebookIndexCollectionBranch.nodes()()).map(notebookIndex => notebookIndex.print()())
     }))));
   }
 

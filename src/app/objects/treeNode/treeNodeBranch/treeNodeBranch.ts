@@ -47,7 +47,7 @@ import {TreeNode} from '../treeNode';
 import {Signal} from '@angular/core';
 
 export interface TreeNodeBranch {
-  nodes():Signal<TreeNode[]>;
+  nodes():Signal<Readonly<Record<string, TreeNode>>>;
   add(treeNode:TreeNode, index:number):void;
   update(treeNode:TreeNode):void;
   remove(treeNodeId:string):void;

@@ -49,11 +49,11 @@ import {computed, signal, Signal, WritableSignal} from '@angular/core';
 
 export class TreeNodeBranchImpl implements TreeNodeBranch {
   private readonly _treeNodeBranch:WritableSignal<Map<string, TreeNode>>;
-  private readonly _nodes:Signal<TreeNode[]>;
+  private readonly _nodes:Signal<Readonly<Record<string, TreeNode>>>;
 
   constructor() {
     this._treeNodeBranch = signal(new Map(), {equal:() => false});
-    this._nodes = computed(() => Array.from(this._treeNodeBranch().values()));
+    this._nodes = computed(() => Object.fromEntries(this._treeNodeBranch()));
   }
 
   update(treeNode: TreeNode): void {
@@ -87,7 +87,7 @@ export class TreeNodeBranchImpl implements TreeNodeBranch {
     this._treeNodeBranch.set(new Map());
   }
 
-  nodes(): Signal<TreeNode[]> {
+  nodes():Signal<Readonly<Record<string, TreeNode>>> {
     return this._nodes;
   }
 }

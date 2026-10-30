@@ -43,9 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
-import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
+import {Component, input, OnInit} from '@angular/core';
 import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
+import {Printable} from '../../../objects/rendering/printable/printable';
 
 @Component({
   selector: 'notebook-index',
@@ -53,12 +53,16 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
     RenderNodeRootView
   ],
   template: `
-    @if (!notebook().isStub()) {
-      <render-node-host [renderNode]="notebook()" [containerId]="containerId()"></render-node-host>
+    @if(notebook() !== undefined) {
+      <render-node-host [renderNode]="notebook().print()()" [containerId]="containerId()"></render-node-host>
     }
   `
 })
-export class NotebookIndexView {
-  notebook = input.required<RenderNode>();
+export class NotebookIndexView implements OnInit {
   containerId = input.required<string>();
+  notebook = input<Printable>();
+
+  ngOnInit() {
+    console.debug('Notebook input:', this.notebook());
+  }
 }

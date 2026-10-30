@@ -49,7 +49,6 @@ import {NotebookIndex} from './notebookIndex';
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {RenderNodeStub} from '../rendering/renderNode/renderNodeStub';
 import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
 
 export class NotebookIndexImpl implements NotebookIndex {
@@ -58,9 +57,9 @@ export class NotebookIndexImpl implements NotebookIndex {
 
   constructor(notebookIndexState:WebSocketPayload, notebookIndexBranch:TreeNodeBranch) {
     this._notebookIndexState = notebookIndexState;
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
-      notebook: notebookIndexBranch.nodes()().length > 0 ? notebookIndexBranch.nodes()()[0].print()() : new RenderNodeStub()
-    }))));
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() =>
+      notebookIndexBranch.nodes()()
+    )));
   }
 
   id():string {

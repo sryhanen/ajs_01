@@ -55,7 +55,7 @@ export class ParagraphCollectionImpl implements Printable {
 
   constructor(paragraphCollectionBranch:TreeNodeBranch) {
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, computed(() => ({
-      paragraphs: paragraphCollectionBranch.nodes()().map(node => node.print()()),
+      paragraphs: Object.values(paragraphCollectionBranch.nodes()()).map(node => node.print()()),
     }))));
   }
 

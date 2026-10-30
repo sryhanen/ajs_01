@@ -44,8 +44,8 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
-import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
+import {Printable} from '../../../objects/rendering/printable/printable';
 
 @Component({
   selector: 'notebook',
@@ -53,10 +53,10 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
     RenderNodeRootView
   ],
   template: `
-    <render-node-host [renderNode]="paragraphCollection()" [containerId]="containerId()"></render-node-host>
+    <render-node-host [renderNode]="paragraphCollection().print()()" [containerId]="containerId()"></render-node-host>
   `
 })
 export class NotebookView {
-  paragraphCollection = input.required<RenderNode>();
+  paragraphCollection = input.required<Printable>();
   containerId = input.required<string>();
 }
