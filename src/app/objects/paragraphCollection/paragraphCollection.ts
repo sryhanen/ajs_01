@@ -43,12 +43,54 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Printable} from '../rendering/printable/printable';
-import {Paragraph} from '../paragraph/paragraph';
+import {Respondable} from '../channel/respondable';
+import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
+import {Requestable} from '../channel/requestable';
+import {ParagraphImpl} from '../paragraph/paragraphImpl';
+import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
 
-export interface ParagraphCollection extends Printable {
-  update(paragraph:Paragraph): void;
-  add(paragraph: Paragraph, index:number): void;
-  remove(paragraphId:string):void;
-  run(paragraphId:string):void;
+export class ParagraphCollection implements Respondable {
+  private readonly _requestable: Requestable;
+  private readonly _paragraphCollectionBranch:TreeNodeBranch;
+  private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
+
+  constructor(requestable: Requestable, paragraphCollectionBranch:TreeNodeBranch) {
+    this._requestable = requestable;
+    this._paragraphCollectionBranch = paragraphCollectionBranch;
+    this._responseEvents = {
+      'PARAGRAPH':(webSocketResponse) => this.handleParagraphResponse(webSocketResponse),
+      'PARAGRAPH_ADDED': (webSocketResponse) => this.handleParagraphAddedResponse(webSocketResponse),
+      'PARAGRAPH_REMOVED': (webSocketResponse) => this.handleParagraphRemovedResponse(webSocketResponse)
+    };
+  }
+
+  response(json: object) {
+    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    const eventName = webSocketResponse.operation();
+    if(eventName in this._responseEvents) {
+      this._responseEvents[eventName](webSocketResponse);
+    }
+    else{
+      Object.values(this._paragraphCollectionBranch.nodes()()).forEach(paragraphNode => paragraphNode.response(json));
+    }
+  }
+
+  private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
+    const paragraph = new ParagraphImpl(this._requestable, webSocketResponse.data());
+    this._paragraphCollectionBranch.update(paragraph);
+  }
+
+  private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
+    const responseData = webSocketResponse.dataAsWebSocketPayload();
+    const paragraph = new ParagraphImpl(this._requestable, responseData.objectProperty('paragraph'));
+    const index = responseData.numberProperty('index');
+    this._paragraphCollectionBranch.add(paragraph, index);
+  }
+
+  private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
+    const paragraphId  = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
+    this._paragraphCollectionBranch.remove(paragraphId);
+  }
 }

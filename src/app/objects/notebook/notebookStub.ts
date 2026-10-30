@@ -44,19 +44,13 @@
  * a licensee so wish it.
  */
 import {Notebook} from './notebook';
-import {Signal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
 
 export class NotebookStub implements Notebook {
   isStub(): boolean {
     return true;
   }
 
-  id(): string {
-    throw new Error('NotebookStub: Method not implemented');
-  }
-
-  print(): Signal<RenderNode> {
-    throw new Error('NotebookStub: Method not implemented');
+  response(json: object): void {
+    throw new Error('NotebookResponseStub: Method not implemented.');
   }
 }

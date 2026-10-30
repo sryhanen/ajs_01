@@ -43,10 +43,53 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Printable} from '../rendering/printable/printable';
+import {Respondable} from '../channel/respondable';
+import {computed, signal} from '@angular/core';
+import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
+import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
+import {Requestable} from '../channel/requestable';
 import {NotebookIndex} from '../notebookIndex/notebookIndex';
+import {NotebookStub} from '../notebook/notebookStub';
+import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
+import {TreeNodeImpl} from '../treeNode/treeNodeImpl';
+import {TreeNodeBranchImpl} from '../treeNode/treeNodeBranch/treeNodeBranchImpl';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 
-export interface NotebookIndexCollection extends Printable{
-  add(notebookIndex:NotebookIndex):void;
-  clear():void;
+export class NotebookIndexCollection implements Respondable {
+  private readonly _notebookIndexCollectionBranch:TreeNodeBranch;
+  private readonly _requestable: Requestable;
+
+  constructor(notebookIndexCollectionBranch:TreeNodeBranch, requestable:Requestable) {
+    this._notebookIndexCollectionBranch = notebookIndexCollectionBranch;
+    this._requestable = requestable;
+  }
+
+  response(json: object) {
+    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    if(webSocketResponse.operation() === 'NOTES_INFO'){
+      this.handleNotesInfoResponse(webSocketResponse);
+    }
+    else{
+      Object.values(this._notebookIndexCollectionBranch.nodes()()).forEach(respondable => respondable.response(json));
+    }
+  }
+
+  private handleNotesInfoResponse(webSocketResponse:WebSocketResponse):void{
+    const notebookIndicesPayload = webSocketResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
+    this._notebookIndexCollectionBranch.clear();
+    notebookIndicesPayload.forEach((notebookIndexPayload, index) => {
+      const notebookIndexState = new WebSocketPayloadImpl(notebookIndexPayload);
+      const notebookIndexId = notebookIndexState.stringProperty('id');
+      const notebookIndexBranch = new TreeNodeBranchImpl();
+      const notebook = signal(new NotebookStub());
+      const notebookIndexResponse = new NotebookIndex(notebook, this._requestable, notebookIndexBranch, notebookIndexId);
+      const notebookIndexView  = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() =>
+        notebookIndexBranch.nodes()()
+      )));
+      const notebookIndexNode = new TreeNodeImpl(this._requestable, notebookIndexResponse, notebookIndexView, notebookIndexId);
+      this._notebookIndexCollectionBranch.add(notebookIndexNode, index);
+    });
+  }
 }

@@ -43,29 +43,33 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {Respondable} from '../channel/respondable';
+import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {WebSocketResponseFilter} from '../webSocket/response/webSocketResponseFilter/webSocketResponseFilter';
+import {
+  WebSocketResponsePropertyEqualsFilter
+} from '../webSocket/response/webSocketResponseFilter/webSocketResponsePropertyEqualsFilter';
 import {Notebook} from './notebook';
-import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
-import {computed, signal, Signal} from '@angular/core';
-import {RenderNode} from '../rendering/renderNode/renderNode';
-import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
-import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
 
-export class NotebookImpl implements Notebook {
-  private readonly _notebookState: WebSocketPayload;
-  private readonly _renderNode: Signal<RenderNode>;
+export class NotebookImpl implements Notebook{
+  private readonly _respondable: Respondable;
+  private readonly _noteIdFilter:WebSocketResponseFilter;
 
-  constructor(notebookState: WebSocketPayload, notebookBranch: TreeNodeBranch) {
-    this._notebookState = notebookState;
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, computed(() => notebookBranch.nodes()())));
+  constructor(respondable: Respondable, notebookId:string) {
+    this._respondable = respondable;
+    this._noteIdFilter = new WebSocketResponsePropertyEqualsFilter('noteId', notebookId);
   }
 
-  print(): Signal<RenderNode> {
-    return this._renderNode;
-  }
-
-  id(): string {
-    return this._notebookState.stringProperty('id');
+  response(json: object):void {
+    const message = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    const filteredMessage = this._noteIdFilter.filterResponse(message);
+    if(!filteredMessage.isStub()){
+      this._respondable.response({
+        op:filteredMessage.operation(),
+        data:filteredMessage.data()
+      });
+    }
   }
 
   isStub(): boolean {

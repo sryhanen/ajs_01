@@ -45,14 +45,13 @@
  */
 import {Channel} from '../channel/channel';
 import {WebSocketChannel} from '../webSocket/channel/webSocketChannel';
-import {NotebookIndexCollectionImpl} from '../notebookIndexCollection/notebookIndexCollectionImpl';
 import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
 import {computed, signal, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {
-  NotebookIndexCollectionResponse
-} from '../notebookIndexCollection/notebookIndexCollectionResponse/notebookIndexCollectionResponse';
+  NotebookIndexCollection
+} from '../notebookIndexCollection/notebookIndexCollection';
 import {TreeNodeBranchImpl} from '../treeNode/treeNodeBranch/treeNodeBranchImpl';
 import {TreeNodeImpl} from '../treeNode/treeNodeImpl';
 import {TreeNode} from '../treeNode/treeNode';
@@ -87,11 +86,11 @@ class WebAppRootImpl implements WebAppRoot {
       return;
     }
     const notebookIndexCollectionBranch = new TreeNodeBranchImpl();
-    const notebookIndexCollectionResponse = new NotebookIndexCollectionResponse(notebookIndexCollectionBranch, this);
+    const notebookIndexCollection = new NotebookIndexCollection(notebookIndexCollectionBranch, this);
     const notebookIndexCollectionView = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
       notebookIndices: Object.values(notebookIndexCollectionBranch.nodes()()).map(notebookIndex => notebookIndex.print()())
     }))));
-    this.treeNode = new TreeNodeImpl(this, notebookIndexCollectionResponse, notebookIndexCollectionView, 'notebookIndexCollection');
+    this.treeNode = new TreeNodeImpl(this, notebookIndexCollection, notebookIndexCollectionView, 'notebookIndexCollection');
     this.webSocket = new WebSocketChannel(this, webSocketService);
     this._hasInitialized = true;
   }
