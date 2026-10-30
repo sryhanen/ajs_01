@@ -48,21 +48,20 @@ import {signal} from '@angular/core';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
-import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
-import {NotebookStub} from '../../notebook/notebookStub';
 import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
 import {Requestable} from '../../channel/requestable';
 import {NotebookIndexResponse} from '../../notebookIndex/notebookIndexResponse/notebookIndexResponse';
 import {NotebookResponseStub} from '../../notebook/notebookResponse/notebookResponseStub';
 import {TreeNodeBranch} from '../../treeNode/treeNodeBranch/treeNodeBranch';
 import {TreeNodeImpl} from '../../treeNode/treeNodeImpl';
+import {TreeNodeBranchImpl} from '../../treeNode/treeNodeBranch/treeNodeBranchImpl';
 
 export class NotebookIndexCollectionResponse implements Respondable {
-  private readonly _treeNodeTree:TreeNodeBranch;
+  private readonly _treeNodeBranch:TreeNodeBranch;
   private readonly _requestable: Requestable;
 
-  constructor(treeNodeTree:TreeNodeBranch, requestable:Requestable) {
-    this._treeNodeTree = treeNodeTree;
+  constructor(treeNodeBranch:TreeNodeBranch, requestable:Requestable) {
+    this._treeNodeBranch = treeNodeBranch;
     this._requestable = requestable;
   }
 
@@ -72,21 +71,21 @@ export class NotebookIndexCollectionResponse implements Respondable {
       this.handleNotesInfoResponse(webSocketResponse);
     }
     else{
-      Array.from(this._treeNodeTree.nodes()()).forEach(respondable => respondable.response(json));
+      Array.from(this._treeNodeBranch.nodes()()).forEach(respondable => respondable.response(json));
     }
   }
 
   private handleNotesInfoResponse(webSocketResponse:WebSocketResponse):void{
     const notebookIndicesPayload = webSocketResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
-    this._treeNodeTree.clear();
+    this._treeNodeBranch.clear();
     notebookIndicesPayload.forEach(notebookIndexPayload => {
       const notebookIndexState = new WebSocketPayloadImpl(notebookIndexPayload);
-      const notebook = signal(new NotebookStub());
-      const notebookIndex = new NotebookIndexImpl(notebookIndexState, notebook);
+      const notebookIndexBranch = new TreeNodeBranchImpl();
+      const notebookIndex = new NotebookIndexImpl(notebookIndexState, notebookIndexBranch);
       const notebookResponse = signal(new NotebookResponseStub());
-      const notebookIndexResponse = new NotebookIndexResponse(notebookResponse, this._requestable, notebookIndex);
+      const notebookIndexResponse = new NotebookIndexResponse(notebookResponse, this._requestable, notebookIndexBranch, notebookIndex.id());
       const treeNode = new TreeNodeImpl(this._requestable, notebookIndexResponse, notebookIndex, notebookIndex.id());
-      this._treeNodeTree.add(treeNode);
+      this._treeNodeBranch.add(treeNode);
     });
   }
 }
