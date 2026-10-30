@@ -43,36 +43,11 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {TreeNodeTree} from './treeNodeTree';
 import {TreeNode} from '../treeNode';
-import {computed, signal, Signal, WritableSignal} from '@angular/core';
+import {Signal} from '@angular/core';
 
-export class TreeNodeTreeImpl implements TreeNodeTree {
-  private readonly _treeBranch:WritableSignal<Map<string, TreeNode>>;
-
-  constructor(treeNodeTree?: TreeNodeTree) {
-    let treeBranchMap:Map<string, TreeNode>;
-    if(treeNodeTree) {
-      treeBranchMap = new Map(Array.from(treeNodeTree.nodes()()).map(node => [node.id(), node]));
-    }
-    else {
-      treeBranchMap = new Map();
-    }
-    this._treeBranch = signal(treeBranchMap);
-  }
-
-  add(treeNode: TreeNode): void {
-    this._treeBranch.update(treeBranch => {
-      treeBranch.set(treeNode.id(), treeNode);
-      return treeBranch;
-    });
-  }
-
-  clear(): void {
-    this._treeBranch.set(new Map());
-  }
-
-  nodes(): Signal<MapIterator<TreeNode>> {
-    return computed(() => this._treeBranch().values());
-  }
+export interface TreeNodeBranch {
+  nodes():Signal<TreeNode[]>;
+  add(treeNode:TreeNode):void;
+  clear():void;
 }

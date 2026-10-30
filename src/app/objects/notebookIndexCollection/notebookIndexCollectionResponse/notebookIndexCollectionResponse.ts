@@ -54,14 +54,14 @@ import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
 import {Requestable} from '../../channel/requestable';
 import {NotebookIndexResponse} from '../../notebookIndex/notebookIndexResponse/notebookIndexResponse';
 import {NotebookResponseStub} from '../../notebook/notebookResponse/notebookResponseStub';
-import {TreeNodeTree} from '../../treeNode/treeNodeTree/treeNodeTree';
+import {TreeNodeBranch} from '../../treeNode/treeNodeBranch/treeNodeBranch';
 import {TreeNodeImpl} from '../../treeNode/treeNodeImpl';
 
 export class NotebookIndexCollectionResponse implements Respondable {
-  private readonly _treeNodeTree:TreeNodeTree;
+  private readonly _treeNodeTree:TreeNodeBranch;
   private readonly _requestable: Requestable;
 
-  constructor(treeNodeTree:TreeNodeTree, requestable:Requestable) {
+  constructor(treeNodeTree:TreeNodeBranch, requestable:Requestable) {
     this._treeNodeTree = treeNodeTree;
     this._requestable = requestable;
   }

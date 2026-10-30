@@ -53,7 +53,7 @@ import { RenderNode } from '../rendering/renderNode/renderNode';
 import {
   NotebookIndexCollectionResponse
 } from '../notebookIndexCollection/notebookIndexCollectionResponse/notebookIndexCollectionResponse';
-import {TreeNodeTreeImpl} from '../treeNode/treeNodeTree/treeNodeTreeImpl';
+import {TreeNodeBranchImpl} from '../treeNode/treeNodeBranch/treeNodeBranchImpl';
 import {TreeNodeImpl} from '../treeNode/treeNodeImpl';
 import {TreeNode} from '../treeNode/treeNode';
 
@@ -84,11 +84,10 @@ class WebAppRootImpl implements WebAppRoot {
     if(this._hasInitialized){
       return;
     }
-    const treeNodeTree = new TreeNodeTreeImpl();
-    const notebookIndexCollection = new NotebookIndexCollectionImpl(treeNodeTree);
-    const notebookIndexCollectionResponse = new NotebookIndexCollectionResponse(treeNodeTree, this);
-    treeNodeTree.add(new TreeNodeImpl(this, notebookIndexCollectionResponse, notebookIndexCollection, 'notebookIndexCollection'));
-    this.treeNode = Array.from(treeNodeTree.nodes()())[0];
+    const treeNodeBranch = new TreeNodeBranchImpl();
+    const notebookIndexCollection = new NotebookIndexCollectionImpl(treeNodeBranch);
+    const notebookIndexCollectionResponse = new NotebookIndexCollectionResponse(treeNodeBranch, this);
+    this.treeNode = new TreeNodeImpl(this, notebookIndexCollectionResponse, notebookIndexCollection, 'notebookIndexCollection');
     this.webSocket = new WebSocketChannel(this, webSocketService);
     this._hasInitialized = true;
   }

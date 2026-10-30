@@ -48,16 +48,16 @@ import {RenderNode} from '../rendering/renderNode/renderNode';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {Printable} from '../rendering/printable/printable';
-import {TreeNodeTree} from '../treeNode/treeNodeTree/treeNodeTree';
+import {TreeNodeBranch} from '../treeNode/treeNodeBranch/treeNodeBranch';
 
 export class NotebookIndexCollectionImpl implements Printable{
-  private readonly _treeNodeTree:TreeNodeTree;
+  private readonly _treeNodeBranch:TreeNodeBranch;
   private readonly _renderNode:Signal<RenderNode>;
 
-  constructor(treeNodeTree:TreeNodeTree) {
-    this._treeNodeTree = treeNodeTree;
+  constructor(treeNodeBranch:TreeNodeBranch) {
+    this._treeNodeBranch = treeNodeBranch;
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
-      notebookIndices:Array.from(this._treeNodeTree.nodes()()).map(notebookIndex => notebookIndex.print()())
+      notebookIndices: this._treeNodeBranch.nodes()().map(notebookIndex => notebookIndex.print()())
     }))));
   }
 
