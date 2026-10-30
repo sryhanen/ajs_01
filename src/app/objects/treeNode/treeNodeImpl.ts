@@ -48,23 +48,22 @@ import {Signal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {Requestable} from '../channel/requestable';
 import {Respondable} from '../channel/respondable';
-import {Printable} from '../rendering/printable/printable';
 
 export class TreeNodeImpl implements TreeNode {
   private readonly _requestable:Requestable;
   private readonly _respondable:Respondable;
-  private readonly _printable:Printable;
+  private readonly _renderNode:Signal<RenderNode>;
   private readonly _id:string;
 
-  constructor(requestable:Requestable, respondable:Respondable, printable:Printable, id:string) {
+  constructor(requestable:Requestable, respondable:Respondable, renderNode:Signal<RenderNode>, id:string) {
     this._requestable = requestable;
     this._respondable = respondable;
-    this._printable = printable;
+    this._renderNode = renderNode;
     this._id = id;
   }
 
   print(): Signal<RenderNode> {
-    return this._printable.print();
+    return this._renderNode;
   }
 
   request(json: object): void {

@@ -44,17 +44,18 @@
  * a licensee so wish it.
  */
 import {Respondable} from '../../channel/respondable';
-import {signal} from '@angular/core';
+import {computed, signal} from '@angular/core';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
-import {NotebookIndexImpl} from '../../notebookIndex/notebookIndexImpl';
 import {Requestable} from '../../channel/requestable';
 import {NotebookIndexResponse} from '../../notebookIndex/notebookIndexResponse/notebookIndexResponse';
 import {NotebookResponseStub} from '../../notebook/notebookResponse/notebookResponseStub';
 import {TreeNodeBranch} from '../../treeNode/treeNodeBranch/treeNodeBranch';
 import {TreeNodeImpl} from '../../treeNode/treeNodeImpl';
 import {TreeNodeBranchImpl} from '../../treeNode/treeNodeBranch/treeNodeBranchImpl';
+import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class NotebookIndexCollectionResponse implements Respondable {
   private readonly _notebookIndexCollectionBranch:TreeNodeBranch;
@@ -80,12 +81,15 @@ export class NotebookIndexCollectionResponse implements Respondable {
     this._notebookIndexCollectionBranch.clear();
     notebookIndicesPayload.forEach((notebookIndexPayload, index) => {
       const notebookIndexState = new WebSocketPayloadImpl(notebookIndexPayload);
+      const notebookIndexId = notebookIndexState.stringProperty('id');
       const notebookIndexBranch = new TreeNodeBranchImpl();
-      const notebookIndex = new NotebookIndexImpl(notebookIndexState, notebookIndexBranch);
       const notebookResponse = signal(new NotebookResponseStub());
-      const notebookIndexResponse = new NotebookIndexResponse(notebookResponse, this._requestable, notebookIndexBranch, notebookIndex.id());
-      const treeNode = new TreeNodeImpl(this._requestable, notebookIndexResponse, notebookIndex, notebookIndex.id());
-      this._notebookIndexCollectionBranch.add(treeNode, index);
+      const notebookIndexResponse = new NotebookIndexResponse(notebookResponse, this._requestable, notebookIndexBranch, notebookIndexId);
+      const notebookIndexView  = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() =>
+        notebookIndexBranch.nodes()()
+      )));
+      const notebookIndexNode = new TreeNodeImpl(this._requestable, notebookIndexResponse, notebookIndexView, notebookIndexId);
+      this._notebookIndexCollectionBranch.add(notebookIndexNode, index);
     });
   }
 }

@@ -44,14 +44,12 @@
  * a licensee so wish it.
  */
 import {Respondable} from '../../channel/respondable';
-import {WritableSignal} from '@angular/core';
+import {computed, signal, WritableSignal} from '@angular/core';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
 import {TypedWebSocketResponse} from '../../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookRequest} from '../../notebook/notebookRequest/notebookRequest';
-import {ParagraphCollectionImpl} from '../../paragraphCollection/paragraphCollectionImpl';
-import {NotebookImpl} from '../../notebook/notebookImpl';
 import {Requestable} from '../../channel/requestable';
 import {NotebookResponseImpl} from '../../notebook/notebookResponse/notebookResponseImpl';
 import {NotebookResponse} from '../../notebook/notebookResponse/notebookResponse';
@@ -66,6 +64,8 @@ import {ParagraphImpl} from '../../paragraph/paragraphImpl';
 import {TreeNodeBranch} from '../../treeNode/treeNodeBranch/treeNodeBranch';
 import {TreeNodeImpl} from '../../treeNode/treeNodeImpl';
 import {TreeNodeBranchImpl} from '../../treeNode/treeNodeBranch/treeNodeBranchImpl';
+import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class NotebookIndexResponse implements Respondable{
   private readonly _notebookResponse: WritableSignal<NotebookResponse>;
@@ -97,17 +97,19 @@ export class NotebookIndexResponse implements Respondable{
     if(receivedNotebookId === this._notebookIndexId){
       const notebookRequest = new NotebookRequest(this._requestable, receivedNotebookId);
       const paragraphCollectionBranch = new TreeNodeBranchImpl();
-      const paragraphCollection = new ParagraphCollectionImpl(paragraphCollectionBranch);
       const paragraphCollectionRequest = new ParagraphCollectionRequest(notebookRequest);
       this.initializedParagraphNodes(notebookState, paragraphCollectionRequest, paragraphCollectionBranch);
       const paragraphCollectionResponse = new ParagraphCollectionResponse(paragraphCollectionRequest, paragraphCollectionBranch);
       const notebookBranch = new TreeNodeBranchImpl();
-      const paragraphCollectionNode = new TreeNodeImpl(notebookRequest, paragraphCollectionResponse, paragraphCollection, 'paragraphCollection');
+      const paragraphCollectionView = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, computed(() => ({
+        paragraphs: Object.values(paragraphCollectionBranch.nodes()()).map(node => node.print()()),
+      }))));
+      const paragraphCollectionNode = new TreeNodeImpl(notebookRequest, paragraphCollectionResponse, paragraphCollectionView, 'paragraphCollection');
       notebookBranch.add(paragraphCollectionNode,0);
-      const notebook = new NotebookImpl(notebookState, notebookBranch);
       const notebookResponse = new NotebookResponseImpl(paragraphCollectionResponse, notebookState.stringProperty('id'));
       this._notebookResponse.set(notebookResponse);
-      const notebookNode = new TreeNodeImpl(this._requestable, notebookResponse, notebook, 'notebook');
+      const notebookView = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, computed(() => notebookBranch.nodes()())));
+      const notebookNode = new TreeNodeImpl(this._requestable, notebookResponse, notebookView, 'notebook');
       this._notebookIndexBranch.update(notebookNode);
     }
   }

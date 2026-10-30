@@ -48,7 +48,7 @@ import {WebSocketChannel} from '../webSocket/channel/webSocketChannel';
 import {NotebookIndexCollectionImpl} from '../notebookIndexCollection/notebookIndexCollectionImpl';
 import {WebAppRoot} from './webAppRoot';
 import {WebSocketService} from '../webSocket/service/webSocketService';
-import {Signal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {
   NotebookIndexCollectionResponse
@@ -56,6 +56,8 @@ import {
 import {TreeNodeBranchImpl} from '../treeNode/treeNodeBranch/treeNodeBranchImpl';
 import {TreeNodeImpl} from '../treeNode/treeNodeImpl';
 import {TreeNode} from '../treeNode/treeNode';
+import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 
 class WebAppRootImpl implements WebAppRoot {
   private _hasInitialized:boolean = false;
@@ -84,10 +86,12 @@ class WebAppRootImpl implements WebAppRoot {
     if(this._hasInitialized){
       return;
     }
-    const treeNodeBranch = new TreeNodeBranchImpl();
-    const notebookIndexCollection = new NotebookIndexCollectionImpl(treeNodeBranch);
-    const notebookIndexCollectionResponse = new NotebookIndexCollectionResponse(treeNodeBranch, this);
-    this.treeNode = new TreeNodeImpl(this, notebookIndexCollectionResponse, notebookIndexCollection, 'notebookIndexCollection');
+    const notebookIndexCollectionBranch = new TreeNodeBranchImpl();
+    const notebookIndexCollectionResponse = new NotebookIndexCollectionResponse(notebookIndexCollectionBranch, this);
+    const notebookIndexCollectionView = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
+      notebookIndices: Object.values(notebookIndexCollectionBranch.nodes()()).map(notebookIndex => notebookIndex.print()())
+    }))));
+    this.treeNode = new TreeNodeImpl(this, notebookIndexCollectionResponse, notebookIndexCollectionView, 'notebookIndexCollection');
     this.webSocket = new WebSocketChannel(this, webSocketService);
     this._hasInitialized = true;
   }
