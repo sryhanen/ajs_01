@@ -47,7 +47,6 @@ import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphCollectionImpl} from './paragraphCollectionImpl';
 import {FakeChannel} from '../channel/fakeChannel';
 import {Requestable} from '../channel/requestable';
-import {ParagraphImpl} from '../paragraph/paragraphImpl';
 
 describe('ParagraphCollection unit test', () => {
   let requestable: Requestable;
@@ -61,64 +60,6 @@ describe('ParagraphCollection unit test', () => {
     const paragraphCollectionPrinted = paragraphCollection.print()();
     expect(paragraphCollectionPrinted.isStub()).toBe(false);
     expect(paragraphCollectionPrinted.inputs()()['paragraphs']).toEqual([]);
-  });
-
-  describe('Add', () => {
-    const newParagraph = new ParagraphImpl(requestable, {id:'paragraphId'});
-
-    it('Should add paragraph', () => {
-      paragraphCollection.add(newParagraph, 0);
-      const paragraphCollectionPrinted = paragraphCollection.print()();
-      expect(paragraphCollectionPrinted.inputs()()['paragraphs']).toHaveLength(1);
-    });
-
-    it('Should throw if if index is invalid', () => {
-      expect(() => paragraphCollection.add(newParagraph, -1)).toThrow();
-      expect(() => paragraphCollection.add(newParagraph, 1)).toThrow();
-    });
-
-    it('Should throw if paragraph is already in the collection', () => {
-      paragraphCollection.add(newParagraph, 0);
-      expect(() => paragraphCollection.add(newParagraph, 0)).toThrow();
-    });
-  });
-
-  describe('Remove', () => {
-    const paragraphId = 'paragraphId';
-
-    it('Should remove paragraph', () => {
-      paragraphCollection = new ParagraphCollectionImpl(requestable, [{
-        id:paragraphId,
-      }]);
-      const paragraphCollectionPrinted = paragraphCollection.print()();
-      const paragraphsBeforeRemove = paragraphCollectionPrinted.inputs()()['paragraphs'];
-      paragraphCollection.remove(paragraphId);
-      const paragraphsAfterRemove = paragraphCollectionPrinted.inputs()()['paragraphs'];
-      expect(paragraphsBeforeRemove).toHaveLength(1);
-      expect(paragraphsAfterRemove).toHaveLength(0);
-    });
-
-    it('Should throw if paragraph does not exists', () => {
-      expect(() => paragraphCollection.remove(paragraphId)).toThrow();
-    });
-  });
-
-  describe('Update', () => {
-    const paragraphId = 'paragraphId';
-    const paragraphToUpdate = new ParagraphImpl(requestable, {id:paragraphId});
-
-    it('Should update', () => {
-      paragraphCollection = new ParagraphCollectionImpl(requestable, [{
-        id:paragraphId,
-      }]);
-      paragraphCollection.update(paragraphToUpdate);
-      const paragraphCollectionPrinted = paragraphCollection.print()();
-      expect(paragraphCollectionPrinted.inputs()()['paragraphs']).toHaveLength(1);
-    });
-
-    it('Should throw if paragraph does not exists', () => {
-      expect(() => paragraphCollection.update(paragraphToUpdate)).toThrow();
-    });
   });
 
   describe('Channel events', () => {
@@ -177,15 +118,41 @@ describe('ParagraphCollection unit test', () => {
       expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
     });
 
-    it('Should try to update paragraph', () => {
+    it('Should not add paragraph if index is negative', () => {
+      const paragraphAddedResponse = {
+        op:'PARAGRAPH_ADDED',
+        data:{
+          paragraph:{
+            id:'para3',
+          },
+          index:-1
+        }
+      };
+      expect(() => paragraphCollection.response(paragraphAddedResponse)).toThrow();
+    });
+
+    it('Should not add paragraph if index is invalid', () => {
+      const paragraphAddedResponse = {
+        op:'PARAGRAPH_ADDED',
+        data:{
+          paragraph:{
+            id:'para3',
+          },
+          index:1
+        }
+      };
+      expect(() => paragraphCollection.response(paragraphAddedResponse)).toThrow();
+    });
+
+    it('Should add paragraph', () => {
       const paragraphResponse = {
         op:'PARAGRAPH',
         data:{
           id:'para3'
         }
       };
-      // Since we paragraph state cannot be asserted, this is the only way to assert that something happens
-      expect(() => paragraphCollection.response(paragraphResponse)).toThrow();
+      paragraphCollection.response(paragraphResponse);
+      expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
     });
 
     it('Should remove paragraph', () => {
@@ -204,6 +171,21 @@ describe('ParagraphCollection unit test', () => {
       const paragraphsAfterRemove = paragraphCollection.print()().inputs()()['paragraphs'];
       expect(paragraphsBeforeRemove).toHaveLength(1);
       expect(paragraphsAfterRemove).toHaveLength(0);
+    });
+
+    it('Should not remove paragraph', () => {
+      const paragraphId = 'paragraphId';
+      paragraphCollection = new ParagraphCollectionImpl(requestable, [{
+        id:paragraphId,
+      }]);
+      const wrongParagraphId = 'wrongParagraphId';
+      const paragraphRemovedResponse = {
+        op:'PARAGRAPH_REMOVED',
+        data:{
+          id:wrongParagraphId,
+        }
+      };
+      expect(() => paragraphCollection.response(paragraphRemovedResponse)).toThrow();
     });
   });
 });

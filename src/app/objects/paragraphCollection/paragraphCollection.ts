@@ -45,10 +45,5 @@
  */
 import {Channel} from '../channel/channel';
 import {Printable} from '../rendering/printable/printable';
-import {Paragraph} from '../paragraph/paragraph';
 
-export interface ParagraphCollection extends Channel, Printable {
-  update(paragraph:Paragraph): void;
-  add(paragraph: Paragraph, index:number): void;
-  remove(paragraphId:string):void;
-}
+export interface ParagraphCollection extends Channel, Printable {}

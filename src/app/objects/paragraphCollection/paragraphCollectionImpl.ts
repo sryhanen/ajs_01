@@ -75,41 +75,6 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     };
   }
 
-  add(paragraph:Paragraph, index:number): void {
-    if(index < 0 || index > 0 && index > this._paragraphs().size){
-      throw new Error(`Invalid index "${index}" provided.`);
-    }
-    const paragraphId = paragraph.id();
-    if(this._paragraphs().has(paragraphId)){
-      throw new Error(`Paragraph with id "${paragraphId}" already exists.`);
-    }
-    const paragraphsAsArray = Array.from(this._paragraphs().values());
-    paragraphsAsArray.splice(index, 0, paragraph);
-    this._paragraphs.set(new Map(paragraphsAsArray.map(paragraph => [paragraph.id(), paragraph])));
-  }
-
-  update(paragraph: Paragraph): void {
-    const paragraphId = paragraph.id();
-    if(!this._paragraphs().has(paragraphId)){
-      throw new Error(`Paragraph "${paragraphId}" does not exist.`);
-    }
-    this._paragraphs.update(paragraphs => {
-      paragraphs.set(paragraph.id(), paragraph);
-      return paragraphs;
-    });
-  }
-
-  remove(paragraphId: string): void {
-    if(!this._paragraphs().has(paragraphId)){
-      throw new Error(`Paragraph "${paragraphId}" does not exist.`);
-    }
-    this._paragraphs.update(paragraphs => {
-      paragraphs.delete(paragraphId);
-      return paragraphs;
-    });
-  }
-
-
   print(): Signal<RenderNode> {
     return this._renderNode;
   }
@@ -155,20 +120,31 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphResponse = new TypedWebSocketResponse('PARAGRAPH', webSocketResponse);
     const paragraph = new ParagraphImpl(this, paragraphResponse.data());
-    this.update(paragraph);
+    this._paragraphs.update(paragraphs => paragraphs.set(paragraph.id(), paragraph));
   }
 
   private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphAddedResponse = new TypedWebSocketResponse('PARAGRAPH_ADDED', webSocketResponse);
     const responseData = paragraphAddedResponse.dataAsWebSocketPayload();
-    const paragraph = new ParagraphImpl(this, responseData.objectProperty('paragraph'));
     const index = responseData.numberProperty('index');
-    this.add(paragraph, index);
+    if(index < 0 || index > 0 && index > this._paragraphs().size){
+      throw new Error(`Invalid index "${index}" provided.`);
+    }
+    const paragraph = new ParagraphImpl(this, responseData.objectProperty('paragraph'));
+    const paragraphsAsArray = Array.from(this._paragraphs().values());
+    paragraphsAsArray.splice(index, 0, paragraph);
+    this._paragraphs.set(new Map(paragraphsAsArray.map(paragraph => [paragraph.id(), paragraph])));
   }
 
   private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphRemovedResponse = new TypedWebSocketResponse('PARAGRAPH_REMOVED', webSocketResponse);
     const paragraphId  = paragraphRemovedResponse.dataAsWebSocketPayload().stringProperty('id');
-    this.remove(paragraphId);
+    if(!this._paragraphs().has(paragraphId)){
+      throw new Error(`Paragraph "${paragraphId}" does not exist.`);
+    }
+    this._paragraphs.update(paragraphs => {
+      paragraphs.delete(paragraphId);
+      return paragraphs;
+    });
   }
 }
