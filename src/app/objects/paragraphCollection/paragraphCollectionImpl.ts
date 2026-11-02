@@ -127,7 +127,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     const paragraphAddedResponse = new TypedWebSocketResponse('PARAGRAPH_ADDED', webSocketResponse);
     const responseData = paragraphAddedResponse.dataAsWebSocketPayload();
     const index = responseData.numberProperty('index');
-    if(index < 0 || index > 0 && index > this._paragraphs().size){
+    if(index < 0 || index > this._paragraphs().size){
       throw new Error(`Invalid index "${index}" provided.`);
     }
     const paragraph = new ParagraphImpl(this, responseData.objectProperty('paragraph'));
