@@ -69,24 +69,6 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
     }))));
   }
 
-  add(notebookIndex: NotebookIndex): void {
-    const notebookId = notebookIndex.id();
-    if(this._notebookIndices().has(notebookId)){
-      throw new Error(`NotebookIndex "${notebookId}" already exists.`);
-    }
-    this._notebookIndices.update(notebookIndices => {
-      notebookIndices.set(notebookIndex.id(), notebookIndex);
-      return notebookIndices;
-    });
-  }
-
-  clear(): void {
-    this._notebookIndices.update(notebookIndices  => {
-      notebookIndices.clear();
-      return notebookIndices;
-    });
-  }
-
   print(): Signal<RenderNode> {
     return this._renderNode;
   }
@@ -108,10 +90,13 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
   private handleNotesInfoResponse(webSocketResponse:WebSocketResponse):void{
     const notesInfoResponse = new TypedWebSocketResponse('NOTES_INFO', webSocketResponse);
     const notebookIndicesPayload = notesInfoResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
-    this.clear();
+    this._notebookIndices.update(notebookIndices => {
+      notebookIndices.clear();
+      return notebookIndices;
+    });
     notebookIndicesPayload.forEach(notebookIndexPayload => {
       const notebookIndex = new NotebookIndexImpl(this, notebookIndexPayload);
-      this.add(notebookIndex);
+      this._notebookIndices.update(notebookIndices => notebookIndices.set(notebookIndex.id(), notebookIndex));
     });
   }
 }
