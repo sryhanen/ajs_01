@@ -47,7 +47,6 @@ import {uPlotSwitcherButton} from './switcherButton/uPlotSwitcherButton';
 import {GraphType} from './graphType';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {Channel} from '../../../channel/channel';
 import {Printable} from '../../../rendering/printable/printable';
 import uPlot from 'uplot';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
@@ -85,23 +84,14 @@ export class uPlotFormatImpl implements OutputFormat {
 
   render(uPlotData:uPlot.AlignedData, uPlotOptions:uPlotOptions): void {
     this._uPlotData.set(uPlotData);
-    this._uPlotOptions.set(this.parseOptions(uPlotOptions));
-  }
-
-  private parseOptions(uPlotOptions:uPlotOptions):uPlot.Options {
-    const labels = uPlotOptions.labels;
-    const series = uPlotOptions.series;
-    const xAxisLabel = uPlotOptions.xAxisLabel;
-    const graphType = uPlotOptions.graphType;
-    const basicOptions = new BasicOptionsImpl(labels, series, xAxisLabel, graphType);
-    let options: uPlot.Options;
-    if(graphType === GraphType.bar){
-      options = new BarChartOptionsImpl(basicOptions).options();
+    const basicOptions = new BasicOptionsImpl(uPlotOptions);
+    if(uPlotOptions.graphType === GraphType.bar){
+      const barChartOptions = new BarChartOptionsImpl(basicOptions);
+      this._uPlotOptions.set(barChartOptions.options());
     }
     else{
-      options = basicOptions.options();
+      this._uPlotOptions.set(basicOptions.options());
     }
-    return options;
   }
 
   print(): Signal<RenderNode> {
