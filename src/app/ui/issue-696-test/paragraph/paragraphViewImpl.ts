@@ -45,11 +45,9 @@
  */
 import {Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {Paragraph} from './paragraph';
-import {ViewNode} from '../viewNode/viewNode';
 import {ParagraphView} from './paragraphView';
 import {Output} from '../output/output';
 import {OutputViewImpl} from '../output/outputViewImpl';
-import {OutputView} from '../output/outputView';
 
 @Component({
   selector: 'paragraph',
@@ -58,7 +56,7 @@ import {OutputView} from '../output/outputView';
   `
 })
 export class ParagraphViewImpl implements ParagraphView, OnInit, OnDestroy {
-  paragraph = input.required<Paragraph&ViewNode<ParagraphView>>();
+  paragraph = input.required<Paragraph>();
   @ViewChild('outputHost', { read: ViewContainerRef, static: true }) private outputHost!: ViewContainerRef;
 
   ngOnInit(): void {
@@ -69,7 +67,7 @@ export class ParagraphViewImpl implements ParagraphView, OnInit, OnDestroy {
     this.paragraph().detachView();
   }
 
-  attachOutput(output:Output&ViewNode<OutputView>): void {
+  attachOutput(output:Output): void {
     this.outputHost.clear();
     const componentRef = this.outputHost.createComponent(OutputViewImpl);
     componentRef.setInput('output', output);

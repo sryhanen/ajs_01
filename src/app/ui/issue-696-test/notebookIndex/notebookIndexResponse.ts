@@ -59,6 +59,11 @@ import {ParagraphRequest} from '../paragraph/paragraphRequest';
 import {OutputImpl} from '../output/outputImpl';
 import {OutputResponse} from '../output/outputResponse';
 import {ParagraphResponse} from '../paragraph/paragraphResponse';
+import {OutputFormat} from '../outputFormat/outputFormat';
+import {OutputType} from '../../../objects/output/outputType';
+import {UPlotFormat} from '../outputFormat/uPlot/uPlotFormat';
+import {TextFormat} from '../outputFormat/text/textFormat';
+import {DataTablesFormat} from '../outputFormat/dataTable/dataTablesFormat';
 
 export class NotebookIndexResponse implements Respondable {
   private readonly _notebookIndex:NotebookIndex;
@@ -98,7 +103,13 @@ export class NotebookIndexResponse implements Respondable {
         const paragraphState = new WebSocketPayloadImpl(paragraphPayload);
         const paragraphId = paragraphState.stringProperty('id');
         const paragraphRequest = new ParagraphRequest(notebookRequest, paragraphId);
-        const output = new OutputImpl(new Map());
+        const outputFormatsList:[string, OutputFormat][] = [
+          [OutputType.uPlot, new UPlotFormat()],
+          [OutputType.text, new TextFormat()],
+          [OutputType.dataTables, new DataTablesFormat(paragraphRequest)],
+        ];
+        const outputFormats: Map<string, OutputFormat> = new Map(outputFormatsList);
+        const output = new OutputImpl(outputFormats, paragraphId);
         const outputResponse = new OutputResponse(output);
         const paragraph = new ParagraphImpl(paragraphRequest, paragraphState, {output:output});
         const paragraphResponse = new ParagraphResponse([outputResponse], paragraphId);

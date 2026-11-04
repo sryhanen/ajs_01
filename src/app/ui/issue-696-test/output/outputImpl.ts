@@ -45,22 +45,24 @@
  */
 import {Output} from './output';
 import {OutputView} from './outputView';
-import {ViewNode} from '../viewNode/viewNode';
 import {OutputState} from './outputState';
 import {OutputFormat} from '../outputFormat/outputFormat';
 
-export class OutputImpl implements Output, ViewNode<OutputView> {
+export class OutputImpl implements Output {
   private readonly _childNodes:{interpreterErrorListener: object, outputSwitcher: object};
   private _outputView:OutputView;
   private readonly _outputFormats: Map<string, OutputFormat>;
+  private readonly _paragraphId:string;
 
-  constructor(outputFormats: Map<string, OutputFormat>, childNodes?:{interpreterErrorListener: object, outputSwitcher: object}) {
+  constructor(outputFormats: Map<string, OutputFormat>,paragraphId:string, childNodes?:{interpreterErrorListener: object, outputSwitcher: object}) {
     this._outputFormats = outputFormats;
     this._childNodes = childNodes;
+    this._paragraphId = paragraphId;
   }
 
   attachView(view: OutputView): void {
     this._outputView = view;
+    console.debug('attached output', this._paragraphId);
     // this._outputView.attachInterpreterErrorListener(this._childNodes.interpreterErrorListener);
     // this._outputView.attachSwitcher(this._childNodes.outputSwitcher);
   }
@@ -71,8 +73,10 @@ export class OutputImpl implements Output, ViewNode<OutputView> {
 
   render(outputState:OutputState): void {
     if(this._outputView){
+      console.debug('rendering output', this._paragraphId);
       const outputFormat = this._outputFormats.get(outputState.type);
-      this._outputView.render(outputFormat.render(outputState.data, outputState.options));
+      const rendered = outputFormat.render(outputState.data, outputState.options);
+      this._outputView.render(rendered);
     }
   }
 }

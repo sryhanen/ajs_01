@@ -53,6 +53,12 @@ import {Requestable} from '../../../objects/channel/requestable';
 import {OutputImpl} from '../output/outputImpl';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {ParagraphResponse} from '../paragraph/paragraphResponse';
+import {OutputFormat} from '../outputFormat/outputFormat';
+import {OutputType} from '../../../objects/output/outputType';
+import {UPlotFormat} from '../outputFormat/uPlot/uPlotFormat';
+import {TextFormat} from '../outputFormat/text/textFormat';
+import {DataTablesFormat} from '../outputFormat/dataTable/dataTablesFormat';
+import {OutputResponse} from '../output/outputResponse';
 
 export class ParagraphCollectionResponse implements Respondable {
   private readonly _requestable:Requestable;
@@ -85,12 +91,18 @@ export class ParagraphCollectionResponse implements Respondable {
   private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphId = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
     const paragraphRequest = new ParagraphRequest(this._requestable, paragraphId);
-    const interpreterErrorListener = {};
-    const outputSwitcher = {};
-    const output = new OutputImpl(new Map(), {interpreterErrorListener: interpreterErrorListener, outputSwitcher: outputSwitcher});
+
+    const outputFormatsList:[string, OutputFormat][] = [
+      [OutputType.uPlot, new UPlotFormat()],
+      [OutputType.text, new TextFormat()],
+      [OutputType.dataTables, new DataTablesFormat(paragraphRequest)],
+    ];
+    const outputFormats: Map<string, OutputFormat> = new Map(outputFormatsList);
+    const output = new OutputImpl(outputFormats, paragraphId);
+    const outputResponse = new OutputResponse(output);
     const paragraph = new ParagraphImpl(paragraphRequest, webSocketResponse.dataAsWebSocketPayload(), {output:output});
     this._paragraphCollection.updateParagraph(paragraph);
-    const paragraphResponse = new ParagraphResponse([], paragraphId);
+    const paragraphResponse = new ParagraphResponse([outputResponse], paragraphId);
     this._paragraphResponses.set(paragraphId, paragraphResponse);
   }
 

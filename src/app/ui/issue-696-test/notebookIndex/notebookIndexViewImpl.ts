@@ -45,7 +45,7 @@
  */
 import { Notebook } from '../notebook/notebook';
 import {NotebookIndexView} from './notebookIndexView';
-import {AfterViewInit, Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
 import {NotebookIndex} from './notebookIndex';
 import {NotebookViewImpl} from '../notebook/notebookViewImpl';
 

@@ -43,6 +43,9 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface Output {
+import {ViewNode} from '../viewNode/viewNode';
+import {OutputView} from './outputView';
+
+export interface Output extends ViewNode<OutputView> {
   render(data:object|string, options?:object):void;
 }

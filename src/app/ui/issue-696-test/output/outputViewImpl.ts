@@ -44,23 +44,30 @@
  * a licensee so wish it.
  */
 import {OutputView} from './outputView';
-import {Component, inject, input, OnDestroy, OnInit, Type, ViewChild, ViewContainerRef} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  inject,
+  input,
+  OnDestroy,
+  Type,
+  ViewChild,
+  ViewContainerRef
+} from '@angular/core';
 import {Output} from './output';
-import {ViewNode} from '../viewNode/viewNode';
 import {COMPONENT_REGISTRY} from '../../angular2+/componentRegistry/componentRegistry';
 
 @Component({
   selector: 'output',
   template: `
-    <h1>OUTPUT</h1>
     <ng-container #outputContainer/>
   `
 })
-export class OutputViewImpl implements OutputView, OnInit, OnDestroy {
-  output = input.required<Output&ViewNode<OutputView>>();
+export class OutputViewImpl implements OutputView, AfterViewInit, OnDestroy{
+  output = input.required<Output>();
   @ViewChild('outputContainer') private outputContainer: ViewContainerRef;
 
-  ngOnInit() {
+  ngAfterViewInit() {
     this.output().attachView(this);
   }
 
