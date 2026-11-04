@@ -46,11 +46,10 @@
 import {Paragraph} from './paragraph';
 import {Requestable} from '../../../objects/channel/requestable';
 import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
-import {ViewNode} from '../viewNode/viewNode';
 import {ParagraphView} from './paragraphView';
 import {Output} from '../output/output';
 
-export class ParagraphImpl implements Paragraph, ViewNode<ParagraphView> {
+export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
   private readonly _paragraphState: WebSocketPayload;
   private readonly _childNodes: {output:Output};

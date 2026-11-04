@@ -43,7 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface Paragraph {
+import {ViewNode} from '../viewNode/viewNode';
+import {ParagraphView} from './paragraphView';
+
+export interface Paragraph extends ViewNode<ParagraphView> {
   id():string;
   run():void;
 }
