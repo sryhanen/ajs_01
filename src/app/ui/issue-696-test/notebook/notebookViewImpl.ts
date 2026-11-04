@@ -47,6 +47,7 @@ import {Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '
 import {NotebookView} from './notebookView';
 import { ParagraphCollection } from '../paragraphCollection/paragraphCollection';
 import {Notebook} from './notebook';
+import {ParagraphCollectionViewImpl} from '../paragraphCollection/paragraphCollectionViewImpl';
 
 @Component({
   selector: 'notebook',
@@ -67,7 +68,7 @@ export class NotebookViewImpl implements NotebookView, OnInit, OnDestroy {
   }
 
   attachParagraphCollection(paragraphCollection: ParagraphCollection): void {
-    // const componentRef = this.paragraphCollectionContainer.createComponent(ParagraphCollectionViewImpl);
-    // componentRef.setInput('paragraphCollection', paragraphCollection);
+    const componentRef = this.paragraphCollectionContainer.createComponent(ParagraphCollectionViewImpl);
+    componentRef.setInput('paragraphCollection', paragraphCollection);
   }
 }

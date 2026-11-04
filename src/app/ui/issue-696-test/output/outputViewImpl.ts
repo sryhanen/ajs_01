@@ -52,12 +52,12 @@ import {COMPONENT_REGISTRY} from '../../angular2+/componentRegistry/componentReg
 @Component({
   selector: 'output',
   template: `
-    <ng-container #container />
+    <ng-container #outputContainer/>
   `
 })
 export class OutputViewImpl implements OutputView, OnInit, OnDestroy {
   output = input.required<Output&ViewNode<OutputView>>();
-  @ViewChild('container') private container: ViewContainerRef;
+  @ViewChild('outputContainer') private outputContainer: ViewContainerRef;
 
   ngOnInit() {
     this.output().attachView(this);
@@ -74,7 +74,8 @@ export class OutputViewImpl implements OutputView, OnInit, OnDestroy {
   }
 
   render(component:{componentReference: string, inputs: Record<string, unknown>}):void{
-    const componentRef = this.container.createComponent(this.componentInstance(component.componentReference));
+    this.outputContainer.clear();
+    const componentRef = this.outputContainer.createComponent(this.componentInstance(component.componentReference));
     for(const [name,value] of Object.entries(component.inputs)) {
       componentRef.setInput(name, value);
     }
