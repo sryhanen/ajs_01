@@ -44,11 +44,10 @@
  * a licensee so wish it.
  */
 import {OutputView} from './outputView';
-import {Component, ComponentRef, input, OnDestroy, OnInit, Type, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, inject, input, OnDestroy, OnInit, Type, ViewChild, ViewContainerRef} from '@angular/core';
 import {Output} from './output';
 import {ViewNode} from '../viewNode/viewNode';
-import { OutputState } from './outputState';
-import {HtmlOutputView} from '../../angular2+/output/outputViews/htmlOutputView/htmlOutputView';
+import {COMPONENT_REGISTRY} from '../../angular2+/componentRegistry/componentRegistry';
 
 @Component({
   selector: 'output',
@@ -60,30 +59,25 @@ export class OutputViewImpl implements OutputView, OnInit, OnDestroy {
   output = input.required<Output&ViewNode<OutputView>>();
   @ViewChild('container') private container: ViewContainerRef;
 
-  private readonly _outputFormats: Record<string, {
-    component:Type<unknown>,
-    applyInputs: (component:ComponentRef<unknown>, outputState:OutputState) => void,
-  }> = {
-    html:{
-      component:HtmlOutputView,
-      applyInputs: (component:ComponentRef<HtmlOutputView>, outputState:OutputState) => {
-        component.setInput('htmlTemplate', outputState.data);
-      }
-    }
-  };
-
-  render(outputState: OutputState): void {
-    const outputFormat = this._outputFormats[outputState.type];
-    const componentRef = this.container.createComponent(outputFormat.component);
-    outputFormat.applyInputs(componentRef, outputState);
-  }
-
   ngOnInit() {
     this.output().attachView(this);
   }
 
   ngOnDestroy() {
     this.output().detachView();
+  }
+
+  private readonly componentRegistry = inject(COMPONENT_REGISTRY);
+
+  protected componentInstance(componentId:string):Type<unknown>{
+    return this.componentRegistry.get(componentId);
+  }
+
+  render(component:{componentReference: string, inputs: Record<string, unknown>}):void{
+    const componentRef = this.container.createComponent(this.componentInstance(component.componentReference));
+    for(const [name,value] of Object.entries(component.inputs)) {
+      componentRef.setInput(name, value);
+    }
   }
 
   attachInterpreterErrorListener(interpreterErrorListener: object): void {

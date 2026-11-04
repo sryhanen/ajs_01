@@ -47,7 +47,7 @@ import {Output} from './output';
 import {OutputView} from './outputView';
 import {ViewNode} from '../viewNode/viewNode';
 import {OutputState} from './outputState';
-import {OutputFormat} from '../../../objects/output/format/outputFormat';
+import {OutputFormat} from '../outputFormat/outputFormat';
 
 export class OutputImpl implements Output, ViewNode<OutputView> {
   private readonly _childNodes:{interpreterErrorListener: object, outputSwitcher: object};
@@ -73,7 +73,9 @@ export class OutputImpl implements Output, ViewNode<OutputView> {
   }
 
   render(outputState:OutputState): void {
-    const outputFormat = this._outputFormats.get(outputState.type);
-    outputFormat.render(outputState.data, outputState.options);
+    if(this._outputView){
+      const outputFormat = this._outputFormats.get(outputState.type);
+      this._outputView.render(outputFormat.render(outputState.data, outputState.options));
+    }
   }
 }

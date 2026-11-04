@@ -43,10 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputState} from './outputState';
-
 export interface OutputView {
   attachInterpreterErrorListener(interpreterErrorListener:object):void;
   attachSwitcher(outputSwitcher:object):void;
-  render(outputState:OutputState):void;
+  render(component:{componentReference: string, inputs: Record<string, unknown>}):void;
 }
