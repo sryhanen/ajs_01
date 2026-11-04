@@ -45,7 +45,7 @@
  */
 import { Notebook } from '../notebook/notebook';
 import {NotebookIndexView} from './notebookIndexView';
-import {Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {NotebookIndex} from './notebookIndex';
 import {NotebookViewImpl} from '../notebook/notebookViewImpl';
 
@@ -55,11 +55,11 @@ import {NotebookViewImpl} from '../notebook/notebookViewImpl';
     <ng-container #notebook />
   `
 })
-export class NotebookIndexViewImpl implements NotebookIndexView, OnInit, OnDestroy {
+export class NotebookIndexViewImpl implements NotebookIndexView, AfterViewInit, OnDestroy {
   notebookIndex = input.required<NotebookIndex>();
-  @ViewChild('notebook') private notebookContainer: ViewContainerRef;
+  @ViewChild('notebook', {read:ViewContainerRef, static:true}) private notebookContainer: ViewContainerRef;
 
-  ngOnInit(): void {
+  ngAfterViewInit() {
     this.notebookIndex().attachView(this);
   }
 
@@ -68,8 +68,11 @@ export class NotebookIndexViewImpl implements NotebookIndexView, OnInit, OnDestr
   }
 
   openNotebook(notebook: Notebook): void {
-    this.notebookContainer.clear();
-    const componentRef = this.notebookContainer.createComponent(NotebookViewImpl);
-    componentRef.setInput('notebook', notebook);
+    if(this.notebookContainer){
+      this.notebookContainer.clear();
+      const componentRef = this.notebookContainer.createComponent(NotebookViewImpl);
+      componentRef.setInput('notebook', notebook);
+      componentRef.changeDetectorRef.detectChanges();
+    }
   }
 }

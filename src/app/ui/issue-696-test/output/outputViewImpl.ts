@@ -52,6 +52,7 @@ import {COMPONENT_REGISTRY} from '../../angular2+/componentRegistry/componentReg
 @Component({
   selector: 'output',
   template: `
+    <h1>OUTPUT</h1>
     <ng-container #outputContainer/>
   `
 })

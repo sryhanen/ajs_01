@@ -43,20 +43,25 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, computed, input} from '@angular/core';
-import {webAppRoot} from '../../../objects/webAppRoot/webAppRootImpl';
-import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
+import {Component, input, OnInit} from '@angular/core';
+import {
+  NotebookIndexCollectionViewImpl
+} from '../../issue-696-test/notebookIndexCollection/notebookIndexCollectionViewImpl';
+import {webAppRoot} from '../../issue-696-test/webAppRoot/webAppRootImpl';
 
 @Component({
   selector: 'web-app-view-port',
   imports: [
-    RenderNodeRootView
+    NotebookIndexCollectionViewImpl
   ],
   template: `
-    <render-node-host [renderNode]="renderNode()" [containerId]="containerId()"></render-node-host>
+    <notebook-index-collection [notebookIndexCollection]="webAppRoot.notebookIndexCollection()"></notebook-index-collection>
   `
 })
-export class WebAppViewPort {
+export class WebAppViewPort implements OnInit {
   containerId= input.required<string>();
-  protected renderNode = computed(() => webAppRoot.print()());
+
+  ngOnInit(): void {}
+
+  protected readonly webAppRoot = webAppRoot;
 }

@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {NotebookView} from './notebookView';
 import { ParagraphCollection } from '../paragraphCollection/paragraphCollection';
 import {Notebook} from './notebook';
@@ -55,11 +55,11 @@ import {ParagraphCollectionViewImpl} from '../paragraphCollection/paragraphColle
     <ng-container #paragraphCollection />
   `
 })
-export class NotebookViewImpl implements NotebookView, OnInit, OnDestroy {
+export class NotebookViewImpl implements NotebookView, AfterViewInit, OnDestroy {
   notebook = input.required<Notebook>();
-  @ViewChild('paragraphCollection') private paragraphCollectionContainer: ViewContainerRef;
+  @ViewChild('paragraphCollection', {read:ViewContainerRef, static:true}) private paragraphCollectionContainer: ViewContainerRef;
 
-  ngOnInit() {
+  ngAfterViewInit() {
     this.notebook().attachView(this);
   }
 

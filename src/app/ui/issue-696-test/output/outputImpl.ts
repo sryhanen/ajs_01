@@ -54,15 +54,15 @@ export class OutputImpl implements Output, ViewNode<OutputView> {
   private _outputView:OutputView;
   private readonly _outputFormats: Map<string, OutputFormat>;
 
-  constructor(outputFormats: Map<string, OutputFormat>, childNodes:{interpreterErrorListener: object, outputSwitcher: object}) {
+  constructor(outputFormats: Map<string, OutputFormat>, childNodes?:{interpreterErrorListener: object, outputSwitcher: object}) {
     this._outputFormats = outputFormats;
     this._childNodes = childNodes;
   }
 
   attachView(view: OutputView): void {
     this._outputView = view;
-    this._outputView.attachInterpreterErrorListener(this._childNodes.interpreterErrorListener);
-    this._outputView.attachSwitcher(this._childNodes.outputSwitcher);
+    // this._outputView.attachInterpreterErrorListener(this._childNodes.interpreterErrorListener);
+    // this._outputView.attachSwitcher(this._childNodes.outputSwitcher);
   }
 
   detachView(): void {

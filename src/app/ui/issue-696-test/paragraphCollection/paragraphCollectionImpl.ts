@@ -52,7 +52,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   private _paragraphCollectionView: ParagraphCollectionView;
 
   constructor() {
-
+    this._paragraphCollection = new Map();
   }
 
   attachView(view: ParagraphCollectionView): void {
@@ -65,21 +65,29 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   addParagraph(paragraph: Paragraph, index: number): void {
-
+    if(index < 0 || index > this._paragraphCollection.size){
+      throw new Error(`Invalid index "${index}" provided.`);
+    }
+    const paragraphsAsArray = Array.from(this._paragraphCollection.values());
+    paragraphsAsArray.splice(index, 0, paragraph);
+    this._paragraphCollection.clear();
+    for (const paragraph of paragraphsAsArray) {
+      this._paragraphCollection.set(paragraph.id(), paragraph);
+    }
     if(this._paragraphCollectionView){
       this._paragraphCollectionView.updateCollection(Array.from(this._paragraphCollection.values()));
     }
   }
 
   removeParagraph(paragraphId: string): void {
-
+    this._paragraphCollection.delete(paragraphId);
     if(this._paragraphCollectionView){
       this._paragraphCollectionView.updateCollection(Array.from(this._paragraphCollection.values()));
     }
   }
 
   updateParagraph(paragraph: Paragraph): void {
-
+    this._paragraphCollection.set(paragraph.id(), paragraph);
     if(this._paragraphCollectionView){
       this._paragraphCollectionView.updateCollection(Array.from(this._paragraphCollection.values()));
     }

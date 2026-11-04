@@ -51,6 +51,7 @@ import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webS
 export class NotebookIndexImpl implements NotebookIndex {
   private readonly _notebookIndexState:WebSocketPayload;
   private _notebookIndexView: NotebookIndexView;
+  private _openNotebook:Notebook;
 
   constructor(notebookIndexState:WebSocketPayload) {
     this._notebookIndexState = notebookIndexState;
@@ -58,6 +59,9 @@ export class NotebookIndexImpl implements NotebookIndex {
 
   attachView(view: NotebookIndexView): void {
     this._notebookIndexView = view;
+    if(this._openNotebook){
+      this._notebookIndexView.openNotebook(this._openNotebook);
+    }
   }
 
   detachView(): void {
@@ -69,6 +73,7 @@ export class NotebookIndexImpl implements NotebookIndex {
   }
 
   openNotebook(notebook: Notebook): void {
+    this._openNotebook = notebook;
     if(this._notebookIndexView){
       this._notebookIndexView.openNotebook(notebook);
     }

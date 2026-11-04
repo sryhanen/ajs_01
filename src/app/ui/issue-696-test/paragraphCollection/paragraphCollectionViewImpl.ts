@@ -44,11 +44,10 @@
  * a licensee so wish it.
  */
 import {ParagraphCollectionView} from './paragraphCollectionView';
-import {Component, input, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, signal, WritableSignal} from '@angular/core';
 import {Paragraph} from '../paragraph/paragraph';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphViewImpl} from '../paragraph/paragraphViewImpl';
-
 
 @Component({
   selector: 'paragraph-collection',
@@ -61,11 +60,11 @@ import {ParagraphViewImpl} from '../paragraph/paragraphViewImpl';
     ParagraphViewImpl
   ]
 })
-export class ParagraphCollectionViewImpl implements ParagraphCollectionView, OnInit, OnDestroy {
+export class ParagraphCollectionViewImpl implements ParagraphCollectionView, AfterViewInit, OnDestroy {
   paragraphCollection = input.required<ParagraphCollection>();
   protected readonly paragraphCollectionSignal: WritableSignal<Paragraph[]> = signal([], {equal:() => false});
 
-  ngOnInit(): void {
+  ngAfterViewInit() {
     this.paragraphCollection().attachView(this);
   }
 

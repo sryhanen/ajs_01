@@ -60,9 +60,10 @@ export class ParagraphCollectionResponse implements Respondable {
   private readonly _paragraphResponses: Map<string, Respondable>;
   private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
 
-  constructor(requestable:Requestable) {
+  constructor(requestable:Requestable, paragraphResponses: Map<string, Respondable>, paragraphCollection:ParagraphCollection) {
     this._requestable = requestable;
-    this._paragraphResponses = new Map();
+    this._paragraphResponses = paragraphResponses;
+    this._paragraphCollection = paragraphCollection;
     this._responseEvents = {
       'PARAGRAPH':(webSocketResponse) => this.handleParagraphResponse(webSocketResponse),
       'PARAGRAPH_ADDED': (webSocketResponse) => this.handleParagraphAddedResponse(webSocketResponse),

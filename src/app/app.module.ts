@@ -52,8 +52,8 @@ import {wsMessageListenerProvider, WebsocketMessageProvider, ToasterProvider} fr
 import {AuthenticationServiceImpl} from './shared/services/authenticationServiceImpl';
 import { provideHttpClient } from '@angular/common/http';
 import {WebSocketServiceImpl} from './objects/webSocket/service/webSocketServiceImpl';
-import {webAppRoot} from './objects/webAppRoot/webAppRootImpl';
 import {ComponentRegistryProvider} from './ui/angular2+/componentRegistry/componentRegistryProvider';
+import {webAppRoot} from './ui/issue-696-test/webAppRoot/webAppRootImpl';
 
 @NgModule({
   declarations: [],
