@@ -45,13 +45,16 @@
  */
 import {NotebookView} from './notebookView';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
-import {ViewNode} from '../viewNode/viewNode';
+import {Notebook} from './notebook';
+import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
 
-export class NotebookImpl implements ViewNode<NotebookView> {
+export class NotebookImpl implements Notebook {
   private _notebookView: NotebookView;
+  private readonly _notebookState:WebSocketPayload;
   private readonly _childNodes:{paragraphCollection:ParagraphCollection};
 
-  constructor(childNodes:{paragraphCollection:ParagraphCollection}) {
+  constructor(notebookState:WebSocketPayload, childNodes:{paragraphCollection:ParagraphCollection}) {
+    this._notebookState = notebookState;
     this._childNodes = childNodes;
   }
 
@@ -62,5 +65,9 @@ export class NotebookImpl implements ViewNode<NotebookView> {
 
   detachView(): void {
     this._notebookView = undefined;
+  }
+
+  id():string{
+    return this._notebookState.stringProperty('id');
   }
 }
