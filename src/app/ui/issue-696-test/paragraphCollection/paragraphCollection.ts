@@ -43,9 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-export interface Notebook {
-  updateParagraph(paragraph:object):void;
-  addParagraph(paragraph:object, index:number):void;
+import {ViewNode} from '../viewNode/viewNode';
+import {ParagraphCollectionView} from './paragraphCollectionView';
+import {Paragraph} from '../paragraph/paragraph';
+
+export interface ParagraphCollection extends ViewNode<ParagraphCollectionView> {
+  updateParagraph(paragraph:Paragraph):void;
+  addParagraph(paragraph:Paragraph, index:number):void;
   removeParagraph(paragraphId:string):void;
 }
 

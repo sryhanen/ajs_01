@@ -43,52 +43,24 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Notebook} from './notebook';
+import {NotebookView} from './notebookView';
+import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 import {ViewNode} from '../viewNode/viewNode';
 
-export class NotebookImpl implements Notebook, ViewNode<Notebook>{
-  private readonly _paragraphs:Map<string, object>;
-  private _notebookView:Notebook;
+export class NotebookImpl implements ViewNode<NotebookView> {
+  private _notebookView: NotebookView;
+  private readonly _childNodes:{paragraphCollection:ParagraphCollection};
 
-  constructor() {
-    this._paragraphs = new Map<string, object>();
+  constructor(childNodes:{paragraphCollection:ParagraphCollection}) {
+    this._childNodes = childNodes;
   }
 
-
-  addParagraph(paragraph: object, index: number): void {
-
-    if(this._notebookView){
-      this._notebookView.addParagraph(paragraph, index);
-    }
-  }
-
-  removeParagraph(paragraphId: string): void {
-
-    if(this._notebookView){
-      this._notebookView.removeParagraph(paragraphId);
-    }
-  }
-
-  updateParagraph(paragraph: object): void {
-
-    if(this._notebookView){
-      this._notebookView.updateParagraph(paragraph);
-    }
-  }
-
-  attachView(view: Notebook): void {
+  attachView(view: NotebookView): void {
     this._notebookView = view;
+    this._notebookView.attachParagraphCollection(this._childNodes.paragraphCollection);
   }
 
   detachView(): void {
     this._notebookView = undefined;
-  }
-
-  project(): void {
-    let index = 0;
-    for(const paragraph of this._paragraphs){
-      this._notebookView.addParagraph(paragraph,index);
-      index++;
-    }
   }
 }

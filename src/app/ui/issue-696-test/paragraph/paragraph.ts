@@ -44,5 +44,6 @@
  * a licensee so wish it.
  */
 export interface Paragraph {
+  id():string;
   run():void;
 }

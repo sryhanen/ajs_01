@@ -64,14 +64,11 @@ export class ParagraphImpl implements Paragraph, ViewNode<ParagraphView> {
 
   attachView(view: ParagraphView): void {
     this._paragraphView = view;
+    this._paragraphView.attachOutput(this._childNodes.output);
   }
 
   detachView(): void {
     this._paragraphView = undefined;
-  }
-
-  project(): void {
-    this._paragraphView.attachOutput(this._childNodes.output);
   }
 
   run(): void {
@@ -87,7 +84,7 @@ export class ParagraphImpl implements Paragraph, ViewNode<ParagraphView> {
     this._requestable.request(runParagraphRequest);
   }
 
-  private id(): string {
+  id(): string {
     return this._paragraphState.stringProperty('id');
   }
 }

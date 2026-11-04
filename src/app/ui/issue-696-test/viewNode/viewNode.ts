@@ -46,5 +46,4 @@
 export interface ViewNode<T> {
   attachView(view:T):void;
   detachView():void;
-  project():void;
 }

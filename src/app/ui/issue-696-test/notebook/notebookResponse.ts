@@ -44,78 +44,32 @@
  * a licensee so wish it.
  */
 import {Respondable} from '../../../objects/channel/respondable';
-import {WebSocketResponse} from '../../../objects/webSocket/response/webSocketResponse';
-import {Notebook} from './notebook';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphImpl} from '../paragraph/paragraphImpl';
-import {ParagraphRequest} from '../paragraph/paragraphRequest';
-import {ParagraphResponse} from '../paragraph/paragraphResponse';
+import {
+  WebSocketResponsePropertyEqualsFilter
+} from '../../../objects/webSocket/response/webSocketResponseFilter/webSocketResponsePropertyEqualsFilter';
+import {
+  WebSocketResponseFilter
+} from '../../../objects/webSocket/response/webSocketResponseFilter/webSocketResponseFilter';
 import {WebSocketResponseImpl} from '../../../objects/webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../../objects/webSocket/webSocketPayload/webSocketPayloadImpl';
-import {OutputImpl} from '../output/outputImpl';
 
 export class NotebookResponse implements Respondable {
-  private readonly _notebook:Notebook;
-  private readonly _requestable:Requestable;
-  private readonly _paragraphResponses: Map<string, Respondable>;
-  private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
+  private readonly _respondables: Respondable[];
+  private readonly _noteIdFilter:WebSocketResponseFilter;
 
-  constructor(notebook:Notebook, requestable:Requestable) {
-    this._notebook = notebook;
-    this._requestable = requestable;
-    this._paragraphResponses = new Map();
-    this._responseEvents = {
-      'PARAGRAPH':(webSocketResponse) => this.handleParagraphResponse(webSocketResponse),
-      'PARAGRAPH_ADDED': (webSocketResponse) => this.handleParagraphAddedResponse(webSocketResponse),
-      'PARAGRAPH_REMOVED': (webSocketResponse) => this.handleParagraphRemovedResponse(webSocketResponse)
-    };
+  constructor(respondables: Respondable[], noteId:string) {
+    this._respondables = respondables;
+    this._noteIdFilter = new WebSocketResponsePropertyEqualsFilter('noteId', noteId);
   }
 
   response(json: object): void {
-    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    const eventName = webSocketResponse.operation();
-    if(eventName in this._responseEvents) {
-      this._responseEvents[eventName](webSocketResponse);
+    const message = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    const filteredMessage = this._noteIdFilter.filterResponse(message);
+    if(!filteredMessage.isStub()){
+      this._respondables.forEach(respondable => respondable.response({
+        op:filteredMessage.operation(),
+        data:filteredMessage.data()
+      }));
     }
-    else{
-      this._paragraphResponses.forEach(paragraph => paragraph.response(json));
-    }
-  }
-
-  private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphId = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
-    const paragraphRequest = new ParagraphRequest(this._requestable, paragraphId);
-    const interpreterErrorListener = {};
-    const outputSwitcher = {};
-    const output = new OutputImpl(new Map(), {interpreterErrorListener: interpreterErrorListener, outputSwitcher: outputSwitcher});
-    const paragraph = new ParagraphImpl(paragraphRequest, webSocketResponse.dataAsWebSocketPayload(), {output:output});
-    this._notebook.updateParagraph(paragraph);
-    const paragraphResponse = new ParagraphResponse([], paragraphId);
-    this._paragraphResponses.set(paragraphId, paragraphResponse);
-  }
-
-  private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
-    // const paragraphAddedResponse = new TypedWebSocketResponse('PARAGRAPH_ADDED', webSocketResponse);
-    // const responseData = paragraphAddedResponse.dataAsWebSocketPayload();
-    // const index = responseData.numberProperty('index');
-    // if(index < 0 || index > this._paragraphs().size){
-    //   throw new Error(`Invalid index "${index}" provided.`);
-    // }
-    // const paragraph = new ParagraphImpl(this, responseData.objectProperty('paragraph'));
-    // const paragraphsAsArray = Array.from(this._paragraphs().values());
-    // paragraphsAsArray.splice(index, 0, paragraph);
-    // this._paragraphs.set(new Map(paragraphsAsArray.map(paragraph => [paragraph.id(), paragraph])));
-  }
-
-  private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
-    // const paragraphRemovedResponse = new TypedWebSocketResponse('PARAGRAPH_REMOVED', webSocketResponse);
-    // const paragraphId  = paragraphRemovedResponse.dataAsWebSocketPayload().stringProperty('id');
-    // if(!this._paragraphs().has(paragraphId)){
-    //   throw new Error(`Paragraph "${paragraphId}" does not exist.`);
-    // }
-    // this._paragraphs.update(paragraphs => {
-    //   paragraphs.delete(paragraphId);
-    //   return paragraphs;
-    // });
   }
 }

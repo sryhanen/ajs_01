@@ -61,15 +61,12 @@ export class OutputImpl implements Output, ViewNode<OutputView> {
 
   attachView(view: OutputView): void {
     this._outputView = view;
+    this._outputView.attachInterpreterErrorListener(this._childNodes.interpreterErrorListener);
+    this._outputView.attachSwitcher(this._childNodes.outputSwitcher);
   }
 
   detachView(): void {
     this._outputView = undefined;
-  }
-
-  project(): void {
-    this._outputView.attachInterpreterErrorListener(this._childNodes.interpreterErrorListener);
-    this._outputView.attachSwitcher(this._childNodes.outputSwitcher);
   }
 
   render(outputState:OutputState): void {
