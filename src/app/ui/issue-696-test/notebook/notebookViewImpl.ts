@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
 import {NotebookView} from './notebookView';
 import { ParagraphCollection } from '../paragraphCollection/paragraphCollection';
 import {Notebook} from './notebook';

@@ -68,11 +68,8 @@ export class NotebookIndexViewImpl implements NotebookIndexView, AfterViewInit, 
   }
 
   openNotebook(notebook: Notebook): void {
-    if(this.notebookContainer){
-      this.notebookContainer.clear();
-      const componentRef = this.notebookContainer.createComponent(NotebookViewImpl);
-      componentRef.setInput('notebook', notebook);
-      componentRef.changeDetectorRef.detectChanges();
-    }
+    this.notebookContainer.clear();
+    const componentRef = this.notebookContainer.createComponent(NotebookViewImpl);
+    componentRef.setInput('notebook', notebook);
   }
 }
