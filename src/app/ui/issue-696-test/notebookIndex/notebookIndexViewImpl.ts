@@ -57,7 +57,7 @@ import {NotebookViewImpl} from '../notebook/notebookViewImpl';
 })
 export class NotebookIndexViewImpl implements NotebookIndexView, AfterViewInit, OnDestroy {
   notebookIndex = input.required<NotebookIndex>();
-  @ViewChild('notebook', {read:ViewContainerRef, static:true}) private notebookContainer: ViewContainerRef;
+  @ViewChild('notebook', {read:ViewContainerRef}) private notebookContainer: ViewContainerRef;
 
   ngAfterViewInit() {
     this.notebookIndex().attachView(this);

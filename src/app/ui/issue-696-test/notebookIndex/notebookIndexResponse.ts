@@ -109,7 +109,7 @@ export class NotebookIndexResponse implements Respondable {
           [OutputType.dataTables, new DataTablesFormat(paragraphRequest)],
         ];
         const outputFormats: Map<string, OutputFormat> = new Map(outputFormatsList);
-        const output = new OutputImpl(outputFormats, paragraphId);
+        const output = new OutputImpl(outputFormats);
         const outputResponse = new OutputResponse(output);
         const paragraph = new ParagraphImpl(paragraphRequest, paragraphState, {output:output});
         const paragraphResponse = new ParagraphResponse([outputResponse], paragraphId);

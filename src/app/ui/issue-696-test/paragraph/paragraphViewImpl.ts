@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
 import {Paragraph} from './paragraph';
 import {ParagraphView} from './paragraphView';
 import {Output} from '../output/output';
@@ -55,11 +55,11 @@ import {OutputViewImpl} from '../output/outputViewImpl';
     <ng-container #outputHost />
   `
 })
-export class ParagraphViewImpl implements ParagraphView, OnInit, OnDestroy {
+export class ParagraphViewImpl implements ParagraphView, AfterViewInit, OnDestroy {
   paragraph = input.required<Paragraph>();
-  @ViewChild('outputHost', { read: ViewContainerRef, static: true }) private outputHost!: ViewContainerRef;
+  @ViewChild('outputHost', { read: ViewContainerRef}) private outputHost!: ViewContainerRef;
 
-  ngOnInit(): void {
+  ngAfterViewInit() {
     this.paragraph().attachView(this);
   }
 

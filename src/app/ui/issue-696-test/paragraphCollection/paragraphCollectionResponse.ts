@@ -98,7 +98,7 @@ export class ParagraphCollectionResponse implements Respondable {
       [OutputType.dataTables, new DataTablesFormat(paragraphRequest)],
     ];
     const outputFormats: Map<string, OutputFormat> = new Map(outputFormatsList);
-    const output = new OutputImpl(outputFormats, paragraphId);
+    const output = new OutputImpl(outputFormats);
     const outputResponse = new OutputResponse(output);
     const paragraph = new ParagraphImpl(paragraphRequest, webSocketResponse.dataAsWebSocketPayload(), {output:output});
     this._paragraphCollection.updateParagraph(paragraph);

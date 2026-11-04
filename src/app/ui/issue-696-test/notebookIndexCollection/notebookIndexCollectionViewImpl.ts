@@ -45,7 +45,7 @@
  */
 import {NotebookIndexCollectionView} from './notebookIndexCollectionView';
 import {NotebookIndex} from '../notebookIndex/notebookIndex';
-import {Component, input, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
 import {NotebookIndexCollection} from './notebookIndexCollection';
 import {NotebookIndexViewImpl} from '../notebookIndex/notebookIndexViewImpl';
 
@@ -60,11 +60,11 @@ import {NotebookIndexViewImpl} from '../notebookIndex/notebookIndexViewImpl';
     }
   `
 })
-export class NotebookIndexCollectionViewImpl implements NotebookIndexCollectionView, OnInit, OnDestroy {
+export class NotebookIndexCollectionViewImpl implements NotebookIndexCollectionView, AfterViewInit, OnDestroy {
   notebookIndexCollection = input.required<NotebookIndexCollection>();
   protected notebookIndices:WritableSignal<NotebookIndex[]> = signal([], {equal: () => false});
 
-  ngOnInit(): void {
+  ngAfterViewInit() {
     this.notebookIndexCollection().attachView(this);
   }
 
