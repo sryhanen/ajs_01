@@ -66,6 +66,8 @@ import {TextFormat} from '../outputFormat/text/textFormat';
 import {DataTablesFormat} from '../outputFormat/dataTable/dataTablesFormat';
 import {Assembler} from '../assembler/assembler';
 import {AssemblerImpl} from '../assembler/assemblerImpl';
+import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
+import {Output} from '../../../objects/output/output';
 
 export class NotebookIndexResponse implements Respondable {
   private readonly _notebookIndex:NotebookIndex;
@@ -110,6 +112,7 @@ export class NotebookIndexResponse implements Respondable {
         const output = this._assembler.output(paragraphRequest);
         const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
         const outputResponse = new OutputResponse(output);
+        this.createOutputResponseIfOutputExists(paragraphState, outputResponse);
         const paragraphResponse = new ParagraphResponse([outputResponse], paragraphId);
         paragraphResponses.set(paragraphId, paragraphResponse);
         paragraphCollection.addParagraph(paragraph, paragraphIndex);
@@ -118,6 +121,26 @@ export class NotebookIndexResponse implements Respondable {
       const paragraphCollectionResponse = new ParagraphCollectionResponse(notebookRequest, paragraphResponses, paragraphCollection);
       const notebookResponse = new NotebookResponse([paragraphCollectionResponse], receivedNotebookId);
       this._respondables.push(notebookResponse);
+    }
+  }
+
+  private createOutputResponseIfOutputExists(paragraphState: WebSocketPayload, respondable:Respondable):void{
+    if (paragraphState.propertyExists('output')) {
+      const paragraphOutput = paragraphState.objectProperty('output');
+      const paragraphId = paragraphState.stringProperty('id');
+      if (paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined) {
+        console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
+      } else {
+        const paragraphOutputResponse = {
+          op: 'PARAGRAPH_OUTPUT',
+          data: {
+            noteId: '',
+            paragraphId: paragraphId,
+            output: paragraphOutput,
+          }
+        };
+        respondable.response(paragraphOutputResponse);
+      }
     }
   }
 }

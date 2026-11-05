@@ -52,6 +52,7 @@ export class OutputImpl implements Output {
   private readonly _childNodes:{interpreterErrorListener: object, outputSwitcher: object};
   private _outputView:OutputView;
   private readonly _outputFormats: Map<string, OutputFormat>;
+  private _rendered: {componentReference: string, inputs: Record<string, unknown>};
 
   constructor(outputFormats: Map<string, OutputFormat>, childNodes?:{interpreterErrorListener: object, outputSwitcher: object}) {
     this._outputFormats = outputFormats;
@@ -60,6 +61,9 @@ export class OutputImpl implements Output {
 
   attachView(view: OutputView): void {
     this._outputView = view;
+    if(this._rendered){
+      this._outputView.render(this._rendered);
+    }
     // this._outputView.attachInterpreterErrorListener(this._childNodes.interpreterErrorListener);
     // this._outputView.attachSwitcher(this._childNodes.outputSwitcher);
   }
@@ -69,10 +73,10 @@ export class OutputImpl implements Output {
   }
 
   render(outputState:OutputState): void {
+    const outputFormat = this._outputFormats.get(outputState.type);
+    this._rendered = outputFormat.render(outputState.data, outputState.options);
     if(this._outputView){
-      const outputFormat = this._outputFormats.get(outputState.type);
-      const rendered = outputFormat.render(outputState.data, outputState.options);
-      this._outputView.render(rendered);
+      this._outputView.render(this._rendered);
     }
   }
 }
