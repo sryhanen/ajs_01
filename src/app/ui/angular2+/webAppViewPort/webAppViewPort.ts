@@ -55,7 +55,7 @@ import {webAppRoot} from '../../issue-696-test/webAppRoot/webAppRootImpl';
     NotebookIndexCollectionViewImpl
   ],
   template: `
-    <notebook-index-collection [notebookIndexCollection]="webAppRoot.notebookIndexCollection()"></notebook-index-collection>
+    <notebook-index-collection [notebookIndexCollection]="webAppRoot.notebookIndexCollection()" [containerId]="containerId()"></notebook-index-collection>
   `
 })
 export class WebAppViewPort implements OnInit {

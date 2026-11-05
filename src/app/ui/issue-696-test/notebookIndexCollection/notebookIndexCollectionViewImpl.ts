@@ -56,12 +56,13 @@ import {NotebookIndexViewImpl} from '../notebookIndex/notebookIndexViewImpl';
   ],
   template: `
     @for (notebookIndex of notebookIndices(); track $index) {
-      <notebook-index [notebookIndex]="notebookIndex"></notebook-index>
+      <notebook-index [notebookIndex]="notebookIndex" [containerId]="containerId()"></notebook-index>
     }
   `
 })
 export class NotebookIndexCollectionViewImpl implements NotebookIndexCollectionView, AfterViewInit, OnDestroy {
   notebookIndexCollection = input.required<NotebookIndexCollection>();
+  containerId = input.required<string>();
   protected notebookIndices:WritableSignal<NotebookIndex[]> = signal([], {equal: () => false});
 
   ngAfterViewInit() {

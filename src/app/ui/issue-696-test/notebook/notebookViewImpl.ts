@@ -57,6 +57,7 @@ import {ParagraphCollectionViewImpl} from '../paragraphCollection/paragraphColle
 })
 export class NotebookViewImpl implements NotebookView, AfterViewInit, OnDestroy {
   notebook = input.required<Notebook>();
+  containerId = input.required<string>();
   @ViewChild('paragraphCollection', {read:ViewContainerRef}) private paragraphCollectionContainer: ViewContainerRef;
 
   ngAfterViewInit() {
@@ -70,5 +71,6 @@ export class NotebookViewImpl implements NotebookView, AfterViewInit, OnDestroy 
   attachParagraphCollection(paragraphCollection: ParagraphCollection): void {
     const componentRef = this.paragraphCollectionContainer.createComponent(ParagraphCollectionViewImpl);
     componentRef.setInput('paragraphCollection', paragraphCollection);
+    componentRef.setInput('containerId', this.containerId());
   }
 }

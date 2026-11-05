@@ -60,7 +60,9 @@ import {ParagraphViewImpl} from '../paragraph/paragraphViewImpl';
   selector: 'paragraph-collection',
   template: `
     @for (paragraph of paragraphCollectionSignal(); track paragraph) {
-      <paragraph [paragraph]="paragraph"></paragraph>
+      @if(paragraph.id() === containerId()){
+        <paragraph [paragraph]="paragraph"></paragraph>
+      }
     }
   `,
   imports: [
@@ -69,6 +71,7 @@ import {ParagraphViewImpl} from '../paragraph/paragraphViewImpl';
 })
 export class ParagraphCollectionViewImpl implements ParagraphCollectionView, OnInit, OnDestroy {
   paragraphCollection = input.required<ParagraphCollection>();
+  containerId = input.required<string>();
   protected readonly paragraphCollectionSignal: WritableSignal<Paragraph[]> = signal([], {equal:() => false});
 
   ngOnInit() {
