@@ -66,13 +66,14 @@ export class ParagraphCollectionViewImpl implements ParagraphCollectionView, Aft
   paragraphCollection = input.required<ParagraphCollection>();
   containerId = input.required<string>();
   @ViewChild('paragraphHost', { read: ViewContainerRef}) private paragraphHost!: ViewContainerRef;
+  private detachView:() => void;
 
   ngAfterViewInit() {
-    this.paragraphCollection().attachView(this);
+    this.detachView =  this.paragraphCollection().attachView(this, this.containerId());
   }
 
   ngOnDestroy(): void {
-    this.paragraphCollection().detachView();
+    this.detachView();
   }
 
   updateCollection(paragraphCollection: Paragraph[]): void {

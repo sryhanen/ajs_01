@@ -59,13 +59,14 @@ export class NotebookViewImpl implements NotebookView, AfterViewInit, OnDestroy 
   notebook = input.required<Notebook>();
   containerId = input.required<string>();
   @ViewChild('paragraphCollection', {read:ViewContainerRef}) private paragraphCollectionContainer: ViewContainerRef;
+  private detachView:() => void;
 
   ngAfterViewInit() {
-    this.notebook().attachView(this);
+    this.detachView =  this.notebook().attachView(this, this.containerId());
   }
 
-  ngOnDestroy() {
-    this.notebook().detachView();
+  ngOnDestroy(): void {
+    this.detachView();
   }
 
   attachParagraphCollection(paragraphCollection: ParagraphCollection): void {

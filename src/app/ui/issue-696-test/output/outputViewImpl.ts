@@ -66,13 +66,14 @@ import {COMPONENT_REGISTRY} from '../../angular2+/componentRegistry/componentReg
 export class OutputViewImpl implements OutputView, AfterViewInit, OnDestroy{
   output = input.required<Output>();
   @ViewChild('outputContainer', {read:ViewContainerRef}) private outputContainer: ViewContainerRef;
+  private detachView:() => void;
 
   ngAfterViewInit() {
-    this.output().attachView(this);
+    this.detachView = this.output().attachView(this, 'output');
   }
 
-  ngOnDestroy() {
-    this.output().detachView();
+  ngOnDestroy(): void {
+    this.detachView();
   }
 
   private readonly componentRegistry = inject(COMPONENT_REGISTRY);

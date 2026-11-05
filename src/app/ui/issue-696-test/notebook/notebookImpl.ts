@@ -49,22 +49,22 @@ import {Notebook} from './notebook';
 import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
 
 export class NotebookImpl implements Notebook {
-  private _notebookView: NotebookView;
+  private _views: Map<string, NotebookView>;
   private readonly _notebookState:WebSocketPayload;
   private readonly _childNodes:{paragraphCollection:ParagraphCollection};
 
   constructor(notebookState:WebSocketPayload, childNodes:{paragraphCollection:ParagraphCollection}) {
     this._notebookState = notebookState;
     this._childNodes = childNodes;
+    this._views = new Map();
   }
 
-  attachView(view: NotebookView): void {
-    this._notebookView = view;
-    this._notebookView.attachParagraphCollection(this._childNodes.paragraphCollection);
-  }
-
-  detachView(): void {
-    this._notebookView = undefined;
+  attachView(view: NotebookView, viewId:string): () => void {
+    this._views.set(viewId, view);
+    view.attachParagraphCollection(this._childNodes.paragraphCollection);
+    return () => {
+      this._views.delete(viewId);
+    };
   }
 
   id():string{

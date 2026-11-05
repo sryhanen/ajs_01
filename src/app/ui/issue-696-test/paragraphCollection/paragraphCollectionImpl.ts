@@ -49,20 +49,19 @@ import {Paragraph} from '../paragraph/paragraph';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _paragraphCollection:Map<string,Paragraph>;
-  private readonly _paragraphCollectionViews: ParagraphCollectionView[];
+  private readonly _views: Map<string, ParagraphCollectionView>;
 
   constructor() {
     this._paragraphCollection = new Map();
-    this._paragraphCollectionViews = [];
+    this._views = new Map();
   }
 
-  attachView(view: ParagraphCollectionView): void {
-    this._paragraphCollectionViews.push(view);
-    this._paragraphCollectionViews.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
-  }
-
-  detachView(): void {
-    this._paragraphCollectionViews.splice(0, this._paragraphCollectionViews.length);
+  attachView(view: ParagraphCollectionView, viewId:string): () => void {
+    this._views.set(viewId, view);
+    view.updateCollection(Array.from(this._paragraphCollection.values()));
+    return () => {
+      this._views.delete(viewId);
+    };
   }
 
   addParagraph(paragraph: Paragraph, index: number): void {
@@ -75,18 +74,16 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     for (const paragraph of paragraphsAsArray) {
       this._paragraphCollection.set(paragraph.id(), paragraph);
     }
-    if(this._paragraphCollectionViews){
-      this._paragraphCollectionViews.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
-    }
+    this._views.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
   }
 
   removeParagraph(paragraphId: string): void {
     this._paragraphCollection.delete(paragraphId);
-    this._paragraphCollectionViews.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
+    this._views.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
   }
 
   updateParagraph(paragraph: Paragraph): void {
     this._paragraphCollection.set(paragraph.id(), paragraph);
-    this._paragraphCollectionViews.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
+    this._views.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
   }
 }

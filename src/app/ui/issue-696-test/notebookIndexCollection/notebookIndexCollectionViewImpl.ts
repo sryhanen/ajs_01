@@ -64,13 +64,14 @@ export class NotebookIndexCollectionViewImpl implements NotebookIndexCollectionV
   notebookIndexCollection = input.required<NotebookIndexCollection>();
   containerId = input.required<string>();
   protected notebookIndices:WritableSignal<NotebookIndex[]> = signal([], {equal: () => false});
+  private detachView:() => void;
 
   ngAfterViewInit() {
-    this.notebookIndexCollection().attachView(this);
+    this.detachView = this.notebookIndexCollection().attachView(this, this.containerId());
   }
 
   ngOnDestroy(): void {
-    this.notebookIndexCollection().detachView();
+    this.detachView();
   }
 
   updateNotebookIndices(notebookIndices: NotebookIndex[]): void {

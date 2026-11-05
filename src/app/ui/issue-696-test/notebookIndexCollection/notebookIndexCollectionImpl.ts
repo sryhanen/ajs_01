@@ -49,32 +49,28 @@ import {NotebookIndex} from '../notebookIndex/notebookIndex';
 
 export class NotebookIndexCollectionImpl implements NotebookIndexCollection {
   private readonly _notebookIndices: NotebookIndex[];
-  private _notebookIndexCollectionView: NotebookIndexCollectionView;
+  private readonly _views: Map<string, NotebookIndexCollectionView>;
 
   constructor() {
     this._notebookIndices = [];
+    this._views = new Map();
   }
 
-  attachView(view: NotebookIndexCollectionView): void {
-    this._notebookIndexCollectionView = view;
-    this._notebookIndexCollectionView.updateNotebookIndices(this._notebookIndices);
-  }
-
-  detachView(): void {
-    this._notebookIndexCollectionView = undefined;
+  attachView(view: NotebookIndexCollectionView, viewId:string): () => void {
+    this._views.set(viewId, view);
+    view.updateNotebookIndices(this._notebookIndices);
+    return () => {
+      this._views.delete(viewId);
+    };
   }
 
   add(notebookIndex: NotebookIndex): void {
     this._notebookIndices.push(notebookIndex);
-    if(this._notebookIndexCollectionView){
-      this._notebookIndexCollectionView.updateNotebookIndices(this._notebookIndices);
-    }
+    this._views.forEach(view => view.updateNotebookIndices(this._notebookIndices));
   }
 
   clear(): void {
     this._notebookIndices.splice(0, this._notebookIndices.length);
-    if(this._notebookIndexCollectionView){
-      this._notebookIndexCollectionView.updateNotebookIndices(this._notebookIndices);
-    }
+    this._views.forEach(view => view.updateNotebookIndices(this._notebookIndices));
   }
 }

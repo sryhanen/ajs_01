@@ -50,33 +50,31 @@ import {OutputFormat} from '../outputFormat/outputFormat';
 
 export class OutputImpl implements Output {
   private readonly _childNodes:{interpreterErrorListener: object, outputSwitcher: object};
-  private _outputView:OutputView;
   private readonly _outputFormats: Map<string, OutputFormat>;
   private _rendered: {componentReference: string, inputs: Record<string, unknown>};
+  private readonly _views:Map<string, OutputView>;
 
   constructor(outputFormats: Map<string, OutputFormat>, childNodes?:{interpreterErrorListener: object, outputSwitcher: object}) {
     this._outputFormats = outputFormats;
     this._childNodes = childNodes;
+    this._views = new Map();
   }
 
-  attachView(view: OutputView): void {
-    this._outputView = view;
+  attachView(view: OutputView, viewId:string): () => void {
+    this._views.set(viewId, view);
     if(this._rendered){
-      this._outputView.render(this._rendered);
+      view.render(this._rendered);
     }
+    return () => {
+      this._views.delete(viewId);
+    };
     // this._outputView.attachInterpreterErrorListener(this._childNodes.interpreterErrorListener);
     // this._outputView.attachSwitcher(this._childNodes.outputSwitcher);
-  }
-
-  detachView(): void {
-    this._outputView = undefined;
   }
 
   render(outputState:OutputState): void {
     const outputFormat = this._outputFormats.get(outputState.type);
     this._rendered = outputFormat.render(outputState.data, outputState.options);
-    if(this._outputView){
-      this._outputView.render(this._rendered);
-    }
+    this._views.forEach(view => view.render(this._rendered));
   }
 }

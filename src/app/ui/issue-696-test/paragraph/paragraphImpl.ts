@@ -53,21 +53,21 @@ export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
   private readonly _paragraphState: WebSocketPayload;
   private readonly _childNodes: {output:Output};
-  private _paragraphView: ParagraphView;
+  private _views: Map<string, ParagraphView>;
 
   constructor(requestable: Requestable, paragraphState:WebSocketPayload, childNodes:{output:Output}) {
     this._requestable = requestable;
     this._paragraphState = paragraphState;
     this._childNodes = childNodes;
+    this._views = new Map();
   }
 
-  attachView(view: ParagraphView): void {
-    this._paragraphView = view;
-    this._paragraphView.attachOutput(this._childNodes.output);
-  }
-
-  detachView(): void {
-    this._paragraphView = undefined;
+  attachView(view: ParagraphView, viewId:string): () => void {
+    this._views.set(viewId, view);
+    view.attachOutput(this._childNodes.output);
+    return () => {
+      this._views.delete(viewId);
+    };
   }
 
   run(): void {

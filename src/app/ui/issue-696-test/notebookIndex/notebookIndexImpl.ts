@@ -50,22 +50,22 @@ import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webS
 
 export class NotebookIndexImpl implements NotebookIndex {
   private readonly _notebookIndexState:WebSocketPayload;
-  private _notebookIndexView: NotebookIndexView;
+  private _views: Map<string, NotebookIndexView>;
   private _openNotebook:Notebook;
 
   constructor(notebookIndexState:WebSocketPayload) {
     this._notebookIndexState = notebookIndexState;
+    this._views = new Map();
   }
 
-  attachView(view: NotebookIndexView): void {
-    this._notebookIndexView = view;
+  attachView(view: NotebookIndexView, viewId:string): () => void {
+    this._views.set(viewId, view);
     if(this._openNotebook){
-      this._notebookIndexView.openNotebook(this._openNotebook);
+      view.openNotebook(this._openNotebook);
     }
-  }
-
-  detachView(): void {
-    this._notebookIndexView = undefined;
+    return () => {
+      this._views.delete(viewId);
+    };
   }
 
   id(): string {
@@ -74,8 +74,8 @@ export class NotebookIndexImpl implements NotebookIndex {
 
   openNotebook(notebook: Notebook): void {
     this._openNotebook = notebook;
-    if(this._notebookIndexView){
-      this._notebookIndexView.openNotebook(notebook);
-    }
+    this._views.forEach(view => {
+      view.openNotebook(notebook);
+    });
   }
 }
