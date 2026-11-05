@@ -50,21 +50,17 @@ import {ParagraphCollection} from './paragraphCollection';
 import {WebSocketResponseImpl} from '../../../objects/webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../../objects/webSocket/webSocketPayload/webSocketPayloadImpl';
 import {Requestable} from '../../../objects/channel/requestable';
-import {OutputImpl} from '../output/outputImpl';
-import {ParagraphImpl} from '../paragraph/paragraphImpl';
 import {ParagraphResponse} from '../paragraph/paragraphResponse';
-import {OutputFormat} from '../outputFormat/outputFormat';
-import {OutputType} from '../../../objects/output/outputType';
-import {UPlotFormat} from '../outputFormat/uPlot/uPlotFormat';
-import {TextFormat} from '../outputFormat/text/textFormat';
-import {DataTablesFormat} from '../outputFormat/dataTable/dataTablesFormat';
 import {OutputResponse} from '../output/outputResponse';
+import {Assembler} from '../assembler/assembler';
+import {AssemblerImpl} from '../assembler/assemblerImpl';
 
 export class ParagraphCollectionResponse implements Respondable {
   private readonly _requestable:Requestable;
   private readonly _paragraphCollection: ParagraphCollection;
   private readonly _paragraphResponses: Map<string, Respondable>;
   private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
+  private readonly _assembler:Assembler;
 
   constructor(requestable:Requestable, paragraphResponses: Map<string, Respondable>, paragraphCollection:ParagraphCollection) {
     this._requestable = requestable;
@@ -75,6 +71,7 @@ export class ParagraphCollectionResponse implements Respondable {
       'PARAGRAPH_ADDED': (webSocketResponse) => this.handleParagraphAddedResponse(webSocketResponse),
       'PARAGRAPH_REMOVED': (webSocketResponse) => this.handleParagraphRemovedResponse(webSocketResponse)
     };
+    this._assembler = new AssemblerImpl();
   }
 
   response(json: object): void {
@@ -89,45 +86,30 @@ export class ParagraphCollectionResponse implements Respondable {
   }
 
   private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphId = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
+    const paragraphState = webSocketResponse.dataAsWebSocketPayload();
+    const paragraphId = paragraphState.stringProperty('id');
     const paragraphRequest = new ParagraphRequest(this._requestable, paragraphId);
-
-    const outputFormatsList:[string, OutputFormat][] = [
-      [OutputType.uPlot, new UPlotFormat()],
-      [OutputType.text, new TextFormat()],
-      [OutputType.dataTables, new DataTablesFormat(paragraphRequest)],
-    ];
-    const outputFormats: Map<string, OutputFormat> = new Map(outputFormatsList);
-    const output = new OutputImpl(outputFormats);
-    const outputResponse = new OutputResponse(output);
-    const paragraph = new ParagraphImpl(paragraphRequest, webSocketResponse.dataAsWebSocketPayload(), {output:output});
+    const output = this._assembler.output(paragraphRequest);
+    const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
     this._paragraphCollection.updateParagraph(paragraph);
+    const outputResponse = new OutputResponse(output);
     const paragraphResponse = new ParagraphResponse([outputResponse], paragraphId);
     this._paragraphResponses.set(paragraphId, paragraphResponse);
   }
 
   private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
-    // const paragraphAddedResponse = new TypedWebSocketResponse('PARAGRAPH_ADDED', webSocketResponse);
-    // const responseData = paragraphAddedResponse.dataAsWebSocketPayload();
-    // const index = responseData.numberProperty('index');
-    // if(index < 0 || index > this._paragraphs().size){
-    //   throw new Error(`Invalid index "${index}" provided.`);
-    // }
-    // const paragraph = new ParagraphImpl(this, responseData.objectProperty('paragraph'));
-    // const paragraphsAsArray = Array.from(this._paragraphs().values());
-    // paragraphsAsArray.splice(index, 0, paragraph);
-    // this._paragraphs.set(new Map(paragraphsAsArray.map(paragraph => [paragraph.id(), paragraph])));
+    const responseData = webSocketResponse.dataAsWebSocketPayload();
+    const index = responseData.numberProperty('index');
+    const paragraphState = responseData.objectPropertyAsPayload('paragraph');
+    const paragraphId = paragraphState.stringProperty('id');
+    const paragraphRequest = new ParagraphRequest(this._requestable, paragraphId);
+    const output = this._assembler.output(paragraphRequest);
+    const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
+    this._paragraphCollection.addParagraph(paragraph, index);
   }
 
   private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
-    // const paragraphRemovedResponse = new TypedWebSocketResponse('PARAGRAPH_REMOVED', webSocketResponse);
-    // const paragraphId  = paragraphRemovedResponse.dataAsWebSocketPayload().stringProperty('id');
-    // if(!this._paragraphs().has(paragraphId)){
-    //   throw new Error(`Paragraph "${paragraphId}" does not exist.`);
-    // }
-    // this._paragraphs.update(paragraphs => {
-    //   paragraphs.delete(paragraphId);
-    //   return paragraphs;
-    // });
+    const paragraphId  = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
+    this._paragraphCollection.removeParagraph(paragraphId);
   }
 }

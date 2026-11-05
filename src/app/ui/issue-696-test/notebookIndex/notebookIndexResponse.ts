@@ -64,18 +64,22 @@ import {OutputType} from '../../../objects/output/outputType';
 import {UPlotFormat} from '../outputFormat/uPlot/uPlotFormat';
 import {TextFormat} from '../outputFormat/text/textFormat';
 import {DataTablesFormat} from '../outputFormat/dataTable/dataTablesFormat';
+import {Assembler} from '../assembler/assembler';
+import {AssemblerImpl} from '../assembler/assemblerImpl';
 
 export class NotebookIndexResponse implements Respondable {
   private readonly _notebookIndex:NotebookIndex;
   private readonly _respondables: Respondable[];
   private readonly _notebookId:string;
   private readonly _requestable: Requestable;
+  private readonly _assembler:Assembler;
 
   constructor(notebookIndex:NotebookIndex, respondables: Respondable[], notebookId:string, requestable: Requestable) {
     this._notebookIndex = notebookIndex;
     this._respondables = respondables;
     this._notebookId = notebookId;
     this._requestable = requestable;
+    this._assembler = new AssemblerImpl();
   }
 
   response(json: object): void {
@@ -103,15 +107,9 @@ export class NotebookIndexResponse implements Respondable {
         const paragraphState = new WebSocketPayloadImpl(paragraphPayload);
         const paragraphId = paragraphState.stringProperty('id');
         const paragraphRequest = new ParagraphRequest(notebookRequest, paragraphId);
-        const outputFormatsList:[string, OutputFormat][] = [
-          [OutputType.uPlot, new UPlotFormat()],
-          [OutputType.text, new TextFormat()],
-          [OutputType.dataTables, new DataTablesFormat(paragraphRequest)],
-        ];
-        const outputFormats: Map<string, OutputFormat> = new Map(outputFormatsList);
-        const output = new OutputImpl(outputFormats);
+        const output = this._assembler.output(paragraphRequest);
+        const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
         const outputResponse = new OutputResponse(output);
-        const paragraph = new ParagraphImpl(paragraphRequest, paragraphState, {output:output});
         const paragraphResponse = new ParagraphResponse([outputResponse], paragraphId);
         paragraphResponses.set(paragraphId, paragraphResponse);
         paragraphCollection.addParagraph(paragraph, paragraphIndex);
