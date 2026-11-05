@@ -54,6 +54,8 @@ import {ParagraphResponse} from '../paragraph/paragraphResponse';
 import {OutputResponse} from '../output/outputResponse';
 import {Assembler} from '../assembler/assembler';
 import {AssemblerImpl} from '../assembler/assemblerImpl';
+import {OutputSwitcherResponse} from '../outputSwitcher/outputSwitcherResponse';
+import {OutputSwitcherRequestImpl} from '../outputSwitcher/outputSwitcherRequestImpl';
 
 export class ParagraphCollectionResponse implements Respondable {
   private readonly _requestable:Requestable;
@@ -89,12 +91,14 @@ export class ParagraphCollectionResponse implements Respondable {
     const paragraphState = webSocketResponse.dataAsWebSocketPayload();
     const paragraphId = paragraphState.stringProperty('id');
     const paragraphRequest = new ParagraphRequest(this._requestable, paragraphId);
-    const output = this._assembler.output(paragraphRequest);
+    const outputSwitcherRequest = new OutputSwitcherRequestImpl(paragraphRequest);
+    const output = this._assembler.output(outputSwitcherRequest);
     const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
     this._paragraphCollection.updateParagraph(paragraph);
     const outputResponse = new OutputResponse(output);
     this._assembler.initializeOutput(paragraphState, outputResponse);
-    const paragraphResponse = new ParagraphResponse([outputResponse], paragraphId);
+    const outputSwitcherResponse = new OutputSwitcherResponse(outputSwitcherRequest, [outputResponse]);
+    const paragraphResponse = new ParagraphResponse([outputSwitcherResponse], paragraphId);
     this._paragraphResponses.set(paragraphId, paragraphResponse);
   }
 

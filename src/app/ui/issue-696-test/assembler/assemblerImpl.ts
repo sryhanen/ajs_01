@@ -76,7 +76,6 @@ export class AssemblerImpl implements Assembler {
       [OutputType.dataTables, new DataTablesFormat(requestable)],
     ];
     const outputFormats = new Map(outputFormatsList);
-
     const outputSwitcher = new OutputSwitcherImpl(this.switcherButtons(requestable));
     return new OutputImpl(outputFormats, {interpreterErrorListener:{}, outputSwitcher:outputSwitcher});
   }

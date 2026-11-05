@@ -44,12 +44,41 @@
  * a licensee so wish it.
  */
 import {OutputSwitcherRequest} from './outputSwitcherRequest';
+import {WebSocketRequestImpl} from '../../../objects/webSocket/request/webSocketRequestImpl';
+import {WebSocketPayloadImpl} from '../../../objects/webSocket/webSocketPayload/webSocketPayloadImpl';
+import {Requestable} from '../../../objects/channel/requestable';
+import {WebSocketRequest} from '../../../objects/webSocket/request/webSocketRequest';
+import {WebSocketRequestStub} from '../../../objects/webSocket/request/webSocketRequestStub';
 
 export class OutputSwitcherRequestImpl implements OutputSwitcherRequest {
+  private readonly _requestable:Requestable;
+  private _previousParagraphOutputRequest: WebSocketRequest;
+
+  constructor(requestable:Requestable) {
+    this._requestable = requestable;
+    this._previousParagraphOutputRequest = new WebSocketRequestStub();
+  }
+
   request(json: object): void {
+    const webSocketRequest = new WebSocketRequestImpl(new WebSocketPayloadImpl(json));
+    if(webSocketRequest.operation() === 'PARAGRAPH_OUTPUT_REQUEST'){
+      this._previousParagraphOutputRequest = webSocketRequest;
+    }
+    this._requestable.request(json);
   }
 
   requestIfOutputTypeIsWrong(outputType: string): boolean {
-    return false;
+    let requestCreated = false;
+    if(!this._previousParagraphOutputRequest.isStub()){
+      const requestedOutputType = new WebSocketPayloadImpl(this._previousParagraphOutputRequest.data()).stringProperty('type');
+      if(requestedOutputType !== outputType){
+        this._requestable.request({
+          op:this._previousParagraphOutputRequest.operation(),
+          data:this._previousParagraphOutputRequest.data(),
+        });
+        requestCreated = true;
+      }
+    }
+    return requestCreated;
   }
 }

@@ -59,6 +59,10 @@ import {OutputResponse} from '../output/outputResponse';
 import {ParagraphResponse} from '../paragraph/paragraphResponse';
 import {Assembler} from '../assembler/assembler';
 import {AssemblerImpl} from '../assembler/assemblerImpl';
+import {OutputSwitcherResponse} from '../outputSwitcher/outputSwitcherResponse';
+import {OutputFormat} from '../outputFormat/outputFormat';
+import {OutputType} from '../../../objects/output/outputType';
+import {OutputSwitcherRequestImpl} from '../outputSwitcher/outputSwitcherRequestImpl';
 
 export class NotebookIndexResponse implements Respondable {
   private readonly _notebookIndex:NotebookIndex;
@@ -102,9 +106,11 @@ export class NotebookIndexResponse implements Respondable {
         const paragraphRequest = new ParagraphRequest(notebookRequest, paragraphId);
         const output = this._assembler.output(paragraphRequest);
         const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
+        const outputSwitcherRequest = new OutputSwitcherRequestImpl(paragraphRequest);
         const outputResponse = new OutputResponse(output);
-        this._assembler.initializeOutput(paragraphState, outputResponse);
-        const paragraphResponse = new ParagraphResponse([outputResponse], paragraphId);
+        const outputSwitcherResponse = new OutputSwitcherResponse(outputSwitcherRequest, [outputResponse]);
+        this._assembler.initializeOutput(paragraphState, outputSwitcherResponse);
+        const paragraphResponse = new ParagraphResponse([outputSwitcherResponse], paragraphId);
         paragraphResponses.set(paragraphId, paragraphResponse);
         paragraphCollection.addParagraph(paragraph, paragraphIndex);
         paragraphIndex += 1;

@@ -47,6 +47,7 @@ import {Output} from './output';
 import {OutputView} from './outputView';
 import {OutputState} from './outputState';
 import {OutputFormat} from '../outputFormat/outputFormat';
+import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
 
 export class OutputImpl implements Output {
   private readonly _childNodes:{interpreterErrorListener: object, outputSwitcher: object};
@@ -54,7 +55,7 @@ export class OutputImpl implements Output {
   private _rendered: {componentReference: string, inputs: Record<string, unknown>};
   private readonly _views:Map<string, OutputView>;
 
-  constructor(outputFormats: Map<string, OutputFormat>, childNodes?:{interpreterErrorListener: object, outputSwitcher: object}) {
+  constructor(outputFormats: Map<string, OutputFormat>, childNodes?:{interpreterErrorListener: object, outputSwitcher: OutputSwitcher}) {
     this._outputFormats = outputFormats;
     this._childNodes = childNodes;
     this._views = new Map();

@@ -68,7 +68,7 @@ import {OutputSwitcher} from './outputSwitcher';
 export class OutputSwitcherViewImpl implements OutputSwitcherView {
   outputSwitcher = input.required<OutputSwitcher>();
   protected switcherButtons: WritableSignal<SwitcherButton[]> = signal([]);
-  protected showLoaderSignal:WritableSignal<boolean> = signal(false);
+  protected showLoaderSignal: WritableSignal<boolean> = signal(false);
   private detachView:() => void;
 
   ngOnInit(): void {
