@@ -45,13 +45,11 @@
  */
 import {ParagraphCollectionView} from './paragraphCollectionView';
 import {
-  AfterViewInit,
   Component,
   input,
   OnDestroy,
+  OnInit,
   signal,
-  ViewChild,
-  ViewContainerRef,
   WritableSignal
 } from '@angular/core';
 import {Paragraph} from '../paragraph/paragraph';
@@ -61,15 +59,19 @@ import {ParagraphViewImpl} from '../paragraph/paragraphViewImpl';
 @Component({
   selector: 'paragraph-collection',
   template: `
-    <ng-container #paragraphHost />
+    @for (paragraph of paragraphCollectionSignal(); track paragraph) {
+      <paragraph [paragraph]="paragraph"></paragraph>
+    }
   `,
+  imports: [
+    ParagraphViewImpl
+  ]
 })
-export class ParagraphCollectionViewImpl implements ParagraphCollectionView, AfterViewInit, OnDestroy {
+export class ParagraphCollectionViewImpl implements ParagraphCollectionView, OnInit, OnDestroy {
   paragraphCollection = input.required<ParagraphCollection>();
   protected readonly paragraphCollectionSignal: WritableSignal<Paragraph[]> = signal([], {equal:() => false});
-  @ViewChild('paragraphHost', { read: ViewContainerRef}) private paragraphHost!: ViewContainerRef;
 
-  ngAfterViewInit() {
+  ngOnInit() {
     this.paragraphCollection().attachView(this);
   }
 
@@ -79,10 +81,5 @@ export class ParagraphCollectionViewImpl implements ParagraphCollectionView, Aft
 
   updateCollection(paragraphCollection: Paragraph[]): void {
     this.paragraphCollectionSignal.set(paragraphCollection);
-    this.paragraphHost.clear();
-    this.paragraphCollectionSignal().forEach(paragraph => {
-      const componentRef = this.paragraphHost.createComponent(ParagraphViewImpl);
-      componentRef.setInput('paragraph', paragraph);
-    });
   }
 }
