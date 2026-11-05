@@ -93,7 +93,7 @@ export class ParagraphCollectionResponse implements Respondable {
     const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
     this._paragraphCollection.updateParagraph(paragraph);
     const outputResponse = new OutputResponse(output);
-    this._assembler.initializeOutput(output, paragraphState, outputResponse);
+    this._assembler.initializeOutput(paragraphState, outputResponse);
     const paragraphResponse = new ParagraphResponse([outputResponse], paragraphId);
     this._paragraphResponses.set(paragraphId, paragraphResponse);
   }

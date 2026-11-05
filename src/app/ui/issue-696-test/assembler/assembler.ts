@@ -52,5 +52,5 @@ import {Respondable} from '../../../objects/channel/respondable';
 export interface Assembler {
   paragraph(paragraphState:WebSocketPayload, requestable:Requestable, childNodes: {output: Output}):Paragraph;
   output(requestable:Requestable):Output;
-  initializeOutput(output:Output, paragraphState: WebSocketPayload, outputResponse:Respondable):void;
+  initializeOutput(paragraphState: WebSocketPayload, outputResponse:Respondable):void;
 }

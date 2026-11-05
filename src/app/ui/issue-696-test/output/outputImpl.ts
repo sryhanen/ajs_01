@@ -65,11 +65,11 @@ export class OutputImpl implements Output {
     if(this._rendered){
       view.render(this._rendered);
     }
+    view.attachSwitcher(this._childNodes.outputSwitcher);
     return () => {
       this._views.delete(viewId);
     };
     // this._outputView.attachInterpreterErrorListener(this._childNodes.interpreterErrorListener);
-    // this._outputView.attachSwitcher(this._childNodes.outputSwitcher);
   }
 
   render(outputState:OutputState): void {

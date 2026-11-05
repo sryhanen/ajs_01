@@ -56,15 +56,19 @@ import {
 } from '@angular/core';
 import {Output} from './output';
 import {COMPONENT_REGISTRY} from '../../angular2+/componentRegistry/componentRegistry';
+import {OutputSwitcherViewImpl} from '../outputSwitcher/outputSwitcherViewImpl';
+import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
 
 @Component({
   selector: 'output',
   template: `
+    <ng-container #switcherContainer/>
     <ng-container #outputContainer/>
   `
 })
 export class OutputViewImpl implements OutputView, AfterViewInit, OnDestroy{
   output = input.required<Output>();
+  @ViewChild('switcherContainer', {read:ViewContainerRef}) private switcherContainer: ViewContainerRef;
   @ViewChild('outputContainer', {read:ViewContainerRef}) private outputContainer: ViewContainerRef;
   private detachView:() => void;
 
@@ -90,11 +94,14 @@ export class OutputViewImpl implements OutputView, AfterViewInit, OnDestroy{
     }
   }
 
+  attachSwitcher(outputSwitcher: OutputSwitcher): void {
+    this.switcherContainer.clear();
+    const componentRef = this.switcherContainer.createComponent(OutputSwitcherViewImpl);
+    componentRef.setInput('outputSwitcher', outputSwitcher);
+  }
+
   attachInterpreterErrorListener(interpreterErrorListener: object): void {
     throw new Error('Method not implemented.');
   }
 
-  attachSwitcher(outputSwitcher: object): void {
-      throw new Error('Method not implemented.');
-  }
 }
