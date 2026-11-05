@@ -49,19 +49,20 @@ import {Paragraph} from '../paragraph/paragraph';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _paragraphCollection:Map<string,Paragraph>;
-  private _paragraphCollectionView: ParagraphCollectionView;
+  private readonly _paragraphCollectionViews: ParagraphCollectionView[];
 
   constructor() {
     this._paragraphCollection = new Map();
+    this._paragraphCollectionViews = [];
   }
 
   attachView(view: ParagraphCollectionView): void {
-    this._paragraphCollectionView = view;
-    this._paragraphCollectionView.updateCollection(Array.from(this._paragraphCollection.values()));
+    this._paragraphCollectionViews.push(view);
+    this._paragraphCollectionViews.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
   }
 
   detachView(): void {
-    this._paragraphCollectionView = undefined;
+    this._paragraphCollectionViews.splice(0, this._paragraphCollectionViews.length);
   }
 
   addParagraph(paragraph: Paragraph, index: number): void {
@@ -74,22 +75,18 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     for (const paragraph of paragraphsAsArray) {
       this._paragraphCollection.set(paragraph.id(), paragraph);
     }
-    if(this._paragraphCollectionView){
-      this._paragraphCollectionView.updateCollection(Array.from(this._paragraphCollection.values()));
+    if(this._paragraphCollectionViews){
+      this._paragraphCollectionViews.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
     }
   }
 
   removeParagraph(paragraphId: string): void {
     this._paragraphCollection.delete(paragraphId);
-    if(this._paragraphCollectionView){
-      this._paragraphCollectionView.updateCollection(Array.from(this._paragraphCollection.values()));
-    }
+    this._paragraphCollectionViews.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
   }
 
   updateParagraph(paragraph: Paragraph): void {
     this._paragraphCollection.set(paragraph.id(), paragraph);
-    if(this._paragraphCollectionView){
-      this._paragraphCollectionView.updateCollection(Array.from(this._paragraphCollection.values()));
-    }
+    this._paragraphCollectionViews.forEach(view => view.updateCollection(Array.from(this._paragraphCollection.values())));
   }
 }
