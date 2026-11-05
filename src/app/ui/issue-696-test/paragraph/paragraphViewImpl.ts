@@ -61,7 +61,7 @@ export class ParagraphViewImpl implements ParagraphView, AfterViewInit, OnDestro
   private detachView:() => void;
 
   ngAfterViewInit() {
-    this.detachView = this.paragraph().attachView(this, 'paragraph');
+    this.detachView = this.paragraph().attachView(this, this.paragraph().id());
   }
 
   ngOnDestroy(): void {
