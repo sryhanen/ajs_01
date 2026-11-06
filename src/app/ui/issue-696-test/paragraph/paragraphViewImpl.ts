@@ -58,14 +58,14 @@ import {OutputViewImpl} from '../output/outputViewImpl';
 export class ParagraphViewImpl implements ParagraphView, AfterViewInit, OnDestroy {
   paragraph = input.required<Paragraph>();
   @ViewChild('outputHost', { read: ViewContainerRef}) private outputHost!: ViewContainerRef;
-  private detachView:() => void;
+  private detachToken?: () => void;
 
   ngAfterViewInit() {
-    this.detachView = this.paragraph().attachView(this, this.paragraph().id());
+    this.detachToken = this.paragraph().attachView(this, this.paragraph().id());
   }
 
   ngOnDestroy(): void {
-    this.detachView();
+    this.detachToken?.();
   }
 
   attachOutput(output:Output): void {
