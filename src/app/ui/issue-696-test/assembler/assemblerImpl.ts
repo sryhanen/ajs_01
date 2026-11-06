@@ -56,12 +56,8 @@ import {DataTablesFormat} from '../outputFormat/dataTable/dataTablesFormat';
 import {OutputImpl} from '../output/outputImpl';
 import {Output} from '../output/output';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
-import {Respondable} from '../../../objects/channel/respondable';
-import {OutputSwitcherImpl} from '../outputSwitcher/outputSwitcherImpl';
-import {SwitcherButtonImpl} from '../outputSwitcher/switcherButton/switcherButtonImpl';
-import {SwitcherButton} from '../outputSwitcher/switcherButton/switcherButton';
-import {GraphType} from '../outputFormat/uPlot/graphType';
 import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
+import {OutputState} from '../output/outputState';
 
 export class AssemblerImpl implements Assembler {
   paragraph(paragraphState:WebSocketPayload, requestable:Requestable, childNodes: {output: Output}): Paragraph {
@@ -80,29 +76,15 @@ export class AssemblerImpl implements Assembler {
     return new OutputImpl(outputFormats, {interpreterErrorListener:{}, outputSwitcher:outputSwitcher});
   }
 
-  initializeOutput(paragraphState: WebSocketPayload, outputResponse:Respondable):void{
+  initializeOutput(paragraphState: WebSocketPayload, output:Output):void{
     if (paragraphState.propertyExists('output')) {
-      this.createOutputResponse(paragraphState, outputResponse);
+      const outputState = paragraphState.objectProperty('output') as OutputState;
+      if (outputState['data'] === undefined || outputState['type'] === undefined) {
+        console.error(`Output data not processed, format invalid: ${JSON.stringify(outputState)}`);
+      }
+      else{
+        output.render(outputState);
+      }
     }
   }
-
-  private createOutputResponse(paragraphState: WebSocketPayload, respondable:Respondable):void{
-    const paragraphOutput = paragraphState.objectProperty('output');
-    const paragraphId = paragraphState.stringProperty('id');
-    if (paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined) {
-      console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
-    } else {
-      const paragraphOutputResponse = {
-        op: 'PARAGRAPH_OUTPUT',
-        data: {
-          noteId: '',
-          paragraphId: paragraphId,
-          output: paragraphOutput,
-        }
-      };
-      respondable.response(paragraphOutputResponse);
-    }
-  }
-
-
 }

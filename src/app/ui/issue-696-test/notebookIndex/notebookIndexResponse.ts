@@ -114,7 +114,7 @@ export class NotebookIndexResponse implements Respondable {
         const output = this._assembler.output(outputSwitcherRequest, outputSwitcher);
         const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
         const outputResponse = new OutputResponse(output);
-        this._assembler.initializeOutput(paragraphState, outputResponse);
+        this._assembler.initializeOutput(paragraphState, output);
         const outputSwitcherResponse = new OutputSwitcherResponse(outputSwitcherRequest, [outputResponse], switchIndicator);
         const paragraphResponse = new ParagraphResponse([outputSwitcherResponse], paragraphId);
         paragraphResponses.set(paragraphId, paragraphResponse);
