@@ -64,7 +64,7 @@ export class ParagraphImpl implements Paragraph {
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _paragraphIdFilter: WebSocketResponsePropertyEqualsFilter;
 
-  constructor(requestable: Requestable, paragraphData: object, output:Output = new OutputImpl(this)) {
+  constructor(requestable: Requestable, paragraphData: object) {
     this._requestable = requestable;
     this._paragraphData = new WebSocketPayloadImpl(paragraphData);
     this._output = this.initializedOutput(this._paragraphData);
