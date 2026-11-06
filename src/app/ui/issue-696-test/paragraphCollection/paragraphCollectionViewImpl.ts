@@ -48,9 +48,8 @@ import {
   AfterViewInit,
   Component,
   input,
-  OnDestroy, OnInit,
-  ViewChild,
-  ViewContainerRef,
+  OnDestroy, OnInit, signal,
+  WritableSignal,
 } from '@angular/core';
 import {Paragraph} from '../paragraph/paragraph';
 import {ParagraphCollection} from './paragraphCollection';
@@ -60,13 +59,18 @@ import {ViewNodeReference} from '../viewNode/viewNodeReference';
 @Component({
   selector: 'paragraph-collection',
   template: `
-    <ng-container #paragraphHost />
+    @for (paragraph of paragraphs(); track paragraph) {
+      <paragraph [paragraph]="paragraph"></paragraph>
+    }
   `,
+  imports: [
+    ParagraphViewImpl
+  ]
 })
 export class ParagraphCollectionViewImpl implements ParagraphCollectionView, OnInit, AfterViewInit, OnDestroy {
   paragraphCollection = input.required<ParagraphCollection>();
+  paragraphs:WritableSignal<Paragraph[]> = signal([]);
   containerId = input.required<string>();
-  @ViewChild('paragraphHost', { read: ViewContainerRef}) private paragraphHost!: ViewContainerRef;
   private viewNodeReference:ViewNodeReference;
 
   ngOnInit() {
@@ -82,12 +86,6 @@ export class ParagraphCollectionViewImpl implements ParagraphCollectionView, OnI
   }
 
   updateCollection(paragraphCollection: Paragraph[]): void {
-    this.paragraphHost.clear();
-    paragraphCollection.forEach(paragraph => {
-      if(paragraph.id() === this.containerId()){
-        const componentRef = this.paragraphHost.createComponent(ParagraphViewImpl);
-        componentRef.setInput('paragraph', paragraph);
-      }
-    });
+    this.paragraphs.set(paragraphCollection.filter(paragraph => paragraph.id() === this.containerId()));
   }
 }
