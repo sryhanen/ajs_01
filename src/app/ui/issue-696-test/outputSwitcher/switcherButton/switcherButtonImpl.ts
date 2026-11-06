@@ -59,13 +59,25 @@ type RequestMessage = {
 export class SwitcherButtonImpl implements SwitcherButton {
   private readonly _requestMessage:RequestMessage;
   private readonly _requestable:Requestable;
+  private readonly _title:string;
+  private readonly _icon:string;
 
-  constructor(requestMessage:RequestMessage,requestable:Requestable) {
+  constructor(requestMessage:RequestMessage,requestable:Requestable, title:string, icon:string) {
     this._requestMessage = requestMessage;
     this._requestable = requestable;
+    this._title = title;
+    this._icon = icon;
   }
 
   requestSwitch(): void {
     this._requestable.request(this._requestMessage);
+  }
+
+  title(): string {
+    return this._title;
+  }
+
+  icon():string {
+    return this._icon;
   }
 }

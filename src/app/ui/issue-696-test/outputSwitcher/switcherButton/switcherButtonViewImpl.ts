@@ -51,10 +51,10 @@ import {SwitcherButton} from './switcherButton';
   template:`
     <button class="btn btn-secondary"
             type="button"
-            aria-label="switch"
-            title="switch"
+            [aria-label]="switcherButton().title()"
+            [title]="switcherButton().title()"
             (click)="switcherButton().requestSwitch()">
-      <i class="fas fa-table"></i>
+      <i [class]="switcherButton().icon()"></i>
     </button>
 
   `

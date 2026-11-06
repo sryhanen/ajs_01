@@ -132,18 +132,32 @@ export class OutputPayloadImpl implements OutputPayload {
         }
       }
     };
-    const uPlotSwitch = {
-      op:'PARAGRAPH_OUTPUT_REQUEST',
-      data:{
+    return [
+      new SwitcherButtonImpl(datatablesSwitch, requestable, 'Datatable','fas fa-table'),
+      new SwitcherButtonImpl(this.uPlotRequest(GraphType.line), requestable, 'Line chart', 'fas fa-chart-line'),
+      new SwitcherButtonImpl(this.uPlotRequest(GraphType.area), requestable, 'Area chart', 'fas fa-chart-area'),
+      new SwitcherButtonImpl(this.uPlotRequest(GraphType.bar), requestable, 'Barchart', 'fas fa-chart-bar'),
+      new SwitcherButtonImpl(this.uPlotRequest(GraphType.scatter), requestable, 'Scatter chart', 'cf cf-scatter-chart'),
+    ];
+  }
+
+  private uPlotRequest(type:string): {
+    op: string;
+    data: {
+      noteId: string;
+      paragraphId: string;
+      type: string;
+      requestOptions: object;
+    };
+  }{
+    return {
+      op: 'PARAGRAPH_OUTPUT_REQUEST',
+      data: {
         paragraphId: '',
         noteId: '',
         type: OutputType.uPlot,
-        requestOptions: {graphType: GraphType.bar}
+        requestOptions: {graphType: type}
       }
     };
-    return [
-      new SwitcherButtonImpl(datatablesSwitch, requestable),
-      new SwitcherButtonImpl(uPlotSwitch, requestable)
-    ];
   }
 }

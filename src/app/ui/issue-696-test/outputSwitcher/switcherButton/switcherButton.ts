@@ -45,4 +45,6 @@
  */
 export interface SwitcherButton {
   requestSwitch():void;
+  title():string;
+  icon():string;
 }
