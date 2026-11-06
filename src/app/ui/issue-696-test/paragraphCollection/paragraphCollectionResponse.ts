@@ -49,7 +49,7 @@ import {ParagraphCollection} from './paragraphCollection';
 import {WebSocketResponseImpl} from '../../../objects/webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../../objects/webSocket/webSocketPayload/webSocketPayloadImpl';
 import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphStateImpl} from '../paragraphState/paragraphStateImpl';
+import {ParagraphPayloadImpl} from '../paragraphPayload/paragraphPayloadImpl';
 
 export class ParagraphCollectionResponse implements Respondable {
   private readonly _requestable:Requestable;
@@ -81,25 +81,24 @@ export class ParagraphCollectionResponse implements Respondable {
 
   private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
     const payload = webSocketResponse.dataAsWebSocketPayload();
-    const paragraphState = new ParagraphStateImpl(payload, this._requestable);
-    this._paragraphCollection.updateParagraph(paragraphState.asParagraph());
+    const paragraphPayload = new ParagraphPayloadImpl(payload, this._requestable);
+    this._paragraphCollection.updateParagraph(paragraphPayload.asParagraph());
     const paragraphId = payload.stringProperty('id');
-    this._paragraphResponses.set(paragraphId, paragraphState.asParagraphResponse());
+    this._paragraphResponses.set(paragraphId, paragraphPayload.asParagraphResponse());
   }
 
   private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
     const responseData = webSocketResponse.dataAsWebSocketPayload();
     const index = responseData.numberProperty('index');
     const payload = responseData.objectPropertyAsPayload('paragraph');
-    const paragraphState = new ParagraphStateImpl(payload, this._requestable);
+    const paragraphPayload = new ParagraphPayloadImpl(payload, this._requestable);
     const paragraphId = payload.stringProperty('id');
-    this._paragraphCollection.addParagraph(paragraphState.asParagraph(), index);
-    this._paragraphResponses.set(paragraphId, paragraphState.asParagraphResponse());
+    this._paragraphCollection.addParagraph(paragraphPayload.asParagraph(), index);
+    this._paragraphResponses.set(paragraphId, paragraphPayload.asParagraphResponse());
   }
 
   private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphId  = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
     this._paragraphCollection.removeParagraph(paragraphId);
   }
-
 }

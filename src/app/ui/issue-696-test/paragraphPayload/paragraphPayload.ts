@@ -47,7 +47,7 @@ import {Paragraph} from '../paragraph/paragraph';
 import {Respondable} from '../../../objects/channel/respondable';
 import {Requestable} from '../../../objects/channel/requestable';
 
-export interface ParagraphState {
+export interface ParagraphPayload {
   asParagraph(requestable: Requestable):Paragraph;
   asParagraphResponse():Respondable;
 }

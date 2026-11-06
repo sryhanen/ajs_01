@@ -46,7 +46,7 @@
 import {Output} from '../output/output';
 import {Respondable} from '../../../objects/channel/respondable';
 
-export interface OutputState {
+export interface OutputPayload {
   asOutput():Output;
   asOutputResponse():Respondable;
 }

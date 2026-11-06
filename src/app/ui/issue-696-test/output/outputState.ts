@@ -1,4 +1,4 @@
-export type OutputPayload = {
+export type OutputState = {
   data:object | string;
   type:string;
   isAggregated:boolean;

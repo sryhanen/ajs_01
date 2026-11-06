@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputState} from './outputState';
+import {OutputPayload} from './outputPayload';
 import {Respondable} from '../../../objects/channel/respondable';
 import {Output} from '../output/output';
 import {OutputImpl} from '../output/outputImpl';
@@ -61,12 +61,12 @@ import {GraphType} from '../outputFormat/uPlot/graphType';
 import {SwitcherButtonImpl} from '../outputSwitcher/switcherButton/switcherButtonImpl';
 import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
 import {OutputResponse} from '../output/outputResponse';
-import {OutputPayload} from '../output/outputPayload';
 import {OutputSwitcherResponse} from '../outputSwitcher/outputSwitcherResponse';
 import {OutputSwitcherRequest} from '../outputSwitcher/outputSwitcherRequest';
 import {SwitchIndicator} from '../outputSwitcher/switchIndicator/switchIndicator';
+import {OutputState} from '../output/outputState';
 
-export class OutputStateImpl implements OutputState {
+export class OutputPayloadImpl implements OutputPayload {
   private readonly _requestable:Requestable;
   private readonly _output:Output;
   private readonly _outputSwitcherRequest:OutputSwitcherRequest;
@@ -108,7 +108,7 @@ export class OutputStateImpl implements OutputState {
 
   private initializeOutputWithData(paragraphState: WebSocketPayload, output:Output):void{
     if (paragraphState.propertyExists('output')) {
-      const outputState = paragraphState.objectProperty('output') as OutputPayload;
+      const outputState = paragraphState.objectProperty('output') as OutputState;
       if (outputState['data'] === undefined || outputState['type'] === undefined) {
         console.error(`Output data not processed, format invalid: ${JSON.stringify(outputState)}`);
       }

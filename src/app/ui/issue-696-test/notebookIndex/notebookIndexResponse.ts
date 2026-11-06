@@ -54,7 +54,7 @@ import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectio
 import {NotebookResponse} from '../notebook/notebookResponse';
 import {ParagraphCollectionResponse} from '../paragraphCollection/paragraphCollectionResponse';
 import {NotebookRequest} from '../notebook/notebookRequest';
-import {ParagraphStateImpl} from '../paragraphState/paragraphStateImpl';
+import {ParagraphPayloadImpl} from '../paragraphPayload/paragraphPayloadImpl';
 
 export class NotebookIndexResponse implements Respondable {
   private readonly _notebookIndex:NotebookIndex;
@@ -90,12 +90,12 @@ export class NotebookIndexResponse implements Respondable {
       const notebookRequest = new NotebookRequest(this._requestable, receivedNotebookId);
       const paragraphResponses: Map<string, Respondable> = new Map();
       let paragraphIndex = 0;
-      for(const paragraphPayload of paragraphs){
-        const payload = new WebSocketPayloadImpl(paragraphPayload);
+      for(const paragraph of paragraphs){
+        const payload = new WebSocketPayloadImpl(paragraph);
         const paragraphId = payload.stringProperty('id');
-        const paragraphState = new ParagraphStateImpl(payload, notebookRequest);
-        paragraphResponses.set(paragraphId, paragraphState.asParagraphResponse());
-        paragraphCollection.addParagraph(paragraphState.asParagraph(), paragraphIndex);
+        const paragraphPayload = new ParagraphPayloadImpl(payload, notebookRequest);
+        paragraphResponses.set(paragraphId, paragraphPayload.asParagraphResponse());
+        paragraphCollection.addParagraph(paragraphPayload.asParagraph(), paragraphIndex);
         paragraphIndex += 1;
       }
       const paragraphCollectionResponse = new ParagraphCollectionResponse(notebookRequest, paragraphResponses, paragraphCollection);

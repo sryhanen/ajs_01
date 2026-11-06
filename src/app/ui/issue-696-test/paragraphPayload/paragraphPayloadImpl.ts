@@ -43,22 +43,22 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ParagraphState} from './paragraphState';
+import {ParagraphPayload} from './paragraphPayload';
 import {ParagraphResponse} from '../paragraph/paragraphResponse';
 import {Paragraph} from '../paragraph/paragraph';
 import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
 import {Requestable} from '../../../objects/channel/requestable';
 import {ParagraphRequest} from '../paragraph/paragraphRequest';
-import {OutputState} from '../outputState/outputState';
+import {OutputPayload} from '../outputPayload/outputPayload';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
-import {OutputStateImpl} from '../outputState/outputStateImpl';
+import {OutputPayloadImpl} from '../outputPayload/outputPayloadImpl';
 import {Respondable} from '../../../objects/channel/respondable';
 
-export class ParagraphStateImpl implements ParagraphState {
+export class ParagraphPayloadImpl implements ParagraphPayload {
   private readonly _paragraphState:WebSocketPayload;
   private readonly _requestable: Requestable;
   private readonly _paragraphRequest:Requestable;
-  private readonly _outputState: OutputState;
+  private readonly _outputState: OutputPayload;
   private readonly _paragraph: Paragraph;
   private readonly _paragraphResponse:Respondable;
 
@@ -75,8 +75,8 @@ export class ParagraphStateImpl implements ParagraphState {
     return new ParagraphRequest(requestable, this.paragraphId());
   }
 
-  private initializeOutputState(paragraphState:WebSocketPayload, paragraphRequest:Requestable):OutputState{
-    return new OutputStateImpl(paragraphState, paragraphRequest);
+  private initializeOutputState(paragraphState:WebSocketPayload, paragraphRequest:Requestable):OutputPayload{
+    return new OutputPayloadImpl(paragraphState, paragraphRequest);
   }
 
   asParagraph(): Paragraph {
