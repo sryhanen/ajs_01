@@ -49,15 +49,13 @@ import {ParagraphCollection} from './paragraphCollection';
 import {WebSocketResponseImpl} from '../../../objects/webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../../objects/webSocket/webSocketPayload/webSocketPayloadImpl';
 import {Requestable} from '../../../objects/channel/requestable';
-import {Assembler} from '../assembler/assembler';
-import {AssemblerImpl} from '../assembler/assemblerImpl';
+import {ParagraphStateImpl} from '../paragraphState/paragraphStateImpl';
 
 export class ParagraphCollectionResponse implements Respondable {
   private readonly _requestable:Requestable;
   private readonly _paragraphCollection: ParagraphCollection;
   private readonly _paragraphResponses: Map<string, Respondable>;
   private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
-  private readonly _assembler:Assembler;
 
   constructor(requestable:Requestable, paragraphResponses: Map<string, Respondable>, paragraphCollection:ParagraphCollection) {
     this._requestable = requestable;
@@ -68,7 +66,6 @@ export class ParagraphCollectionResponse implements Respondable {
       'PARAGRAPH_ADDED': (webSocketResponse) => this.handleParagraphAddedResponse(webSocketResponse),
       'PARAGRAPH_REMOVED': (webSocketResponse) => this.handleParagraphRemovedResponse(webSocketResponse)
     };
-    this._assembler = new AssemblerImpl();
   }
 
   response(json: object): void {
@@ -83,22 +80,21 @@ export class ParagraphCollectionResponse implements Respondable {
   }
 
   private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphState = webSocketResponse.dataAsWebSocketPayload();
-    const assembledParagraph = this._assembler.paragraphNode(paragraphState, this._requestable);
-    this._paragraphCollection.updateParagraph(assembledParagraph.paragraph);
-    const paragraphId = paragraphState.stringProperty('id');
-    this._paragraphResponses.set(paragraphId, assembledParagraph.paragraphResponse);
+    const payload = webSocketResponse.dataAsWebSocketPayload();
+    const paragraphState = new ParagraphStateImpl(payload, this._requestable);
+    this._paragraphCollection.updateParagraph(paragraphState.asParagraph());
+    const paragraphId = payload.stringProperty('id');
+    this._paragraphResponses.set(paragraphId, paragraphState.asParagraphResponse());
   }
 
   private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
     const responseData = webSocketResponse.dataAsWebSocketPayload();
     const index = responseData.numberProperty('index');
-    const paragraphState = responseData.objectPropertyAsPayload('paragraph');
-    const assembledParagraph = this._assembler.paragraphNode(paragraphState, this._requestable);
-    this._paragraphCollection.updateParagraph(assembledParagraph.paragraph);
-    const paragraphId = paragraphState.stringProperty('id');
-    this._paragraphCollection.addParagraph(assembledParagraph.paragraph, index);
-    this._paragraphResponses.set(paragraphId, assembledParagraph.paragraphResponse);
+    const payload = responseData.objectPropertyAsPayload('paragraph');
+    const paragraphState = new ParagraphStateImpl(payload, this._requestable);
+    const paragraphId = payload.stringProperty('id');
+    this._paragraphCollection.addParagraph(paragraphState.asParagraph(), index);
+    this._paragraphResponses.set(paragraphId, paragraphState.asParagraphResponse());
   }
 
   private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{

@@ -43,11 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Paragraph} from '../paragraph/paragraph';
+import {Output} from '../output/output';
 import {Respondable} from '../../../objects/channel/respondable';
-import {Requestable} from '../../../objects/channel/requestable';
-import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
 
-export interface Assembler {
-  paragraphNode(paragraphState:WebSocketPayload, requestable:Requestable): {paragraph:Paragraph, paragraphResponse:Respondable};
+export interface OutputState {
+  asOutput():Output;
+  asOutputResponse():Respondable;
 }

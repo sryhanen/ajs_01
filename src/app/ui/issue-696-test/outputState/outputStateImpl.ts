@@ -43,67 +43,70 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Assembler} from './assembler';
-import {Paragraph} from '../paragraph/paragraph';
-import {Requestable} from '../../../objects/channel/requestable';
-import {ParagraphRequest} from '../paragraph/paragraphRequest';
-import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
+import {OutputState} from './outputState';
+import {Respondable} from '../../../objects/channel/respondable';
+import {Output} from '../output/output';
+import {OutputImpl} from '../output/outputImpl';
 import {OutputFormat} from '../outputFormat/outputFormat';
 import {OutputType} from '../../../objects/output/outputType';
 import {UPlotFormat} from '../outputFormat/uPlot/uPlotFormat';
 import {TextFormat} from '../outputFormat/text/textFormat';
 import {DataTablesFormat} from '../outputFormat/dataTable/dataTablesFormat';
-import {OutputImpl} from '../output/outputImpl';
-import {Output} from '../output/output';
-import {ParagraphImpl} from '../paragraph/paragraphImpl';
-import {OutputPayload} from '../output/outputPayload';
-import {Respondable} from '../../../objects/channel/respondable';
-import {ParagraphResponse} from '../paragraph/paragraphResponse';
+import {Requestable} from '../../../objects/channel/requestable';
 import {SwitchIndicatorImpl} from '../outputSwitcher/switchIndicator/switchIndicatorImpl';
 import {OutputSwitcherRequestImpl} from '../outputSwitcher/outputSwitcherRequestImpl';
 import {OutputSwitcherImpl} from '../outputSwitcher/outputSwitcherImpl';
-import {OutputResponse} from '../output/outputResponse';
-import {OutputSwitcherResponse} from '../outputSwitcher/outputSwitcherResponse';
 import {SwitcherButton} from '../outputSwitcher/switcherButton/switcherButton';
 import {GraphType} from '../outputFormat/uPlot/graphType';
 import {SwitcherButtonImpl} from '../outputSwitcher/switcherButton/switcherButtonImpl';
+import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
+import {OutputResponse} from '../output/outputResponse';
+import {OutputPayload} from '../output/outputPayload';
+import {OutputSwitcherResponse} from '../outputSwitcher/outputSwitcherResponse';
+import {OutputSwitcherRequest} from '../outputSwitcher/outputSwitcherRequest';
+import {SwitchIndicator} from '../outputSwitcher/switchIndicator/switchIndicator';
 
-export class AssemblerImpl implements Assembler {
-  paragraphNode(paragraphState:WebSocketPayload, requestable:Requestable): {paragraph:Paragraph, paragraphResponse:Respondable}{
-    const paragraphId = paragraphState.stringProperty('id');
-    const paragraphRequest = new ParagraphRequest(requestable, paragraphId);
-    const outputAssembled = this.output(paragraphRequest, paragraphState);
-    const paragraph = this.paragraph(paragraphState, paragraphRequest, {output:outputAssembled.output});
-    const paragraphResponse = new ParagraphResponse([outputAssembled.outputResponse], paragraphId);
-    return {paragraph:paragraph, paragraphResponse:paragraphResponse};
+export class OutputStateImpl implements OutputState {
+  private readonly _requestable:Requestable;
+  private readonly _output:Output;
+  private readonly _outputSwitcherRequest:OutputSwitcherRequest;
+  private readonly _switchIndicator:SwitchIndicator;
+  private readonly _outputSwitcherResponse:Respondable;
+
+  constructor(paragraphState:WebSocketPayload, requestable:Requestable) {
+    this._requestable = requestable;
+    this._switchIndicator = new SwitchIndicatorImpl();
+    this._outputSwitcherRequest = this.initializeOutputSwitcherRequest(this._switchIndicator);
+    this._output = this.initializeOutput(paragraphState, this._outputSwitcherRequest, this._switchIndicator);
+    this._outputSwitcherResponse = new OutputSwitcherResponse(this._outputSwitcherRequest, [new OutputResponse(this._output)], this._switchIndicator);
   }
 
-  private output(requestable:Requestable, paragraphState:WebSocketPayload):{output:Output, outputResponse:Respondable}{
-    const switchIndicator = new SwitchIndicatorImpl();
-    const outputSwitcherRequest = new OutputSwitcherRequestImpl(requestable, switchIndicator);
+  asOutput(): Output {
+    return this._output;
+  }
+
+  asOutputResponse(): Respondable {
+    return this._outputSwitcherResponse;
+  }
+
+  private initializeOutputSwitcherRequest(switchIndicator:SwitchIndicator):OutputSwitcherRequest {
+    return new OutputSwitcherRequestImpl(this._requestable, switchIndicator);
+  }
+
+  private initializeOutput(paragraphState: WebSocketPayload, outputSwitcherRequest:OutputSwitcherRequest,switchIndicator:SwitchIndicator):Output {
     const outputSwitcher = new OutputSwitcherImpl(this.switcherButtons(outputSwitcherRequest),switchIndicator);
     const outputFormatsList:[string, OutputFormat][] = [
       [OutputType.uPlot, new UPlotFormat()],
       [OutputType.text, new TextFormat()],
-      [OutputType.dataTables, new DataTablesFormat(requestable)],
+      [OutputType.dataTables, new DataTablesFormat(this._requestable)],
     ];
     const outputFormats = new Map(outputFormatsList);
     const output = new OutputImpl(outputFormats, {interpreterErrorListener:{}, outputSwitcher:outputSwitcher});
-    const outputResponse = new OutputResponse(output);
-    this.initializeOutput(paragraphState, output);
-    const outputSwitcherResponse = new OutputSwitcherResponse(outputSwitcherRequest, [outputResponse], switchIndicator);
-    return {
-      output:output, outputResponse:outputSwitcherResponse,
-    };
+    this.initializeOutputWithData(paragraphState, output);
+    return output;
   }
 
-  private paragraph(paragraphState:WebSocketPayload, requestable:Requestable, childNodes: {output: Output}): Paragraph {
-    const paragraphId = paragraphState.stringProperty('id');
-    const paragraphRequest = new ParagraphRequest(requestable, paragraphId);
-    return new ParagraphImpl(paragraphRequest, paragraphState, childNodes);
-  }
-
-  private initializeOutput(paragraphState: WebSocketPayload, output:Output):void{
+  private initializeOutputWithData(paragraphState: WebSocketPayload, output:Output):void{
     if (paragraphState.propertyExists('output')) {
       const outputState = paragraphState.objectProperty('output') as OutputPayload;
       if (outputState['data'] === undefined || outputState['type'] === undefined) {

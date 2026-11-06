@@ -54,22 +54,19 @@ import {ParagraphCollectionImpl} from '../paragraphCollection/paragraphCollectio
 import {NotebookResponse} from '../notebook/notebookResponse';
 import {ParagraphCollectionResponse} from '../paragraphCollection/paragraphCollectionResponse';
 import {NotebookRequest} from '../notebook/notebookRequest';
-import {Assembler} from '../assembler/assembler';
-import {AssemblerImpl} from '../assembler/assemblerImpl';
+import {ParagraphStateImpl} from '../paragraphState/paragraphStateImpl';
 
 export class NotebookIndexResponse implements Respondable {
   private readonly _notebookIndex:NotebookIndex;
   private readonly _respondables: Respondable[];
   private readonly _notebookId:string;
   private readonly _requestable: Requestable;
-  private readonly _assembler:Assembler;
 
   constructor(notebookIndex:NotebookIndex, respondables: Respondable[], notebookId:string, requestable: Requestable) {
     this._notebookIndex = notebookIndex;
     this._respondables = respondables;
     this._notebookId = notebookId;
     this._requestable = requestable;
-    this._assembler = new AssemblerImpl();
   }
 
   response(json: object): void {
@@ -94,11 +91,11 @@ export class NotebookIndexResponse implements Respondable {
       const paragraphResponses: Map<string, Respondable> = new Map();
       let paragraphIndex = 0;
       for(const paragraphPayload of paragraphs){
-        const paragraphState = new WebSocketPayloadImpl(paragraphPayload);
-        const assembledParagraph = this._assembler.paragraphNode(paragraphState, notebookRequest);
-        const paragraphId = paragraphState.stringProperty('id');
-        paragraphResponses.set(paragraphId, assembledParagraph.paragraphResponse);
-        paragraphCollection.addParagraph(assembledParagraph.paragraph, paragraphIndex);
+        const payload = new WebSocketPayloadImpl(paragraphPayload);
+        const paragraphId = payload.stringProperty('id');
+        const paragraphState = new ParagraphStateImpl(payload, notebookRequest);
+        paragraphResponses.set(paragraphId, paragraphState.asParagraphResponse());
+        paragraphCollection.addParagraph(paragraphState.asParagraph(), paragraphIndex);
         paragraphIndex += 1;
       }
       const paragraphCollectionResponse = new ParagraphCollectionResponse(notebookRequest, paragraphResponses, paragraphCollection);
