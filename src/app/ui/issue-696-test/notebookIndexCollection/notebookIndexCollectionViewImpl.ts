@@ -48,6 +48,7 @@ import {NotebookIndex} from '../notebookIndex/notebookIndex';
 import {AfterViewInit, Component, input, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
 import {NotebookIndexCollection} from './notebookIndexCollection';
 import {NotebookIndexViewImpl} from '../notebookIndex/notebookIndexViewImpl';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
 
 @Component({
   selector: 'notebook-index-collection',
@@ -60,18 +61,22 @@ import {NotebookIndexViewImpl} from '../notebookIndex/notebookIndexViewImpl';
     }
   `
 })
-export class NotebookIndexCollectionViewImpl implements NotebookIndexCollectionView, AfterViewInit, OnDestroy {
+export class NotebookIndexCollectionViewImpl implements NotebookIndexCollectionView, OnInit, AfterViewInit, OnDestroy {
   notebookIndexCollection = input.required<NotebookIndexCollection>();
   containerId = input.required<string>();
   protected notebookIndices:WritableSignal<NotebookIndex[]> = signal([], {equal: () => false});
-  private detachView:() => void;
+  private viewNodeReference:ViewNodeReference;
+
+  ngOnInit() {
+    this.viewNodeReference = this.notebookIndexCollection().attachView(this, this.containerId());
+  }
 
   ngAfterViewInit() {
-    this.detachView = this.notebookIndexCollection().attachView(this, this.containerId());
+    this.notebookIndexCollection().project();
   }
 
   ngOnDestroy(): void {
-    this.detachView();
+    this.viewNodeReference.destroy();
   }
 
   updateNotebookIndices(notebookIndices: NotebookIndex[]): void {

@@ -46,6 +46,8 @@
 import {NotebookIndexCollection} from './notebookIndexCollection';
 import {NotebookIndexCollectionView} from './notebookIndexCollectionView';
 import {NotebookIndex} from '../notebookIndex/notebookIndex';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
+import {ViewNodeReferenceImpl} from '../viewNode/viewNodeReferenceImpl';
 
 export class NotebookIndexCollectionImpl implements NotebookIndexCollection {
   private readonly _notebookIndices: NotebookIndex[];
@@ -56,21 +58,22 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection {
     this._views = new Map();
   }
 
-  attachView(view: NotebookIndexCollectionView, viewId:string): () => void {
+  attachView(view: NotebookIndexCollectionView, viewId:string): ViewNodeReference {
     this._views.set(viewId, view);
-    view.updateNotebookIndices(this._notebookIndices);
-    return () => {
-      this._views.delete(viewId);
-    };
+    return new ViewNodeReferenceImpl(() => this._views.delete(viewId));
+  }
+
+  project():void {
+    this._views.forEach(view => view.updateNotebookIndices(this._notebookIndices));
   }
 
   add(notebookIndex: NotebookIndex): void {
     this._notebookIndices.push(notebookIndex);
-    this._views.forEach(view => view.updateNotebookIndices(this._notebookIndices));
+    this.project();
   }
 
   clear(): void {
     this._notebookIndices.splice(0, this._notebookIndices.length);
-    this._views.forEach(view => view.updateNotebookIndices(this._notebookIndices));
+    this.project();
   }
 }

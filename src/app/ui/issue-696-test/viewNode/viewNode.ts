@@ -43,6 +43,8 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {ViewNodeReference} from './viewNodeReference';
+
 export interface ViewNode<T> {
   attachView(view:T, viewId:string):ViewNodeReference;
   project():void;
