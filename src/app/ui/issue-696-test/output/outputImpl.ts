@@ -45,7 +45,7 @@
  */
 import {Output} from './output';
 import {OutputView} from './outputView';
-import {OutputState} from './outputState';
+import {OutputPayload} from './outputPayload';
 import {OutputFormat} from '../outputFormat/outputFormat';
 import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
 import {ViewNodeReference} from '../viewNode/viewNodeReference';
@@ -75,7 +75,7 @@ export class OutputImpl implements Output {
     view.attachSwitcher(this._childNodes.outputSwitcher);
   }
 
-  render(outputState:OutputState): void {
+  render(outputState:OutputPayload): void {
     const outputFormat = this._outputFormats.get(outputState.type);
     this._rendered = outputFormat.render(outputState.data, outputState.options);
     this._views.forEach(view => view.render(this._rendered));

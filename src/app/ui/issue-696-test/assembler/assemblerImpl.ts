@@ -56,8 +56,7 @@ import {DataTablesFormat} from '../outputFormat/dataTable/dataTablesFormat';
 import {OutputImpl} from '../output/outputImpl';
 import {Output} from '../output/output';
 import {ParagraphImpl} from '../paragraph/paragraphImpl';
-import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
-import {OutputState} from '../output/outputState';
+import {OutputPayload} from '../output/outputPayload';
 import {Respondable} from '../../../objects/channel/respondable';
 import {ParagraphResponse} from '../paragraph/paragraphResponse';
 import {SwitchIndicatorImpl} from '../outputSwitcher/switchIndicator/switchIndicatorImpl';
@@ -106,7 +105,7 @@ export class AssemblerImpl implements Assembler {
 
   private initializeOutput(paragraphState: WebSocketPayload, output:Output):void{
     if (paragraphState.propertyExists('output')) {
-      const outputState = paragraphState.objectProperty('output') as OutputState;
+      const outputState = paragraphState.objectProperty('output') as OutputPayload;
       if (outputState['data'] === undefined || outputState['type'] === undefined) {
         console.error(`Output data not processed, format invalid: ${JSON.stringify(outputState)}`);
       }

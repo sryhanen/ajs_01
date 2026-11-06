@@ -45,8 +45,8 @@
  */
 import {ViewNode} from '../viewNode/viewNode';
 import {OutputView} from './outputView';
-import {OutputState} from './outputState';
+import {OutputPayload} from './outputPayload';
 
 export interface Output extends ViewNode<OutputView> {
-  render(outputState:OutputState):void;
+  render(outputState:OutputPayload):void;
 }
