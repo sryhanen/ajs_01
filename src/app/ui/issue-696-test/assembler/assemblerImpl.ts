@@ -73,32 +73,35 @@ export class AssemblerImpl implements Assembler {
   paragraphNode(paragraphState:WebSocketPayload, requestable:Requestable): {paragraph:Paragraph, paragraphResponse:Respondable}{
     const paragraphId = paragraphState.stringProperty('id');
     const paragraphRequest = new ParagraphRequest(requestable, paragraphId);
-    const switchIndicator = new SwitchIndicatorImpl();
-    const outputSwitcherRequest = new OutputSwitcherRequestImpl(paragraphRequest, switchIndicator);
-    const outputSwitcher = new OutputSwitcherImpl(this.switcherButtons(outputSwitcherRequest),switchIndicator);
-    const output = this.output(outputSwitcherRequest, outputSwitcher);
-    const paragraph = this.paragraph(paragraphState, paragraphRequest, {output:output});
-    const outputResponse = new OutputResponse(output);
-    this.initializeOutput(paragraphState, output);
-    const outputSwitcherResponse = new OutputSwitcherResponse(outputSwitcherRequest, [outputResponse], switchIndicator);
-    const paragraphResponse = new ParagraphResponse([outputSwitcherResponse], paragraphId);
+    const outputAssembled = this.output(paragraphRequest, paragraphState);
+    const paragraph = this.paragraph(paragraphState, paragraphRequest, {output:outputAssembled.output});
+    const paragraphResponse = new ParagraphResponse([outputAssembled.outputResponse], paragraphId);
     return {paragraph:paragraph, paragraphResponse:paragraphResponse};
   }
 
-  private paragraph(paragraphState:WebSocketPayload, requestable:Requestable, childNodes: {output: Output}): Paragraph {
-    const paragraphId = paragraphState.stringProperty('id');
-    const paragraphRequest = new ParagraphRequest(requestable, paragraphId);
-    return new ParagraphImpl(paragraphRequest, paragraphState, childNodes);
-  }
-
-  private output(requestable:Requestable, outputSwitcher:OutputSwitcher):Output{
+  private output(requestable:Requestable, paragraphState:WebSocketPayload):{output:Output, outputResponse:Respondable}{
+    const switchIndicator = new SwitchIndicatorImpl();
+    const outputSwitcherRequest = new OutputSwitcherRequestImpl(requestable, switchIndicator);
+    const outputSwitcher = new OutputSwitcherImpl(this.switcherButtons(outputSwitcherRequest),switchIndicator);
     const outputFormatsList:[string, OutputFormat][] = [
       [OutputType.uPlot, new UPlotFormat()],
       [OutputType.text, new TextFormat()],
       [OutputType.dataTables, new DataTablesFormat(requestable)],
     ];
     const outputFormats = new Map(outputFormatsList);
-    return new OutputImpl(outputFormats, {interpreterErrorListener:{}, outputSwitcher:outputSwitcher});
+    const output = new OutputImpl(outputFormats, {interpreterErrorListener:{}, outputSwitcher:outputSwitcher});
+    const outputResponse = new OutputResponse(output);
+    this.initializeOutput(paragraphState, output);
+    const outputSwitcherResponse = new OutputSwitcherResponse(outputSwitcherRequest, [outputResponse], switchIndicator);
+    return {
+      output:output, outputResponse:outputSwitcherResponse,
+    };
+  }
+
+  private paragraph(paragraphState:WebSocketPayload, requestable:Requestable, childNodes: {output: Output}): Paragraph {
+    const paragraphId = paragraphState.stringProperty('id');
+    const paragraphRequest = new ParagraphRequest(requestable, paragraphId);
+    return new ParagraphImpl(paragraphRequest, paragraphState, childNodes);
   }
 
   private initializeOutput(paragraphState: WebSocketPayload, output:Output):void{
