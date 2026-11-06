@@ -63,17 +63,17 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection {
     return new ViewNodeReferenceImpl(() => this._views.delete(viewId));
   }
 
-  project():void {
-    this._views.forEach(view => view.updateNotebookIndices(this._notebookIndices));
+  project(view: NotebookIndexCollectionView):void {
+    view.updateNotebookIndices(this._notebookIndices);
   }
 
   add(notebookIndex: NotebookIndex): void {
     this._notebookIndices.push(notebookIndex);
-    this.project();
+    this._views.forEach(view => view.updateNotebookIndices(this._notebookIndices));
   }
 
   clear(): void {
     this._notebookIndices.splice(0, this._notebookIndices.length);
-    this.project();
+    this._views.forEach(view => view.updateNotebookIndices(this._notebookIndices));
   }
 }

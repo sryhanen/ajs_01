@@ -45,9 +45,10 @@
  */
 import { Notebook } from '../notebook/notebook';
 import {NotebookIndexView} from './notebookIndexView';
-import {AfterViewInit, Component, input, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {NotebookIndex} from './notebookIndex';
 import {NotebookViewImpl} from '../notebook/notebookViewImpl';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
 
 @Component({
   selector: 'notebook-index',
@@ -55,18 +56,22 @@ import {NotebookViewImpl} from '../notebook/notebookViewImpl';
     <ng-container #notebook />
   `
 })
-export class NotebookIndexViewImpl implements NotebookIndexView, AfterViewInit, OnDestroy {
+export class NotebookIndexViewImpl implements NotebookIndexView, OnInit, AfterViewInit, OnDestroy {
   notebookIndex = input.required<NotebookIndex>();
   containerId = input.required<string>();
   @ViewChild('notebook', {read:ViewContainerRef}) private notebookContainer: ViewContainerRef;
-  private detachView:() => void;
+  private viewNodeReference:ViewNodeReference;
+
+  ngOnInit(): void {
+    this.viewNodeReference = this.notebookIndex().attachView(this, this.containerId());
+  }
 
   ngAfterViewInit() {
-    this.detachView = this.notebookIndex().attachView(this, this.containerId());
+    this.notebookIndex().project(this);
   }
 
   ngOnDestroy(): void {
-    this.detachView();
+    this.viewNodeReference.destroy();
   }
 
   openNotebook(notebook: Notebook): void {

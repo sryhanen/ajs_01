@@ -47,6 +47,8 @@ import {NotebookView} from './notebookView';
 import {ParagraphCollection} from '../paragraphCollection/paragraphCollection';
 import {Notebook} from './notebook';
 import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
+import {ViewNodeReferenceImpl} from '../viewNode/viewNodeReferenceImpl';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
 
 export class NotebookImpl implements Notebook {
   private _views: Map<string, NotebookView>;
@@ -59,12 +61,13 @@ export class NotebookImpl implements Notebook {
     this._views = new Map();
   }
 
-  attachView(view: NotebookView, viewId:string): () => void {
+  attachView(view: NotebookView, viewId:string): ViewNodeReference{
     this._views.set(viewId, view);
+    return new ViewNodeReferenceImpl(() => this._views.delete(viewId));
+  }
+
+  project(view: NotebookView) {
     view.attachParagraphCollection(this._childNodes.paragraphCollection);
-    return () => {
-      this._views.delete(viewId);
-    };
   }
 
   id():string{

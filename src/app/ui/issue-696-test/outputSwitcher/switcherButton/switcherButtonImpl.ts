@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import {SwitcherButton} from './switcherButton';
-import {SwitcherButtonView} from './switcherButtonView';
 import {Requestable} from '../../../../objects/channel/requestable';
 
 type RequestMessage = {
@@ -60,20 +59,10 @@ type RequestMessage = {
 export class SwitcherButtonImpl implements SwitcherButton {
   private readonly _requestMessage:RequestMessage;
   private readonly _requestable:Requestable;
-  private readonly _views:Map<string, SwitcherButtonView>;
-
 
   constructor(requestMessage:RequestMessage,requestable:Requestable) {
     this._requestMessage = requestMessage;
     this._requestable = requestable;
-    this._views = new Map();
-  }
-
-  attachView(view: SwitcherButtonView, viewId: string): () => void {
-    this._views.set(viewId, view);
-    return () => {
-      this._views.delete(viewId);
-    };
   }
 
   requestSwitch(): void {

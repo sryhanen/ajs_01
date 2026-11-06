@@ -44,10 +44,9 @@
  * a licensee so wish it.
  */
 import {SwitcherButton} from './switcherButton/switcherButton';
-import {AfterViewInit, OnDestroy} from '@angular/core';
 import {SwitchIndicator} from './switchIndicator/switchIndicator';
 
-export interface OutputSwitcherView extends AfterViewInit, OnDestroy {
+export interface OutputSwitcherView{
   attachSwitchIndicator(switchIndicator: SwitchIndicator): void;
   attachSwitcherButtons(switcherButtons:SwitcherButton[]):void;
 }

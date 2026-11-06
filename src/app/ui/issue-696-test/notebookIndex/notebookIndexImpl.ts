@@ -47,6 +47,8 @@ import {NotebookIndex} from './notebookIndex';
 import {Notebook} from '../notebook/notebook';
 import {NotebookIndexView} from './notebookIndexView';
 import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
+import {ViewNodeReferenceImpl} from '../viewNode/viewNodeReferenceImpl';
 
 export class NotebookIndexImpl implements NotebookIndex {
   private readonly _notebookIndexState:WebSocketPayload;
@@ -58,14 +60,15 @@ export class NotebookIndexImpl implements NotebookIndex {
     this._views = new Map();
   }
 
-  attachView(view: NotebookIndexView, viewId:string): () => void {
+  attachView(view: NotebookIndexView, viewId:string): ViewNodeReference {
     this._views.set(viewId, view);
+    return new ViewNodeReferenceImpl(() => this._views.delete(viewId));
+  }
+
+  project(view: NotebookIndexView):void{
     if(this._openNotebook){
       view.openNotebook(this._openNotebook);
     }
-    return () => {
-      this._views.delete(viewId);
-    };
   }
 
   id(): string {
@@ -74,8 +77,6 @@ export class NotebookIndexImpl implements NotebookIndex {
 
   openNotebook(notebook: Notebook): void {
     this._openNotebook = notebook;
-    this._views.forEach(view => {
-      view.openNotebook(notebook);
-    });
+    this._views.forEach(view => view.openNotebook(notebook));
   }
 }

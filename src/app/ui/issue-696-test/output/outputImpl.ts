@@ -48,6 +48,8 @@ import {OutputView} from './outputView';
 import {OutputState} from './outputState';
 import {OutputFormat} from '../outputFormat/outputFormat';
 import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
+import {ViewNodeReferenceImpl} from '../viewNode/viewNodeReferenceImpl';
 
 export class OutputImpl implements Output {
   private readonly _childNodes:{interpreterErrorListener: object, outputSwitcher: object};
@@ -61,16 +63,16 @@ export class OutputImpl implements Output {
     this._views = new Map();
   }
 
-  attachView(view: OutputView, viewId:string): () => void {
+  attachView(view: OutputView, viewId:string): ViewNodeReference {
     this._views.set(viewId, view);
+    return new ViewNodeReferenceImpl(() => this._views.delete(viewId));
+  }
+
+  project(view: OutputView) {
     if(this._rendered){
       view.render(this._rendered);
     }
     view.attachSwitcher(this._childNodes.outputSwitcher);
-    return () => {
-      this._views.delete(viewId);
-    };
-    // this._outputView.attachInterpreterErrorListener(this._childNodes.interpreterErrorListener);
   }
 
   render(outputState:OutputState): void {

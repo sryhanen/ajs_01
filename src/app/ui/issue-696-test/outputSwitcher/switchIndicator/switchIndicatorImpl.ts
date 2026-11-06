@@ -45,6 +45,8 @@
  */
 import {SwitchIndicator} from './switchIndicator';
 import {SwitchIndicatorView} from './switchIndicatorView';
+import {ViewNodeReference} from '../../viewNode/viewNodeReference';
+import {ViewNodeReferenceImpl} from '../../viewNode/viewNodeReferenceImpl';
 
 export class SwitchIndicatorImpl implements SwitchIndicator {
   private readonly _views: Map<string, SwitchIndicatorView>;
@@ -53,11 +55,13 @@ export class SwitchIndicatorImpl implements SwitchIndicator {
     this._views = new Map();
   }
 
-  attachView(view: SwitchIndicatorView, viewId: string): () => void {
+  attachView(view: SwitchIndicatorView, viewId: string): ViewNodeReference {
     this._views.set(viewId, view);
-    return () => {
-      this._views.delete(viewId);
-    };
+    return new ViewNodeReferenceImpl(() => this._views.delete(viewId));
+  }
+
+  project(view: SwitchIndicatorView) {
+    view.hideLoader();
   }
 
   hideLoader(): void {

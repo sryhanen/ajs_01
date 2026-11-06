@@ -43,11 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, input, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {Paragraph} from './paragraph';
 import {ParagraphView} from './paragraphView';
 import {Output} from '../output/output';
 import {OutputViewImpl} from '../output/outputViewImpl';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
 
 @Component({
   selector: 'paragraph',
@@ -55,17 +56,21 @@ import {OutputViewImpl} from '../output/outputViewImpl';
     <ng-container #outputHost />
   `
 })
-export class ParagraphViewImpl implements ParagraphView, AfterViewInit, OnDestroy {
+export class ParagraphViewImpl implements ParagraphView, OnInit, AfterViewInit, OnDestroy {
   paragraph = input.required<Paragraph>();
   @ViewChild('outputHost', { read: ViewContainerRef}) private outputHost!: ViewContainerRef;
-  private detachToken?: () => void;
+  private viewNodeReference: ViewNodeReference;
+
+  ngOnInit() {
+    this.viewNodeReference = this.paragraph().attachView(this, this.paragraph().id());
+  }
 
   ngAfterViewInit() {
-    this.detachToken = this.paragraph().attachView(this, this.paragraph().id());
+    this.paragraph().project(this);
   }
 
   ngOnDestroy(): void {
-    this.detachToken?.();
+    this.viewNodeReference.destroy();
   }
 
   attachOutput(output:Output): void {

@@ -72,7 +72,7 @@ export class NotebookIndexCollectionViewImpl implements NotebookIndexCollectionV
   }
 
   ngAfterViewInit() {
-    this.notebookIndexCollection().project();
+    this.notebookIndexCollection().project(this);
   }
 
   ngOnDestroy(): void {

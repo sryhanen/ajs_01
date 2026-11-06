@@ -46,6 +46,8 @@
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphCollectionView} from './paragraphCollectionView';
 import {Paragraph} from '../paragraph/paragraph';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
+import {ViewNodeReferenceImpl} from '../viewNode/viewNodeReferenceImpl';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _paragraphCollection:Map<string,Paragraph>;
@@ -56,12 +58,13 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     this._views = new Map();
   }
 
-  attachView(view: ParagraphCollectionView, viewId:string): () => void {
+  attachView(view: ParagraphCollectionView, viewId:string): ViewNodeReference  {
     this._views.set(viewId, view);
+    return new ViewNodeReferenceImpl(() => this._views.delete(viewId));
+  }
+
+  project(view: ParagraphCollectionView) {
     view.updateCollection(Array.from(this._paragraphCollection.values()));
-    return () => {
-      this._views.delete(viewId);
-    };
   }
 
   addParagraph(paragraph: Paragraph, index: number): void {

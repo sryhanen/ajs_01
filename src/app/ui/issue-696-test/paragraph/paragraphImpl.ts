@@ -48,6 +48,8 @@ import {Requestable} from '../../../objects/channel/requestable';
 import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
 import {ParagraphView} from './paragraphView';
 import {Output} from '../output/output';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
+import {ViewNodeReferenceImpl} from '../viewNode/viewNodeReferenceImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
@@ -62,12 +64,13 @@ export class ParagraphImpl implements Paragraph {
     this._views = new Map();
   }
 
-  attachView(view: ParagraphView, viewId:string): () => void {
+  attachView(view: ParagraphView, viewId:string): ViewNodeReference {
     this._views.set(viewId, view);
+    return new ViewNodeReferenceImpl(() => this._views.delete(viewId));
+  }
+
+  project(view: ParagraphView) {
     view.attachOutput(this._childNodes.output);
-    return () => {
-      this._views.delete(viewId);
-    };
   }
 
   run(): void {

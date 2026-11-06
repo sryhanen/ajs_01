@@ -47,6 +47,8 @@ import {OutputSwitcherView} from './outputSwitcherView';
 import {SwitcherButton} from './switcherButton/switcherButton';
 import {ViewNode} from '../viewNode/viewNode';
 import {SwitchIndicator} from './switchIndicator/switchIndicator';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
+import {ViewNodeReferenceImpl} from '../viewNode/viewNodeReferenceImpl';
 
 export class OutputSwitcherImpl implements ViewNode<OutputSwitcherView> {
   private readonly _views: Map<string, OutputSwitcherView>;
@@ -59,12 +61,13 @@ export class OutputSwitcherImpl implements ViewNode<OutputSwitcherView> {
     this._views = new Map();
   }
 
-  attachView(view: OutputSwitcherView, viewId: string): () => void {
+  attachView(view: OutputSwitcherView, viewId: string): ViewNodeReference {
     this._views.set(viewId, view);
+    return new ViewNodeReferenceImpl(() => this._views.delete(viewId));
+  }
+
+  project(view: OutputSwitcherView) {
     view.attachSwitcherButtons(this._switcherButtons);
     view.attachSwitchIndicator(this._switchIndicator);
-    return ()=> {
-      this._views.delete(viewId);
-    };
   }
 }

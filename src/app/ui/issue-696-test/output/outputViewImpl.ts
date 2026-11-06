@@ -49,7 +49,7 @@ import {
   Component,
   inject,
   input,
-  OnDestroy,
+  OnDestroy, OnInit,
   Type,
   ViewChild,
   ViewContainerRef
@@ -58,6 +58,7 @@ import {Output} from './output';
 import {COMPONENT_REGISTRY} from '../../angular2+/componentRegistry/componentRegistry';
 import {OutputSwitcherViewImpl} from '../outputSwitcher/outputSwitcherViewImpl';
 import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
 
 @Component({
   selector: 'output',
@@ -66,18 +67,22 @@ import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
     <ng-container #outputContainer/>
   `
 })
-export class OutputViewImpl implements OutputView, AfterViewInit, OnDestroy{
+export class OutputViewImpl implements OutputView, OnInit, AfterViewInit, OnDestroy{
   output = input.required<Output>();
   @ViewChild('switcherContainer', {read:ViewContainerRef}) private switcherContainer: ViewContainerRef;
   @ViewChild('outputContainer', {read:ViewContainerRef}) private outputContainer: ViewContainerRef;
-  private detachView:() => void;
+  private viewNodeReference:ViewNodeReference;
+
+  ngOnInit() {
+    this.viewNodeReference =  this.output().attachView(this, 'output');
+  }
 
   ngAfterViewInit() {
-    this.detachView = this.output().attachView(this, 'output');
+    this.output().project(this);
   }
 
   ngOnDestroy(): void {
-    this.detachView();
+    this.viewNodeReference.destroy();
   }
 
   private readonly componentRegistry = inject(COMPONENT_REGISTRY);
@@ -103,5 +108,4 @@ export class OutputViewImpl implements OutputView, AfterViewInit, OnDestroy{
   attachInterpreterErrorListener(interpreterErrorListener: object): void {
     throw new Error('Method not implemented.');
   }
-
 }

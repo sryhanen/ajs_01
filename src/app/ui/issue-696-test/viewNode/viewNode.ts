@@ -47,5 +47,5 @@ import {ViewNodeReference} from './viewNodeReference';
 
 export interface ViewNode<T> {
   attachView(view:T, viewId:string):ViewNodeReference;
-  project():void;
+  project(view:T):void;
 }

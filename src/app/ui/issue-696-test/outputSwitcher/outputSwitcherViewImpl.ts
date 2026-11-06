@@ -45,11 +45,21 @@
  */
 import {OutputSwitcherView} from './outputSwitcherView';
 import {SwitcherButton} from './switcherButton/switcherButton';
-import {Component, input, signal, ViewChild, ViewContainerRef, WritableSignal} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  input,
+  OnDestroy, OnInit,
+  signal,
+  ViewChild,
+  ViewContainerRef,
+  WritableSignal
+} from '@angular/core';
 import {SwitcherButtonViewImpl} from './switcherButton/switcherButtonViewImpl';
 import {OutputSwitcher} from './outputSwitcher';
 import {SwitchIndicator} from './switchIndicator/switchIndicator';
 import {SwitchIndicatorViewImpl} from './switchIndicator/switchIndicatorViewImpl';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
 
 @Component({
   selector: 'output-switcher',
@@ -65,18 +75,22 @@ import {SwitchIndicatorViewImpl} from './switchIndicator/switchIndicatorViewImpl
     <ng-container #switchIndicatorHost />
   `
 })
-export class OutputSwitcherViewImpl implements OutputSwitcherView {
+export class OutputSwitcherViewImpl implements OutputSwitcherView, OnInit, AfterViewInit, OnDestroy {
   outputSwitcher = input.required<OutputSwitcher>();
   @ViewChild('switchIndicatorHost', { read: ViewContainerRef}) private switchIndicatorHost: ViewContainerRef;
   protected switcherButtons: WritableSignal<SwitcherButton[]> = signal([]);
-  private detachView:() => void;
+  private viewNodeReference:ViewNodeReference;
+
+  ngOnInit() {
+    this.viewNodeReference = this.outputSwitcher().attachView(this, 'outputSwitcher');
+  }
 
   ngAfterViewInit() {
-    this.detachView = this.outputSwitcher().attachView(this, 'outputSwitcher');
+    this.outputSwitcher().project(this);
   }
 
   ngOnDestroy(): void {
-    this.detachView();
+    this.viewNodeReference.destroy();
   }
 
   attachSwitcherButtons(switcherButtons: SwitcherButton[]): void {

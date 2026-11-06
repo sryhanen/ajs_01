@@ -43,11 +43,12 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, input, OnDestroy, ViewChild, ViewContainerRef} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {NotebookView} from './notebookView';
 import { ParagraphCollection } from '../paragraphCollection/paragraphCollection';
 import {Notebook} from './notebook';
 import {ParagraphCollectionViewImpl} from '../paragraphCollection/paragraphCollectionViewImpl';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
 
 @Component({
   selector: 'notebook',
@@ -55,18 +56,22 @@ import {ParagraphCollectionViewImpl} from '../paragraphCollection/paragraphColle
     <ng-container #paragraphCollection />
   `
 })
-export class NotebookViewImpl implements NotebookView, AfterViewInit, OnDestroy {
+export class NotebookViewImpl implements NotebookView, OnInit, AfterViewInit, OnDestroy {
   notebook = input.required<Notebook>();
   containerId = input.required<string>();
   @ViewChild('paragraphCollection', {read:ViewContainerRef}) private paragraphCollectionContainer: ViewContainerRef;
-  private detachView:() => void;
+  private viewNodeReference:ViewNodeReference;
+
+  ngOnInit() {
+    this.viewNodeReference =  this.notebook().attachView(this, this.containerId());
+  }
 
   ngAfterViewInit() {
-    this.detachView =  this.notebook().attachView(this, this.containerId());
+    this.notebook().project(this);
   }
 
   ngOnDestroy(): void {
-    this.detachView();
+    this.viewNodeReference.destroy();
   }
 
   attachParagraphCollection(paragraphCollection: ParagraphCollection): void {

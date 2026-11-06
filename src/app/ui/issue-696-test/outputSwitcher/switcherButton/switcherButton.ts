@@ -43,9 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ViewNode} from '../../viewNode/viewNode';
-import {SwitcherButtonView} from './switcherButtonView';
-
-export interface SwitcherButton extends ViewNode<SwitcherButtonView>{
+export interface SwitcherButton {
   requestSwitch():void;
 }

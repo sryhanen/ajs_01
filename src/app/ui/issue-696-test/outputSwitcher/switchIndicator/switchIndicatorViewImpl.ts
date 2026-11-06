@@ -44,8 +44,9 @@
  * a licensee so wish it.
  */
 import {SwitchIndicatorView} from './switchIndicatorView';
-import {Component, input, signal} from '@angular/core';
+import {AfterViewInit, Component, input, OnDestroy, OnInit, signal} from '@angular/core';
 import {SwitchIndicator} from './switchIndicator';
+import {ViewNodeReference} from '../../viewNode/viewNodeReference';
 
 @Component({
   selector: 'switch-indicator',
@@ -55,17 +56,21 @@ import {SwitchIndicator} from './switchIndicator';
     }
   `
 })
-export class SwitchIndicatorViewImpl implements SwitchIndicatorView {
+export class SwitchIndicatorViewImpl implements SwitchIndicatorView, OnInit, AfterViewInit, OnDestroy {
   switchIndicator = input.required<SwitchIndicator>();
   protected readonly loaderVisible = signal(false);
-  private detachView:() => void;
+  private viewNodeReference:ViewNodeReference;
 
   ngOnInit(): void {
-    this.detachView = this.switchIndicator().attachView(this, 'switchIndicator');
+    this.viewNodeReference = this.switchIndicator().attachView(this, 'switchIndicator');
+  }
+
+  ngAfterViewInit() {
+    this.switchIndicator().project(this);
   }
 
   ngOnDestroy(): void {
-    this.detachView();
+    this.viewNodeReference.destroy();
   }
 
   hideLoader(): void {

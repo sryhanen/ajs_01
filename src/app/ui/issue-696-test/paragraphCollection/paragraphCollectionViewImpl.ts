@@ -48,13 +48,14 @@ import {
   AfterViewInit,
   Component,
   input,
-  OnDestroy,
+  OnDestroy, OnInit,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import {Paragraph} from '../paragraph/paragraph';
 import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphViewImpl} from '../paragraph/paragraphViewImpl';
+import {ViewNodeReference} from '../viewNode/viewNodeReference';
 
 @Component({
   selector: 'paragraph-collection',
@@ -62,18 +63,22 @@ import {ParagraphViewImpl} from '../paragraph/paragraphViewImpl';
     <ng-container #paragraphHost />
   `,
 })
-export class ParagraphCollectionViewImpl implements ParagraphCollectionView, AfterViewInit, OnDestroy {
+export class ParagraphCollectionViewImpl implements ParagraphCollectionView, OnInit, AfterViewInit, OnDestroy {
   paragraphCollection = input.required<ParagraphCollection>();
   containerId = input.required<string>();
   @ViewChild('paragraphHost', { read: ViewContainerRef}) private paragraphHost!: ViewContainerRef;
-  private detachView:() => void;
+  private viewNodeReference:ViewNodeReference;
+
+  ngOnInit() {
+    this.viewNodeReference =  this.paragraphCollection().attachView(this, this.containerId());
+  }
 
   ngAfterViewInit() {
-    this.detachView =  this.paragraphCollection().attachView(this, this.containerId());
+    this.paragraphCollection().project(this);
   }
 
   ngOnDestroy(): void {
-    this.detachView();
+    this.viewNodeReference.destroy();
   }
 
   updateCollection(paragraphCollection: Paragraph[]): void {

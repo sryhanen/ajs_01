@@ -43,7 +43,6 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {SwitcherButtonView} from './switcherButtonView';
 import {Component, input} from '@angular/core';
 import {SwitcherButton} from './switcherButton';
 
@@ -60,15 +59,6 @@ import {SwitcherButton} from './switcherButton';
 
   `
 })
-export class SwitcherButtonViewImpl implements SwitcherButtonView {
+export class SwitcherButtonViewImpl {
   switcherButton = input.required<SwitcherButton>();
-  private detachView:() => void;
-
-  ngOnInit(): void {
-    this.detachView = this.switcherButton().attachView(this, 'switcherView');
-  }
-
-  ngOnDestroy(): void {
-    this.detachView();
-  }
 }
