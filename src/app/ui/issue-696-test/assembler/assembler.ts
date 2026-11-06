@@ -44,13 +44,10 @@
  * a licensee so wish it.
  */
 import {Paragraph} from '../paragraph/paragraph';
+import {Respondable} from '../../../objects/channel/respondable';
 import {Requestable} from '../../../objects/channel/requestable';
 import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
-import {Output} from '../output/output';
-import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
 
 export interface Assembler {
-  paragraph(paragraphState:WebSocketPayload, requestable:Requestable, childNodes: {output: Output}):Paragraph;
-  output(requestable:Requestable, outputSwitcher:OutputSwitcher):Output;
-  initializeOutput(paragraphState: WebSocketPayload, output:Output):void;
+  paragraphNode(paragraphState:WebSocketPayload, requestable:Requestable): {paragraph:Paragraph, paragraphResponse:Respondable};
 }
