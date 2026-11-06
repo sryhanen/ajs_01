@@ -48,9 +48,10 @@ import {Requestable} from '../../../objects/channel/requestable';
 import {WebSocketPayload} from '../../../objects/webSocket/webSocketPayload/webSocketPayload';
 import {Output} from '../output/output';
 import {Respondable} from '../../../objects/channel/respondable';
+import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
 
 export interface Assembler {
   paragraph(paragraphState:WebSocketPayload, requestable:Requestable, childNodes: {output: Output}):Paragraph;
-  output(requestable:Requestable):Output;
+  output(requestable:Requestable, outputSwitcher:OutputSwitcher):Output;
   initializeOutput(paragraphState: WebSocketPayload, outputResponse:Respondable):void;
 }

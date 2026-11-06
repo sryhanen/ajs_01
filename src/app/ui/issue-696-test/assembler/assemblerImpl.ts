@@ -61,6 +61,7 @@ import {OutputSwitcherImpl} from '../outputSwitcher/outputSwitcherImpl';
 import {SwitcherButtonImpl} from '../outputSwitcher/switcherButton/switcherButtonImpl';
 import {SwitcherButton} from '../outputSwitcher/switcherButton/switcherButton';
 import {GraphType} from '../outputFormat/uPlot/graphType';
+import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
 
 export class AssemblerImpl implements Assembler {
   paragraph(paragraphState:WebSocketPayload, requestable:Requestable, childNodes: {output: Output}): Paragraph {
@@ -69,14 +70,13 @@ export class AssemblerImpl implements Assembler {
     return new ParagraphImpl(paragraphRequest, paragraphState, childNodes);
   }
 
-  output(requestable:Requestable):Output{
+  output(requestable:Requestable, outputSwitcher:OutputSwitcher):Output{
     const outputFormatsList:[string, OutputFormat][] = [
       [OutputType.uPlot, new UPlotFormat()],
       [OutputType.text, new TextFormat()],
       [OutputType.dataTables, new DataTablesFormat(requestable)],
     ];
     const outputFormats = new Map(outputFormatsList);
-    const outputSwitcher = new OutputSwitcherImpl(this.switcherButtons(requestable));
     return new OutputImpl(outputFormats, {interpreterErrorListener:{}, outputSwitcher:outputSwitcher});
   }
 
@@ -104,32 +104,5 @@ export class AssemblerImpl implements Assembler {
     }
   }
 
-  private switcherButtons(requestable:Requestable):SwitcherButton[]{
-    const datatablesSwitch = {
-      op:'PARAGRAPH_OUTPUT_REQUEST',
-      data: {
-        noteId:'',
-        paragraphId:'',
-        type: OutputType.dataTables,
-        requestOptions:{
-          draw: 1,
-          start: 0,
-          length: 50
-        }
-      }
-    };
-    const uPlotSwitch = {
-      op:'PARAGRAPH_OUTPUT_REQUEST',
-      data:{
-        paragraphId: '',
-        noteId: '',
-        type: OutputType.uPlot,
-        requestOptions: {graphType: GraphType.bar}
-      }
-    };
-    return [
-      new SwitcherButtonImpl(datatablesSwitch, requestable),
-      new SwitcherButtonImpl(uPlotSwitch, requestable)
-    ];
-  }
+
 }

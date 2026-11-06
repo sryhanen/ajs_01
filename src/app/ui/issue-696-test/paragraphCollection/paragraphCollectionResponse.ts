@@ -56,6 +56,12 @@ import {Assembler} from '../assembler/assembler';
 import {AssemblerImpl} from '../assembler/assemblerImpl';
 import {OutputSwitcherResponse} from '../outputSwitcher/outputSwitcherResponse';
 import {OutputSwitcherRequestImpl} from '../outputSwitcher/outputSwitcherRequestImpl';
+import {OutputSwitcherImpl} from '../outputSwitcher/outputSwitcherImpl';
+import {OutputType} from '../../../objects/output/outputType';
+import {SwitcherButton} from '../outputSwitcher/switcherButton/switcherButton';
+import {GraphType} from '../outputFormat/uPlot/graphType';
+import {SwitcherButtonImpl} from '../outputSwitcher/switcherButton/switcherButtonImpl';
+import {SwitchIndicatorImpl} from '../outputSwitcher/switchIndicator/switchIndicatorImpl';
 
 export class ParagraphCollectionResponse implements Respondable {
   private readonly _requestable:Requestable;
@@ -91,13 +97,15 @@ export class ParagraphCollectionResponse implements Respondable {
     const paragraphState = webSocketResponse.dataAsWebSocketPayload();
     const paragraphId = paragraphState.stringProperty('id');
     const paragraphRequest = new ParagraphRequest(this._requestable, paragraphId);
-    const outputSwitcherRequest = new OutputSwitcherRequestImpl(paragraphRequest);
-    const output = this._assembler.output(outputSwitcherRequest);
+    const switchIndicator = new SwitchIndicatorImpl();
+    const outputSwitcherRequest = new OutputSwitcherRequestImpl(paragraphRequest, switchIndicator);
+    const outputSwitcher = new OutputSwitcherImpl(this.switcherButtons(outputSwitcherRequest),switchIndicator);
+    const output = this._assembler.output(outputSwitcherRequest, outputSwitcher);
     const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
     this._paragraphCollection.updateParagraph(paragraph);
     const outputResponse = new OutputResponse(output);
     this._assembler.initializeOutput(paragraphState, outputResponse);
-    const outputSwitcherResponse = new OutputSwitcherResponse(outputSwitcherRequest, [outputResponse]);
+    const outputSwitcherResponse = new OutputSwitcherResponse(outputSwitcherRequest, [outputResponse], switchIndicator);
     const paragraphResponse = new ParagraphResponse([outputSwitcherResponse], paragraphId);
     this._paragraphResponses.set(paragraphId, paragraphResponse);
   }
@@ -108,7 +116,10 @@ export class ParagraphCollectionResponse implements Respondable {
     const paragraphState = responseData.objectPropertyAsPayload('paragraph');
     const paragraphId = paragraphState.stringProperty('id');
     const paragraphRequest = new ParagraphRequest(this._requestable, paragraphId);
-    const output = this._assembler.output(paragraphRequest);
+    const switchIndicator = new SwitchIndicatorImpl();
+    const outputSwitcherRequest = new OutputSwitcherRequestImpl(paragraphRequest, switchIndicator);
+    const outputSwitcher = new OutputSwitcherImpl(this.switcherButtons(outputSwitcherRequest),switchIndicator);
+    const output = this._assembler.output(outputSwitcherRequest, outputSwitcher);
     const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
     this._paragraphCollection.addParagraph(paragraph, index);
   }
@@ -116,5 +127,34 @@ export class ParagraphCollectionResponse implements Respondable {
   private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
     const paragraphId  = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
     this._paragraphCollection.removeParagraph(paragraphId);
+  }
+
+  private switcherButtons(requestable:Requestable):SwitcherButton[]{
+    const datatablesSwitch = {
+      op:'PARAGRAPH_OUTPUT_REQUEST',
+      data: {
+        noteId:'',
+        paragraphId:'',
+        type: OutputType.dataTables,
+        requestOptions:{
+          draw: 1,
+          start: 0,
+          length: 50
+        }
+      }
+    };
+    const uPlotSwitch = {
+      op:'PARAGRAPH_OUTPUT_REQUEST',
+      data:{
+        paragraphId: '',
+        noteId: '',
+        type: OutputType.uPlot,
+        requestOptions: {graphType: GraphType.bar}
+      }
+    };
+    return [
+      new SwitcherButtonImpl(datatablesSwitch, requestable),
+      new SwitcherButtonImpl(uPlotSwitch, requestable)
+    ];
   }
 }

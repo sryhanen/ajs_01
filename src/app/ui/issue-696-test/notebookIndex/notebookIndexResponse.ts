@@ -60,9 +60,13 @@ import {ParagraphResponse} from '../paragraph/paragraphResponse';
 import {Assembler} from '../assembler/assembler';
 import {AssemblerImpl} from '../assembler/assemblerImpl';
 import {OutputSwitcherResponse} from '../outputSwitcher/outputSwitcherResponse';
-import {OutputFormat} from '../outputFormat/outputFormat';
-import {OutputType} from '../../../objects/output/outputType';
 import {OutputSwitcherRequestImpl} from '../outputSwitcher/outputSwitcherRequestImpl';
+import {OutputSwitcherImpl} from '../outputSwitcher/outputSwitcherImpl';
+import {SwitcherButton} from '../outputSwitcher/switcherButton/switcherButton';
+import {OutputType} from '../../../objects/output/outputType';
+import {GraphType} from '../outputFormat/uPlot/graphType';
+import {SwitcherButtonImpl} from '../outputSwitcher/switcherButton/switcherButtonImpl';
+import {SwitchIndicatorImpl} from '../outputSwitcher/switchIndicator/switchIndicatorImpl';
 
 export class NotebookIndexResponse implements Respondable {
   private readonly _notebookIndex:NotebookIndex;
@@ -104,12 +108,14 @@ export class NotebookIndexResponse implements Respondable {
         const paragraphState = new WebSocketPayloadImpl(paragraphPayload);
         const paragraphId = paragraphState.stringProperty('id');
         const paragraphRequest = new ParagraphRequest(notebookRequest, paragraphId);
-        const output = this._assembler.output(paragraphRequest);
+        const switchIndicator = new SwitchIndicatorImpl();
+        const outputSwitcherRequest = new OutputSwitcherRequestImpl(paragraphRequest, switchIndicator);
+        const outputSwitcher = new OutputSwitcherImpl(this.switcherButtons(outputSwitcherRequest), switchIndicator);
+        const output = this._assembler.output(outputSwitcherRequest, outputSwitcher);
         const paragraph = this._assembler.paragraph(paragraphState, paragraphRequest, {output:output});
-        const outputSwitcherRequest = new OutputSwitcherRequestImpl(paragraphRequest);
         const outputResponse = new OutputResponse(output);
-        const outputSwitcherResponse = new OutputSwitcherResponse(outputSwitcherRequest, [outputResponse]);
-        this._assembler.initializeOutput(paragraphState, outputSwitcherResponse);
+        this._assembler.initializeOutput(paragraphState, outputResponse);
+        const outputSwitcherResponse = new OutputSwitcherResponse(outputSwitcherRequest, [outputResponse], switchIndicator);
         const paragraphResponse = new ParagraphResponse([outputSwitcherResponse], paragraphId);
         paragraphResponses.set(paragraphId, paragraphResponse);
         paragraphCollection.addParagraph(paragraph, paragraphIndex);
@@ -119,5 +125,34 @@ export class NotebookIndexResponse implements Respondable {
       const notebookResponse = new NotebookResponse([paragraphCollectionResponse], receivedNotebookId);
       this._respondables.push(notebookResponse);
     }
+  }
+
+  private switcherButtons(requestable:Requestable):SwitcherButton[]{
+    const datatablesSwitch = {
+      op:'PARAGRAPH_OUTPUT_REQUEST',
+      data: {
+        noteId:'',
+        paragraphId:'',
+        type: OutputType.dataTables,
+        requestOptions:{
+          draw: 1,
+          start: 0,
+          length: 50
+        }
+      }
+    };
+    const uPlotSwitch = {
+      op:'PARAGRAPH_OUTPUT_REQUEST',
+      data:{
+        paragraphId: '',
+        noteId: '',
+        type: OutputType.uPlot,
+        requestOptions: {graphType: GraphType.bar}
+      }
+    };
+    return [
+      new SwitcherButtonImpl(datatablesSwitch, requestable),
+      new SwitcherButtonImpl(uPlotSwitch, requestable)
+    ];
   }
 }

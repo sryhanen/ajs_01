@@ -43,36 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {OutputSwitcher} from './outputSwitcher';
 import {OutputSwitcherView} from './outputSwitcherView';
 import {SwitcherButton} from './switcherButton/switcherButton';
+import {ViewNode} from '../viewNode/viewNode';
+import {SwitchIndicator} from './switchIndicator/switchIndicator';
 
-export class OutputSwitcherImpl implements OutputSwitcher {
+export class OutputSwitcherImpl implements ViewNode<OutputSwitcherView> {
   private readonly _views: Map<string, OutputSwitcherView>;
   private readonly _switcherButtons:SwitcherButton[];
+  private readonly _switchIndicator:SwitchIndicator;
 
-  constructor(switcherButtons:SwitcherButton[]) {
+  constructor(switcherButtons:SwitcherButton[], switchIndicator:SwitchIndicator) {
     this._switcherButtons = switcherButtons;
+    this._switchIndicator = switchIndicator;
     this._views = new Map();
   }
 
   attachView(view: OutputSwitcherView, viewId: string): () => void {
     this._views.set(viewId, view);
     view.attachSwitcherButtons(this._switcherButtons);
+    view.attachSwitchIndicator(this._switchIndicator);
     return ()=> {
       this._views.delete(viewId);
     };
-  }
-
-  hideLoader(): void {
-    this._views.forEach(view => {
-      view.hideLoader();
-    });
-  }
-
-  showLoader(): void {
-    this._views.forEach(view => {
-      view.showLoader();
-    });
   }
 }

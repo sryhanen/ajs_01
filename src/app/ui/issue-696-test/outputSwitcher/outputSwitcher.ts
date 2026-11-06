@@ -46,7 +46,4 @@
 import {OutputSwitcherView} from './outputSwitcherView';
 import {ViewNode} from '../viewNode/viewNode';
 
-export interface OutputSwitcher extends ViewNode<OutputSwitcherView>{
-  showLoader():void;
-  hideLoader():void;
-}
+export type OutputSwitcher = ViewNode<OutputSwitcherView>;

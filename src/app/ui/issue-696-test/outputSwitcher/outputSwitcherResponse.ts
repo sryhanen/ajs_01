@@ -47,14 +47,17 @@ import {Respondable} from '../../../objects/channel/respondable';
 import {OutputSwitcherRequest} from './outputSwitcherRequest';
 import {WebSocketResponseImpl} from '../../../objects/webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../../objects/webSocket/webSocketPayload/webSocketPayloadImpl';
+import {SwitchIndicator} from './switchIndicator/switchIndicator';
 
 export class OutputSwitcherResponse implements Respondable {
   private readonly _outputSwitcherRequest:OutputSwitcherRequest;
   private readonly _respondables:Respondable[];
+  private readonly _switchIndicator:SwitchIndicator;
 
-  constructor(outputSwitcherRequest:OutputSwitcherRequest, respondables:Respondable[]) {
+  constructor(outputSwitcherRequest:OutputSwitcherRequest, respondables:Respondable[], switchIndicator:SwitchIndicator) {
     this._outputSwitcherRequest = outputSwitcherRequest;
     this._respondables = respondables;
+    this._switchIndicator = switchIndicator;
   }
 
   response(json:object):void{
@@ -63,6 +66,7 @@ export class OutputSwitcherResponse implements Respondable {
       const receivedOutputType = webSocketResponse.dataAsWebSocketPayload().objectPropertyAsPayload('output').stringProperty('type');
       const requestCreated = this._outputSwitcherRequest.requestIfOutputTypeIsWrong(receivedOutputType);
       if(!requestCreated){
+        this._switchIndicator.hideLoader();
         this._respondables.forEach(respondable => {
           respondable.response(json);
         });

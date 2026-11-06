@@ -45,9 +45,11 @@
  */
 import {OutputSwitcherView} from './outputSwitcherView';
 import {SwitcherButton} from './switcherButton/switcherButton';
-import {Component, input, signal, WritableSignal} from '@angular/core';
+import {Component, input, signal, ViewChild, ViewContainerRef, WritableSignal} from '@angular/core';
 import {SwitcherButtonViewImpl} from './switcherButton/switcherButtonViewImpl';
 import {OutputSwitcher} from './outputSwitcher';
+import {SwitchIndicator} from './switchIndicator/switchIndicator';
+import {SwitchIndicatorViewImpl} from './switchIndicator/switchIndicatorViewImpl';
 
 @Component({
   selector: 'output-switcher',
@@ -60,18 +62,16 @@ import {OutputSwitcher} from './outputSwitcher';
         <switcher-button [switcherButton]="button"></switcher-button>
       }
     </div>
-    @if (showLoaderSignal()) {
-      <div class="spinner-border mx-2 text-primary" role="status"></div>
-    }
+    <ng-container #switchIndicatorHost />
   `
 })
 export class OutputSwitcherViewImpl implements OutputSwitcherView {
   outputSwitcher = input.required<OutputSwitcher>();
+  @ViewChild('switchIndicatorHost', { read: ViewContainerRef}) private switchIndicatorHost: ViewContainerRef;
   protected switcherButtons: WritableSignal<SwitcherButton[]> = signal([]);
-  protected showLoaderSignal: WritableSignal<boolean> = signal(false);
   private detachView:() => void;
 
-  ngOnInit(): void {
+  ngAfterViewInit() {
     this.detachView = this.outputSwitcher().attachView(this, 'outputSwitcher');
   }
 
@@ -83,11 +83,8 @@ export class OutputSwitcherViewImpl implements OutputSwitcherView {
     this.switcherButtons.set(switcherButtons);
   }
 
-  hideLoader(): void {
-    this.showLoaderSignal.set(false);
-  }
-
-  showLoader(): void {
-    this.showLoaderSignal.set(true);
+  attachSwitchIndicator(switchIndicator: SwitchIndicator):void {
+    const componentRef = this.switchIndicatorHost.createComponent(SwitchIndicatorViewImpl);
+    componentRef.setInput('switchIndicator', switchIndicator);
   }
 }

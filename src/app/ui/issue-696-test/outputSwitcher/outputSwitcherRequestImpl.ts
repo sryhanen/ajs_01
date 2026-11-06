@@ -49,13 +49,16 @@ import {WebSocketPayloadImpl} from '../../../objects/webSocket/webSocketPayload/
 import {Requestable} from '../../../objects/channel/requestable';
 import {WebSocketRequest} from '../../../objects/webSocket/request/webSocketRequest';
 import {WebSocketRequestStub} from '../../../objects/webSocket/request/webSocketRequestStub';
+import {SwitchIndicator} from './switchIndicator/switchIndicator';
 
 export class OutputSwitcherRequestImpl implements OutputSwitcherRequest {
   private readonly _requestable:Requestable;
+  private readonly _switchIndicator:SwitchIndicator;
   private _previousParagraphOutputRequest: WebSocketRequest;
 
-  constructor(requestable:Requestable) {
+  constructor(requestable:Requestable, switchIndicator:SwitchIndicator) {
     this._requestable = requestable;
+    this._switchIndicator = switchIndicator;
     this._previousParagraphOutputRequest = new WebSocketRequestStub();
   }
 
@@ -63,6 +66,7 @@ export class OutputSwitcherRequestImpl implements OutputSwitcherRequest {
     const webSocketRequest = new WebSocketRequestImpl(new WebSocketPayloadImpl(json));
     if(webSocketRequest.operation() === 'PARAGRAPH_OUTPUT_REQUEST'){
       this._previousParagraphOutputRequest = webSocketRequest;
+      this._switchIndicator.showLoader();
     }
     this._requestable.request(json);
   }
