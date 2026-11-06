@@ -59,7 +59,7 @@ import {ViewNodeReference} from '../viewNode/viewNodeReference';
 export class ParagraphViewImpl implements ParagraphView, OnInit, AfterViewInit, OnDestroy {
   paragraph = input.required<Paragraph>();
   @ViewChild('outputHost', { read: ViewContainerRef}) private outputHost!: ViewContainerRef;
-  private viewNodeReference: ViewNodeReference;
+  private viewNodeReference?: ViewNodeReference;
 
   ngOnInit() {
     this.viewNodeReference = this.paragraph().attachView(this, this.paragraph().id());
@@ -70,7 +70,7 @@ export class ParagraphViewImpl implements ParagraphView, OnInit, AfterViewInit, 
   }
 
   ngOnDestroy(): void {
-    this.viewNodeReference.destroy();
+    this.viewNodeReference?.destroy();
   }
 
   attachOutput(output:Output): void {
