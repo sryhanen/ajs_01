@@ -44,5 +44,6 @@
  * a licensee so wish it.
  */
 export interface ViewNode<T> {
-  attachView(view:T, viewId:string):() => void;
+  attachView(view:T, viewId:string):ViewNodeReference;
+  project():void;
 }
