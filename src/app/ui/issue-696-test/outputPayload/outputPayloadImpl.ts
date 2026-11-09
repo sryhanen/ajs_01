@@ -76,7 +76,7 @@ export class OutputPayloadImpl implements OutputPayload {
   constructor(paragraphState:WebSocketPayload, requestable:Requestable) {
     this._requestable = requestable;
     this._switchIndicator = new SwitchIndicatorImpl();
-    this._outputSwitcherRequest = this.initializeOutputSwitcherRequest(this._switchIndicator);
+    this._outputSwitcherRequest = new OutputSwitcherRequestImpl(this._requestable, this._switchIndicator);
     this._output = this.initializeOutput(paragraphState, this._outputSwitcherRequest, this._switchIndicator);
     this._outputSwitcherResponse = new OutputSwitcherResponse(this._outputSwitcherRequest, [new OutputResponse(this._output)], this._switchIndicator);
   }
@@ -87,10 +87,6 @@ export class OutputPayloadImpl implements OutputPayload {
 
   asOutputSwitcherResponse(): Respondable {
     return this._outputSwitcherResponse;
-  }
-
-  private initializeOutputSwitcherRequest(switchIndicator:SwitchIndicator):OutputSwitcherRequest {
-    return new OutputSwitcherRequestImpl(this._requestable, switchIndicator);
   }
 
   private initializeOutput(paragraphState: WebSocketPayload, outputSwitcherRequest:OutputSwitcherRequest,switchIndicator:SwitchIndicator):Output {

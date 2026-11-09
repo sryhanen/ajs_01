@@ -65,18 +65,10 @@ export class ParagraphPayloadImpl implements ParagraphPayload {
   constructor(paragraphState:WebSocketPayload, requestable: Requestable) {
     this._paragraphState = paragraphState;
     this._requestable = requestable;
-    this._paragraphRequest = this.initializeParagraphRequest(this._requestable);
-    this._outputState = this.initializeOutputState(paragraphState, this._paragraphRequest);
+    this._paragraphRequest = new ParagraphRequest(this._requestable, this.paragraphId());
+    this._outputState = new OutputPayloadImpl(paragraphState, this._paragraphRequest);
     this._paragraph = new ParagraphImpl(this._paragraphRequest, this._paragraphState, {output: this._outputState.asOutput()});
     this._paragraphResponse = new ParagraphResponse([this._outputState.asOutputSwitcherResponse()], this.paragraphId());
-  }
-
-  private initializeParagraphRequest(requestable: Requestable):Requestable{
-    return new ParagraphRequest(requestable, this.paragraphId());
-  }
-
-  private initializeOutputState(paragraphState:WebSocketPayload, paragraphRequest:Requestable):OutputPayload{
-    return new OutputPayloadImpl(paragraphState, paragraphRequest);
   }
 
   asParagraph(): Paragraph {
