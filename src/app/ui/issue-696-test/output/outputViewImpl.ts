@@ -62,7 +62,7 @@ import {ViewNodeReference} from '../viewNode/viewNodeReference';
 import {RegisteredComponents} from '../../angular2+/componentRegistry/registeredComponents';
 
 @Component({
-  selector: 'output',
+  selector: 'output-view',
   template: `
     <ng-container #switcherContainer/>
     <ng-container #outputContainer/>
