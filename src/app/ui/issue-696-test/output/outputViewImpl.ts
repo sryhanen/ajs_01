@@ -46,7 +46,7 @@
 import {OutputView} from './outputView';
 import {
   AfterViewInit,
-  Component,
+  Component, ComponentRef,
   inject,
   input,
   OnDestroy, OnInit,
@@ -59,6 +59,7 @@ import {COMPONENT_REGISTRY} from '../../angular2+/componentRegistry/componentReg
 import {OutputSwitcherViewImpl} from '../outputSwitcher/outputSwitcherViewImpl';
 import {OutputSwitcher} from '../outputSwitcher/outputSwitcher';
 import {ViewNodeReference} from '../viewNode/viewNodeReference';
+import {RegisteredComponents} from '../../angular2+/componentRegistry/registeredComponents';
 
 @Component({
   selector: 'output',
@@ -72,6 +73,7 @@ export class OutputViewImpl implements OutputView, OnInit, AfterViewInit, OnDest
   @ViewChild('switcherContainer', {read:ViewContainerRef}) private switcherContainer: ViewContainerRef;
   @ViewChild('outputContainer', {read:ViewContainerRef}) private outputContainer: ViewContainerRef;
   private viewNodeReference:ViewNodeReference;
+  private previousComponentReference: { componentName: string, componentRef: ComponentRef<unknown> };
 
   ngOnInit() {
     this.viewNodeReference =  this.output().attachView(this, 'output');
@@ -92,11 +94,25 @@ export class OutputViewImpl implements OutputView, OnInit, AfterViewInit, OnDest
   }
 
   render(component:{componentReference: string, inputs: Record<string, unknown>}):void{
-    this.outputContainer.clear();
-    const componentRef = this.outputContainer.createComponent(this.componentInstance(component.componentReference));
-    for(const [name,value] of Object.entries(component.inputs)) {
-      componentRef.setInput(name, value);
+    const datatablesComponentReference = RegisteredComponents.DATATABLES_OUTPUT_VIEW;
+    if(this.previousComponentReference && this.previousComponentReference.componentName === datatablesComponentReference && component.componentReference === datatablesComponentReference){
+      for(const [name,value] of Object.entries(component.inputs)) {
+        this.previousComponentReference.componentRef.setInput(name, value);
+      }
     }
+    else{
+      this.outputContainer.clear();
+      const componentName = component.componentReference;
+      const componentRef = this.outputContainer.createComponent(this.componentInstance(componentName));
+      for(const [name,value] of Object.entries(component.inputs)) {
+        componentRef.setInput(name, value);
+      }
+      this.previousComponentReference = {
+        componentRef:componentRef,
+        componentName:componentName
+      };
+    }
+
   }
 
   attachSwitcher(outputSwitcher: OutputSwitcher): void {
