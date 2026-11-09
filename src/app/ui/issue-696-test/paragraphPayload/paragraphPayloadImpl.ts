@@ -68,7 +68,7 @@ export class ParagraphPayloadImpl implements ParagraphPayload {
     this._paragraphRequest = this.initializeParagraphRequest(this._requestable);
     this._outputState = this.initializeOutputState(paragraphState, this._paragraphRequest);
     this._paragraph = new ParagraphImpl(this._paragraphRequest, this._paragraphState, {output: this._outputState.asOutput()});
-    this._paragraphResponse = new ParagraphResponse([this._outputState.asOutputResponse()], this.paragraphId());
+    this._paragraphResponse = new ParagraphResponse([this._outputState.asOutputSwitcherResponse()], this.paragraphId());
   }
 
   private initializeParagraphRequest(requestable: Requestable):Requestable{

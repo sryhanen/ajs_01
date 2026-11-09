@@ -48,5 +48,5 @@ import {Respondable} from '../../../objects/channel/respondable';
 
 export interface OutputPayload {
   asOutput():Output;
-  asOutputResponse():Respondable;
+  asOutputSwitcherResponse():Respondable;
 }

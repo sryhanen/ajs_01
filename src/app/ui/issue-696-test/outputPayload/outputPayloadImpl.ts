@@ -85,7 +85,7 @@ export class OutputPayloadImpl implements OutputPayload {
     return this._output;
   }
 
-  asOutputResponse(): Respondable {
+  asOutputSwitcherResponse(): Respondable {
     return this._outputSwitcherResponse;
   }
 
