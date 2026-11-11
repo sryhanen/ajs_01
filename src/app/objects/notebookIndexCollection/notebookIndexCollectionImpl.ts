@@ -44,7 +44,6 @@
  * a licensee so wish it.
  */
 import {NotebookIndexCollection} from './notebookIndexCollection';
-import {Channel} from '../channel/channel';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {NotebookIndex} from '../notebookIndex/notebookIndex';
@@ -54,14 +53,15 @@ import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
 import {NotebookIndexImpl} from '../notebookIndex/notebookIndexImpl';
+import {Requestable} from '../channel/requestable';
 
 export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
-  private readonly _channel:Channel;
+  private readonly _requestable:Requestable;
   private readonly _notebookIndices: WritableSignal<Map<string, NotebookIndex>>;
   private readonly _renderNode:Signal<RenderNode>;
 
-  constructor(channel:Channel) {
-    this._channel = channel;
+  constructor(requestable:Requestable) {
+    this._requestable = requestable;
     this._notebookIndices = signal(new Map(), {equal:() => false});
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_COLLECTION_VIEW, computed(() => ({
       notebookIndices: Array.from(this._notebookIndices().values()).map(notebookIndex => notebookIndex.print()())
@@ -73,7 +73,7 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
   }
 
   request(data: object): void {
-    this._channel.request(data);
+    this._requestable.request(data);
   }
 
   response(json: object): void {
@@ -93,7 +93,7 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
       return notebookIndices;
     });
     notebookIndicesPayload.forEach(notebookIndexPayload => {
-      const notebookIndex = new NotebookIndexImpl(this, notebookIndexPayload);
+      const notebookIndex = new NotebookIndexImpl(this, new WebSocketPayloadImpl(notebookIndexPayload));
       this._notebookIndices.update(notebookIndices => notebookIndices.set(notebookIndex.id(), notebookIndex));
     });
   }
