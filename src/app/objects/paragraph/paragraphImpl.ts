@@ -60,14 +60,17 @@ import {Requestable} from '../channel/requestable';
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
   private readonly _output: Output;
-  private readonly _paragraphData: WebSocketPayload;
+  private readonly _paragraphState: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _paragraphIdFilter: WebSocketResponsePropertyEqualsFilter;
 
-  constructor(requestable: Requestable, paragraphData: object) {
+  constructor(requestable: Requestable,
+              paragraphState: WebSocketPayload,
+              output:Output = new OutputImpl(this, paragraphState)
+  ) {
     this._requestable = requestable;
-    this._paragraphData = new WebSocketPayloadImpl(paragraphData);
-    this._output = this.initializedOutput(this._paragraphData);
+    this._paragraphState = paragraphState;
+    this._output = output;
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
       output:this._output.print()(),
       paragraphId:this.id()
@@ -80,9 +83,9 @@ export class ParagraphImpl implements Paragraph {
       op:'RUN_PARAGRAPH',
       data: {
         id: this.id(),
-        paragraph: this._paragraphData.stringProperty('text'),
-        config: this._paragraphData.objectProperty('config'),
-        params: this._paragraphData.objectPropertyAsPayload('settings').objectProperty('params'),
+        paragraph: this._paragraphState.stringProperty('text'),
+        config: this._paragraphState.objectProperty('config'),
+        params: this._paragraphState.objectPropertyAsPayload('settings').objectProperty('params'),
       },
     };
     this._requestable.request(runParagraphRequest);
@@ -93,7 +96,7 @@ export class ParagraphImpl implements Paragraph {
   }
 
   id(): string {
-    return this._paragraphData.stringProperty('id');
+    return this._paragraphState.stringProperty('id');
   }
 
   request(json: object): void {
@@ -113,31 +116,6 @@ export class ParagraphImpl implements Paragraph {
         op:filteredResponse.operation(),
         data:filteredResponse.data()
       });
-    }
-  }
-
-  private initializedOutput(paragraphData: WebSocketPayload): Output {
-    const output = new OutputImpl(this);
-    this.createOutputResponseIfOutputExists(paragraphData, output);
-    return output;
-  }
-
-  private createOutputResponseIfOutputExists(paragraphData: WebSocketPayload, output:Output):void{
-    if (paragraphData.propertyExists('output')) {
-      const paragraphOutput = paragraphData.objectProperty('output');
-      if (paragraphOutput['data'] === undefined || paragraphOutput['type'] === undefined) {
-        console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
-      } else {
-        const paragraphOutputResponse = {
-          op: 'PARAGRAPH_OUTPUT',
-          data: {
-            noteId: '',
-            paragraphId: this.id(),
-            output: paragraphOutput,
-          }
-        };
-        output.response(paragraphOutputResponse);
-      }
     }
   }
 }
