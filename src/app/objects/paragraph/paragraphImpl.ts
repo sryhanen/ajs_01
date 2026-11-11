@@ -56,9 +56,12 @@ import {WebSocketResponsePropertyEqualsFilter} from '../webSocket/response/webSo
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
 import {WebSocketRequestWithField} from '../webSocket/request/webSocketRequestWithField/webSocketRequestWithField';
 import {Requestable} from '../channel/requestable';
+import {EditorImpl} from './editor/editorImpl';
+import {Editor} from './editor/editor';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
+  private readonly _editor: Editor;
   private readonly _output: Output;
   private readonly _paragraphState: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
@@ -66,12 +69,15 @@ export class ParagraphImpl implements Paragraph {
 
   constructor(requestable: Requestable,
               paragraphState: WebSocketPayload,
+              editor:Editor = new EditorImpl(this, paragraphState),
               output:Output = new OutputImpl(this, paragraphState)
   ) {
     this._requestable = requestable;
     this._paragraphState = paragraphState;
+    this._editor = editor;
     this._output = output;
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
+      editor:this._editor.print()(),
       output:this._output.print()(),
       paragraphId:this.id()
     })));
@@ -113,6 +119,10 @@ export class ParagraphImpl implements Paragraph {
     const filteredResponse = this._paragraphIdFilter.filterResponse(message);
     if(!filteredResponse.isStub()) {
       this._output.response({
+        op:filteredResponse.operation(),
+        data:filteredResponse.data()
+      });
+      this._editor.response({
         op:filteredResponse.operation(),
         data:filteredResponse.data()
       });
