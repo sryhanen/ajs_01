@@ -67,6 +67,7 @@ import {WebSocketRequest} from '../webSocket/request/webSocketRequest';
 import {WebSocketRequestStub} from '../webSocket/request/webSocketRequestStub';
 import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
 import {Requestable} from '../channel/requestable';
+import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 
 export class OutputImpl implements Output {
   private readonly _requestable:Requestable;
@@ -79,7 +80,7 @@ export class OutputImpl implements Output {
   private readonly _output:WritableSignal<RenderNode>;
   private readonly _renderNodeStub:RenderNode;
 
-  constructor(requestable:Requestable) {
+  constructor(requestable:Requestable, paragraphState: WebSocketPayload) {
     this._requestable = requestable;
     this._renderNodeStub = new RenderNodeStub();
     this._interpreterErrorListener = new InterpreterErrorListenerImpl();
@@ -96,6 +97,7 @@ export class OutputImpl implements Output {
     this._outputSwitcher = new OutputSwitcherImpl(buttons.flat());
     this._previousParagraphOutputRequest = new WebSocketRequestStub();
     this._output = signal(new RenderNodeStub());
+    this.initializeOutput(this._outputFormats, paragraphState, this._output);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.OUTPUT_VIEW, computed(() => ({
       interpreterErrorListener: this._interpreterErrorListener.print()(),
       outputSwitcher: this._showSwitcher() ? this._outputSwitcher.print()() : this._renderNodeStub,
@@ -119,45 +121,46 @@ export class OutputImpl implements Output {
   response(json: object): void {
     const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
     if(webSocketResponse.operation() === 'PARAGRAPH_OUTPUT'){
-      const receivedOutputType = webSocketResponse.dataAsWebSocketPayload().objectPropertyAsPayload('output').stringProperty('type');
-      if(!this._previousParagraphOutputRequest.isStub() && !this.receivedOutputIsValid(webSocketResponse)){
+      if(!this._previousParagraphOutputRequest.isStub() && this.receivedOutputIsInvalid(webSocketResponse)){
         this._requestable.request({
           op:this._previousParagraphOutputRequest.operation(),
           data:this._previousParagraphOutputRequest.data(),
         });
       }
       else{
-        if(!this._outputFormats.has(receivedOutputType)){
-          throw new Error(`OutputFormat "${receivedOutputType}" is not supported.`);
-        }
-        const output = webSocketResponse.dataAsWebSocketPayload().objectProperty('output');
-        const outputData = output['data'];
-        if(!('data' in output)){
-          throw new Error(`Output response data is not defined, output: ${JSON.stringify(output)}`);
-        }
-        const outputOptions = output['options'];
-        const outputFormat = this._outputFormats.get(receivedOutputType);
-        outputFormat.render(outputData, outputOptions);
-        this._output.set(outputFormat.print()());
-        this.updateSwitcher(webSocketResponse);
+        const outputState = webSocketResponse.dataAsWebSocketPayload().objectProperty('output');
+        this.updateOutputAndOutputSwitcher(outputState, this._outputFormats, this._output);
       }
     }
   }
 
-  private receivedOutputIsValid(paragraphOutputResponse:WebSocketResponse):boolean{
+  private receivedOutputIsInvalid(paragraphOutputResponse:WebSocketResponse):boolean{
     const receivedOutputType = paragraphOutputResponse.dataAsWebSocketPayload().objectPropertyAsPayload('output').stringProperty('type');
     const requestedOutputType = new WebSocketPayloadImpl(this._previousParagraphOutputRequest.data()).stringProperty('type');
-    return receivedOutputType === requestedOutputType;
+    return receivedOutputType !== requestedOutputType;
   }
 
-  private updateSwitcher(paragraphOutputResponse:WebSocketResponse):void{
-    const isAggregated = paragraphOutputResponse.dataAsWebSocketPayload().objectPropertyAsPayload('output').booleanProperty('isAggregated');
-    if(isAggregated){
-      this._showSwitcher.set(true);
+  private initializeOutput(outputFormats: Map<string, OutputFormat>, paragraphState:WebSocketPayload, output:WritableSignal<RenderNode>):void{
+    if (paragraphState.propertyExists('output')) {
+      const paragraphOutput = paragraphState.objectPropertyAsPayload('output');
+      if (!paragraphOutput.propertyExists('data') || !paragraphOutput.propertyExists('type')) {
+         console.error(`Output data not processed, format invalid: ${JSON.stringify(paragraphOutput)}`);
+      }
+      else{
+        this.updateOutputAndOutputSwitcher(paragraphState.objectProperty('output'), outputFormats, output);
+      }
     }
-    else{
-      this._showSwitcher.set(false);
-    }
+  }
+
+  private updateOutputAndOutputSwitcher(outputState:object, outputFormats: Map<string, OutputFormat>, output:WritableSignal<RenderNode>):void{
+    const outputType = outputState['type'];
+    const outputData = outputState['data'];
+    const outputOptions = outputState['options'];
+    const isAggregated = outputState['isAggregated'];
+    const outputFormat = outputFormats.get(outputType);
+    outputFormat.render(outputData, outputOptions);
+    output.set(outputFormat.print()());
+    this._showSwitcher.set(isAggregated);
     this._outputSwitcher.hideLoader();
   }
 }

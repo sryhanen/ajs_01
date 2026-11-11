@@ -50,6 +50,7 @@ import {Requestable} from '../channel/requestable';
 import {OutputType} from './outputType';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
+import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 describe('Output unit test', () => {
   let requestable:Requestable;
@@ -57,8 +58,9 @@ describe('Output unit test', () => {
 
   beforeEach(() => {
     requestable = new FakeChannel();
-    output = new OutputImpl(requestable);
+    output = new OutputImpl(requestable, new WebSocketPayloadImpl({}));
   });
+
 
   it('Should print', () => {
     const printed = output.print()();
@@ -69,6 +71,19 @@ describe('Output unit test', () => {
     expect((inputs['outputSwitcher'] as RenderNode).isStub()).toBe(true);
     expect(inputs['output']).toBeDefined();
     expect((inputs['output'] as RenderNode).isStub()).toBe(true);
+  });
+
+  it('Should initialize output', () => {
+    output = new OutputImpl(requestable, new WebSocketPayloadImpl({
+      output:{
+        type:OutputType.text,
+        data:'',
+      }
+    }));
+    const printed = output.print()();
+    const inputs = printed.inputs()();
+    expect(inputs['output']).toBeDefined();
+    expect((inputs['output'] as RenderNode).isStub()).toBe(false);
   });
 
   it('Should request requestable', () => {
