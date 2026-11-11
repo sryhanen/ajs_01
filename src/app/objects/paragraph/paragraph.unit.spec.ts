@@ -80,19 +80,26 @@ describe('Paragraph', () => {
     paragraph = new ParagraphImpl(channel, new WebSocketPayloadImpl(paragraphData));
   });
 
-  describe('Birth', () => {
-    it('Should initialize', () => {
-      expect(paragraph).toBeInstanceOf(ParagraphImpl);
-    });
+  it('Should have id', () => {
+    expect(paragraph.id()).toEqual(paragraphId);
+  });
 
-    it('Should have id', () => {
-      expect(paragraph.id()).toEqual(paragraphId);
-    });
+  it('Should print renderNode', () => {
+    const paragraphPrinted = paragraph.print()();
+    expect(paragraphPrinted.isStub()).toBe(false);
+  });
 
-    it('Should print', () => {
-      const paragraphPrinted = paragraph.print()();
-      expect(paragraphPrinted.isStub()).toBe(false);
-    });
+  it('Should print Execution', () => {
+    expect(paragraph.print()().inputs()()['execution']).toBeDefined();
+  });
+
+  it('Should print output', () => {
+    expect(paragraph.print()().inputs()()['output']).toBeDefined();
+
+  });
+
+  it('Should print paragraphId', () => {
+    expect(paragraph.print()().inputs()()['paragraphId']).toEqual(paragraphId);
   });
 
   it('RunParagraph should create expected request', () => {
