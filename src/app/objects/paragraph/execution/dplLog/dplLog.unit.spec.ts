@@ -65,7 +65,7 @@ describe('DplLog unit test', () => {
     dplLog = new DplLogImpl();
     const name = 'batchMsg';
     const value = '';
-    const dplLogUpdateMessage = new AngularObjectUpdateServerResponse(name, value);
+    const dplLogUpdateMessage = new AngularObjectUpdateServerResponse(name, value, '', '');
     dplLog.response(dplLogUpdateMessage.toObject());
     const printed = dplLog.print()();
     expect(printed.isStub()).toBe(false);
@@ -75,7 +75,7 @@ describe('DplLog unit test', () => {
     dplLog = new DplLogImpl();
     const name = 'batchMsg';
     const value = 'Batch message value';
-    const dplLogUpdateMessage = new AngularObjectUpdateServerResponse(name, value);
+    const dplLogUpdateMessage = new AngularObjectUpdateServerResponse(name, value, '', '');
     dplLog.response(dplLogUpdateMessage.toObject());
     const printed = dplLog.print()();
     expect(printed.inputs()()['dplLog']['batchMsg']).toEqual(value);
@@ -85,7 +85,7 @@ describe('DplLog unit test', () => {
     dplLog = new DplLogImpl();
     const name = 'message';
     const value = 'Message value';
-    const dplLogUpdateMessage = new AngularObjectUpdateServerResponse(name, value);
+    const dplLogUpdateMessage = new AngularObjectUpdateServerResponse(name, value, '', '');
     dplLog.response(dplLogUpdateMessage.toObject());
     const printed = dplLog.print()();
     expect(printed.inputs()()['dplLog']['message']).toEqual(value);
@@ -95,7 +95,7 @@ describe('DplLog unit test', () => {
     dplLog = new DplLogImpl();
     const name = 'timeMsg';
     const value = 'Time message value';
-    const dplLogUpdateMessage = new AngularObjectUpdateServerResponse(name, value);
+    const dplLogUpdateMessage = new AngularObjectUpdateServerResponse(name, value, '', '');
     dplLog.response(dplLogUpdateMessage.toObject());
     const printed = dplLog.print()();
     expect(printed.inputs()()['dplLog']['timeMsg']).toEqual(value);
@@ -105,7 +105,7 @@ describe('DplLog unit test', () => {
     dplLog = new DplLogImpl();
     const name = 'batchMsg';
     const value = 'Batch message value';
-    const dplLogUpdateMessage = new AngularObjectUpdateServerResponse(name, value);
+    const dplLogUpdateMessage = new AngularObjectUpdateServerResponse(name, value, '', '');
     dplLog.response(dplLogUpdateMessage.toObject());
     const dplValueBeforeRemove = dplLog.print()().inputs()()['dplLog']['batchMsg'];
     const dplLogRemoveMessage = new AngularObjectRemoveServerResponse(name);

@@ -48,10 +48,14 @@ import {WebSocketServerResponse} from '../webSocketServerResponse';
 export class AngularObjectUpdateServerResponse implements WebSocketServerResponse{
   private readonly _name:string;
   private readonly _value:unknown;
+  private readonly _paragraphId:string;
+  private readonly _noteId:string;
 
-  constructor(name:string, value:unknown) {
+  constructor(name:string, value:unknown, paragraphId:string, noteId:string) {
     this._name = name;
     this._value = value;
+    this._paragraphId = paragraphId;
+    this._noteId = noteId;
   }
 
   toJson(): string {
@@ -65,7 +69,9 @@ export class AngularObjectUpdateServerResponse implements WebSocketServerRespons
         angularObject:{
           name:this._name,
           object:this._value
-        }
+        },
+        paragraphId:this._paragraphId,
+        noteId:this._noteId,
       }
     };
   }
