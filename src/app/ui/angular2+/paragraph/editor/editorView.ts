@@ -43,14 +43,44 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, input, OnChanges, ViewChild} from '@angular/core';
+import ace from 'ace-builds';
+import {EditorRule} from '../../../../objects/paragraph/editor/editorRule/editorRule';
 
 @Component({
   selector: 'editor',
   template: `
-
+    <div class="paragraph-editor my-2">
+      <pre #editorAnchor class="editor-container"></pre>
+    </div>
   `
 })
-export class EditorView {
+export class EditorView implements AfterViewInit, OnChanges{
+  @ViewChild('editorAnchor') editorAnchor: ElementRef;
+  editorRules = input.required<EditorRule[]>();
+  private _aceEditor: ace.Ace.Editor;
 
+  ngAfterViewInit() {
+    ace.config.set('basePath', '/');
+    ace.config.set('modePath', '/');
+    ace.config.set('themePath', '/');
+    ace.config.set('workerPath', '/');
+    this.initializeEditor();
+  }
+
+  ngOnChanges() {
+    if(this._aceEditor){
+      this.editorAnchor.nativeElement.className = '';
+      this.editorAnchor.nativeElement.classList.add('editor-container');
+      this._aceEditor.destroy();
+      this.initializeEditor();
+    }
+  }
+
+  private initializeEditor():void{
+    this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
+    this.editorRules().forEach(rule => {
+      rule.applyTo(this._aceEditor);
+    });
+  }
 }

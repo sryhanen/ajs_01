@@ -50,15 +50,42 @@ import {Requestable} from '../../channel/requestable';
 import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
+import {KeyBindingsRule} from './editorRule/keyBindingsRule/keyBindingsRule';
+import {EditorRule} from './editorRule/editorRule';
+import {AnnotationsRule} from './editorRule/annotationsRule/annotationsRule';
+import {AutoCommitRule} from './editorRule/autoCommitRule/autoCommitRule';
+import {EditorStateRule} from './editorRule/editorStateRule/editorStateRule';
+import {HighlightsRule} from './editorRule/highlightsRule/highlightsRule';
+import {ExcludedCommandsRule} from './editorRule/excludedCommandsRule/excludedCommandsRule';
+import {SyntaxLanguageSelectRuleImpl} from './editorRule/syntaxLanguageSelectRule/syntaxLanguageSelectRuleImpl';
+import {AutoCompletionsRuleImpl} from './editorRule/autoCompletionsRule/autoCompletionsRuleImpl';
+import {DplCompleterImpl} from './editorRule/autoCompletionsRule/dplCompleter/dplCompleterImpl';
+import {SyntaxLanguageSelectRule} from './editorRule/syntaxLanguageSelectRule/syntaxLanguageSelectRule';
+import {AutoCompletionsRule} from './editorRule/autoCompletionsRule/autoCompletionsRule';
 
 export class EditorImpl implements Editor {
   private readonly _requestable: Requestable;
+  private readonly _editorRules:EditorRule[];
+  private readonly _autoCompleteRule:AutoCompletionsRule;
+  private readonly _syntaxLanguageSelectRule:SyntaxLanguageSelectRule;
   private readonly _printSignal:Signal<RenderNode>;
 
   constructor(requestable: Requestable, paragraphState: WebSocketPayload) {
     this._requestable = requestable;
+    this._autoCompleteRule = new AutoCompletionsRuleImpl(new DplCompleterImpl(this));
+    this._syntaxLanguageSelectRule = new SyntaxLanguageSelectRuleImpl(this);
+    this._editorRules = [
+      new AnnotationsRule(),
+      new AutoCommitRule(this),
+      new EditorStateRule(paragraphState),
+      new ExcludedCommandsRule(),
+      new HighlightsRule(),
+      new KeyBindingsRule(this),
+      this._autoCompleteRule,
+      this._syntaxLanguageSelectRule
+    ];
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
-
+      editorRules:this._editorRules
     }))));
   }
 
@@ -67,10 +94,11 @@ export class EditorImpl implements Editor {
   }
 
   request(json: object): void {
-
+    this._requestable.request(json);
   }
 
   response(json: object) {
-
+    this._autoCompleteRule.response(json);
+    this._syntaxLanguageSelectRule.response(json);
   }
 }
