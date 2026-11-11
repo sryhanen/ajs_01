@@ -67,6 +67,6 @@ export class ExecutionImpl implements Execution {
   }
 
   response(json: object): void {
-
+    this._dplLog.response(json);
   }
 }
