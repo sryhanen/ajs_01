@@ -60,15 +60,19 @@ import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registe
 
 export class NotebookImpl implements Notebook {
   private readonly _channel: Channel;
-  private readonly _notebook: WebSocketPayload;
+  private readonly _notebookState: WebSocketPayload;
   private readonly _paragraphCollection: ParagraphCollection;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _noteIdFilter:WebSocketResponseFilter;
 
-  constructor(channel: Channel, notebook: object) {
+  constructor(channel: Channel,
+              notebookState: WebSocketPayload,
+              paragraphCollection: ParagraphCollection
+              = new ParagraphCollectionImpl(this, notebookState)
+  ) {
     this._channel = channel;
-    this._notebook = new WebSocketPayloadImpl(notebook);
-    this._paragraphCollection = new ParagraphCollectionImpl(this, this._notebook.arrayProperty('paragraphs'));
+    this._notebookState = notebookState;
+    this._paragraphCollection = paragraphCollection;
     this._noteIdFilter = new WebSocketResponsePropertyEqualsFilter('noteId', this.id());
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_VIEW, signal({
       paragraphCollection: this._paragraphCollection.print()()
@@ -80,7 +84,7 @@ export class NotebookImpl implements Notebook {
   }
 
   id(): string {
-    return this._notebook.stringProperty('id');
+    return this._notebookState.stringProperty('id');
   }
 
   request(json: object): void {
