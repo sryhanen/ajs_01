@@ -51,22 +51,22 @@ import {Notebook} from '../notebook/notebook';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {NotebookStub} from '../notebook/notebookStub';
-import {Channel} from '../channel/channel';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
 import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
 import {NotebookImpl} from '../notebook/notebookImpl';
+import {Requestable} from '../channel/requestable';
 
 export class NotebookIndexImpl implements NotebookIndex {
-  private readonly _channel: Channel;
-  private readonly _notebookIndexData:WebSocketPayload;
+  private readonly _requestable: Requestable;
+  private readonly _notebookIndexState:WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _notebook: WritableSignal<Notebook>;
 
-  constructor(channel: Channel, notebookIndexData:object) {
-    this._channel = channel;
-    this._notebookIndexData = new WebSocketPayloadImpl(notebookIndexData);
+  constructor(requestable: Requestable, notebookIndexState:WebSocketPayload) {
+    this._requestable = requestable;
+    this._notebookIndexState = notebookIndexState;
     this._notebook = signal(new NotebookStub());
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.NOTEBOOK_INDEX_VIEW, computed(() => ({
       notebook: this._notebook().isStub() ? new RenderNodeStub() : this._notebook().print()()
@@ -74,7 +74,7 @@ export class NotebookIndexImpl implements NotebookIndex {
   }
 
   request(json: object): void {
-    this._channel.request(json);
+    this._requestable.request(json);
   }
 
   response(json: object): void {
@@ -88,7 +88,7 @@ export class NotebookIndexImpl implements NotebookIndex {
   }
 
   id():string {
-    return this._notebookIndexData.stringProperty('id');
+    return this._notebookIndexState.stringProperty('id');
   }
 
   print(): Signal<RenderNode> {
@@ -98,7 +98,7 @@ export class NotebookIndexImpl implements NotebookIndex {
   private handleNoteResponseEvent(webSocketResponse: WebSocketResponse): void {
     const receivedNotebookId = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
     if(receivedNotebookId === this.id()){
-      const notebook = new NotebookImpl(this, webSocketResponse.data());
+      const notebook = new NotebookImpl(this, webSocketResponse.dataAsWebSocketPayload());
       this._notebook.set(notebook);
     }
   }

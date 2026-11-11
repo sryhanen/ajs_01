@@ -48,6 +48,7 @@ import {NotebookIndexImpl} from './notebookIndexImpl';
 import {Channel} from '../channel/channel';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {FakeChannel} from '../channel/fakeChannel';
+import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 describe('NotebookIndex', () => {
   let notebookIndex: NotebookIndex;
@@ -63,7 +64,7 @@ describe('NotebookIndex', () => {
 
   beforeEach(() => {
     channel = new FakeChannel();
-    notebookIndex = new NotebookIndexImpl(channel, notebookIndexData);
+    notebookIndex = new NotebookIndexImpl(channel, new WebSocketPayloadImpl(notebookIndexData));
   });
 
   it('Should have id', () => {
