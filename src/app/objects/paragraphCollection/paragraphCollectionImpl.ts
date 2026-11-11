@@ -54,7 +54,6 @@ import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {Requestable} from '../channel/requestable';
-import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _requestable: Requestable;
@@ -118,14 +117,12 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphResponse = new TypedWebSocketResponse('PARAGRAPH', webSocketResponse);
-    const paragraph = new ParagraphImpl(this, paragraphResponse.data());
+    const paragraph = new ParagraphImpl(this, webSocketResponse.data());
     this._paragraphs.update(paragraphs => paragraphs.set(paragraph.id(), paragraph));
   }
 
   private handleParagraphAddedResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphAddedResponse = new TypedWebSocketResponse('PARAGRAPH_ADDED', webSocketResponse);
-    const responseData = paragraphAddedResponse.dataAsWebSocketPayload();
+    const responseData = webSocketResponse.dataAsWebSocketPayload();
     const index = responseData.numberProperty('index');
     if(index < 0 || index > this._paragraphs().size){
       throw new Error(`Invalid index "${index}" provided.`);
@@ -137,8 +134,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphRemovedResponse = new TypedWebSocketResponse('PARAGRAPH_REMOVED', webSocketResponse);
-    const paragraphId  = paragraphRemovedResponse.dataAsWebSocketPayload().stringProperty('id');
+    const paragraphId  = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
     if(!this._paragraphs().has(paragraphId)){
       throw new Error(`Paragraph "${paragraphId}" does not exist.`);
     }

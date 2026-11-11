@@ -56,7 +56,6 @@ import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPaylo
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
 import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
-import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookImpl} from '../notebook/notebookImpl';
 
 export class NotebookIndexImpl implements NotebookIndex {
@@ -97,10 +96,9 @@ export class NotebookIndexImpl implements NotebookIndex {
   }
 
   private handleNoteResponseEvent(webSocketResponse: WebSocketResponse): void {
-    const noteResponse = new TypedWebSocketResponse('NOTE', webSocketResponse);
-    const receivedNotebookId = noteResponse.dataAsWebSocketPayload().stringProperty('id');
+    const receivedNotebookId = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
     if(receivedNotebookId === this.id()){
-      const notebook = new NotebookImpl(this, noteResponse.data());
+      const notebook = new NotebookImpl(this, webSocketResponse.data());
       this._notebook.set(notebook);
     }
   }

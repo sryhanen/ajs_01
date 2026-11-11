@@ -53,7 +53,6 @@ import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPaylo
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
-import {TypedWebSocketResponse} from '../webSocket/response/typedWebSocketResponse/typedWebSocketResponse';
 import {NotebookIndexImpl} from '../notebookIndex/notebookIndexImpl';
 
 export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
@@ -88,8 +87,7 @@ export class NotebookIndexCollectionImpl implements NotebookIndexCollection{
   }
 
   private handleNotesInfoResponse(webSocketResponse:WebSocketResponse):void{
-    const notesInfoResponse = new TypedWebSocketResponse('NOTES_INFO', webSocketResponse);
-    const notebookIndicesPayload = notesInfoResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
+    const notebookIndicesPayload = webSocketResponse.dataAsWebSocketPayload().arrayProperty<object>('notes');
     this._notebookIndices.update(notebookIndices => {
       notebookIndices.clear();
       return notebookIndices;
