@@ -43,14 +43,37 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component} from '@angular/core';
+import {Component, input, signal, WritableSignal} from '@angular/core';
+import {DplLogKey} from '../../../../../objects/paragraph/execution/dplLog/dplLogKeys';
 
 @Component({
   selector: 'dpl-log',
   template: `
-
+    <div class="dpl-log paragraph-footer-elapsed" role="log">
+      <p>
+        <button
+          (click)="toggleLog()"
+          class="btn btn-secondary btn-small my-2">
+          Show/Hide log
+        </button>
+      </p>
+      @if(logIsVisible()){
+        <div class="log-message">
+          <h3>Data Batch Status</h3>
+          <p class="batch-message">{{dplLog().batchMsg}}</p>
+          <p>{{dplLog().timeMsg}}</p>
+          <p class="overflow-auto">{{dplLog().message}}</p>
+        </div>
+      }
+    </div>
   `
 })
 export class DplLogView {
+  dplLog = input.required<Record<DplLogKey, string>>();
 
+  protected logIsVisible:WritableSignal<boolean> = signal(false);
+
+  protected toggleLog():void{
+    this.logIsVisible.update(logIsVisible => !logIsVisible);
+  }
 }
