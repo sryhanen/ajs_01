@@ -54,6 +54,7 @@ import {WebSocketResponse} from '../webSocket/response/webSocketResponse';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {Requestable} from '../channel/requestable';
+import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _requestable: Requestable;
@@ -61,9 +62,12 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
 
-  constructor(requestable: Requestable, paragraphs: object[]) {
+  constructor(requestable: Requestable, notebookState:WebSocketPayload) {
     this._requestable = requestable;
-    this._paragraphs = this.initializedParagraphs(paragraphs);
+    this._paragraphs = signal(new Map(), {
+      equal: () => false
+    });
+    this.initializeParagraphs(notebookState, this._paragraphs);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, computed(() => ({
       paragraphs: Array.from(this._paragraphs().values()).map(paragraph => paragraph.print()()),
     }))));
@@ -99,15 +103,15 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     }
   }
 
-  private initializedParagraphs(paragraphs: object[]): WritableSignal<Map<string,  Paragraph>> {
+  private initializeParagraphs(notebookState:WebSocketPayload, paragraphs: WritableSignal<Map<string,  Paragraph>>): void {
+    const notebookParagraphs = notebookState.arrayProperty<object>('paragraphs');
     const paragraphMap = new Map<string, Paragraph>();
-    paragraphs.forEach(paragraphData => {
-      const paragraph = new ParagraphImpl(this, paragraphData);
+    notebookParagraphs.forEach(paragraphData => {
+      const paragraphState = new WebSocketPayloadImpl(paragraphData);
+      const paragraph = new ParagraphImpl(this, paragraphState);
       paragraphMap.set(paragraph.id(), paragraph);
     });
-    return signal(paragraphMap, {
-      equal: () => false
-    });
+    paragraphs.set(paragraphMap);
   }
 
   private executeParagraphRequest(webSocketResponse:WebSocketResponse):void {
@@ -117,7 +121,8 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   private handleParagraphResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraph = new ParagraphImpl(this, webSocketResponse.data());
+    const paragraphState = webSocketResponse.dataAsWebSocketPayload();
+    const paragraph = new ParagraphImpl(this, paragraphState);
     this._paragraphs.update(paragraphs => paragraphs.set(paragraph.id(), paragraph));
   }
 
@@ -127,14 +132,14 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     if(index < 0 || index > this._paragraphs().size){
       throw new Error(`Invalid index "${index}" provided.`);
     }
-    const paragraph = new ParagraphImpl(this, responseData.objectProperty('paragraph'));
+    const paragraph = new ParagraphImpl(this, responseData.objectPropertyAsPayload('paragraph'));
     const paragraphsAsArray = Array.from(this._paragraphs().values());
     paragraphsAsArray.splice(index, 0, paragraph);
     this._paragraphs.set(new Map(paragraphsAsArray.map(paragraph => [paragraph.id(), paragraph])));
   }
 
   private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphId  = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
+    const paragraphId = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
     if(!this._paragraphs().has(paragraphId)){
       throw new Error(`Paragraph "${paragraphId}" does not exist.`);
     }

@@ -47,13 +47,14 @@ import {ParagraphCollection} from './paragraphCollection';
 import {ParagraphCollectionImpl} from './paragraphCollectionImpl';
 import {FakeChannel} from '../channel/fakeChannel';
 import {Requestable} from '../channel/requestable';
+import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 describe('ParagraphCollection unit test', () => {
   let requestable: Requestable;
   let paragraphCollection: ParagraphCollection;
   beforeEach(() => {
     requestable = new FakeChannel();
-    paragraphCollection = new ParagraphCollectionImpl(requestable, []);
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl({paragraphs:[]}));
   });
 
   it('Should print', () => {
@@ -78,12 +79,15 @@ describe('ParagraphCollection unit test', () => {
       const paragraphText = 'paragraph text';
       const paragraphConfig = {test1:'test1'};
       const paragraphSettings = {params:{test2:'test2'}};
-      paragraphCollection = new ParagraphCollectionImpl(requestable, [{
-        id:paragraphId,
-        text:paragraphText,
-        config:paragraphConfig,
-        settings:paragraphSettings,
-      }]);
+      const notebookState = new WebSocketPayloadImpl({
+        paragraphs: [{
+          id:paragraphId,
+          text:paragraphText,
+          config:paragraphConfig,
+          settings:paragraphSettings,
+        }]
+      });
+      paragraphCollection = new ParagraphCollectionImpl(requestable, notebookState);
       const executeParagraphRequest = {
         op:'EXECUTE_PARAGRAPH',
         data:{
@@ -157,9 +161,12 @@ describe('ParagraphCollection unit test', () => {
 
     it('Should remove paragraph', () => {
       const paragraphId = 'paragraphId';
-      paragraphCollection = new ParagraphCollectionImpl(requestable, [{
-        id:paragraphId,
-      }]);
+      const notebookState = new WebSocketPayloadImpl({
+        paragraphs:[{
+          id:paragraphId,
+        }]
+      });
+      paragraphCollection = new ParagraphCollectionImpl(requestable, notebookState);
       const paragraphRemovedResponse = {
         op:'PARAGRAPH_REMOVED',
         data:{
@@ -175,9 +182,12 @@ describe('ParagraphCollection unit test', () => {
 
     it('Should not remove paragraph', () => {
       const paragraphId = 'paragraphId';
-      paragraphCollection = new ParagraphCollectionImpl(requestable, [{
-        id:paragraphId,
-      }]);
+      const notebookState = new WebSocketPayloadImpl({
+        paragraphs:[{
+          id:paragraphId,
+        }]
+      });
+      paragraphCollection = new ParagraphCollectionImpl(requestable, notebookState);
       const wrongParagraphId = 'wrongParagraphId';
       const paragraphRemovedResponse = {
         op:'PARAGRAPH_REMOVED',
