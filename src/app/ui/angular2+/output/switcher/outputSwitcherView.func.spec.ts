@@ -48,9 +48,9 @@ import {render, screen} from '@testing-library/angular';
 import {OutputSwitcherView} from './outputSwitcherView';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 import {By} from '@angular/platform-browser';
-import {FakeRenderNode} from '../../../../../test/fakes/fakeRenderNode';
-import {FakeComponent} from '../../../../../test/fakes/fakeComponent';
-import {FakeComponentRegistryProvider} from '../../../../../test/fakes/fakeComponentRegistryProvider';
+import {RenderNodeFake} from '../../../../../test/fakes/app/renderNode/renderNodeFake';
+import {FakeComponent} from '../../../../../test/fakes/app/componentRegistry/fakeComponent';
+import {FakeComponentRegistryProvider} from '../../../../../test/fakes/app/componentRegistry/fakeComponentRegistryProvider';
 
 describe('OutputSwitcherView functional test', () => {
   let fixture: ComponentFixture<OutputSwitcherView>;
@@ -58,8 +58,8 @@ describe('OutputSwitcherView functional test', () => {
 
   beforeEach(async () => {
     switcherButtons = [
-      new FakeRenderNode(),
-      new FakeRenderNode()
+      new RenderNodeFake(),
+      new RenderNodeFake()
     ];
 
     const renderResult = await render(OutputSwitcherView, {
