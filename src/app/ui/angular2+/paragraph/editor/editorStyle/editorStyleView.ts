@@ -44,6 +44,7 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
+import {EditorStyle} from '../../../../../objects/paragraph/editor/editorStyle/editorStyle';
 
 @Component({
   selector:'editor-style',
@@ -57,7 +58,7 @@ import {Component, input} from '@angular/core';
       </li>
       <li class="px-2 py-2 d-flex align-items-center justify-content-between">
         <label>Font size</label>
-        <select class="form-select form-select-sm w-auto" aria-label="Select font size">
+        <select class="form-select form-select-sm w-auto" aria-label="Select font size" (change)="updateFontSize($event)">
           @for(fontSizeOption of fontSizeOptions(); track $index){
             @if(fontSizeOption === currentFontSize()){
               <option [value]="fontSizeOption" selected>{{fontSizeOption}}</option>
@@ -78,5 +79,10 @@ export class EditorStyleView {
   fontSizeOptions = input.required<number[]>();
   currentFontSize = input.required<number>();
   displayLineNumbers = input.required<boolean>();
+  editorStyle = input.required<EditorStyle>();
 
+  updateFontSize(event: Event):void{
+    const value = (event.target as HTMLSelectElement).value;
+    this.editorStyle().updateFontSize(Number(value));
+  }
 }

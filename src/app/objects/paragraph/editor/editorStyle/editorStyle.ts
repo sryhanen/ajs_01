@@ -49,4 +49,7 @@ import {Printable} from '../../../rendering/printable/printable';
 /**
  * Editor style allows user to inspect and select style rules for ace editor instance
  */
-export interface EditorStyle extends Printable, Channel{}
+export interface EditorStyle extends Printable, Channel{
+  updateFontSize(fontSize: number): void;
+  updateLineNumberVisibility(lineNumberVisibility: boolean): void;
+}

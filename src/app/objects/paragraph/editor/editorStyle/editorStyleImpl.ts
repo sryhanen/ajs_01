@@ -62,7 +62,16 @@ export class EditorStyleImpl implements EditorStyle {
       fontSizeOptions:fontSizeOptions,
       currentFontSize:12,
       displayLineNumbers:true,
+      editorStyle:this
     }))));
+  }
+
+  updateFontSize(fontSize: number): void {
+    this._editor.setFontSize(fontSize);
+  }
+
+  updateLineNumberVisibility(lineNumberVisibility: boolean): void {
+     this._editor.renderer.setShowGutter(lineNumberVisibility);
   }
 
   print(): Signal<RenderNode> {
