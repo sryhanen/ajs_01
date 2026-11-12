@@ -82,7 +82,6 @@ export class SyntaxLanguageSelectRuleImpl implements SyntaxLanguageSelectRule {
         this._requestable.request({
           op:'EDITOR_SETTING',
           data:{
-            paragraphId:'',
             paragraphText: editorValue
           }
         });
