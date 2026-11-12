@@ -61,17 +61,6 @@ describe('SyntaxLanguageRule unit test', () => {
     editor = ace.edit(document.createElement('div'));
   });
 
-  it('Should throw if setting has not been applied', () => {
-    expect(() => syntaxLanguageRule.setEditorLanguage(language)).toThrow();
-  });
-
-  it('Should set editor language', () => {
-    syntaxLanguageRule.applyTo(editor);
-    const editorLanguageSpy = vi.spyOn(editor.getSession(), 'setMode');
-    syntaxLanguageRule.setEditorLanguage(language);
-    expect(editorLanguageSpy).toHaveBeenCalledExactlyOnceWith(language);
-  });
-
   it('Should set editor language on editor setting response', () => {
     syntaxLanguageRule.applyTo(editor);
     const editorSettings = {

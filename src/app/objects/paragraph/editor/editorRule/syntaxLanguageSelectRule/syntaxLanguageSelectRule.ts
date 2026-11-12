@@ -46,6 +46,4 @@
 import {EditorRule} from '../editorRule';
 import {Respondable} from '../../../../channel/respondable';
 
-export interface SyntaxLanguageSelectRule extends EditorRule, Respondable {
-  setEditorLanguage(language: string): void;
-}
+export interface SyntaxLanguageSelectRule extends EditorRule, Respondable {}
