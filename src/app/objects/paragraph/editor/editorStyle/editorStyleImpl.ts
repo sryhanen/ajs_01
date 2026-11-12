@@ -54,10 +54,14 @@ export class EditorStyleImpl implements EditorStyle {
   private readonly _editor:ace.Ace.Editor;
   private readonly _printSignal:Signal<RenderNode>;
 
-  constructor(editor:ace.Ace.Editor) {
+  constructor(editor:ace.Ace.Editor,
+              fontSizeOptions:number[] = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+  ) {
     this._editor = editor;
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_STYLE_VIEW, computed(() => ({
-
+      fontSizeOptions:fontSizeOptions,
+      currentFontSize:12,
+      displayLineNumbers:true,
     }))));
   }
 

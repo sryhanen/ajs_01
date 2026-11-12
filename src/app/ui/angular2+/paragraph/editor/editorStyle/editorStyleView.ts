@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
   selector:'editor-style',
@@ -51,16 +51,21 @@ import {Component} from '@angular/core';
     <ul class="dropdown-menu">
       <li class="px-2 py-2 d-flex align-items-center justify-content-between">
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch">
-            <label class="form-check-label" for="switchCheckDefault">Toggle line numbers</label>
+            <input class="form-check-input" type="checkbox" role="switch" [checked]="displayLineNumbers()">
+            <label class="form-check-label">Toggle line numbers</label>
         </div>
       </li>
       <li class="px-2 py-2 d-flex align-items-center justify-content-between">
         <label>Font size</label>
         <select class="form-select form-select-sm w-auto" aria-label="Select font size">
-          <option value="9" selected>9</option>
-          <option value="12">12</option>
-          <option value="20">20</option>
+          @for(fontSizeOption of fontSizeOptions(); track $index){
+            @if(fontSizeOption === currentFontSize()){
+              <option [value]="fontSizeOption" selected>{{fontSizeOption}}</option>
+            }
+            @else{
+              <option [value]="fontSizeOption">{{fontSizeOption}}</option>
+            }
+          }
         </select>
       </li>
     </ul>
@@ -70,5 +75,8 @@ import {Component} from '@angular/core';
   `
 })
 export class EditorStyleView {
+  fontSizeOptions = input.required<number[]>();
+  currentFontSize = input.required<number>();
+  displayLineNumbers = input.required<boolean>();
 
 }
