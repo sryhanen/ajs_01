@@ -43,19 +43,47 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {render, screen} from '@testing-library/angular';
+import {render} from '@testing-library/angular';
 import {EditorView} from './editorView';
+import {ComponentRef} from '@angular/core';
+import {WebSocketPayloadImpl} from '../../../../objects/webSocket/webSocketPayload/webSocketPayloadImpl';
+import {EditorStateRule} from '../../../../objects/paragraph/editor/editorRule/editorStateRule/editorStateRule';
+import ace from 'ace-builds';
 
 describe('EditorView functional test', () => {
+  let componentRef:ComponentRef<EditorView>;
+  let container: HTMLElement;
+
   beforeEach(async () => {
-    await render(EditorView, {
+    const renderResult = await render(EditorView, {
       inputs:{
         editorRules:[]
       }
     });
+    componentRef = renderResult.fixture.componentRef;
+    container = renderResult.container;
   });
 
   it('Should have rendered ace editor', () => {
-    expect(screen.getByRole('textbox')).toBeDefined();
+    expect(container.querySelector('.ace_editor')).not.toBeNull();
+  });
+
+  it('Should re-render editor on editorRule update', () => {
+    const editorTextContent = 'some text content';
+    const paragraphState =  new WebSocketPayloadImpl({
+      status:'',
+      config:{
+        fontSize:0,
+        lineNumbers:false,
+      },
+      text:editorTextContent
+    });
+    componentRef.setInput('editorRules', [
+      new EditorStateRule(paragraphState)
+    ]);
+    componentRef.changeDetectorRef.detectChanges();
+    const activeEditor = ace.edit(container.querySelector('.ace_editor') as HTMLElement);
+    expect(activeEditor.getValue()).toEqual(editorTextContent);
   });
 });
+
