@@ -52,7 +52,7 @@ import {EditorStyle} from '../../../../../objects/paragraph/editor/editorStyle/e
     <ul class="dropdown-menu">
       <li class="px-2 py-2 d-flex align-items-center justify-content-between">
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" [checked]="displayLineNumbers()">
+            <input class="form-check-input" type="checkbox" role="switch" [checked]="displayLineNumbers()" (change)="updateLineNumberVisibility($event)">
             <label class="form-check-label">Toggle line numbers</label>
         </div>
       </li>
@@ -84,5 +84,10 @@ export class EditorStyleView {
   updateFontSize(event: Event):void{
     const value = (event.target as HTMLSelectElement).value;
     this.editorStyle().updateFontSize(Number(value));
+  }
+
+  updateLineNumberVisibility(event: Event):void{
+    const value = (event.target as HTMLInputElement).checked;
+    this.editorStyle().updateLineNumberVisibility(Boolean(value));
   }
 }
