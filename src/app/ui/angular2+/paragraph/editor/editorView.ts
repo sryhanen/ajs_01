@@ -43,22 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, input, OnChanges, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, inject, input, OnChanges, Renderer2, ViewChild} from '@angular/core';
 import ace from 'ace-builds';
 import {EditorRule} from '../../../../objects/paragraph/editor/editorRule/editorRule';
+import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
 
 @Component({
   selector: 'editor',
+  imports: [
+    RenderNodeRootView
+  ],
   template: `
-    <div class="paragraph-editor my-2">
-      <pre #editorAnchor class="editor-container"></pre>
-    </div>
+    <render-node-host [renderNode]="editorStyle()"></render-node-host>
+    <div #editorAnchor class="paragraph-editor my-2"></div>
   `
 })
 export class EditorView implements AfterViewInit, OnChanges{
-  @ViewChild('editorAnchor') editorAnchor: ElementRef;
+  editorStyle = input.required<RenderNode>();
   editorRules = input.required<EditorRule[]>();
-  private _aceEditor: ace.Ace.Editor;
+  editor = input.required<ace.Ace.Editor>();
+  @ViewChild('editorAnchor') editorAnchor: ElementRef;
+  private readonly renderer = inject(Renderer2);
 
   ngAfterViewInit() {
     ace.config.set('basePath', '/');
@@ -69,18 +75,16 @@ export class EditorView implements AfterViewInit, OnChanges{
   }
 
   ngOnChanges() {
-    if(this._aceEditor){
-      this.editorAnchor.nativeElement.className = '';
-      this.editorAnchor.nativeElement.classList.add('editor-container');
-      this._aceEditor.destroy();
+    if(this.editorAnchor){
       this.initializeEditor();
     }
   }
 
   private initializeEditor():void{
-    this._aceEditor = ace.edit(this.editorAnchor.nativeElement);
+    this.editorAnchor.nativeElement.replaceChildren();
     this.editorRules().forEach(rule => {
-      rule.applyTo(this._aceEditor);
+      rule.applyTo(this.editor());
     });
+    this.renderer.appendChild(this.editorAnchor.nativeElement, this.editor().container);
   }
 }

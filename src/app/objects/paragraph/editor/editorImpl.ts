@@ -51,7 +51,6 @@ import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayloa
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 import {KeyBindingsRule} from './editorRule/keyBindingsRule/keyBindingsRule';
-import {EditorRule} from './editorRule/editorRule';
 import {AnnotationsRule} from './editorRule/annotationsRule/annotationsRule';
 import {AutoCommitRule} from './editorRule/autoCommitRule/autoCommitRule';
 import {EditorStateRule} from './editorRule/editorStateRule/editorStateRule';
@@ -62,10 +61,13 @@ import {AutoCompletionsRuleImpl} from './editorRule/autoCompletionsRule/autoComp
 import {LanguageCompleterImpl} from './editorRule/autoCompletionsRule/languageCompleter/languageCompleterImpl';
 import {SyntaxLanguageSelectRule} from './editorRule/syntaxLanguageSelectRule/syntaxLanguageSelectRule';
 import {AutoCompletionsRule} from './editorRule/autoCompletionsRule/autoCompletionsRule';
+import ace from 'ace-builds';
+import {EditorStyleImpl} from './editorStyle/editorStyleImpl';
+import {EditorStyle} from './editorStyle/editorStyle';
 
 export class EditorImpl implements Editor {
   private readonly _requestable: Requestable;
-  private readonly _editorRules:EditorRule[];
+  private readonly _editorStyle: EditorStyle;
   private readonly _autoCompleteRule:AutoCompletionsRule;
   private readonly _syntaxLanguageSelectRule:SyntaxLanguageSelectRule;
   private readonly _printSignal:Signal<RenderNode>;
@@ -74,7 +76,7 @@ export class EditorImpl implements Editor {
     this._requestable = requestable;
     this._autoCompleteRule = new AutoCompletionsRuleImpl(new LanguageCompleterImpl(this));
     this._syntaxLanguageSelectRule = new SyntaxLanguageSelectRuleImpl(this);
-    this._editorRules = [
+    const editorRules = [
       new AnnotationsRule(),
       new AutoCommitRule(this),
       new EditorStateRule(paragraphState),
@@ -84,8 +86,14 @@ export class EditorImpl implements Editor {
       this._autoCompleteRule,
       this._syntaxLanguageSelectRule
     ];
+    const preElement = document.createElement('pre');
+    preElement.classList.add('editor-container');
+    const editor = ace.edit(preElement);
+    this._editorStyle = new EditorStyleImpl(editor);
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
-      editorRules:this._editorRules
+      editorStyle:this._editorStyle.print()(),
+      editor:editor,
+      editorRules:editorRules
     }))));
   }
 
@@ -98,6 +106,7 @@ export class EditorImpl implements Editor {
   }
 
   response(json: object) {
+    this._editorStyle.response(json);
     this._autoCompleteRule.response(json);
     this._syntaxLanguageSelectRule.response(json);
   }
