@@ -69,7 +69,7 @@ export class KeyBindingsRule implements EditorRule {
         requestable.request({
           op:'RUN_PARAGRAPH',
           data: {
-            paragraph: '',
+            paragraph: editor.getValue(),
             config: {},
             params: {},
           },
