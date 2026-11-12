@@ -48,6 +48,25 @@ import {Component} from '@angular/core';
 @Component({
   selector:'editor-style',
   template:`
+    <ul class="dropdown-menu">
+      <li class="px-2 py-2 d-flex align-items-center justify-content-between">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch">
+            <label class="form-check-label" for="switchCheckDefault">Toggle line numbers</label>
+        </div>
+      </li>
+      <li class="px-2 py-2 d-flex align-items-center justify-content-between">
+        <label>Font size</label>
+        <select class="form-select form-select-sm w-auto" aria-label="Select font size">
+          <option value="9" selected>9</option>
+          <option value="12">12</option>
+          <option value="20">20</option>
+        </select>
+      </li>
+    </ul>
+    <button class="btn btn-sm" data-bs-toggle="dropdown">
+      <i class="fa-solid fa-gear"></i>
+    </button>
   `
 })
 export class EditorStyleView {

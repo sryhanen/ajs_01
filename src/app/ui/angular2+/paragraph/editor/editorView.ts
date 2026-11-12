@@ -55,8 +55,12 @@ import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
     RenderNodeRootView
   ],
   template: `
-    <render-node-host [renderNode]="editorStyle()"></render-node-host>
-    <div #editorAnchor class="paragraph-editor my-2"></div>
+    <div class="my-2">
+        <div class="d-flex justify-content-end gap-2">
+        <render-node-host [renderNode]="editorStyle()"></render-node-host>
+        </div>
+        <div #editorAnchor class="paragraph-editor"></div>
+    </div>
   `
 })
 export class EditorView implements AfterViewInit, OnChanges{
