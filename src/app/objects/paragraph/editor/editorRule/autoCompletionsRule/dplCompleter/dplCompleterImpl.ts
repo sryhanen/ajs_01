@@ -69,7 +69,6 @@ export class DplCompleterImpl implements DplCompleter {
     this._requestable.request({
       op: 'COMPLETION',
       data: {
-        paragraphId: '', //Change required in the server
         buf: editorValue,
         cursor: editorValue.length,
       },
