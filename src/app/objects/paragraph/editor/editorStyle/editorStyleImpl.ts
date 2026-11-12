@@ -44,41 +44,67 @@
  * a licensee so wish it.
  */
 import {EditorStyle} from './editorStyle';
-import {computed, signal, Signal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import ace from 'ace-builds';
 import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
+import {WebSocketPayload} from '../../../webSocket/webSocketPayload/webSocketPayload';
+import {Requestable} from '../../../channel/requestable';
 
 export class EditorStyleImpl implements EditorStyle {
   private readonly _editor:ace.Ace.Editor;
+  private readonly _requestable:Requestable;
   private readonly _printSignal:Signal<RenderNode>;
+  private readonly _currentFontSize:WritableSignal<number>;
+  private readonly _displayLineNumbers:WritableSignal<boolean>;
 
   constructor(editor:ace.Ace.Editor,
+              requestable:Requestable,
+              paragraphState:WebSocketPayload,
               fontSizeOptions:number[] = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
   ) {
     this._editor = editor;
+    this._requestable = requestable;
+    const config = paragraphState.objectPropertyAsPayload('config');
+    this._currentFontSize = signal(config.numberProperty('fontSize'));
+    this._displayLineNumbers = signal(config.booleanProperty('lineNumbers'));
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_STYLE_VIEW, computed(() => ({
       fontSizeOptions:fontSizeOptions,
-      currentFontSize:12,
-      displayLineNumbers:true,
+      currentFontSize:this._currentFontSize(),
+      displayLineNumbers:this._displayLineNumbers(),
       editorStyle:this
     }))));
   }
 
   updateFontSize(fontSize: number): void {
     this._editor.setFontSize(fontSize);
+    if(this._currentFontSize() !== fontSize){
+      this._currentFontSize.set(fontSize);
+      this._requestable.request({
+        op:'EDITOR_FONT_SIZE',
+        data:{
+          size:fontSize
+        }
+      });
+    }
   }
 
   updateLineNumberVisibility(lineNumberVisibility: boolean): void {
      this._editor.renderer.setShowGutter(lineNumberVisibility);
+     if(this._displayLineNumbers() !==  lineNumberVisibility){
+       this._displayLineNumbers.set(lineNumberVisibility);
+       this._requestable.request({
+         op:'EDITOR_LINE_NUMBER',
+         data:{
+           isVisible:lineNumberVisibility
+         }
+       });
+     }
   }
 
   print(): Signal<RenderNode> {
     return this._printSignal;
-  }
-
-  request(json: object): void {
   }
 
   response(json: object): void {

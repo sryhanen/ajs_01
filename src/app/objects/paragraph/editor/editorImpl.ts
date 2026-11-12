@@ -89,7 +89,7 @@ export class EditorImpl implements Editor {
     const preElement = document.createElement('pre');
     preElement.classList.add('editor-container');
     const editor = ace.edit(preElement);
-    this._editorStyle = new EditorStyleImpl(editor);
+    this._editorStyle = new EditorStyleImpl(editor, this, paragraphState);
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
       editorStyle:this._editorStyle.print()(),
       editor:editor,

@@ -43,13 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Channel} from '../../../channel/channel';
 import {Printable} from '../../../rendering/printable/printable';
+import {Respondable} from '../../../channel/respondable';
 
 /**
  * Editor style allows user to inspect and select style rules for ace editor instance
  */
-export interface EditorStyle extends Printable, Channel{
+export interface EditorStyle extends Printable, Respondable{
   updateFontSize(fontSize: number): void;
   updateLineNumberVisibility(lineNumberVisibility: boolean): void;
 }
