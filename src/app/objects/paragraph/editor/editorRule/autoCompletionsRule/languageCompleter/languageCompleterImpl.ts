@@ -48,20 +48,17 @@ import {Ace} from 'ace-builds';
 import {Requestable} from '../../../../../channel/requestable';
 import {WebSocketResponseImpl} from '../../../../../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../../../../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {AceCompleterCallback} from './aceCompleterCallback/aceCompleterCallback';
+import {AceCompleterCallbackStub} from './aceCompleterCallback/aceCompleterCallbackStub';
+import {AceCompleterCallbackImpl} from './aceCompleterCallback/aceCompleterCallbackImpl';
 
 export class LanguageCompleterImpl implements LanguageCompleter {
   private readonly _requestable:Requestable;
-  private _aceEditorCallback: Ace.CompleterCallback;
+  private _aceCompleterCallback: AceCompleterCallback;
 
   constructor(requestable:Requestable) {
     this._requestable = requestable;
-  }
-
-  applyCompletions(completions:  Ace.Completion[]) {
-    if(!this._aceEditorCallback){
-      throw new Error('Cannot apply completions. Editor not linked to completions.');
-    }
-    this._aceEditorCallback(null, completions);
+    this._aceCompleterCallback = new AceCompleterCallbackStub();
   }
 
   getCompletions(editor: Ace.Editor, session: Ace.EditSession, position: Ace.Point, prefix: string, callback: Ace.CompleterCallback): void {
@@ -73,14 +70,14 @@ export class LanguageCompleterImpl implements LanguageCompleter {
         cursor: editorValue.length,
       },
     });
-    this._aceEditorCallback = callback;
+    this._aceCompleterCallback = new AceCompleterCallbackImpl(callback);
   }
 
   response(json: object): void {
     const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    if(webSocketResponse.operation() === 'COMPLETION_LIST') {
+    if(!this._aceCompleterCallback.isStub() && webSocketResponse.operation() === 'COMPLETION_LIST') {
       const completions = webSocketResponse.dataAsWebSocketPayload().arrayProperty<{name:string, value:string}>('completions');
-      this.applyCompletions(completions);
+      this._aceCompleterCallback.apply(completions);
     }
   }
 }

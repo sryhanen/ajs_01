@@ -46,6 +46,4 @@
 import {Ace} from 'ace-builds';
 import {Respondable} from '../../../../../channel/respondable';
 
-export interface LanguageCompleter extends Ace.Completer, Respondable {
-  applyCompletions(completions:  Ace.Completion[]):void;
-}
+export interface LanguageCompleter extends Ace.Completer, Respondable {}

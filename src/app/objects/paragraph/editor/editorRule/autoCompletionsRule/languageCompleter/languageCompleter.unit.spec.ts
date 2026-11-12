@@ -48,6 +48,9 @@ import {LanguageCompleter} from './languageCompleter';
 import {LanguageCompleterImpl} from './languageCompleterImpl';
 import ace from 'ace-builds';
 import {FakeChannel} from '../../../../../channel/fakeChannel';
+import {
+  CompletionListServerResponse
+} from '../../../../../../../test/fakes/server/webSocketResponses/completionList/completionListServerResponse';
 
 describe('LanguageCompleter unit test', () => {
   let requestable:Requestable;
@@ -66,7 +69,6 @@ describe('LanguageCompleter unit test', () => {
     const expectedRequest = {
       op: 'COMPLETION',
       data: {
-        paragraphId: '',
         buf: '',
         cursor: 0,
       },
@@ -74,29 +76,15 @@ describe('LanguageCompleter unit test', () => {
     expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
   });
 
-  describe('applyCompletions', () => {
-    it('Should throw if getCompletions has not been evoked', () => {
-      expect(() => languageCompleter.applyCompletions([])).toThrow();
-    });
-
-    it('Should apply completions', () => {
-      languageCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
-      const applyCompletionsSpy = vi.spyOn(languageCompleter, 'applyCompletions');
-      languageCompleter.applyCompletions([]);
-      expect(applyCompletionsSpy).toHaveReturned();
-    });
-  });
-
-  it('Should apply completions on completion list response', () => {
-    languageCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
-    const applyCompletionsSpy = vi.spyOn(languageCompleter, 'applyCompletions');
-    const completionListResponse = {
-      op: 'COMPLETION_LIST',
-      data: {
-        completions: []
-      }
-    };
-    languageCompleter.response(completionListResponse);
-    expect(applyCompletionsSpy).toHaveReturned();
+  it('Should apply completions to callback function', () => {
+    const callback = vi.fn();
+    languageCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', callback);
+    const completions = [
+      {value:'value1', name:'name1' },
+      {value:'value2', name:'name2' },
+    ];
+    const completionsListServerResponse = new CompletionListServerResponse(completions, '');
+    languageCompleter.response(completionsListServerResponse.toObject());
+    expect(callback).toHaveBeenCalledExactlyOnceWith(null, completions);
   });
 });
