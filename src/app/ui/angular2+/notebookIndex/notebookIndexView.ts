@@ -54,11 +54,10 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
   ],
   template: `
     @if (!notebook().isStub()) {
-      <render-node-host [renderNode]="notebook()" [containerId]="containerId()"></render-node-host>
+      <render-node-host [renderNode]="notebook()"></render-node-host>
     }
   `
 })
 export class NotebookIndexView {
   notebook = input.required<RenderNode>();
-  containerId = input.required<string>();
 }

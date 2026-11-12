@@ -53,17 +53,15 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
     RenderNodeRootView
   ],
   template: `
-    @if(containerId() === paragraphId()){
+    <div class="paragraph-box">
       <render-node-host [renderNode]="editor()"></render-node-host>
       <render-node-host [renderNode]="output()"></render-node-host>
       <render-node-host [renderNode]="execution()"></render-node-host>
-    }
+    </div>
   `
 })
-export class ParagraphView{
+export class ParagraphView {
   editor = input.required<RenderNode>();
   output = input.required<RenderNode>();
   execution = input.required<RenderNode>();
-  paragraphId = input.required<string>();
-  containerId = input.required<string>();
 }

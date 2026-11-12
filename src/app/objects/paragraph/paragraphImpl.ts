@@ -85,7 +85,6 @@ export class ParagraphImpl implements Paragraph {
       editor:this._editor.print()(),
       output:this._output.print()(),
       execution:this._execution.print()(),
-      paragraphId:this.id()
     })));
     this._paragraphIdFilter = new WebSocketResponsePropertyEqualsFilter('paragraphId', this.id());
   }

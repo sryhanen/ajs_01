@@ -114,10 +114,6 @@ describe('Paragraph', () => {
     expect(paragraph.print()().inputs()()['output']).toBeDefined();
   });
 
-  it('Should print paragraphId', () => {
-    expect(paragraph.print()().inputs()()['paragraphId']).toEqual(paragraphId);
-  });
-
   it('RunParagraph should create expected request', () => {
     const expectedRequest = {
       op:'RUN_PARAGRAPH',
