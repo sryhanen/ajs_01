@@ -48,23 +48,27 @@ import {SyntaxLanguageSelectRule} from './syntaxLanguageSelectRule';
 import {Requestable} from '../../../../channel/requestable';
 import {WebSocketResponseImpl} from '../../../../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../../../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {StubableAceEditor} from './stubableAceEditor/stubableAceEditor';
+import {StubableAceEditorImpl} from './stubableAceEditor/stubableAceEditorImpl';
+import {StubableAceEditorStub} from './stubableAceEditor/stubableAceEditorStub';
 
 export class SyntaxLanguageSelectRuleImpl implements SyntaxLanguageSelectRule {
   private readonly _requestable:Requestable;
-  private _editor:Ace.Editor;
+  private _editor:StubableAceEditor;
 
   constructor(requestable:Requestable) {
     this._requestable = requestable;
+    this._editor = new StubableAceEditorStub();
   }
 
   applyTo(editor: Ace.Editor): void {
-    this._editor = editor;
+    this._editor = new StubableAceEditorImpl(editor);
     this.requestLanguageOnFirstRowChange(editor);
   }
 
   response(json: object): void {
     const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    if(webSocketResponse.operation() === 'EDITOR_SETTING') {
+    if(!this._editor.isStub() && webSocketResponse.operation() === 'EDITOR_SETTING') {
       const languagePayload = webSocketResponse.dataAsWebSocketPayload().objectPropertyAsPayload('editor').stringProperty('language');
       const language = `ace/mode/${languagePayload}`;
       this._editor.getSession().setMode(language);
