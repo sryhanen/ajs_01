@@ -59,8 +59,6 @@ export class AutoCommitRule implements EditorRule {
       const commitParagraphRequest = {
         op:'COMMIT_PARAGRAPH',
         data:{
-          id: '',
-          noteId: '',
           title: '',
           paragraph: editor.getValue(),
           config: '',
