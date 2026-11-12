@@ -56,11 +56,14 @@ import {WebSocketResponsePropertyEqualsFilter} from '../webSocket/response/webSo
 import {WebSocketResponseImpl} from '../webSocket/response/webSocketResponseImpl';
 import {WebSocketRequestWithField} from '../webSocket/request/webSocketRequestWithField/webSocketRequestWithField';
 import {Requestable} from '../channel/requestable';
+import {EditorImpl} from './editor/editorImpl';
+import {Editor} from './editor/editor';
 import {Execution} from './execution/execution';
 import {ExecutionImpl} from './execution/executionImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
+  private readonly _editor: Editor;
   private readonly _output: Output;
   private readonly _execution: Execution;
   private readonly _paragraphState: WebSocketPayload;
@@ -69,14 +72,17 @@ export class ParagraphImpl implements Paragraph {
 
   constructor(requestable: Requestable,
               paragraphState: WebSocketPayload,
+              editor:Editor = new EditorImpl(this, paragraphState),
               output:Output = new OutputImpl(this, paragraphState),
               execution:Execution = new ExecutionImpl(),
   ) {
     this._requestable = requestable;
     this._paragraphState = paragraphState;
+    this._editor = editor;
     this._output = output;
     this._execution = execution;
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
+      editor:this._editor.print()(),
       output:this._output.print()(),
       execution:this._execution.print()(),
       paragraphId:this.id()
@@ -118,14 +124,13 @@ export class ParagraphImpl implements Paragraph {
     const message = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
     const filteredResponse = this._paragraphIdFilter.filterResponse(message);
     if(!filteredResponse.isStub()) {
-      this._output.response({
+      const response = {
         op:filteredResponse.operation(),
         data:filteredResponse.data()
-      });
-      this._execution.response({
-        op:filteredResponse.operation(),
-        data:filteredResponse.data()
-      });
+      };
+      this._output.response(response);
+      this._editor.response(response);
+      this._execution.response(response);
     }
   }
 }

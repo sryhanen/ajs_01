@@ -43,33 +43,27 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {ConfiguredEditor} from './configuredEditor';
 import ace from 'ace-builds';
+import {LanguageCompleter} from './languageCompleter/languageCompleter';
+import {AutoCompletionsRule} from './autoCompletionsRule';
 
-export class ConfiguredEditorImpl implements ConfiguredEditor {
-  private readonly _editor: ace.Ace.Editor;
+export class AutoCompletionsRuleImpl implements AutoCompletionsRule {
+  private readonly _languageCompleter:LanguageCompleter;
 
-  constructor(editor: ace.Ace.Editor) {
-    this._editor = editor;
+  constructor(languageCompleter:LanguageCompleter) {
+    this._languageCompleter = languageCompleter;
   }
 
-  lineNumbers(value: boolean): void {
-    this._editor.renderer.setShowGutter(value);
+  response(json: object): void {
+    this._languageCompleter.response(json);
   }
 
-  readonly(value: boolean): void {
-    this._editor.setReadOnly(value);
-    if(value){
-      this._editor.setStyle('paragraph-disable');
-    }
-    else{
-      this._editor.setStyle('paragraph-disable', false);
-    }
-  }
-
-  setFontSize(value: number): void {
-    this._editor.setOptions({
-      fontSize: value,
-    });
+  applyTo(editor: ace.Ace.Editor): void {
+    editor.setOption('enableBasicAutocompletion', true);
+    const langTools = ace.require('ace/ext/language_tools');
+    const keyWordCompleter = langTools.keyWordCompleter;
+    const snippetCompleter = langTools.snippetCompleter;
+    const textCompleter = langTools.textCompleter;
+    editor.completers = [this._languageCompleter, keyWordCompleter, snippetCompleter, textCompleter];
   }
 }
