@@ -44,25 +44,25 @@
  * a licensee so wish it.
  */
 import {Requestable} from '../../../../../channel/requestable';
-import {DplCompleter} from './dplCompleter';
-import {DplCompleterImpl} from './dplCompleterImpl';
+import {LanguageCompleter} from './languageCompleter';
+import {LanguageCompleterImpl} from './languageCompleterImpl';
 import ace from 'ace-builds';
 import {FakeChannel} from '../../../../../channel/fakeChannel';
 
-describe('DplCompleter unit test', () => {
+describe('LanguageCompleter unit test', () => {
   let requestable:Requestable;
-  let dplCompleter:DplCompleter;
+  let languageCompleter:LanguageCompleter;
   let editor:ace.Editor;
 
   beforeEach(() => {
     editor = ace.edit(document.createElement('div'));
     requestable = new FakeChannel();
-    dplCompleter = new DplCompleterImpl(requestable);
+    languageCompleter = new LanguageCompleterImpl(requestable);
   });
 
   it('getCompletions should create completion request', () => {
     const requestSpy = vi.spyOn(requestable, 'request');
-    dplCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
+    languageCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
     const expectedRequest = {
       op: 'COMPLETION',
       data: {
@@ -76,27 +76,27 @@ describe('DplCompleter unit test', () => {
 
   describe('applyCompletions', () => {
     it('Should throw if getCompletions has not been evoked', () => {
-      expect(() => dplCompleter.applyCompletions([])).toThrow();
+      expect(() => languageCompleter.applyCompletions([])).toThrow();
     });
 
     it('Should apply completions', () => {
-      dplCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
-      const applyCompletionsSpy = vi.spyOn(dplCompleter, 'applyCompletions');
-      dplCompleter.applyCompletions([]);
+      languageCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
+      const applyCompletionsSpy = vi.spyOn(languageCompleter, 'applyCompletions');
+      languageCompleter.applyCompletions([]);
       expect(applyCompletionsSpy).toHaveReturned();
     });
   });
 
   it('Should apply completions on completion list response', () => {
-    dplCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
-    const applyCompletionsSpy = vi.spyOn(dplCompleter, 'applyCompletions');
+    languageCompleter.getCompletions(editor, editor.getSession(), {row:0, column:0}, '', () => {});
+    const applyCompletionsSpy = vi.spyOn(languageCompleter, 'applyCompletions');
     const completionListResponse = {
       op: 'COMPLETION_LIST',
       data: {
         completions: []
       }
     };
-    dplCompleter.response(completionListResponse);
+    languageCompleter.response(completionListResponse);
     expect(applyCompletionsSpy).toHaveReturned();
   });
 });

@@ -59,7 +59,7 @@ import {HighlightsRule} from './editorRule/highlightsRule/highlightsRule';
 import {ExcludedCommandsRule} from './editorRule/excludedCommandsRule/excludedCommandsRule';
 import {SyntaxLanguageSelectRuleImpl} from './editorRule/syntaxLanguageSelectRule/syntaxLanguageSelectRuleImpl';
 import {AutoCompletionsRuleImpl} from './editorRule/autoCompletionsRule/autoCompletionsRuleImpl';
-import {DplCompleterImpl} from './editorRule/autoCompletionsRule/dplCompleter/dplCompleterImpl';
+import {LanguageCompleterImpl} from './editorRule/autoCompletionsRule/languageCompleter/languageCompleterImpl';
 import {SyntaxLanguageSelectRule} from './editorRule/syntaxLanguageSelectRule/syntaxLanguageSelectRule';
 import {AutoCompletionsRule} from './editorRule/autoCompletionsRule/autoCompletionsRule';
 
@@ -72,7 +72,7 @@ export class EditorImpl implements Editor {
 
   constructor(requestable: Requestable, paragraphState: WebSocketPayload) {
     this._requestable = requestable;
-    this._autoCompleteRule = new AutoCompletionsRuleImpl(new DplCompleterImpl(this));
+    this._autoCompleteRule = new AutoCompletionsRuleImpl(new LanguageCompleterImpl(this));
     this._syntaxLanguageSelectRule = new SyntaxLanguageSelectRuleImpl(this);
     this._editorRules = [
       new AnnotationsRule(),

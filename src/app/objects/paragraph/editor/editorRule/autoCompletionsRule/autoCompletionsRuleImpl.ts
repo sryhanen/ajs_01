@@ -44,18 +44,18 @@
  * a licensee so wish it.
  */
 import ace from 'ace-builds';
-import {DplCompleter} from './dplCompleter/dplCompleter';
+import {LanguageCompleter} from './languageCompleter/languageCompleter';
 import {AutoCompletionsRule} from './autoCompletionsRule';
 
 export class AutoCompletionsRuleImpl implements AutoCompletionsRule {
-  private readonly _dplCompleter:DplCompleter;
+  private readonly _languageCompleter:LanguageCompleter;
 
-  constructor(dplCompleter:DplCompleter) {
-    this._dplCompleter = dplCompleter;
+  constructor(languageCompleter:LanguageCompleter) {
+    this._languageCompleter = languageCompleter;
   }
 
   response(json: object): void {
-    this._dplCompleter.response(json);
+    this._languageCompleter.response(json);
   }
 
   applyTo(editor: ace.Ace.Editor): void {
@@ -64,6 +64,6 @@ export class AutoCompletionsRuleImpl implements AutoCompletionsRule {
     const keyWordCompleter = langTools.keyWordCompleter;
     const snippetCompleter = langTools.snippetCompleter;
     const textCompleter = langTools.textCompleter;
-    editor.completers = [this._dplCompleter, keyWordCompleter, snippetCompleter, textCompleter];
+    editor.completers = [this._languageCompleter, keyWordCompleter, snippetCompleter, textCompleter];
   }
 }

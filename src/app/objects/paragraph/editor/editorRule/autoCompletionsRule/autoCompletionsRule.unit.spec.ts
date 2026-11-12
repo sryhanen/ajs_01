@@ -46,13 +46,13 @@
 import {AutoCompletionsRule} from './autoCompletionsRule';
 import {AutoCompletionsRuleImpl} from './autoCompletionsRuleImpl';
 import {Requestable} from '../../../../channel/requestable';
-import {DplCompleter} from './dplCompleter/dplCompleter';
-import {DplCompleterImpl} from './dplCompleter/dplCompleterImpl';
+import {LanguageCompleter} from './languageCompleter/languageCompleter';
+import {LanguageCompleterImpl} from './languageCompleter/languageCompleterImpl';
 import {FakeChannel} from '../../../../channel/fakeChannel';
 
 describe('AutoCompletionsRule unit test', () => {
   const requestable:Requestable = new FakeChannel();
-  const dplCompleter:DplCompleter = new DplCompleterImpl(requestable);
+  const dplCompleter:LanguageCompleter = new LanguageCompleterImpl(requestable);
   const autoCompletionsRule:AutoCompletionsRule = new AutoCompletionsRuleImpl(dplCompleter);
 
   it('Should respond DplCompleter', () => {

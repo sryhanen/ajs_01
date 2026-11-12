@@ -43,13 +43,13 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {DplCompleter} from './dplCompleter';
+import {LanguageCompleter} from './languageCompleter';
 import {Ace} from 'ace-builds';
 import {Requestable} from '../../../../../channel/requestable';
 import {WebSocketResponseImpl} from '../../../../../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../../../../webSocket/webSocketPayload/webSocketPayloadImpl';
 
-export class DplCompleterImpl implements DplCompleter {
+export class LanguageCompleterImpl implements LanguageCompleter {
   private readonly _requestable:Requestable;
   private _aceEditorCallback: Ace.CompleterCallback;
 
