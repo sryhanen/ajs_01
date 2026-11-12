@@ -61,8 +61,6 @@ describe('AutoCommitRule unit test', () => {
     const expectedRequest = {
       op:'COMMIT_PARAGRAPH',
       data:{
-        id: '',
-        noteId: '',
         title: '',
         paragraph: text,
         config: '',

@@ -72,7 +72,6 @@ describe('KeyBindingsRule unit test', () => {
     const expectedRequest = {
       op:'RUN_PARAGRAPH',
       data: {
-        id: '',
         paragraph: '',
         config: {},
         params: {},
