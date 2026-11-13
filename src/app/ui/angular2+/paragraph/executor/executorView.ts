@@ -49,7 +49,7 @@ import {Execution} from '../../../../objects/paragraph/execution/execution';
 @Component({
   selector:'executor',
   template:`
-    @if(!isRunning()){
+    @if (!executionIsOngoing()) {
       <button class="btn btn-link btn-sm"
               (click)="execution().start()">
         <i class="fas fa-play"
@@ -57,8 +57,7 @@ import {Execution} from '../../../../objects/paragraph/execution/execution';
            title="Run this paragraph (Shift+Enter)">
         </i>
       </button>
-    }
-    @else{
+    } @else {
       <button class="btn btn-link btn-sm"
               (click)="execution().cancel()">
         <i class="fas fa-pause"
@@ -69,6 +68,6 @@ import {Execution} from '../../../../objects/paragraph/execution/execution';
   `
 })
 export class ExecutorView {
-  isRunning = input.required<boolean>();
+  executionIsOngoing = input.required<boolean>();
   execution = input.required<Execution>();
 }

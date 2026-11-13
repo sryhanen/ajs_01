@@ -44,6 +44,8 @@
  * a licensee so wish it.
  */
 import {Respondable} from '../../channel/respondable';
-import {Printable} from '../../rendering/printable/printable';
+import {Signal} from '@angular/core';
 
-export interface Status extends Respondable, Printable {}
+export interface Status extends Respondable {
+  isExecuting(): Signal<boolean>;
+}

@@ -44,28 +44,31 @@
  * a licensee so wish it.
  */
 import {Status} from './status';
-import {computed, signal, Signal} from '@angular/core';
-import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {signal, Signal, WritableSignal} from '@angular/core';
 import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
-import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
+import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 export class StatusImpl implements Status{
-  private readonly _printSignal:Signal<RenderNode>;
+  private readonly _isLoading:WritableSignal<boolean>;
 
   constructor(paragraphState: WebSocketPayload) {
-    this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.STATUS_VIEW, computed(() => ({
-      isLoading:this.executionIsOnGoing(paragraphState)
-    }))));
+    this._isLoading = signal(this.executionIsOnGoing(paragraphState.stringProperty('status')));
   }
 
-  print(): Signal<RenderNode> {
-    return this._printSignal;
+  response(json: object): void {
+    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    if(webSocketResponse.operation() === 'PARAGRAPH_STATUS'){
+      const status= webSocketResponse.dataAsWebSocketPayload().stringProperty('status');
+      this._isLoading.set(this.executionIsOnGoing(status));
+    }
   }
 
-  response(json: object): void {}
+  isExecuting():Signal<boolean> {
+    return this._isLoading;
+  }
 
-  private executionIsOnGoing(paragraphState:WebSocketPayload): boolean {
-    return paragraphState.stringProperty('status') === 'RUNNING' || paragraphState.stringProperty('status') === 'PENDING';
+  private executionIsOnGoing(status:string): boolean {
+    return status === 'RUNNING' || status === 'PENDING';
   }
 }

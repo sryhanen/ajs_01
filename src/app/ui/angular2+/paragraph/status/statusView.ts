@@ -46,10 +46,10 @@
 import {Component, input} from '@angular/core';
 
 @Component({
-  selector: 'loader',
+  selector: 'execution-status',
   template: `
     @if(isLoading()){
-      <div class="spinner-grow text-primary" role="status">
+      <div class="spinner-grow spinner-grow-sm text-primary mb-3 me-3" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
     }

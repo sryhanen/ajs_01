@@ -56,7 +56,7 @@ export class Executor implements Printable {
 
   constructor(execution:Execution, status:Status) {
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EXECUTOR_VIEW, computed(() => ({
-      isRunning:status.print()().inputs()()['isLoading'],
+      executionIsOngoing:status.isExecuting()(),
       execution:execution
     }))));
   }

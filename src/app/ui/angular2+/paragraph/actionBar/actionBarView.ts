@@ -48,32 +48,34 @@ import {Editor} from '../../../../objects/paragraph/editor/editor';
 import {Output} from '../../../../objects/output/output';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
+import {StatusView} from '../status/statusView';
 
 @Component({
   selector: 'action-bar',
   imports: [
-    RenderNodeRootView
+    RenderNodeRootView,
+    StatusView
   ],
   template: `
     <hr>
     <div class="d-flex align-items-center">
-        <render-node-host [renderNode]="executor()"></render-node-host>
-        <button class="btn btn-link btn-sm"
-                (click)="editor().clear()">
-          <i class="fas fa-eraser"
-             title="Clear editor">
-          </i>
-        </button>
-        <button class="btn btn-link btn-sm"
-                (click)="output().clear()">
-          <i class="fa-solid fa-trash-can"
-             title="Clear output">
-          </i>
-        </button>
-        <div class="ms-auto d-flex align-items-center">
-            <render-node-host [renderNode]="executionStatus()"></render-node-host>
-            <render-node-host [renderNode]="timeInfo()"></render-node-host>
-        </div>
+      <render-node-host [renderNode]="executor()"></render-node-host>
+      <button class="btn btn-link btn-sm"
+              (click)="editor().clear()">
+        <i class="fas fa-eraser"
+           title="Clear editor">
+        </i>
+      </button>
+      <button class="btn btn-link btn-sm"
+              (click)="output().clear()">
+        <i class="fa-solid fa-trash-can"
+           title="Clear output">
+        </i>
+      </button>
+      <div class="ms-auto d-flex align-items-center">
+        <execution-status [isLoading]="executionIsOngoing()"></execution-status>
+        <render-node-host [renderNode]="timeInfo()"></render-node-host>
+      </div>
     </div>
     <hr>
   `
@@ -82,6 +84,6 @@ export class ActionBarView {
   editor = input.required<Editor>();
   output = input.required<Output>();
   executor = input.required<RenderNode>();
-  executionStatus = input.required<RenderNode>();
+  executionIsOngoing = input.required<boolean>();
   timeInfo = input.required<RenderNode>();
 }

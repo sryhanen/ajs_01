@@ -88,7 +88,6 @@ export const ComponentRegistryProvider: Provider = {
     [RegisteredComponents.EDITOR_VIEW, EditorView],
     [RegisteredComponents.DPL_LOG_VIEW, DplLogView],
     [RegisteredComponents.EDITOR_STYLE_VIEW, EditorStyleView],
-    [RegisteredComponents.STATUS_VIEW, StatusView],
     [RegisteredComponents.TIME_INFO_VIEW, TimeInfoView],
     [RegisteredComponents.ACTION_BAR_VIEW, ActionBarView],
     [RegisteredComponents.EXECUTOR_VIEW, ExecutorView],
