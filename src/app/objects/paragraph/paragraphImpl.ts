@@ -60,6 +60,13 @@ import {EditorImpl} from './editor/editorImpl';
 import {Editor} from './editor/editor';
 import {Execution} from './execution/execution';
 import {ExecutionImpl} from './execution/executionImpl';
+import {ActionBar} from './actionBar/actionBar';
+import {DplLogImpl} from './execution/dplLog/dplLogImpl';
+import {TimeInfoImpl} from './execution/timeInfo/timeInfoImpl';
+import {StatusImpl} from './execution/status/statusImpl';
+import {DplLog} from './execution/dplLog/dplLog';
+import {TimeInfo} from './execution/timeInfo/timeInfo';
+import {Status} from './execution/status/status';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
@@ -74,6 +81,8 @@ export class ParagraphImpl implements Paragraph {
               paragraphState: WebSocketPayload,
               editor:Editor = new EditorImpl(this, paragraphState),
               output:Output = new OutputImpl(this, paragraphState),
+              dplLog:DplLog = new DplLogImpl(),
+              timeInfo:TimeInfo = new TimeInfoImpl(paragraphState),
               execution:Execution = new ExecutionImpl(this, paragraphState),
   ) {
     this._requestable = requestable;
@@ -81,12 +90,12 @@ export class ParagraphImpl implements Paragraph {
     this._editor = editor;
     this._output = output;
     this._execution = execution;
+    const actionBar = new ActionBar(editor, output, execution, timeInfo);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
       editor:this._editor.print()(),
+      actionBar: actionBar.print()(),
+      dplLog:dplLog.print()(),
       output:this._output.print()(),
-      dplLog:this._execution.print()().inputs()()['dplLog'],
-      timeInfo:this._execution.print()().inputs()()['timeInfo'],
-      loader:this._execution.print()().inputs()()['loader'],
     }))));
     this._paragraphIdFilter = new WebSocketResponsePropertyEqualsFilter('paragraphId', this.id());
   }

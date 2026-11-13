@@ -55,10 +55,7 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
   template: `
     <div class="paragraph-box">
       <render-node-host [renderNode]="editor()"></render-node-host>
-      <div>
-        <render-node-host [renderNode]="loader()"></render-node-host>
-        <render-node-host [renderNode]="timeInfo()"></render-node-host>
-      </div>
+      <render-node-host [renderNode]="actionBar()"></render-node-host>
       <render-node-host [renderNode]="dplLog()"></render-node-host>
       <render-node-host [renderNode]="output()"></render-node-host>
     </div>
@@ -66,8 +63,7 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
 })
 export class ParagraphView {
   editor = input.required<RenderNode>();
-  output = input.required<RenderNode>();
+  actionBar = input.required<RenderNode>();
   dplLog = input.required<RenderNode>();
-  timeInfo = input.required<RenderNode>();
-  loader = input.required<RenderNode>();
+  output = input.required<RenderNode>();
 }

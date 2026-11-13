@@ -43,10 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Printable} from '../../rendering/printable/printable';
 import {Respondable} from '../../channel/respondable';
+import {Printable} from '../../rendering/printable/printable';
 
-export interface Execution extends Printable, Respondable {
+export interface Execution extends Respondable, Printable {
   start():void;
   cancel():void;
 }

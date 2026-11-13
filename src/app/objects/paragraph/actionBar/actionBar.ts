@@ -43,18 +43,35 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Printable} from '../../rendering/printable/printable';
+import {Output} from '../../output/output';
+import {Editor} from '../editor/editor';
+import {Execution} from '../execution/execution';
+import {computed, signal, Signal} from '@angular/core';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
+import {TimeInfo} from '../execution/timeInfo/timeInfo';
 
-@Component({
-  selector: 'loader',
-  template: `
-    @if(isLoading()){
-      <div class="spinner-grow text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    }
-  `
-})
-export class LoaderView {
-  isLoading = input.required<boolean>();
+export class ActionBar implements Printable{
+  private readonly _editor:Editor;
+  private readonly _output:Output;
+  private readonly _execution:Execution;
+  private readonly _printSignal:Signal<RenderNode>;
+
+  constructor(editor:Editor, output:Output, execution:Execution, timeInfo:TimeInfo) {
+    this._editor = editor;
+    this._output = output;
+    this._execution = execution;
+    this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.ACTION_BAR_VIEW, computed(() => ({
+      editor: this._editor,
+      output: this._output,
+      execution: this._execution,
+      timeInfo:timeInfo.print()(),
+    }))));
+  }
+
+  print(): Signal<RenderNode> {
+    return this._printSignal;
+  }
 }

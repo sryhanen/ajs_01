@@ -45,13 +45,14 @@
  */
 import {Component, input} from '@angular/core';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
+import {Execution} from '../../../../objects/paragraph/execution/execution';
 
 @Component({
   selector: 'execution',
   template: ''
 })
 export class ExecutionView {
-  dplLog = input.required<RenderNode>();
-  timeInfo= input.required<RenderNode>();
-  loader = input.required<RenderNode>();
+  status = input.required<RenderNode>();
+  execution = input.required<Execution>();
+  isLoading = input.required<boolean>();
 }

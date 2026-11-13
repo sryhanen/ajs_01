@@ -44,51 +44,35 @@
  * a licensee so wish it.
  */
 import {Execution} from './execution';
-import {computed, signal, Signal} from '@angular/core';
+import {Status} from './status/status';
+import {Requestable} from '../../channel/requestable';
+import {StatusImpl} from './status/statusImpl';
+import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {computed, signal, Signal} from '@angular/core';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
-import {DplLog} from './dplLog/dplLog';
-import {DplLogImpl} from './dplLog/dplLogImpl';
-import {TimeInfo} from './timeInfo/timeInfo';
-import {Loader} from './loader/loader';
-import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
-import {Requestable} from '../../channel/requestable';
-import {TimeInfoImpl} from './timeInfo/timeInfoImpl';
-import {LoaderImpl} from './loader/loaderImpl';
 
 export class ExecutionImpl implements Execution {
   private readonly _requestable:Requestable;
-  private readonly _printSignal: Signal<RenderNode>;
-  private readonly _dplLog:DplLog;
-  private readonly _timeInfo:TimeInfo;
-  private readonly _loader:Loader;
+  private readonly _status:Status;
+  private readonly _printSignal:Signal<RenderNode>;
 
   constructor(requestable:Requestable,
-              paragraphState: WebSocketPayload,
-              dplLog:DplLog = new DplLogImpl(),
-              timeInfo:TimeInfo = new TimeInfoImpl(paragraphState),
-              loader:Loader = new LoaderImpl(paragraphState)
+              paragraphState:WebSocketPayload,
+              status:Status = new StatusImpl(paragraphState),
   ) {
     this._requestable = requestable;
-    this._dplLog = dplLog;
-    this._timeInfo = timeInfo;
-    this._loader = loader;
+    this._status = status;
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EXECUTION_VIEW, computed(() => ({
-      dplLog: this._dplLog.print()(),
-      timeInfo: this._timeInfo.print()(),
-      loader: this._loader.print()(),
+      status:this._status.print()(),
+      isLoading:this._status.print()().inputs()()['isLoading'],
+      execution:this,
     }))));
   }
 
-  print(): Signal<RenderNode> {
-    return this._printSignal;
-  }
-
   response(json: object): void {
-    this._dplLog.response(json);
-    this._loader.response(json);
-    this._timeInfo.response(json);
+    this._status.response(json);
   }
 
   start():void {
@@ -103,5 +87,9 @@ export class ExecutionImpl implements Execution {
       op:'CANCEL_EXECUTION',
       data:{}
     });
+  }
+
+  print():Signal<RenderNode>{
+    return this._printSignal;
   }
 }
