@@ -49,16 +49,28 @@ import {ComponentRef} from '@angular/core';
 import {WebSocketPayloadImpl} from '../../../../objects/webSocket/webSocketPayload/webSocketPayloadImpl';
 import {EditorStateRule} from '../../../../objects/paragraph/editor/editorRule/editorStateRule/editorStateRule';
 import ace from 'ace-builds';
+import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
+import {RenderNodeFake} from '../../../../../test/fakes/app/renderNode/renderNodeFake';
+import {
+  FakeComponentRegistryProvider
+} from '../../../../../test/fakes/app/componentRegistry/fakeComponentRegistryProvider';
 
 describe('EditorView functional test', () => {
   let componentRef:ComponentRef<EditorView>;
   let container: HTMLElement;
+  let editorStyle:RenderNode;
+  let editor:ace.Ace.Editor;
 
   beforeEach(async () => {
+    editorStyle = new RenderNodeFake();
+    editor = ace.edit();
     const renderResult = await render(EditorView, {
       inputs:{
+        editor:editor,
+        editorStyle:editorStyle,
         editorRules:[]
-      }
+      },
+      providers: [FakeComponentRegistryProvider]
     });
     componentRef = renderResult.fixture.componentRef;
     container = renderResult.container;
