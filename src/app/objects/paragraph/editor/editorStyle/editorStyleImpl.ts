@@ -51,6 +51,9 @@ import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 import {WebSocketPayload} from '../../../webSocket/webSocketPayload/webSocketPayload';
 import {Requestable} from '../../../channel/requestable';
+import {WebSocketResponse} from '../../../webSocket/response/webSocketResponse';
+import {WebSocketResponseImpl} from '../../../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../../../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 export class EditorStyleImpl implements EditorStyle {
   private readonly _editor:ace.Ace.Editor;
@@ -58,6 +61,7 @@ export class EditorStyleImpl implements EditorStyle {
   private readonly _printSignal:Signal<RenderNode>;
   private readonly _currentFontSize:WritableSignal<number>;
   private readonly _displayLineNumbers:WritableSignal<boolean>;
+  private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
 
   constructor(editor:ace.Ace.Editor,
               requestable:Requestable,
@@ -75,12 +79,20 @@ export class EditorStyleImpl implements EditorStyle {
       displayLineNumbers:this._displayLineNumbers(),
       editorStyle:this
     }))));
+    this._responseEvents = {
+      'EDITOR_FONT_SIZE': (webSocketResponse:WebSocketResponse) => this.applyFontSize(webSocketResponse.dataAsWebSocketPayload().numberProperty('fontSize')),
+      'EDITOR_LINE_NUMBER_VISIBILITY': (webSocketResponse:WebSocketResponse) => this.applyLineNumberVisibility(webSocketResponse.dataAsWebSocketPayload().booleanProperty('lineNumbers')),
+    };
+  }
+
+  private applyFontSize(fontSize: number):void{
+    this._editor.setFontSize(fontSize);
+    this._currentFontSize.set(fontSize);
   }
 
   updateFontSize(fontSize: number): void {
-    this._editor.setFontSize(fontSize);
+    this.applyFontSize(fontSize);
     if(this._currentFontSize() !== fontSize){
-      this._currentFontSize.set(fontSize);
       this._requestable.request({
         op:'EDITOR_FONT_SIZE',
         data:{
@@ -90,17 +102,21 @@ export class EditorStyleImpl implements EditorStyle {
     }
   }
 
-  updateLineNumberVisibility(lineNumberVisibility: boolean): void {
-     this._editor.renderer.setShowGutter(lineNumberVisibility);
-     if(this._displayLineNumbers() !== lineNumberVisibility){
-       this._displayLineNumbers.set(lineNumberVisibility);
-       this._requestable.request({
-         op:'EDITOR_LINE_NUMBER',
-         data:{
-           isVisible:lineNumberVisibility
-         }
-       });
-     }
+  private applyLineNumberVisibility(isVisible:boolean):void{
+    this._editor.renderer.setShowGutter(isVisible);
+    this._displayLineNumbers.set(isVisible);
+  }
+
+  updateLineNumberVisibility(isVisible: boolean): void {
+    this.applyLineNumberVisibility(isVisible);
+    if(this._displayLineNumbers() !== isVisible){
+      this._requestable.request({
+        op:'EDITOR_LINE_NUMBER_VISIBILITY',
+        data:{
+          isVisible:isVisible
+        }
+      });
+    }
   }
 
   print(): Signal<RenderNode> {
@@ -108,5 +124,10 @@ export class EditorStyleImpl implements EditorStyle {
   }
 
   response(json: object): void {
+    const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    const eventId= webSocketResponse.operation();
+    if(eventId in this._responseEvents){
+      this._responseEvents[eventId](webSocketResponse);
+    }
   }
 }
