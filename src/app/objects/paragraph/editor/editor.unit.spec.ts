@@ -49,32 +49,40 @@ import {Requestable} from '../../channel/requestable';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {ServerParagraphFakeImpl} from '../../../../test/fakes/server/paragraph/serverParagraphFakeImpl';
+import {
+  ServerParagraphFakeWithText
+} from '../../../../test/fakes/server/paragraph/withText/serverParagraphFakeWithText';
+import ace from 'ace-builds';
+import {IdFakeImpl} from '../../../../test/fakes/server/id/idFakeImpl';
 
 describe('Editor unit test', () => {
   let requestable:Requestable;
   let editor: Editor;
-  const paragraphState = new ServerParagraphFakeImpl().paragraphState();
 
   it('Should print RenderNode', () => {
     requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
     editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState));
     expect(editor.print()().isStub()).toBe(false);
   });
 
   it('Should print editor rules', () => {
     requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
     editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState));
     expect(editor.print()().inputs()()['editorRules']).toBeDefined();
   });
 
   it('Should print editor style', () => {
     requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
     editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState));
     expect(editor.print()().inputs()()['editorStyle']).toBeDefined();
   });
 
   it('Should request channel', () => {
     requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
     editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState));
     const request = {
       op:'',
@@ -83,5 +91,33 @@ describe('Editor unit test', () => {
     const requestSpy = vi.spyOn(requestable, 'request');
     editor.request(request);
     expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
+
+  it('Should clear editor', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState));
+    const aceEditor = editor.print()().inputs()()['editor'] as ace.Editor;
+    const initialText = 'some initial value';
+    aceEditor.setValue(initialText);
+    const editorTextBeforeClear = aceEditor.getValue();
+    editor.clear();
+    const editorTextAfterClear = aceEditor.getValue();
+    expect(editorTextBeforeClear).toEqual(initialText);
+    expect(editorTextAfterClear).toEqual('');
+  });
+
+  it('Should send request when editor is cleared', () => {
+    requestable = new FakeChannel();
+    const paragraphId = 'paragraphId';
+    const paragraphState = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState));
+    const requestSpy = vi.spyOn(requestable, 'request');
+    editor.clear();
+    const expectedRequest ={
+      op:'EDITOR_CLEARED',
+      data:{}
+    };
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
   });
 });

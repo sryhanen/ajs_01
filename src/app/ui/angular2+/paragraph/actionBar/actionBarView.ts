@@ -57,6 +57,18 @@ import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
   template: `
     <hr>
     <render-node-host [renderNode]="executor()"></render-node-host>
+    <button class="btn btn-link btn-sm"
+            (click)="editor().clear()">
+      <i class="fas fa-eraser"
+         title="Clear editor">
+      </i>
+    </button>
+    <button class="btn btn-link btn-sm"
+            (click)="output().clear()">
+      <i class="fa-solid fa-trash-can"
+         title="Clear output">
+      </i>
+    </button>
     <div class="d-flex justify-content-end gap-2">
         <render-node-host [renderNode]="executionStatus()"></render-node-host>
         <render-node-host [renderNode]="timeInfo()"></render-node-host>

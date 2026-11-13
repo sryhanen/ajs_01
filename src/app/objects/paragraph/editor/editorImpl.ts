@@ -71,6 +71,7 @@ export class EditorImpl implements Editor {
   private readonly _autoCompleteRule:AutoCompletionsRule;
   private readonly _syntaxLanguageSelectRule:SyntaxLanguageSelectRule;
   private readonly _printSignal:Signal<RenderNode>;
+  private readonly _editor:ace.Editor;
 
   constructor(requestable: Requestable, paragraphState: WebSocketPayload) {
     this._requestable = requestable;
@@ -88,11 +89,11 @@ export class EditorImpl implements Editor {
     ];
     const preElement = document.createElement('pre');
     preElement.classList.add('editor-container');
-    const editor = ace.edit(preElement);
-    this._editorStyle = new EditorStyleImpl(editor, this, paragraphState);
+    this._editor = ace.edit(preElement);
+    this._editorStyle = new EditorStyleImpl(this._editor, this, paragraphState);
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
       editorStyle:this._editorStyle.print()(),
-      editor:editor,
+      editor:this._editor,
       editorRules:editorRules
     }))));
   }
@@ -109,5 +110,13 @@ export class EditorImpl implements Editor {
     this._editorStyle.response(json);
     this._autoCompleteRule.response(json);
     this._syntaxLanguageSelectRule.response(json);
+  }
+
+  clear():void{
+    this._editor.setValue('', 0);
+    this._requestable.request({
+      op:'EDITOR_CLEARED',
+      data:{}
+    });
   }
 }

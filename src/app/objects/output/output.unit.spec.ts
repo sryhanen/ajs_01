@@ -263,4 +263,44 @@ describe('Output unit test', () => {
       expect(loaderIsVisible).toBe(false);
     });
   });
+
+  it('Should clear output', () => {
+    output = new OutputImpl(requestable, new WebSocketPayloadImpl({
+      output:{
+        type:OutputType.text,
+        data:'',
+      }
+    }));
+    const outputBeforeClear = output.print()().inputs()()['output'] as RenderNode;
+    output.clear();
+    const outputAfterClear = output.print()().inputs()()['output'] as RenderNode;
+    expect(outputBeforeClear.isStub()).toBe(false);
+    expect(outputAfterClear.isStub()).toBe(true);
+  });
+
+  it('Should clear outputSwitcher', () => {
+    output = new OutputImpl(requestable, new WebSocketPayloadImpl({
+      output:{
+        type:OutputType.text,
+        data:'',
+        isAggregated:true,
+      }
+    }));
+    const outputBeforeClear = output.print()().inputs()()['outputSwitcher'] as RenderNode;
+    output.clear();
+    const outputAfterClear = output.print()().inputs()()['outputSwitcher'] as RenderNode;
+    expect(outputBeforeClear.isStub()).toBe(false);
+    expect(outputAfterClear.isStub()).toBe(true);
+  });
+
+  it('Should send request to server on clear', () => {
+    output = new OutputImpl(requestable, new WebSocketPayloadImpl({}));
+    const requestSpy = vi.spyOn(requestable, 'request');
+    output.clear();
+    const expectedRequest = {
+      op:'OUTPUT_CLEARED',
+      data:{}
+    };
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
 });

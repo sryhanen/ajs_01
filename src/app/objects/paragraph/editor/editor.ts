@@ -46,4 +46,6 @@
 import {Printable} from '../../rendering/printable/printable';
 import {Channel} from '../../channel/channel';
 
-export interface Editor extends Printable, Channel {}
+export interface Editor extends Printable, Channel {
+  clear():void;
+}
