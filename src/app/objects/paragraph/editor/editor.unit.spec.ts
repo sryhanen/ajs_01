@@ -48,26 +48,34 @@ import {EditorImpl} from './editorImpl';
 import {Requestable} from '../../channel/requestable';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {ServerParagraphFakeImpl} from '../../../../test/fakes/server/paragraph/serverParagraphFakeImpl';
 
 describe('Editor unit test', () => {
   let requestable:Requestable;
   let editor: Editor;
+  const paragraphState = new ServerParagraphFakeImpl().paragraphState();
 
   it('Should print RenderNode', () => {
     requestable = new FakeChannel();
-    editor = new EditorImpl(requestable, new WebSocketPayloadImpl({}));
+    editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState));
     expect(editor.print()().isStub()).toBe(false);
   });
 
   it('Should print editor rules', () => {
     requestable = new FakeChannel();
-    editor = new EditorImpl(requestable, new WebSocketPayloadImpl({}));
+    editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState));
     expect(editor.print()().inputs()()['editorRules']).toBeDefined();
+  });
+
+  it('Should print editor style', () => {
+    requestable = new FakeChannel();
+    editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState));
+    expect(editor.print()().inputs()()['editorStyle']).toBeDefined();
   });
 
   it('Should request channel', () => {
     requestable = new FakeChannel();
-    editor = new EditorImpl(requestable, new WebSocketPayloadImpl({}));
+    editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState));
     const request = {
       op:'',
       data:{}

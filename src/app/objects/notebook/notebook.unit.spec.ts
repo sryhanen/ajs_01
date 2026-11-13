@@ -49,74 +49,62 @@ import {Notebook} from './notebook';
 import {NotebookImpl} from './notebookImpl';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {ParagraphCollectionFake} from '../../../test/fakes/app/paragraphCollection/paragraphCollectionFake';
+import {ServerNotebookFakeImpl} from '../../../test/fakes/server/notebook/serverNotebookFakeImpl';
+import {IdFakeImpl} from '../../../test/fakes/server/id/idFakeImpl';
+import {RenderNode} from '../rendering/renderNode/renderNode';
 
 describe('Notebook unit test', () => {
   const notebookId = 'noteId';
-  const notebookParagraphs = [
-    {id:'paragraph1'}
-  ];
-  let notebookData: {id:string, paragraphs?: {id:string}[]};
   let channel: Channel;
   let notebook: Notebook;
 
-  beforeEach(() => {
-    notebookData = {
-      id: notebookId,
-      paragraphs:notebookParagraphs
-    };
+  it('Should have id', () => {
     channel = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl(new IdFakeImpl(notebookId)).notebookState();
+    notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookState));
+    expect(notebook.id()).toEqual(notebookId);
   });
 
-  describe('Birth', () => {
-    it('Should have id', () => {
-      notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookData));
-      expect(notebook.id()).toEqual(notebookId);
-    });
-
-    it('Should print', () => {
-      notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookData));
-      const notebookPrinted = notebook.print()();
-      expect(notebookPrinted.isStub()).toBe(false);
-    });
+  it('Should print RenderNode', () => {
+    channel = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl(new IdFakeImpl(notebookId)).notebookState();
+    notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookState));
+    const renderNode:RenderNode = notebook.print()();
+    expect(renderNode.isStub()).toBe(false);
   });
 
-  describe('Request', () => {
-    let channelSpy;
-    beforeEach(() => {
-      channelSpy = vi.spyOn(channel, 'request');
-      notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookData));
-    });
-
-    it('Should decorate with noteId', () => {
-      const request = {
-        op:'',
-        data:{
-          noteId: ''
-        }
-      };
-      const decoratedRequest = {
-        op:'',
-        data:{
-          noteId: notebookId,
-        }
-      };
-      notebook.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(decoratedRequest);
-    });
-
-    it('Should request channel', () => {
-      const request = {
-        op:'',
-        data:{}
-      };
-      notebook.request(request);
-      expect(channelSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
+  it('Should print ParagraphCollection', () => {
+    channel = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl(new IdFakeImpl(notebookId)).notebookState();
+    notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookState));
+    const paragraphCollection = notebook.print()().inputs()()['paragraphCollection'];
+    expect(paragraphCollection).toBeDefined();
   });
 
-  it('Should filter message with different note Id', () => {
+  it('Should decorate request with noteId', () => {
+    channel = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl(new IdFakeImpl(notebookId)).notebookState();
+    notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookState));
+    const request = {
+      op:'',
+      data:{}
+    };
+    const requestSpy = vi.spyOn(channel, 'request');
+    notebook.request(request);
+    const expectedRequest = {
+      op:'',
+      data:{
+        noteId: notebookId,
+      }
+    };
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
+
+  it('Should filter response with different noteId', () => {
+    channel = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl(new IdFakeImpl(notebookId)).notebookState();
     const paragraphCollection = new ParagraphCollectionFake();
-    notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookData), paragraphCollection);
+    notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookState), paragraphCollection);
     const wrongId  = 'wrongId';
     const message = {
       op:'',
@@ -129,17 +117,33 @@ describe('Notebook unit test', () => {
     expect(responseSpy).toHaveBeenCalledTimes(0);
   });
 
-  it('Should respond ParagraphCollection message with matching noteId', () => {
+  it('Should respond ParagraphCollection if response has matching noteId', () => {
+    channel = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl(new IdFakeImpl(notebookId)).notebookState();
     const paragraphCollection = new ParagraphCollectionFake();
-    notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookData), paragraphCollection);
-    const message = {
+    notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookState), paragraphCollection);
+    const response = {
       op:'',
       data:{
         noteId: notebookId
       }
     };
     const responseSpy = vi.spyOn(paragraphCollection, 'response');
-    notebook.response(message);
-    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(message);
+    notebook.response(response);
+    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
+  });
+
+  it('Should respond ParagraphCollection if response does not have noteId', () => {
+    channel = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl(new IdFakeImpl(notebookId)).notebookState();
+    const paragraphCollection = new ParagraphCollectionFake();
+    notebook = new NotebookImpl(channel, new WebSocketPayloadImpl(notebookState), paragraphCollection);
+    const response = {
+      op:'',
+      data:{}
+    };
+    const responseSpy = vi.spyOn(paragraphCollection, 'response');
+    notebook.response(response);
+    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
   });
 });

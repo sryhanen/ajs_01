@@ -46,27 +46,24 @@
 import {EditorStateRule} from './editorStateRule';
 import ace from 'ace-builds';
 import {WebSocketPayloadImpl} from '../../../../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {ServerParagraphFakeImpl} from '../../../../../../test/fakes/server/paragraph/serverParagraphFakeImpl';
+import {
+  ServerParagraphFakeWithText
+} from '../../../../../../test/fakes/server/paragraph/withText/serverParagraphFakeWithText';
 
 describe('EditorStateRule unit test', () => {
   const fontSize = 12;
   const textValue = 'some text value';
-  const paragraphData = {
-    status:'RUNNING',
-    text:textValue,
-    config:{
-      fontSize: fontSize,
-      lineNumbers: false,
-    }
-  };
-  const editorStateRule: EditorStateRule = new EditorStateRule(new WebSocketPayloadImpl(paragraphData));
+  const paragraphState = new ServerParagraphFakeWithText(new ServerParagraphFakeImpl(), textValue).paragraphState();
+  const editorStateRule: EditorStateRule = new EditorStateRule(new WebSocketPayloadImpl(paragraphState));
 
   it('Should apply editor state', () => {
     const editor = ace.edit(document.createElement('div'));
     editorStateRule.applyTo(editor);
     expect(editor.getValue()).toEqual(textValue);
     expect(editor.getFontSize()).toEqual(fontSize);
-    expect(editor.getReadOnly()).toEqual(true);
-    expect(editor.renderer.getShowGutter()).toEqual(false);
+    expect(editor.getReadOnly()).toEqual(false);
+    expect(editor.renderer.getShowGutter()).toEqual(true);
     expect(editor.getShowFoldWidgets()).toBe(false);
     expect(editor.getSession().getUseWrapMode()).toBe(true);
     expect(editor.getOption('maxLines')).toEqual(30);

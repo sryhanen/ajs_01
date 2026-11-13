@@ -48,154 +48,174 @@ import {ParagraphCollectionImpl} from './paragraphCollectionImpl';
 import {FakeChannel} from '../channel/fakeChannel';
 import {Requestable} from '../channel/requestable';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {ServerNotebookFakeImpl} from '../../../test/fakes/server/notebook/serverNotebookFakeImpl';
+import {RenderNode} from '../rendering/renderNode/renderNode';
+import {
+  ServerNotebookFakeWithParagraphs
+} from '../../../test/fakes/server/notebook/withParagraphs/serverNotebookFakeWithParagraphs';
+import {ServerParagraphFakeImpl} from '../../../test/fakes/server/paragraph/serverParagraphFakeImpl';
+import {IdFakeImpl} from '../../../test/fakes/server/id/idFakeImpl';
 
 describe('ParagraphCollection unit test', () => {
   let requestable: Requestable;
   let paragraphCollection: ParagraphCollection;
-  beforeEach(() => {
+
+
+  it('Should print RenderNode', () => {
     requestable = new FakeChannel();
-    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl({paragraphs:[]}));
+    const notebookState = new ServerNotebookFakeImpl().notebookState();
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
+    const renderNode:RenderNode = paragraphCollection.print()();
+    expect(renderNode.isStub()).toBe(false);
   });
 
-  it('Should print', () => {
-    const paragraphCollectionPrinted = paragraphCollection.print()();
-    expect(paragraphCollectionPrinted.isStub()).toBe(false);
-    expect(paragraphCollectionPrinted.inputs()()['paragraphs']).toEqual([]);
+  it('Should print paragraphs', () => {
+    requestable = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl().notebookState();
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
+    const paragraphs= paragraphCollection.print()().inputs()()['paragraphs'];
+    expect(paragraphs).toBeDefined();
   });
 
-  describe('Channel events', () => {
-    it('Should request channel', () => {
-      const requestSpy = vi.spyOn(requestable, 'request');
-      const request =  {
-        op:'test',
-        data: {}
-      };
-      paragraphCollection.request(request);
-      expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
-    });
+  it('Should request channel', () => {
+    requestable = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl().notebookState();
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
+    const requestSpy = vi.spyOn(requestable, 'request');
+    const request =  {
+      op:'test',
+      data: {}
+    };
+    paragraphCollection.request(request);
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
 
-    it('Should delegate EXECUTE_PARAGRAPH request', () => {
-      const paragraphId = 'para1';
-      const paragraphText = 'paragraph text';
-      const paragraphConfig = {test1:'test1'};
-      const paragraphSettings = {params:{test2:'test2'}};
-      const notebookState = new WebSocketPayloadImpl({
-        paragraphs: [{
-          id:paragraphId,
-          text:paragraphText,
-          config:paragraphConfig,
-          settings:paragraphSettings,
-        }]
-      });
-      paragraphCollection = new ParagraphCollectionImpl(requestable, notebookState);
-      const executeParagraphRequest = {
-        op:'EXECUTE_PARAGRAPH',
-        data:{
-          paragraphId:paragraphId,
-        }
-      };
-      const spy = vi.spyOn(requestable, 'request');
-      paragraphCollection.request(executeParagraphRequest);
-      const expectedRequest = {
-        op:'RUN_PARAGRAPH',
-        data:{
-          id:paragraphId,
-          paragraph:paragraphText,
-          config:paragraphConfig,
-          params:paragraphSettings.params
-        }
-      };
-      expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
-    });
+  it('Should delegate EXECUTE_PARAGRAPH request', () => {
+    requestable = new FakeChannel();
+    const paragraphId = 'para1';
+    const fakeParagraph = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    const paragraphs = [
+      fakeParagraph
+    ];
+    const notebookState = new ServerNotebookFakeWithParagraphs(new ServerNotebookFakeImpl(), paragraphs).notebookState();
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
+    const executeParagraphRequest = {
+      op:'EXECUTE_PARAGRAPH',
+      data:{
+        paragraphId:paragraphId,
+      }
+    };
+    const spy = vi.spyOn(requestable, 'request');
+    paragraphCollection.request(executeParagraphRequest);
+    const expectedRequest = {
+      op:'RUN_PARAGRAPH',
+      data:{
+        id:paragraphId,
+        paragraph:fakeParagraph.text,
+        config:fakeParagraph.config,
+        params:fakeParagraph.settings.params
+      }
+    };
+    expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
 
-    it('Should add paragraph', () => {
-      const paragraphAddedResponse = {
-        op:'PARAGRAPH_ADDED',
-        data:{
-          paragraph:{
-            id:'para3',
-          },
-          index:0
-        }
-      };
-      paragraphCollection.response(paragraphAddedResponse);
-      expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
-    });
+  it('Should add paragraph, "PARAGRAPH_ADDED" response', () => {
+    requestable = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl().notebookState();
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
+    const paragraphState  = new ServerParagraphFakeImpl().paragraphState();
+    const paragraphAddedResponse = {
+      op:'PARAGRAPH_ADDED',
+      data:{
+        paragraph:paragraphState,
+        index:0
+      }
+    };
+    paragraphCollection.response(paragraphAddedResponse);
+    expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
+  });
 
-    it('Should not add paragraph if index is negative', () => {
-      const paragraphAddedResponse = {
-        op:'PARAGRAPH_ADDED',
-        data:{
-          paragraph:{
-            id:'para3',
-          },
-          index:-1
-        }
-      };
-      expect(() => paragraphCollection.response(paragraphAddedResponse)).toThrow();
-    });
+  it('Should add paragraph, "PARAGRAPH" response', () => {
+    requestable = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl().notebookState();
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
+    const paragraphState  = new ServerParagraphFakeImpl().paragraphState();
+    const paragraphResponse = {
+      op:'PARAGRAPH',
+      data:paragraphState
+    };
+    paragraphCollection.response(paragraphResponse);
+    expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
+  });
 
-    it('Should not add paragraph if index is invalid', () => {
-      const paragraphAddedResponse = {
-        op:'PARAGRAPH_ADDED',
-        data:{
-          paragraph:{
-            id:'para3',
-          },
-          index:1
-        }
-      };
-      expect(() => paragraphCollection.response(paragraphAddedResponse)).toThrow();
-    });
+  it('Should not add paragraph if index is negative', () => {
+    requestable = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl().notebookState();
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
+    const paragraphState  = new ServerParagraphFakeImpl().paragraphState();
+    const paragraphAddedResponse = {
+      op:'PARAGRAPH_ADDED',
+      data:{
+        paragraph:paragraphState,
+        index:-1
+      }
+    };
+    expect(() => paragraphCollection.response(paragraphAddedResponse)).toThrow();
+  });
 
-    it('Should add paragraph', () => {
-      const paragraphResponse = {
-        op:'PARAGRAPH',
-        data:{
-          id:'para3'
-        }
-      };
-      paragraphCollection.response(paragraphResponse);
-      expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
-    });
+  it('Should not add paragraph if index is invalid', () => {
+    requestable = new FakeChannel();
+    const notebookState = new ServerNotebookFakeImpl().notebookState();
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
+    const paragraphState  = new ServerParagraphFakeImpl().paragraphState();
+    const paragraphAddedResponse = {
+      op:'PARAGRAPH_ADDED',
+      data:{
+        paragraph:paragraphState,
+        index:1
+      }
+    };
+    expect(() => paragraphCollection.response(paragraphAddedResponse)).toThrow();
+  });
 
-    it('Should remove paragraph', () => {
-      const paragraphId = 'paragraphId';
-      const notebookState = new WebSocketPayloadImpl({
-        paragraphs:[{
-          id:paragraphId,
-        }]
-      });
-      paragraphCollection = new ParagraphCollectionImpl(requestable, notebookState);
-      const paragraphRemovedResponse = {
-        op:'PARAGRAPH_REMOVED',
-        data:{
-          id:paragraphId,
-        }
-      };
-      const paragraphsBeforeRemove = paragraphCollection.print()().inputs()()['paragraphs'];
-      paragraphCollection.response(paragraphRemovedResponse);
-      const paragraphsAfterRemove = paragraphCollection.print()().inputs()()['paragraphs'];
-      expect(paragraphsBeforeRemove).toHaveLength(1);
-      expect(paragraphsAfterRemove).toHaveLength(0);
-    });
+  it('Should remove paragraph', () => {
+    requestable = new FakeChannel();
+    const paragraphId = 'para1';
+    const fakeParagraph = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    const paragraphs = [
+      fakeParagraph
+    ];
+    const notebookState = new ServerNotebookFakeWithParagraphs(new ServerNotebookFakeImpl(), paragraphs).notebookState();
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
+    const paragraphRemovedResponse = {
+      op:'PARAGRAPH_REMOVED',
+      data:{
+        id:paragraphId,
+      }
+    };
+    const paragraphsBeforeRemove = paragraphCollection.print()().inputs()()['paragraphs'];
+    paragraphCollection.response(paragraphRemovedResponse);
+    const paragraphsAfterRemove = paragraphCollection.print()().inputs()()['paragraphs'];
+    expect(paragraphsBeforeRemove).toHaveLength(1);
+    expect(paragraphsAfterRemove).toHaveLength(0);
+  });
 
-    it('Should not remove paragraph', () => {
-      const paragraphId = 'paragraphId';
-      const notebookState = new WebSocketPayloadImpl({
-        paragraphs:[{
-          id:paragraphId,
-        }]
-      });
-      paragraphCollection = new ParagraphCollectionImpl(requestable, notebookState);
-      const wrongParagraphId = 'wrongParagraphId';
-      const paragraphRemovedResponse = {
-        op:'PARAGRAPH_REMOVED',
-        data:{
-          id:wrongParagraphId,
-        }
-      };
-      expect(() => paragraphCollection.response(paragraphRemovedResponse)).toThrow();
-    });
+  it('Should not remove paragraph', () => {
+    requestable = new FakeChannel();
+    const paragraphId = 'para1';
+    const fakeParagraph = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    const paragraphs = [
+      fakeParagraph
+    ];
+    const notebookState = new ServerNotebookFakeWithParagraphs(new ServerNotebookFakeImpl(), paragraphs).notebookState();
+    paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
+    const wrongParagraphId = 'wrongParagraphId';
+    const paragraphRemovedResponse = {
+      op:'PARAGRAPH_REMOVED',
+      data:{
+        id:wrongParagraphId,
+      }
+    };
+    expect(() => paragraphCollection.response(paragraphRemovedResponse)).toThrow();
   });
 });

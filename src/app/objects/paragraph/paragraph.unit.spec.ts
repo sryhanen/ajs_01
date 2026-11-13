@@ -43,64 +43,43 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {FakeChannel} from '../channel/fakeChannel';
-import {Channel} from '../channel/channel';
-import {ParagraphImpl} from './paragraphImpl';
 import {Paragraph} from './paragraph';
+import {Requestable} from '../channel/requestable';
+import {ServerParagraphFakeImpl} from '../../../test/fakes/server/paragraph/serverParagraphFakeImpl';
+import {ParagraphImpl} from './paragraphImpl';
+import {FakeChannel} from '../channel/fakeChannel';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {OutputFake} from '../../../test/fakes/app/output/outputFake';
+import {RenderNode} from '../rendering/renderNode/renderNode';
+import {IdFakeImpl} from '../../../test/fakes/server/id/idFakeImpl';
 import {EditorFake} from '../../../test/fakes/app/editor/editorFake';
+import {OutputFake} from '../../../test/fakes/app/output/outputFake';
+import {ExecutionFake} from '../../../test/fakes/app/execution/executionFake';
 
 describe('Paragraph', () => {
-  const paragraphId = 'paragraphId';
-  const paragraphText = 'test';
-  const paragraphConfig = {
-    configValue:'config value1'
-  };
-  const paragraphParams = {
-    paramsValue:'params value1'
-  };
-  let paragraphData: {
-    config:object,
-    settings:object,
-    text:string,
-    id:string,
-  };
-  let channel: Channel;
+  let requestable: Requestable;
   let paragraph: Paragraph;
-  beforeEach(() => {
-    paragraphData = {
-      config: paragraphConfig,
-      settings:{
-        params: paragraphParams,
-      },
-      text: paragraphText,
-      id:paragraphId
-    };
-    channel = new FakeChannel();
-    paragraph = new ParagraphImpl(channel, new WebSocketPayloadImpl(paragraphData));
-  });
-
-  it('Should have id', () => {
-    expect(paragraph.id()).toEqual(paragraphId);
-  });
 
   it('Should print RenderNode', () => {
-    const paragraphPrinted = paragraph.print()();
-    expect(paragraphPrinted.isStub()).toBe(false);
-  });
-
-  it('Should print Execution', () => {
-    expect(paragraph.print()().inputs()()['execution']).toBeDefined();
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState));
+    const renderNode:RenderNode = paragraph.print()();
+    expect(renderNode.isStub()).toBe(false);
   });
 
   it('Should print Editor', () => {
-    expect(paragraph.print()().inputs()()['editor']).toBeDefined();
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState));
+    const editor = paragraph.print()().inputs()()['editor'];
+    expect(editor).toBeDefined();
   });
 
   it('Should respond Editor', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
     const editor = new EditorFake();
-    paragraph = new ParagraphImpl(channel, new WebSocketPayloadImpl(paragraphData), editor);
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor);
     const response = {
       op:'',
       data:{}
@@ -111,45 +90,105 @@ describe('Paragraph', () => {
   });
 
   it('Should print Output', () => {
-    expect(paragraph.print()().inputs()()['output']).toBeDefined();
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState));
+    const output = paragraph.print()().inputs()()['output'];
+    expect(output).toBeDefined();
   });
 
-  it('RunParagraph should create expected request', () => {
+  it('Should respond Output', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    const editor = new EditorFake();
+    const output = new OutputFake();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor, output);
+    const response = {
+      op:'',
+      data:{}
+    };
+    const responseSpy = vi.spyOn(output, 'response');
+    paragraph.response(response);
+    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
+  });
+
+  it('Should print Execution', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState));
+    const execution = paragraph.print()().inputs()()['execution'];
+    expect(execution).toBeDefined();
+  });
+
+  it('Should respond Execution', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    const editor = new EditorFake();
+    const output = new OutputFake();
+    const execution = new ExecutionFake();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor, output, execution);
+    const response = {
+      op:'',
+      data:{}
+    };
+    const responseSpy = vi.spyOn(execution, 'response');
+    paragraph.response(response);
+    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
+  });
+
+  it('Should have id', () => {
+    const paragraphId = 'paragraphId';
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState));
+    expect(paragraph.id()).toEqual(paragraphId);
+  });
+
+  it('Run should should create expected request', () => {
+    const paragraphId = 'paragraphId';
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState));
     const expectedRequest = {
       op:'RUN_PARAGRAPH',
       data:{
         id: paragraphId,
-        paragraph: paragraphText,
-        config: paragraphConfig,
-        params: paragraphParams,
+        paragraph: paragraphState.text,
+        config: paragraphState.config,
+        params: paragraphState.settings.params,
       }
     };
-    const spy = vi.spyOn(channel, 'request');
+    const spy = vi.spyOn(requestable, 'request');
     paragraph.run();
     expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
   });
 
   it('Should decorate request with paragraphId', () => {
+    const paragraphId = 'paragraphId';
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState));
     const request = {
       op:'',
-      data:{
-        paragraphId:''
-      }
+      data:{}
     };
+    const spy = vi.spyOn(requestable, 'request');
+    paragraph.request(request);
     const expectedRequest = {
       op:'',
       data:{
         paragraphId:paragraphId
       }
     };
-    const spy = vi.spyOn(channel, 'request');
-    paragraph.request(request);
     expect(spy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
   });
 
   it('Should filter response if paragraphId is different', () => {
-    const output = new OutputFake();
-    paragraph = new ParagraphImpl(channel, new WebSocketPayloadImpl(paragraphData), output);
+    const paragraphId = 'paragraphId';
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    const editor = new EditorFake();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor);
     const wrongId = 'wrongId';
     const response = {
       op:'',
@@ -157,22 +196,24 @@ describe('Paragraph', () => {
         paragraphId:wrongId,
       }
     };
-    const responseSpy = vi.spyOn(output, 'response');
+    const responseSpy = vi.spyOn(editor, 'response');
     paragraph.response(response);
     expect(responseSpy).toHaveBeenCalledTimes(0);
   });
 
-
   it('Should filter respond output if paragraphId matches', () => {
-    const output = new OutputFake();
-    paragraph = new ParagraphImpl(channel, new WebSocketPayloadImpl(paragraphData), output);
+    const paragraphId = 'paragraphId';
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    const editor = new EditorFake();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor);
     const response = {
       op:'',
       data:{
         paragraphId:paragraphId,
       }
     };
-    const responseSpy = vi.spyOn(output, 'response');
+    const responseSpy = vi.spyOn(editor, 'response');
     paragraph.response(response);
     expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
   });
