@@ -43,7 +43,30 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
+import {ExecutionImpl} from './executionImpl';
+import {FakeChannel} from '../../channel/fakeChannel';
+import {Requestable} from '../../channel/requestable';
+
 describe('Execution unit test', () => {
+  it('Should cancel execution', () => {
+    const requestable:Requestable = new FakeChannel();
+    const execution = new ExecutionImpl(requestable);
+    const requestSpy = vi.spyOn(requestable, 'request');
+    execution.cancel();
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith({
+      op:'CANCEL_EXECUTION',
+      data:{}
+    });
+  });
 
-
+  it('Should start execution', () => {
+    const requestable:Requestable = new FakeChannel();
+    const execution = new ExecutionImpl(requestable);
+    const requestSpy = vi.spyOn(requestable, 'request');
+    execution.start();
+    expect(requestSpy).toHaveBeenCalledExactlyOnceWith({
+      op:'START_EXECUTION',
+      data:{}
+    });
+  });
 });
