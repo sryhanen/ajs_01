@@ -43,7 +43,32 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Printable} from '../../../rendering/printable/printable';
-import {Respondable} from '../../../channel/respondable';
+import {Component, input} from '@angular/core';
+import {Execution} from '../../../../../objects/paragraph/execution/execution';
 
-export interface DplLog extends Respondable, Printable {}
+@Component({
+  selector:'executor',
+  template:`
+    @if(!isRunning()){
+      <button class="btn btn-link btn-sm"
+              (click)="execution().start()">
+        <i class="fas fa-play"
+           role="button"
+           title="Run this paragraph (Shift+Enter)">
+        </i>
+      </button>
+    }
+    @else{
+      <button class="btn btn-link btn-sm"
+              (click)="execution().cancel()">
+        <i class="fas fa-pause"
+           title="Cancel">
+        </i>
+      </button>
+    }
+  `
+})
+export class ExecutorView {
+  isRunning = input.required<boolean>();
+  execution = input.required<Execution>();
+}

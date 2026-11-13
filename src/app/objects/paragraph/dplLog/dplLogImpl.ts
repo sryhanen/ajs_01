@@ -45,14 +45,14 @@
  */
 import {DplLog} from './dplLog';
 import {computed, signal, Signal, WritableSignal} from '@angular/core';
-import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 import {DplLogKey, DplLogKeys} from './dplLogKeys';
-import {WebSocketResponse} from '../../../webSocket/response/webSocketResponse';
-import {RenderNodeStub} from '../../../rendering/renderNode/renderNodeStub';
-import {WebSocketResponseImpl} from '../../../webSocket/response/webSocketResponseImpl';
-import {WebSocketPayloadImpl} from '../../../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {WebSocketResponse} from '../../webSocket/response/webSocketResponse';
+import {RenderNodeStub} from '../../rendering/renderNode/renderNodeStub';
+import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 export class DplLogImpl implements DplLog {
   private readonly _printSignal: WritableSignal<RenderNode>;

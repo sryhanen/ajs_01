@@ -47,10 +47,10 @@ import {DplLog} from './dplLog';
 import {DplLogImpl} from './dplLogImpl';
 import {
   AngularObjectUpdateServerResponse
-} from '../../../../../test/fakes/server/webSocketResponses/angularObjectUpdate/angularObjectUpdateServerResponse';
+} from '../../../../test/fakes/server/webSocketResponses/angularObjectUpdate/angularObjectUpdateServerResponse';
 import {
   AngularObjectRemoveServerResponse
-} from '../../../../../test/fakes/server/webSocketResponses/angularObjectRemove/angularObjectRemoveServerResponse';
+} from '../../../../test/fakes/server/webSocketResponses/angularObjectRemove/angularObjectRemoveServerResponse';
 
 describe('DplLog unit test', () => {
   let dplLog:DplLog;

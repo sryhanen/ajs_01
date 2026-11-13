@@ -45,7 +45,6 @@
  */
 import {Component, input} from '@angular/core';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
-import {Execution} from '../../../../objects/paragraph/execution/execution';
 
 @Component({
   selector: 'execution',
@@ -53,6 +52,5 @@ import {Execution} from '../../../../objects/paragraph/execution/execution';
 })
 export class ExecutionView {
   status = input.required<RenderNode>();
-  execution = input.required<Execution>();
-  isLoading = input.required<boolean>();
+  executor = input.required<RenderNode>();
 }

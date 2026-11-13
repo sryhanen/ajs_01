@@ -52,6 +52,7 @@ import {RenderNode} from '../../rendering/renderNode/renderNode';
 import {computed, signal, Signal} from '@angular/core';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
+import {Executor} from './executor/executor';
 
 export class ExecutionImpl implements Execution {
   private readonly _requestable:Requestable;
@@ -64,10 +65,10 @@ export class ExecutionImpl implements Execution {
   ) {
     this._requestable = requestable;
     this._status = status;
+    const executor = new Executor(this, this._status);
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EXECUTION_VIEW, computed(() => ({
+      executor:executor.print()(),
       status:this._status.print()(),
-      isLoading:this._status.print()().inputs()()['isLoading'],
-      execution:this,
     }))));
   }
 

@@ -61,16 +61,17 @@ import {Editor} from './editor/editor';
 import {Execution} from './execution/execution';
 import {ExecutionImpl} from './execution/executionImpl';
 import {ActionBar} from './actionBar/actionBar';
-import {DplLogImpl} from './execution/dplLog/dplLogImpl';
-import {TimeInfoImpl} from './execution/timeInfo/timeInfoImpl';
+import {DplLogImpl} from './dplLog/dplLogImpl';
+import {TimeInfoImpl} from './timeInfo/timeInfoImpl';
 import {StatusImpl} from './execution/status/statusImpl';
-import {DplLog} from './execution/dplLog/dplLog';
-import {TimeInfo} from './execution/timeInfo/timeInfo';
+import {DplLog} from './dplLog/dplLog';
+import {TimeInfo} from './timeInfo/timeInfo';
 import {Status} from './execution/status/status';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
   private readonly _editor: Editor;
+  private readonly _dplLog:DplLog;
   private readonly _output: Output;
   private readonly _execution: Execution;
   private readonly _paragraphState: WebSocketPayload;
@@ -88,6 +89,7 @@ export class ParagraphImpl implements Paragraph {
     this._requestable = requestable;
     this._paragraphState = paragraphState;
     this._editor = editor;
+    this._dplLog = dplLog;
     this._output = output;
     this._execution = execution;
     const actionBar = new ActionBar(editor, output, execution, timeInfo);
@@ -141,6 +143,7 @@ export class ParagraphImpl implements Paragraph {
       this._output.response(response);
       this._editor.response(response);
       this._execution.response(response);
+      this._dplLog.response(response);
     }
   }
 }

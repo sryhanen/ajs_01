@@ -62,11 +62,12 @@ import {ParagraphView} from '../paragraph/paragraphView';
 import {NotebookIndexView} from '../notebookIndex/notebookIndexView';
 import {EditorView} from '../paragraph/editor/editorView';
 import {ExecutionView} from '../paragraph/execution/executionView';
-import {DplLogView} from '../paragraph/execution/dplLog/dplLogView';
+import {DplLogView} from '../paragraph/dplLog/dplLogView';
 import {EditorStyleView} from '../paragraph/editor/editorStyle/editorStyleView';
-import {TimeInfoView} from '../paragraph/execution/timeInfo/timeInfoView';
+import {TimeInfoView} from '../paragraph/timeInfo/timeInfoView';
 import {StatusView} from '../paragraph/execution/status/statusView';
 import {ActionBarView} from '../paragraph/actionBar/actionBarView';
+import {ExecutorView} from '../paragraph/execution/executor/executorView';
 
 export const ComponentRegistryProvider: Provider = {
   provide: COMPONENT_REGISTRY,
@@ -92,5 +93,6 @@ export const ComponentRegistryProvider: Provider = {
     [RegisteredComponents.STATUS_VIEW, StatusView],
     [RegisteredComponents.TIME_INFO_VIEW, TimeInfoView],
     [RegisteredComponents.ACTION_BAR_VIEW, ActionBarView],
+    [RegisteredComponents.EXECUTOR_VIEW, ExecutorView],
   ])
 };

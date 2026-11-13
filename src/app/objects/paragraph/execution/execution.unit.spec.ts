@@ -45,8 +45,8 @@
  */
 import {Execution} from './execution';
 import {ExecutionImpl} from './executionImpl';
-import {DplLog} from './dplLog/dplLog';
-import {DplLogImpl} from './dplLog/dplLogImpl';
+import {DplLog} from '../dplLog/dplLog';
+import {DplLogImpl} from '../dplLog/dplLogImpl';
 
 describe('Execution unit test', () => {
   let execution: Execution;

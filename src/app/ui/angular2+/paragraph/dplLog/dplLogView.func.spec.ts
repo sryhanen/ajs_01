@@ -34,7 +34,7 @@
  * Names of the licensors and authors may not be used for publicity purposes.
  *
  * No rights are granted for use of trade names, trademarks, or service marks
- * which are in The Program if any.
+ * which are in The Program if any.Record<DplLogKeyType, string>Record<DplLogKeyType, string>
  *
  * Licensee must indemnify licensors and authors for any liability that these
  * contractual assumptions impose on licensors and authors.
@@ -43,38 +43,54 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input, signal, WritableSignal} from '@angular/core';
-import {DplLogKey} from '../../../../../objects/paragraph/execution/dplLog/dplLogKeys';
+import {fireEvent, render, screen} from '@testing-library/angular';
+import {DplLogView} from './dplLogView';
+import {DplLogKey} from '../../../../objects/paragraph/dplLog/dplLogKeys';
 
-@Component({
-  selector: 'dpl-log',
-  template: `
-    <div class="dpl-log paragraph-footer-elapsed" role="log">
-      <p>
-        <button
-          (click)="toggleLog()"
-          class="btn btn-secondary btn-small my-2">
-          @let buttonText = logIsVisible() ? 'Hide log' : 'Show log';
-          {{buttonText}}
-        </button>
-      </p>
-      @if(logIsVisible()){
-        <div class="log-message">
-          <h3>Data Batch Status</h3>
-          <p class="batch-message">{{dplLog().batchMsg}}</p>
-          <p>{{dplLog().timeMsg}}</p>
-          <p class="overflow-auto">{{dplLog().message}}</p>
-        </div>
+describe('DplLogView functional test', () => {
+  let dplLog: Record<DplLogKey, string>;
+  const batchMessageValue = 'batch message value';
+  const timeMessageValue = 'time message value';
+  const messageValue = 'message value';
+  let toggleLogButton:HTMLElement;
+
+  beforeEach(async() => {
+    dplLog = {
+      'batchMsg': batchMessageValue,
+      'timeMsg': timeMessageValue,
+      'message': messageValue,
+    };
+    await render(DplLogView, {
+      inputs:{
+        dplLog: dplLog,
       }
-    </div>
-  `
-})
-export class DplLogView {
-  dplLog = input.required<Record<DplLogKey, string>>();
+    });
+    toggleLogButton = screen.getByRole('button');
+  });
 
-  protected logIsVisible:WritableSignal<boolean> = signal(false);
+  it('Should have rendered', () => {
+    expect(screen.getByRole('log')).toBeDefined();
+    expect(toggleLogButton).toBeDefined();
+  });
 
-  protected toggleLog():void{
-    this.logIsVisible.update(logIsVisible => !logIsVisible);
-  }
-}
+  it('Should have dplLog hidden', () => {
+    expect(() => screen.getByText(batchMessageValue)).toThrow();
+    expect(() => screen.getByText(timeMessageValue)).toThrow();
+    expect(() => screen.getByText(messageValue)).toThrow();
+  });
+
+  it('Should display dplLog after clicking toggle log button', () => {
+    fireEvent.click(toggleLogButton);
+    expect(screen.getByText(batchMessageValue)).toBeDefined();
+    expect(screen.getByText(timeMessageValue)).toBeDefined();
+    expect(screen.getByText(messageValue)).toBeDefined();
+  });
+
+  it('Should hide dplLog after clicking toggle log button', () => {
+    fireEvent.click(toggleLogButton);
+    fireEvent.click(toggleLogButton);
+    expect(() => screen.getByText(batchMessageValue)).toThrow();
+    expect(() => screen.getByText(timeMessageValue)).toThrow();
+    expect(() => screen.getByText(messageValue)).toThrow();
+  });
+});

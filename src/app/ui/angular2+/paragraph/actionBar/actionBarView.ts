@@ -46,7 +46,6 @@
 import {Component, input} from '@angular/core';
 import {Editor} from '../../../../objects/paragraph/editor/editor';
 import {Output} from '../../../../objects/output/output';
-import {Execution} from '../../../../objects/paragraph/execution/execution';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
 
@@ -56,16 +55,17 @@ import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
     RenderNodeRootView
   ],
   template: `
-    <button (click)="execution().start()">
-        <i class="fas fa-solid fa-play"></i>
-    </button>
-    <render-node-host [renderNode]="status()"></render-node-host>
-    <render-node-host [renderNode]="timeInfo()"></render-node-host>
+    <render-node-host [renderNode]="executor()"></render-node-host>
+    <div class="d-flex justify-content-end gap-2">
+        <render-node-host [renderNode]="executionStatus()"></render-node-host>
+        <render-node-host [renderNode]="timeInfo()"></render-node-host>
+    </div>
   `
 })
 export class ActionBarView {
   editor = input.required<Editor>();
   output = input.required<Output>();
-  execution = input.required<Execution>();
+  executor = input.required<RenderNode>();
+  executionStatus = input.required<RenderNode>();
   timeInfo = input.required<RenderNode>();
 }

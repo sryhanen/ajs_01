@@ -43,28 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {TimeInfo} from './timeInfo';
-import {computed, signal, Signal} from '@angular/core';
-import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {WebSocketPayload} from '../../../webSocket/webSocketPayload/webSocketPayload';
-import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
+import {Respondable} from '../../channel/respondable';
+import {Printable} from '../../rendering/printable/printable';
 
-export class TimeInfoImpl implements TimeInfo {
-  private readonly _printSignal:Signal<RenderNode>;
-
-  constructor(paragraphState: WebSocketPayload) {
-    this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.TIME_INFO_VIEW, computed(() => ({
-      status:paragraphState.stringProperty('status'),
-      elapsed:paragraphState.stringProperty('dateFinished'),
-    }))));
-  }
-
-  print(): Signal<RenderNode> {
-    return this._printSignal;
-  }
-
-  response(json: object): void {
-
-  }
-}
+export interface TimeInfo extends Respondable, Printable {}

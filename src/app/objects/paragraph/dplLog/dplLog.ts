@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Respondable} from '../../../channel/respondable';
-import {Printable} from '../../../rendering/printable/printable';
+import {Printable} from '../../rendering/printable/printable';
+import {Respondable} from '../../channel/respondable';
 
-export interface TimeInfo extends Respondable, Printable {}
+export interface DplLog extends Respondable, Printable {}

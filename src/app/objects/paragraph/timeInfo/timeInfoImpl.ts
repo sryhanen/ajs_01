@@ -34,7 +34,7 @@
  * Names of the licensors and authors may not be used for publicity purposes.
  *
  * No rights are granted for use of trade names, trademarks, or service marks
- * which are in The Program if any.Record<DplLogKeyType, string>Record<DplLogKeyType, string>
+ * which are in The Program if any.
  *
  * Licensee must indemnify licensors and authors for any liability that these
  * contractual assumptions impose on licensors and authors.
@@ -43,54 +43,28 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {fireEvent, render, screen} from '@testing-library/angular';
-import {DplLogView} from './dplLogView';
-import {DplLogKey} from '../../../../../objects/paragraph/execution/dplLog/dplLogKeys';
+import {TimeInfo} from './timeInfo';
+import {computed, signal, Signal} from '@angular/core';
+import {RenderNode} from '../../rendering/renderNode/renderNode';
+import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
+import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 
-describe('DplLogView functional test', () => {
-  let dplLog: Record<DplLogKey, string>;
-  const batchMessageValue = 'batch message value';
-  const timeMessageValue = 'time message value';
-  const messageValue = 'message value';
-  let toggleLogButton:HTMLElement;
+export class TimeInfoImpl implements TimeInfo {
+  private readonly _printSignal:Signal<RenderNode>;
 
-  beforeEach(async() => {
-    dplLog = {
-      'batchMsg': batchMessageValue,
-      'timeMsg': timeMessageValue,
-      'message': messageValue,
-    };
-    await render(DplLogView, {
-      inputs:{
-        dplLog: dplLog,
-      }
-    });
-    toggleLogButton = screen.getByRole('button');
-  });
+  constructor(paragraphState: WebSocketPayload) {
+    this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.TIME_INFO_VIEW, computed(() => ({
+      status:paragraphState.stringProperty('status'),
+      elapsed:paragraphState.stringProperty('dateFinished'),
+    }))));
+  }
 
-  it('Should have rendered', () => {
-    expect(screen.getByRole('log')).toBeDefined();
-    expect(toggleLogButton).toBeDefined();
-  });
+  print(): Signal<RenderNode> {
+    return this._printSignal;
+  }
 
-  it('Should have dplLog hidden', () => {
-    expect(() => screen.getByText(batchMessageValue)).toThrow();
-    expect(() => screen.getByText(timeMessageValue)).toThrow();
-    expect(() => screen.getByText(messageValue)).toThrow();
-  });
+  response(json: object): void {
 
-  it('Should display dplLog after clicking toggle log button', () => {
-    fireEvent.click(toggleLogButton);
-    expect(screen.getByText(batchMessageValue)).toBeDefined();
-    expect(screen.getByText(timeMessageValue)).toBeDefined();
-    expect(screen.getByText(messageValue)).toBeDefined();
-  });
-
-  it('Should hide dplLog after clicking toggle log button', () => {
-    fireEvent.click(toggleLogButton);
-    fireEvent.click(toggleLogButton);
-    expect(() => screen.getByText(batchMessageValue)).toThrow();
-    expect(() => screen.getByText(timeMessageValue)).toThrow();
-    expect(() => screen.getByText(messageValue)).toThrow();
-  });
-});
+  }
+}
