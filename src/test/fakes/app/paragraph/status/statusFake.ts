@@ -55,6 +55,14 @@ export class StatusFake implements Status{
     this._printSignal = signal(new RenderNodeFake());
   }
 
+  isExecuting(): Signal<boolean> {
+    return signal(false);
+  }
+
+  toString(): Signal<string> {
+    return signal('');
+  }
+
   print(): Signal<RenderNode> {
     return this._printSignal;
   }

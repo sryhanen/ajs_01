@@ -146,32 +146,32 @@ describe('Paragraph', () => {
     expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
   });
 
-  it('Should respond TimeInfo', () => {
-    requestable = new FakeChannel();
-    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
-    const editor = new EditorFake();
-    const output = new OutputFake();
-    const dplLog = new DplLogFake();
-    const timeInfo = new TimeInfoFake();
-    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor, output, dplLog, timeInfo);
-    const response = {
-      op:'',
-      data:{}
-    };
-    const responseSpy = vi.spyOn(timeInfo, 'response');
-    paragraph.response(response);
-    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
-  });
-
   it('Should respond Status', () => {
     requestable = new FakeChannel();
     const paragraphState = new ServerParagraphFakeImpl().paragraphState();
     const editor = new EditorFake();
     const output = new OutputFake();
     const dplLog = new DplLogFake();
-    const timeInfo = new TimeInfoFake();
     const status = new StatusFake();
-    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor, output, dplLog, timeInfo, status);
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor, output, dplLog, status);
+    const response = {
+      op:'',
+      data:{}
+    };
+    const responseSpy = vi.spyOn(status, 'response');
+    paragraph.response(response);
+    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
+  });
+
+  it('Should respond TimeInfo', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    const editor = new EditorFake();
+    const output = new OutputFake();
+    const dplLog = new DplLogFake();
+    const status = new StatusFake();
+    const timeInfo = new TimeInfoFake();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor, output, dplLog, status, timeInfo);
     const response = {
       op:'',
       data:{}

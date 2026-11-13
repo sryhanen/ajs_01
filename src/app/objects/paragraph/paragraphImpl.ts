@@ -83,8 +83,8 @@ export class ParagraphImpl implements Paragraph {
               editor:Editor = new EditorImpl(this, paragraphState),
               output:Output = new OutputImpl(this, paragraphState),
               dplLog:DplLog = new DplLogImpl(),
-              timeInfo:TimeInfo = new TimeInfoImpl(paragraphState),
               status:Status = new StatusImpl(paragraphState),
+              timeInfo:TimeInfo = new TimeInfoImpl(paragraphState, status),
   ) {
     this._requestable = requestable;
     this._paragraphState = paragraphState;

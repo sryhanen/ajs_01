@@ -48,4 +48,5 @@ import {Signal} from '@angular/core';
 
 export interface Status extends Respondable {
   isExecuting(): Signal<boolean>;
+  toString(): Signal<string>;
 }

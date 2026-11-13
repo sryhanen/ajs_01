@@ -51,21 +51,29 @@ import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPa
 
 export class StatusImpl implements Status{
   private readonly _isLoading:WritableSignal<boolean>;
+  private readonly _status:WritableSignal<string>;
 
   constructor(paragraphState: WebSocketPayload) {
-    this._isLoading = signal(this.executionIsOnGoing(paragraphState.stringProperty('status')));
+    const status = paragraphState.stringProperty('status');
+    this._isLoading = signal(this.executionIsOnGoing(status));
+    this._status = signal(status);
   }
 
   response(json: object): void {
     const webSocketResponse = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
     if(webSocketResponse.operation() === 'PARAGRAPH_STATUS'){
       const status= webSocketResponse.dataAsWebSocketPayload().stringProperty('status');
+      this._status.set(status);
       this._isLoading.set(this.executionIsOnGoing(status));
     }
   }
 
   isExecuting():Signal<boolean> {
     return this._isLoading;
+  }
+
+  toString(): Signal<string> {
+    return this._status;
   }
 
   private executionIsOnGoing(status:string): boolean {

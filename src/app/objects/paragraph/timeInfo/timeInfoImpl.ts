@@ -44,19 +44,22 @@
  * a licensee so wish it.
  */
 import {TimeInfo} from './timeInfo';
-import {computed, signal, Signal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
 import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
+import {Status} from '../status/status';
 
 export class TimeInfoImpl implements TimeInfo {
+  private readonly _elapsed:WritableSignal<string>;
   private readonly _printSignal:Signal<RenderNode>;
 
-  constructor(paragraphState: WebSocketPayload) {
+  constructor(paragraphState: WebSocketPayload, status:Status) {
+    this._elapsed = signal(paragraphState.stringProperty('dateFinished'));
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.TIME_INFO_VIEW, computed(() => ({
-      status:paragraphState.stringProperty('status'),
-      elapsed:paragraphState.stringProperty('dateFinished'),
+      status:status.toString()(),
+      elapsed:this._elapsed(),
     }))));
   }
 
@@ -64,7 +67,5 @@ export class TimeInfoImpl implements TimeInfo {
     return this._printSignal;
   }
 
-  response(json: object): void {
-
-  }
+  response(json: object): void {}
 }
