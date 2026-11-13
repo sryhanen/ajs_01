@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {Component, input} from '@angular/core';
-import {Execution} from '../../../../../objects/paragraph/execution/execution';
+import {Execution} from '../../../../objects/paragraph/execution/execution';
 
 @Component({
   selector:'executor',
