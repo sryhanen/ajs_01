@@ -43,10 +43,10 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Editor} from '../../../../app/objects/paragraph/editor/editor';
+import {Editor} from '../../../../../app/objects/paragraph/editor/editor';
 import {signal, Signal} from '@angular/core';
-import {RenderNode} from '../../../../app/objects/rendering/renderNode/renderNode';
-import {RenderNodeFake} from '../renderNode/renderNodeFake';
+import {RenderNode} from '../../../../../app/objects/rendering/renderNode/renderNode';
+import {RenderNodeFake} from '../../renderNode/renderNodeFake';
 
 export class EditorFake implements Editor {
   private readonly _printSignal:Signal<RenderNode>;
@@ -54,6 +54,8 @@ export class EditorFake implements Editor {
   constructor() {
     this._printSignal = signal(new RenderNodeFake());
   }
+
+  clear(): void {}
 
   print(): Signal<RenderNode> {
     return this._printSignal;

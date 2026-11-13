@@ -51,9 +51,11 @@ import {FakeChannel} from '../channel/fakeChannel';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {RenderNode} from '../rendering/renderNode/renderNode';
 import {IdFakeImpl} from '../../../test/fakes/server/id/idFakeImpl';
-import {EditorFake} from '../../../test/fakes/app/editor/editorFake';
+import {EditorFake} from '../../../test/fakes/app/paragraph/editor/editorFake';
 import {OutputFake} from '../../../test/fakes/app/output/outputFake';
-import {ExecutionFake} from '../../../test/fakes/app/execution/executionFake';
+import {DplLogFake} from '../../../test/fakes/app/paragraph/dplLog/dplLogFake';
+import {StatusFake} from '../../../test/fakes/app/paragraph/status/statusFake';
+import {TimeInfoFake} from '../../../test/fakes/app/paragraph/timeInfo/timeInfoFake';
 
 describe('Paragraph', () => {
   let requestable: Requestable;
@@ -89,6 +91,14 @@ describe('Paragraph', () => {
     expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
   });
 
+  it('Should print ActionBar', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState));
+    const actionBar = paragraph.print()().inputs()()['actionBar'];
+    expect(actionBar).toBeDefined();
+  });
+
   it('Should print Output', () => {
     requestable = new FakeChannel();
     const paragraphState = new ServerParagraphFakeImpl().paragraphState();
@@ -112,26 +122,61 @@ describe('Paragraph', () => {
     expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
   });
 
-  it('Should print Execution', () => {
+  it('Should print DplLog', () => {
     requestable = new FakeChannel();
     const paragraphState = new ServerParagraphFakeImpl().paragraphState();
     paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState));
-    const execution = paragraph.print()().inputs()()['execution'];
-    expect(execution).toBeDefined();
+    const dplLog = paragraph.print()().inputs()()['dplLog'];
+    expect(dplLog).toBeDefined();
   });
 
-  it('Should respond Execution', () => {
+  it('Should respond DplLog', () => {
     requestable = new FakeChannel();
     const paragraphState = new ServerParagraphFakeImpl().paragraphState();
     const editor = new EditorFake();
     const output = new OutputFake();
-    const execution = new ExecutionFake();
-    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor, output, execution);
+    const dplLog = new DplLogFake();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor, output, dplLog);
     const response = {
       op:'',
       data:{}
     };
-    const responseSpy = vi.spyOn(execution, 'response');
+    const responseSpy = vi.spyOn(dplLog, 'response');
+    paragraph.response(response);
+    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
+  });
+
+  it('Should respond TimeInfo', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    const editor = new EditorFake();
+    const output = new OutputFake();
+    const dplLog = new DplLogFake();
+    const timeInfo = new TimeInfoFake();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor, output, dplLog, timeInfo);
+    const response = {
+      op:'',
+      data:{}
+    };
+    const responseSpy = vi.spyOn(timeInfo, 'response');
+    paragraph.response(response);
+    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
+  });
+
+  it('Should respond Status', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    const editor = new EditorFake();
+    const output = new OutputFake();
+    const dplLog = new DplLogFake();
+    const timeInfo = new TimeInfoFake();
+    const status = new StatusFake();
+    paragraph = new ParagraphImpl(requestable, new WebSocketPayloadImpl(paragraphState), editor, output, dplLog, timeInfo, status);
+    const response = {
+      op:'',
+      data:{}
+    };
+    const responseSpy = vi.spyOn(status, 'response');
     paragraph.response(response);
     expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
   });

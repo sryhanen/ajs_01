@@ -72,6 +72,7 @@ export class ParagraphImpl implements Paragraph {
   private readonly _editor: Editor;
   private readonly _dplLog:DplLog;
   private readonly _output: Output;
+  private readonly _timeInfo:TimeInfo;
   private readonly _status: Status;
   private readonly _paragraphState: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
@@ -91,7 +92,8 @@ export class ParagraphImpl implements Paragraph {
     this._dplLog = dplLog;
     this._output = output;
     this._status = status;
-    const actionBar = new ActionBar(editor, output, timeInfo, new ExecutionImpl(this), this._status);
+    this._timeInfo = timeInfo;
+    const actionBar = new ActionBar(editor, output, this._timeInfo, new ExecutionImpl(this), this._status);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
       editor:this._editor.print()(),
       actionBar: actionBar.print()(),
@@ -143,6 +145,7 @@ export class ParagraphImpl implements Paragraph {
       this._editor.response(response);
       this._status.response(response);
       this._dplLog.response(response);
+      this._timeInfo.response(response);
     }
   }
 }

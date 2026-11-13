@@ -43,20 +43,17 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Execution} from '../../../../app/objects/paragraph/execution/execution';
+import {Status} from '../../../../../app/objects/paragraph/status/status';
 import {signal, Signal} from '@angular/core';
-import {RenderNode} from '../../../../app/objects/rendering/renderNode/renderNode';
-import {RenderNodeFake} from '../renderNode/renderNodeFake';
+import {RenderNode} from '../../../../../app/objects/rendering/renderNode/renderNode';
+import {RenderNodeFake} from '../../renderNode/renderNodeFake';
 
-export class ExecutionFake implements Execution {
+export class StatusFake implements Status{
   private readonly _printSignal:Signal<RenderNode>;
 
   constructor() {
     this._printSignal = signal(new RenderNodeFake());
   }
-
-  start(): void {}
-  cancel(): void {}
 
   print(): Signal<RenderNode> {
     return this._printSignal;

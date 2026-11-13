@@ -55,6 +55,8 @@ export class OutputFake implements Output {
     this._printSignal = signal(new RenderNodeFake());
   }
 
+  clear(): void {}
+
   print(): Signal<RenderNode> {
     return this._printSignal;
   }
