@@ -48,7 +48,7 @@ import {Output} from '../output/output';
 import {OutputImpl} from '../output/outputImpl';
 import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
-import {signal, Signal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import { RenderNode } from '../rendering/renderNode/renderNode';
 import {RenderNodeImpl} from '../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../ui/angular2+/componentRegistry/registeredComponents';
@@ -74,18 +74,20 @@ export class ParagraphImpl implements Paragraph {
               paragraphState: WebSocketPayload,
               editor:Editor = new EditorImpl(this, paragraphState),
               output:Output = new OutputImpl(this, paragraphState),
-              execution:Execution = new ExecutionImpl(),
+              execution:Execution = new ExecutionImpl(this, paragraphState),
   ) {
     this._requestable = requestable;
     this._paragraphState = paragraphState;
     this._editor = editor;
     this._output = output;
     this._execution = execution;
-    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, signal({
+    this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
       editor:this._editor.print()(),
       output:this._output.print()(),
-      execution:this._execution.print()(),
-    })));
+      dplLog:this._execution.print()().inputs()()['dplLog'],
+      timeInfo:this._execution.print()().inputs()()['timeInfo'],
+      loader:this._execution.print()().inputs()()['loader'],
+    }))));
     this._paragraphIdFilter = new WebSocketResponsePropertyEqualsFilter('paragraphId', this.id());
   }
 
