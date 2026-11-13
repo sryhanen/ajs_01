@@ -55,6 +55,9 @@ export class ExecutionFake implements Execution {
     this._printSignal = signal(new RenderNodeFake());
   }
 
+  start(): void {}
+  cancel(): void {}
+
   print(): Signal<RenderNode> {
     return this._printSignal;
   }
