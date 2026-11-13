@@ -44,18 +44,24 @@
  * a licensee so wish it.
  */
 import {Loader} from './loader';
-import {Signal} from '@angular/core';
+import {computed, signal, Signal} from '@angular/core';
 import {RenderNode} from '../../../rendering/renderNode/renderNode';
 import {WebSocketPayload} from '../../../webSocket/webSocketPayload/webSocketPayload';
+import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class LoaderImpl implements Loader{
+  private readonly _printSignal:Signal<RenderNode>;
 
   constructor(paragraphState: WebSocketPayload) {
 
+    this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.LOADER_VIEW, computed(() => ({
+
+    }))));
   }
 
   print(): Signal<RenderNode> {
-    return undefined;
+    return this._printSignal;
   }
 
   response(json: object): void {

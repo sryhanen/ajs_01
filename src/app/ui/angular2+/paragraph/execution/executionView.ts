@@ -45,17 +45,13 @@
  */
 import {Component, input} from '@angular/core';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
-import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
 
 @Component({
   selector: 'execution',
-  imports: [
-    RenderNodeRootView
-  ],
-  template: `
-    <render-node-host [renderNode]="dplLog()"></render-node-host>
-  `
+  template: ''
 })
 export class ExecutionView {
   dplLog = input.required<RenderNode>();
+  timeInfo= input.required<RenderNode>();
+  loader = input.required<RenderNode>();
 }
