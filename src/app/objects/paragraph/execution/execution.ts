@@ -46,4 +46,7 @@
 import {Printable} from '../../rendering/printable/printable';
 import {Respondable} from '../../channel/respondable';
 
-export interface Execution extends Printable, Respondable {}
+export interface Execution extends Printable, Respondable {
+  start():void;
+  cancel():void;
+}
