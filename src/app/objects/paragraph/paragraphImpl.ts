@@ -63,10 +63,8 @@ import {ExecutionImpl} from './execution/executionImpl';
 import {ActionBar} from './actionBar/actionBar';
 import {DplLogImpl} from './dplLog/dplLogImpl';
 import {TimeInfoImpl} from './timeInfo/timeInfoImpl';
-import {StatusImpl} from './execution/status/statusImpl';
 import {DplLog} from './dplLog/dplLog';
 import {TimeInfo} from './timeInfo/timeInfo';
-import {Status} from './execution/status/status';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;

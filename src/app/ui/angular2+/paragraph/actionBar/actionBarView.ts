@@ -55,11 +55,13 @@ import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
     RenderNodeRootView
   ],
   template: `
+    <hr>
     <render-node-host [renderNode]="executor()"></render-node-host>
     <div class="d-flex justify-content-end gap-2">
         <render-node-host [renderNode]="executionStatus()"></render-node-host>
         <render-node-host [renderNode]="timeInfo()"></render-node-host>
     </div>
+    <hr>
   `
 })
 export class ActionBarView {
