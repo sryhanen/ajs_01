@@ -45,26 +45,34 @@
  */
 import {Component, input} from '@angular/core';
 import {EditorStyle} from '../../../../../objects/paragraph/editor/editorStyle/editorStyle';
+import {FormsModule} from '@angular/forms';
 
 @Component({
-  selector:'editor-style',
-  template:`
+  selector: 'editor-style',
+  imports: [
+    FormsModule
+  ],
+  template: `
     <ul class="dropdown-menu">
       <li class="px-2 py-2 d-flex align-items-center justify-content-between">
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" [checked]="displayLineNumbers()" (change)="updateLineNumberVisibility($event)">
-            <label class="form-check-label">Toggle line numbers</label>
+          <input class="form-check-input" type="checkbox" role="switch"
+                 [ngModel]="displayLineNumbers()"
+                 (ngModelChange)="updateLineNumberVisibility($event)"
+                 [checked]="displayLineNumbers()">
+          <label class="form-check-label">Toggle line numbers</label>
         </div>
       </li>
       <li class="px-2 py-2 d-flex align-items-center justify-content-between">
         <label>Font size</label>
-        <select class="form-select form-select-sm w-auto" aria-label="Select font size" (change)="updateFontSize($event)">
-          @for(fontSizeOption of fontSizeOptions(); track $index){
-            @if(fontSizeOption === currentFontSize()){
-              <option [value]="fontSizeOption" selected>{{fontSizeOption}}</option>
-            }
-            @else{
-              <option [value]="fontSizeOption">{{fontSizeOption}}</option>
+        <select class="form-select form-select-sm w-auto" aria-label="Select font size"
+                [ngModel]="currentFontSize()"
+                (ngModelChange)="updateFontSize($event)">
+          @for (fontSizeOption of fontSizeOptions(); track $index) {
+            @if (fontSizeOption === currentFontSize()) {
+              <option [ngValue]="fontSizeOption" selected>{{ fontSizeOption }}</option>
+            } @else {
+              <option [ngValue]="fontSizeOption">{{ fontSizeOption }}</option>
             }
           }
         </select>
@@ -81,13 +89,11 @@ export class EditorStyleView {
   displayLineNumbers = input.required<boolean>();
   editorStyle = input.required<EditorStyle>();
 
-  updateFontSize(event: Event):void{
-    const value = (event.target as HTMLSelectElement).value;
-    this.editorStyle().updateFontSize(Number(value));
+  updateFontSize(fontSize:number):void{
+    this.editorStyle().updateFontSize(fontSize);
   }
 
-  updateLineNumberVisibility(event: Event):void{
-    const value = (event.target as HTMLInputElement).checked;
-    this.editorStyle().updateLineNumberVisibility(Boolean(value));
+  updateLineNumberVisibility(isVisible:boolean):void{
+    this.editorStyle().updateLineNumberVisibility(isVisible);
   }
 }

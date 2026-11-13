@@ -92,7 +92,7 @@ export class EditorStyleImpl implements EditorStyle {
 
   updateLineNumberVisibility(lineNumberVisibility: boolean): void {
      this._editor.renderer.setShowGutter(lineNumberVisibility);
-     if(this._displayLineNumbers() !==  lineNumberVisibility){
+     if(this._displayLineNumbers() !== lineNumberVisibility){
        this._displayLineNumbers.set(lineNumberVisibility);
        this._requestable.request({
          op:'EDITOR_LINE_NUMBER',
