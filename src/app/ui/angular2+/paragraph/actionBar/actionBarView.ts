@@ -60,18 +60,20 @@ import {StatusView} from '../status/statusView';
     <hr>
     <div class="d-flex align-items-center">
       <render-node-host [renderNode]="executor()"></render-node-host>
-      <button class="btn btn-link btn-sm"
-              (click)="editor().clear()">
-        <i class="fas fa-eraser"
-           title="Clear editor">
-        </i>
-      </button>
-      <button class="btn btn-link btn-sm"
-              (click)="output().clear()">
-        <i class="fa-solid fa-trash-can"
-           title="Clear output">
-        </i>
-      </button>
+      <fieldset [disabled]="executionIsOngoing()">
+        <button class="btn btn-link btn-sm"
+                (click)="editor().clear()">
+          <i class="fas fa-eraser"
+             title="Clear editor">
+          </i>
+        </button>
+        <button class="btn btn-link btn-sm"
+                (click)="output().clear()">
+          <i class="fa-solid fa-trash-can"
+             title="Clear output">
+          </i>
+        </button>
+      </fieldset>
       <div class="ms-auto d-flex align-items-center">
         <execution-status [isLoading]="executionIsOngoing()"></execution-status>
         <render-node-host [renderNode]="timeInfo()"></render-node-host>
