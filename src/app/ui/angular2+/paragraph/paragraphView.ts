@@ -55,8 +55,8 @@ import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
   template: `
     <div class="paragraph-box">
       <render-node-host [renderNode]="editor()"></render-node-host>
-      <render-node-host [renderNode]="output()"></render-node-host>
       <render-node-host [renderNode]="execution()"></render-node-host>
+      <render-node-host [renderNode]="output()"></render-node-host>
     </div>
   `
 })

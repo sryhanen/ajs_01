@@ -54,7 +54,8 @@ import {DplLogKey} from '../../../../../objects/paragraph/execution/dplLog/dplLo
         <button
           (click)="toggleLog()"
           class="btn btn-secondary btn-small my-2">
-          Show/Hide log
+          @let buttonText = logIsVisible() ? 'Hide log' : 'Show log';
+          {{buttonText}}
         </button>
       </p>
       @if(logIsVisible()){
