@@ -93,7 +93,7 @@ export class ParagraphImpl implements Paragraph {
     this._output = output;
     this._status = status;
     this._timeInfo = timeInfo;
-    const actionBar = new ActionBar(editor, output, this._timeInfo, new ExecutionImpl(this), this._status);
+    const actionBar = new ActionBar(this, editor, output, this._timeInfo, new ExecutionImpl(this), this._status);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
       editor:this._editor.print()(),
       actionBar: actionBar.print()(),
@@ -147,5 +147,14 @@ export class ParagraphImpl implements Paragraph {
       this._dplLog.response(response);
       this._timeInfo.response(response);
     }
+  }
+
+  copy():void{
+    this._requestable.request({
+      op:'COPY_PARAGRAPH',
+      data:{
+        paragraphId:this.id(),
+      }
+    });
   }
 }

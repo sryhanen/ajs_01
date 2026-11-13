@@ -49,6 +49,7 @@ import {Output} from '../../../../objects/output/output';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
 import {StatusView} from '../status/statusView';
+import {Paragraph} from '../../../../objects/paragraph/paragraph';
 
 @Component({
   selector: 'action-bar',
@@ -68,6 +69,18 @@ import {StatusView} from '../status/statusView';
           </i>
         </button>
         <button class="btn btn-link btn-sm"
+                (click)="paragraph().copy()">
+          <i class="fa-solid fa-copy"
+             title="Copy paragraph">
+          </i>
+        </button>
+        <button class="btn btn-link btn-sm"
+                (click)="copyParagraphLink()">
+          <i class="fa-solid fa-link"
+             title="Link to paragraph">
+          </i>
+        </button>
+        <button class="btn btn-link btn-sm"
                 (click)="output().clear()">
           <i class="fa-solid fa-trash-can"
              title="Clear output">
@@ -83,9 +96,14 @@ import {StatusView} from '../status/statusView';
   `
 })
 export class ActionBarView {
+  paragraph = input.required<Paragraph>();
   editor = input.required<Editor>();
   output = input.required<Output>();
   executor = input.required<RenderNode>();
   executionIsOngoing = input.required<boolean>();
   timeInfo = input.required<RenderNode>();
+
+  copyParagraphLink():void{
+
+  }
 }

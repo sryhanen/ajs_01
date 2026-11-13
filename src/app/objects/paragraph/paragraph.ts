@@ -49,4 +49,5 @@ import {Printable} from '../rendering/printable/printable';
 export interface Paragraph extends Channel, Printable {
   id(): string;
   run():void;
+  copy():void;
 }
