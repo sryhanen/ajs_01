@@ -48,10 +48,8 @@ import {Component, input} from '@angular/core';
 @Component({
   selector: 'time-info',
   template: `
-    <div>
-      <p class="text-uppercase">{{status()}}</p>
-      -
-      <p>{{elapsed()}}</p>
+    <div class="d-flex align-items-center">
+      <p class="text-uppercase">{{status()}} - {{elapsed()}}</p>
     </div>
   `
 })
