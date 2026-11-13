@@ -46,10 +46,10 @@
 import {ServerOutputState} from '../output/serverOutputState';
 
 export type ServerParagraphState = {
-  dateCreated: number;
-  dateFinished: number;
-  dateStarted: number;
-  dateUpdated: number;
+  dateCreated: string;
+  dateFinished: string;
+  dateStarted: string;
+  dateUpdated: string;
   id: string;
   jobName: string;
   progress:number;

@@ -62,6 +62,9 @@ import {ServerParagraphFakeWithText} from '../../src/test/fakes/server/paragraph
 import {
   ServerParagraphFakeWithTitle
 } from '../../src/test/fakes/server/paragraph/withTitle/serverParagraphFakeWithTitle';
+import {
+  ServerParagraphFakeWithStatus
+} from '../../src/test/fakes/server/paragraph/withStatus/serverParagraphFakeWithStatus';
 
 export class PageDatasetFakeImpl implements PageDatasetFake {
   private readonly _noteService: NoteService;
@@ -99,7 +102,7 @@ export class PageDatasetFakeImpl implements PageDatasetFake {
     const length = rawData.length;
     const draw = 1;
     const output = outputPayloadFactory.dataTablesOutputPayload(dataTablesDataFactory.paginatedData(rawData, start, length, draw));
-    const paragraphWithOutput = new ServerParagraphFakeWithOutput(new ServerParagraphFakeImpl(), output);
+    const paragraphWithOutput = new ServerParagraphFakeWithStatus(new ServerParagraphFakeWithOutput(new ServerParagraphFakeImpl(), output), 'FINISHED');
     const sparkParagraph = new ServerParagraphFakeWithTitle(new ServerParagraphFakeWithText(new ServerParagraphFakeImpl(), '%spark.conf'), 'hideMeSparkPinger');
     fakeParagraphs.push(paragraphWithOutput.paragraphState());
     fakeParagraphs.push(sparkParagraph.paragraphState());

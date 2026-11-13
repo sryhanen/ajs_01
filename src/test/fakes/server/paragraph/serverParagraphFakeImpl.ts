@@ -49,15 +49,16 @@ import {IdFakeImpl} from '../id/idFakeImpl';
 import {ServerParagraphConfigFakeImpl} from '../paragraphConfig/serverParagraphConfigFakeImpl';
 import {IdFake} from '../id/idFake';
 import {ServerParagraphConfigFake} from '../paragraphConfig/serverParagraphConfigFake';
+import {DateFakeImpl} from '../date/dateFakeImpl';
 
 export class ServerParagraphFakeImpl implements ServerParagraphFake {
   private readonly _id:IdFake;
-  private readonly _dateNow:number;
+  private readonly _dateNow:string;
   private readonly _defaultConfig: ServerParagraphConfigFake;
 
   constructor(paragraphId:IdFake = new IdFakeImpl()) {
     this._id = paragraphId;
-    this._dateNow = Date.now();
+    this._dateNow = new DateFakeImpl(Date.now()).toString();
     this._defaultConfig = new ServerParagraphConfigFakeImpl();
   }
 
