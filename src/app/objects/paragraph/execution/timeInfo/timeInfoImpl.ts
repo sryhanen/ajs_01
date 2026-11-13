@@ -54,9 +54,9 @@ export class TimeInfoImpl implements TimeInfo {
   private readonly _printSignal:Signal<RenderNode>;
 
   constructor(paragraphState: WebSocketPayload) {
-
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.TIME_INFO_VIEW, computed(() => ({
-
+      status:paragraphState.stringProperty('status'),
+      elapsed:paragraphState.stringProperty('dateFinished'),
     }))));
   }
 

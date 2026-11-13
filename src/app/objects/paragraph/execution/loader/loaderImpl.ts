@@ -54,9 +54,8 @@ export class LoaderImpl implements Loader{
   private readonly _printSignal:Signal<RenderNode>;
 
   constructor(paragraphState: WebSocketPayload) {
-
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.LOADER_VIEW, computed(() => ({
-
+      isLoading:this.executionIsOnGoing(paragraphState)
     }))));
   }
 
@@ -66,5 +65,9 @@ export class LoaderImpl implements Loader{
 
   response(json: object): void {
 
+  }
+
+  private executionIsOnGoing(paragraphState:WebSocketPayload): boolean {
+    return paragraphState.stringProperty('status') === 'RUNNING' || paragraphState.stringProperty('status') === 'PENDING';
   }
 }

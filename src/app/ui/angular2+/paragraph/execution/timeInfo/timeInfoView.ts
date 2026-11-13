@@ -43,14 +43,15 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
   selector: 'time-info',
   template: `
-
+    <div><p class="text-uppercase">{{elapsed()}}</p><p> </p></div>
   `
 })
 export class TimeInfoView {
-
+  status = input.required<string>();
+  elapsed = input.required<string>();
 }

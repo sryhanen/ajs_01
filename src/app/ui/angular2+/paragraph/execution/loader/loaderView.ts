@@ -43,14 +43,18 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
   selector: 'loader',
   template: `
-
+    @if(isLoading()){
+      <div class="spinner-grow text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    }
   `
 })
 export class LoaderView {
-
+  isLoading = input.required<boolean>();
 }
