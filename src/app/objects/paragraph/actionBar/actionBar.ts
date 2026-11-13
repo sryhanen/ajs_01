@@ -52,22 +52,28 @@ import {RenderNode} from '../../rendering/renderNode/renderNode';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 import {TimeInfo} from '../timeInfo/timeInfo';
+import {Status} from '../status/status';
+import {Executor} from '../executor/executor';
 
 export class ActionBar implements Printable{
   private readonly _editor:Editor;
   private readonly _output:Output;
-  private readonly _execution:Execution;
   private readonly _printSignal:Signal<RenderNode>;
 
-  constructor(editor:Editor, output:Output, execution:Execution, timeInfo:TimeInfo) {
+  constructor(editor:Editor,
+              output:Output,
+              timeInfo:TimeInfo,
+              execution:Execution,
+              status:Status,
+              executor = new Executor(execution, status)
+              ) {
     this._editor = editor;
     this._output = output;
-    this._execution = execution;
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.ACTION_BAR_VIEW, computed(() => ({
       editor: this._editor,
       output: this._output,
-      executor: this._execution.print()().inputs()()['executor'],
-      executionStatus: this._execution.print()().inputs()()['status'],
+      executor: executor.print()(),
+      executionStatus: status.print()(),
       timeInfo:timeInfo.print()(),
     }))));
   }

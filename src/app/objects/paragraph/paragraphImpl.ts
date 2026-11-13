@@ -58,20 +58,21 @@ import {WebSocketRequestWithField} from '../webSocket/request/webSocketRequestWi
 import {Requestable} from '../channel/requestable';
 import {EditorImpl} from './editor/editorImpl';
 import {Editor} from './editor/editor';
-import {Execution} from './execution/execution';
-import {ExecutionImpl} from './execution/executionImpl';
 import {ActionBar} from './actionBar/actionBar';
 import {DplLogImpl} from './dplLog/dplLogImpl';
 import {TimeInfoImpl} from './timeInfo/timeInfoImpl';
 import {DplLog} from './dplLog/dplLog';
 import {TimeInfo} from './timeInfo/timeInfo';
+import {ExecutionImpl} from './execution/executionImpl';
+import {Status} from './status/status';
+import {StatusImpl} from './status/statusImpl';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
   private readonly _editor: Editor;
   private readonly _dplLog:DplLog;
   private readonly _output: Output;
-  private readonly _execution: Execution;
+  private readonly _status: Status;
   private readonly _paragraphState: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _paragraphIdFilter: WebSocketResponsePropertyEqualsFilter;
@@ -82,15 +83,15 @@ export class ParagraphImpl implements Paragraph {
               output:Output = new OutputImpl(this, paragraphState),
               dplLog:DplLog = new DplLogImpl(),
               timeInfo:TimeInfo = new TimeInfoImpl(paragraphState),
-              execution:Execution = new ExecutionImpl(this, paragraphState),
+              status:Status = new StatusImpl(paragraphState),
   ) {
     this._requestable = requestable;
     this._paragraphState = paragraphState;
     this._editor = editor;
     this._dplLog = dplLog;
     this._output = output;
-    this._execution = execution;
-    const actionBar = new ActionBar(editor, output, execution, timeInfo);
+    this._status = status;
+    const actionBar = new ActionBar(editor, output, timeInfo, new ExecutionImpl(this), this._status);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
       editor:this._editor.print()(),
       actionBar: actionBar.print()(),
@@ -140,7 +141,7 @@ export class ParagraphImpl implements Paragraph {
       };
       this._output.response(response);
       this._editor.response(response);
-      this._execution.response(response);
+      this._status.response(response);
       this._dplLog.response(response);
     }
   }

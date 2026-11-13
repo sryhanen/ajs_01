@@ -43,29 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Status} from './status';
-import {computed, signal, Signal} from '@angular/core';
-import {RenderNode} from '../../../rendering/renderNode/renderNode';
-import {WebSocketPayload} from '../../../webSocket/webSocketPayload/webSocketPayload';
-import {RenderNodeImpl} from '../../../rendering/renderNode/renderNodeImpl';
-import {RegisteredComponents} from '../../../../ui/angular2+/componentRegistry/registeredComponents';
+import {Respondable} from '../../channel/respondable';
+import {Printable} from '../../rendering/printable/printable';
 
-export class StatusImpl implements Status{
-  private readonly _printSignal:Signal<RenderNode>;
-
-  constructor(paragraphState: WebSocketPayload) {
-    this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.STATUS_VIEW, computed(() => ({
-      isLoading:this.executionIsOnGoing(paragraphState)
-    }))));
-  }
-
-  print(): Signal<RenderNode> {
-    return this._printSignal;
-  }
-
-  response(json: object): void {}
-
-  private executionIsOnGoing(paragraphState:WebSocketPayload): boolean {
-    return paragraphState.stringProperty('status') === 'RUNNING' || paragraphState.stringProperty('status') === 'PENDING';
-  }
-}
+export interface Status extends Respondable, Printable {}

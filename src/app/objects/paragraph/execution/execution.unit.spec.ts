@@ -43,33 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Execution} from './execution';
-import {ExecutionImpl} from './executionImpl';
-import {DplLog} from '../dplLog/dplLog';
-import {DplLogImpl} from '../dplLog/dplLogImpl';
-
 describe('Execution unit test', () => {
-  let execution: Execution;
 
-  it('Should print RenderNode', () => {
-    execution = new ExecutionImpl();
-    expect(execution.print()().isStub()).toBe(false);
-  });
 
-  it('Should print DplLog', () => {
-    execution = new ExecutionImpl();
-    expect(execution.print()().inputs()()['dplLog']).toBeDefined();
-  });
-
-  it('Should respond DplLog', () => {
-    const dplLog:DplLog = new DplLogImpl();
-    execution = new ExecutionImpl(dplLog);
-    const response = {
-      op:'',
-      data:{}
-    };
-    const responseSpy = vi.spyOn(dplLog, 'response');
-    execution.response(response);
-    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
-  });
 });
