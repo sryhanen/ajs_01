@@ -47,6 +47,8 @@ import {FakeChannel} from '../channel/fakeChannel';
 import {Channel} from '../channel/channel';
 import {ParagraphImpl} from './paragraphImpl';
 import {Paragraph} from './paragraph';
+import {WebSocketPayloadImpl} from '../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {EditorFake} from '../../../test/fakes/app/editor/editorFake';
 
 describe('Paragraph', () => {
   const paragraphId = 'paragraphId';
@@ -82,17 +84,33 @@ describe('Paragraph', () => {
     expect(paragraph.id()).toEqual(paragraphId);
   });
 
-  it('Should print renderNode', () => {
+  it('Should print RenderNode', () => {
     const paragraphPrinted = paragraph.print()();
     expect(paragraphPrinted.isStub()).toBe(false);
+  });
+
+  it('Should print output', () => {
+    expect(paragraph.print()().inputs()()['output']).toBeDefined();
   });
 
   it('Should print DplLog', () => {
     expect(paragraph.print()().inputs()()['dplLog']).toBeDefined();
   });
 
-  it('Should print output', () => {
-    expect(paragraph.print()().inputs()()['output']).toBeDefined();
+  it('Should print Editor', () => {
+    expect(paragraph.print()().inputs()()['editor']).toBeDefined();
+  });
+
+  it('Should respond Editor', () => {
+    const editor = new EditorFake();
+    paragraph = new ParagraphImpl(channel, new WebSocketPayloadImpl(paragraphData), editor);
+    const response = {
+      op:'',
+      data:{}
+    };
+    const responseSpy = vi.spyOn(editor, 'response');
+    paragraph.response(response);
+    expect(responseSpy).toHaveBeenCalledExactlyOnceWith(response);
   });
 
   it('Should print paragraphId', () => {
