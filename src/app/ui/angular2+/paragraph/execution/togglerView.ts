@@ -48,9 +48,9 @@ import {Component, input} from '@angular/core';
 @Component({
   selector: 'toggler',
   template: `
-    <button class="btn btn-secondary btn-sm" (click)="toggle()">
+    <button class="btn btn-link-secondary btn-sm d-inline-flex gap-2 align-items-center" (click)="toggle()">
       <i class="fas fa-play"></i>
-      <p>{{ isDisabled() ? 'Enable run' : 'Disable run' }}</p>
+      <p class="mb-0">{{ isDisabled() ? 'Enable run' : 'Disable run' }}</p>
     </button>
   `
 })
