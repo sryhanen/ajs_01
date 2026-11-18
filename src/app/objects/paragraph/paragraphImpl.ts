@@ -65,6 +65,8 @@ import {Execution} from './execution/execution';
 import {TitleImpl} from './title/titleImpl';
 import {Title} from './title/title';
 import {ActionsImpl} from './actions/actionsImpl';
+import {WidthImpl} from './width/widthImpl';
+import {Width} from './width/width';
 
 export class ParagraphImpl implements Paragraph {
   private readonly _requestable: Requestable;
@@ -76,6 +78,7 @@ export class ParagraphImpl implements Paragraph {
   private readonly _paragraphState: WebSocketPayload;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _paragraphIdFilter: WebSocketResponsePropertyEqualsFilter;
+  private readonly _width:Width;
 
   constructor(requestable: Requestable,
               paragraphState: WebSocketPayload,
@@ -83,7 +86,8 @@ export class ParagraphImpl implements Paragraph {
               output:Output = new OutputImpl(this, paragraphState),
               dplLog:DplLog = new DplLogImpl(),
               execution: Execution = new ExecutionImpl(this, paragraphState),
-              title:Title = new TitleImpl(this.titleValue(paragraphState), this)
+              title:Title = new TitleImpl(this.titleValue(paragraphState), this),
+              width:Width = new WidthImpl(this, paragraphState),
   ) {
     this._requestable = requestable;
     this._paragraphState = paragraphState;
@@ -92,9 +96,11 @@ export class ParagraphImpl implements Paragraph {
     this._output = output;
     this._execution = execution;
     this._title = title;
+    this._width = width;
     const actions = new ActionsImpl(this._execution, this._output, this);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_VIEW, computed(() => ({
       paragraphId:this.id(),
+      width:this._width.currentWidth()(),
       title:this._title.print()(),
       editor:this._editor.print()(),
       actions: actions,
@@ -147,6 +153,7 @@ export class ParagraphImpl implements Paragraph {
       this._dplLog.response(response);
       this._execution.response(response);
       this._title.response(response);
+      this._width.response(response);
     }
   }
 

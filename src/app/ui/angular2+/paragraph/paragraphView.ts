@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
 import {Actions} from '../../../objects/paragraph/actions/actions';
@@ -56,7 +56,7 @@ import {ActionBarView} from './actionBar/actionBarView';
     ActionBarView
   ],
   template: `
-    <div class="paragraph-box" [id]="paragraphId()">
+    <div class="paragraph-box paragraph-col" [class]="widthClass()" [id]="paragraphId()">
       <div class="paragraph-title-container ms-auto d-flex align-items-center py-2">
         <render-node-host [renderNode]="title()"></render-node-host>
         <render-node-host [renderNode]="actions().actions().removeParagraph"></render-node-host>
@@ -72,6 +72,10 @@ import {ActionBarView} from './actionBar/actionBarView';
   `
 })
 export class ParagraphView {
+  width = input.required<number>();
+  widthClass = computed(() => {
+    return `col-md-${this.width()}`;
+  });
   paragraphId = input.required<string>();
   title = input.required<RenderNode>();
   editor = input.required<RenderNode>();
