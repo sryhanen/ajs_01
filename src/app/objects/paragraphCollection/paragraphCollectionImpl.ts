@@ -69,9 +69,9 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     });
     this.initializeParagraphs(notebookState, this._paragraphs);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, computed(() => ({
-      paragraphs: Array.from(this._paragraphs().values()).map(paragraph => paragraph.print()()),
+      paragraphs: new Map(Array.from(this._paragraphs().values()).map(paragraph => [paragraph.id(), paragraph.print()()])),
       addParagraphCallback:(index:number) => this.insertParagraphRequest(index),
-      moveParagraphCallback:(index:number) => this.moveParagraph(index),
+      moveParagraphCallback:(index:number, paragraphId:string) => this.moveParagraph(index, paragraphId),
     }))));
     this._responseEvents = {
       'PARAGRAPH':(webSocketResponse) => this.handleParagraphResponse(webSocketResponse),
@@ -158,7 +158,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     });
   }
 
-  private moveParagraph(index:number) {
+  private moveParagraph(index:number, paragraphId:string) {
 
   }
 }

@@ -58,9 +58,10 @@ import {Component, input} from '@angular/core';
 })
 export class MoveParagraphView {
   currentIndex = input.required<number>();
-  moveParagraphCallback = input.required<(index:number) => void>();
+  paragraphId = input.required<string>();
+  moveParagraphCallback = input.required<(index:number, paragraphId:string) => void>();
 
   moveParagraph(index:number):void{
-    this.moveParagraphCallback()(index);
+    this.moveParagraphCallback()(index, this.paragraphId());
   }
 }

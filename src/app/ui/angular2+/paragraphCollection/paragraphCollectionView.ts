@@ -60,16 +60,16 @@ import {MoveParagraphView} from '../paragraph/actions/moveParagraph/moveParagrap
       @for(paragraph of paragraphs(); track $index){
         <insert-paragraph [addParagraphCallback]="addParagraphCallback()" [index]="$index"></insert-paragraph>
         <ng-template #projectedContent>
-          <move-paragraph [moveParagraphCallback]="moveParagraphCallback()" [currentIndex]="$index"></move-paragraph>
+          <move-paragraph [paragraphId]="paragraph[0]" [moveParagraphCallback]="moveParagraphCallback()" [currentIndex]="$index"></move-paragraph>
         </ng-template>
-        <render-node-host [renderNode]="paragraph" [projectableContent]="projectedContent"></render-node-host>
+        <render-node-host [renderNode]="paragraph[1]" [projectableContent]="projectedContent"></render-node-host>
       }
-      @let index = paragraphs().length;
+      @let index = paragraphs().size;
       <insert-paragraph [addParagraphCallback]="addParagraphCallback()" [index]="index"></insert-paragraph>
   `
 })
 export class ParagraphCollectionView {
-  paragraphs = input.required<RenderNode[]>();
+  paragraphs = input.required<Map<string, RenderNode>>();
   addParagraphCallback = input.required<(index:number) => void>();
-  moveParagraphCallback = input.required<(index:number) => void>();
+  moveParagraphCallback = input.required<(index:number, paragraphId:string) => void>();
 }
