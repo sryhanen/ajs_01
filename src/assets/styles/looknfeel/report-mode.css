@@ -51,8 +51,14 @@
     min-height: 0;
     box-shadow: none;
   }
-  paragraph .control {
-    display: none !important;
+  .paragraph-title-container {
+    float: left;
+  }
+  paragraph .controls-container {
+    border-color: transparent;
+  }
+  .controls {
+    display: none;
   }
   .collapse-button {
     margin-top: -3px;
@@ -81,7 +87,7 @@
     margin-left: -20px;
     margin-right: -15px;
   }
-  .new-paragraph    { display: none; }
+  .add-paragraph    { display: none; }
   .paragraph-id     { display: none; }
   .editor-container { display: none; }
   .dpl-time         { display: none; }

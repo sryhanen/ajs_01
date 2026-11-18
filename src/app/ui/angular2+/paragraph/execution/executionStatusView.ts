@@ -50,7 +50,7 @@ import {Component, input} from '@angular/core';
   template: `
     <div class="d-flex align-items-center">
       @if (executionIsOngoing()) {
-        <div class="spinner-grow spinner-grow-sm text-primary me-3" role="status">
+        <div class="spinner-grow spinner-grow-sm status-running me-3" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
       }

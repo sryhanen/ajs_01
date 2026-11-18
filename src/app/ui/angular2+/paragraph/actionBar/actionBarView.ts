@@ -55,11 +55,13 @@ import {ActionDropdown} from './dropdown/actionDropdown';
     ActionDropdown,
   ],
   template: `
-    <div class="control d-flex align-items-center">
-      <render-node-host [renderNode]="actions().actions().executor()"></render-node-host>
-      <render-node-host [renderNode]="actions().actions().clearOutput"></render-node-host>
-      <render-node-host [renderNode]="actions().actions().copyParagraph"></render-node-host>
-      <render-node-host [renderNode]="actions().actions().paragraphLink"></render-node-host>
+    <div class="controls-container d-flex align-items-center">
+      <div class="controls">
+        <render-node-host [renderNode]="actions().actions().executor()"></render-node-host>
+        <render-node-host [renderNode]="actions().actions().clearOutput"></render-node-host>
+        <render-node-host [renderNode]="actions().actions().copyParagraph"></render-node-host>
+        <render-node-host [renderNode]="actions().actions().paragraphLink"></render-node-host>
+      </div>
       <div class="ms-auto d-flex align-items-center">
         <render-node-host [renderNode]="actions().actions().executionStatus"></render-node-host>
       </div>

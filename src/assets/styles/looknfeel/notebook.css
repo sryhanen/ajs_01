@@ -296,68 +296,6 @@
   display: inline;
 }
 
-/* Add New Paragraph */
-
-.new-paragraph{
-  padding: 15px 30px 5px;
-  cursor: pointer;
-  color: var(--grey-600);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  text-align: right;
-  font-size: 10px;
-  font-weight: 500;
-  &:before {
-    content: "\f067";
-    font-family: 'Font Awesome 5 Free', fantasy;
-    font-weight: 900;
-    padding-right: 5px;
-    color: var(--grey-500);
-  }
-  &:hover {
-    text-shadow: 1px 1px 1px var(--grey-000);
-    color: var(--grey-700);
-    transition: all 0.2s ease-in;
-    &:before {
-      color: var(--grey-600);
-      transition: all 0.2s ease-in;
-    }
-  }
-  &-disable {
-    color: var(--grey-400) !important;
-    cursor: default !important;
-    &:before {
-      color: var(--grey-400);
-    }
-  }
-}
-
-.dark-mode .new-paragraph {
-  color: var(--dm-grey-400);
-  &:before {
-    color: var(--dm-grey-500);
-  }
-  &:hover {
-    text-shadow: 1px 1px 1px var(--dm-grey-900);
-    color: var(--dm-grey-300);
-    transition: all 0.2s ease-in;
-    &:before {
-      color: var(--dm-grey-400);
-      transition: all 0.2s ease-in;
-    }
-  }
-}
-
-.dark-mode .new-paragraph:hover .plus-sign {
-  background: var(--dm-grey-300);
-  border: 1px solid var(--dm-grey-800);
-  box-shadow: 0 2px 3px var(--dm-grey-900);
-}
-
-.noteBtnfa {
-  margin-left: 3px;
-}
-
 .disable {
   opacity: 0.6!important;
   pointer-events: none;
@@ -579,20 +517,6 @@
 }
 
 /* DPL */
-
-.log-message {
-  font-family: 'Roboto Mono', monospace;
-  color: var(--dm-grey-500);
-  word-break: break-all;
-}
-
-.dark-mode .log-message {
-  color: var(--tertiary-300);
-}
-
-.log-message h3 {
-  font-size: 14px;
-}
 
 .add-info p {
   margin-bottom: 5px;

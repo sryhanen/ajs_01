@@ -525,11 +525,12 @@
   &:disabled,
   &.disabled {
     color: var(--grey-500);
+    border-color: transparent;
     .fas,
     .fa-solid,
     .far,
     .fa-regular {
-      color: var(--grey-300);
+      color: var(--grey-400);
     }
   }
 }

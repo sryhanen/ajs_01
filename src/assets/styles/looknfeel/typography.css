@@ -224,7 +224,8 @@ div > :first-child {
   color: var(--dm-grey-300);
 }
 
-.status-running, .status-waiting {
+.status-running,
+.status-waiting {
   color: var(--primary-700);
 }
 

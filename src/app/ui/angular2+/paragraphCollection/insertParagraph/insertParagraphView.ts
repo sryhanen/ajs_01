@@ -48,8 +48,11 @@ import {Component, input} from '@angular/core';
 @Component({
   selector: 'insert-paragraph',
   template:`
-    <div class="clearfix">
-      <button class="btn btn-link btn-sm float-end" (click)="addParagraphCallback()(index())"><p>+ Add paragraph</p></button>
+    <div class="add-paragraph clearfix">
+      <button class="btn btn-link-secondary btn-sm float-end mb-3" (click)="addParagraphCallback()(index())">
+        <i class="fa-solid fa-plus me-1"></i>
+        Add paragraph
+      </button>
     </div>
   `
 })
