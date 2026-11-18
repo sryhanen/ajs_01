@@ -46,11 +46,13 @@
 import {Component, input} from '@angular/core';
 import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
 import {Actions} from '../../../../objects/paragraph/actions/actions';
+import {ActionDropdown} from './dropdown/actionDropdown';
 
 @Component({
   selector: 'action-bar',
   imports: [
     RenderNodeRootView,
+    ActionDropdown,
   ],
   template: `
     <div class="control d-flex align-items-center">
@@ -61,6 +63,7 @@ import {Actions} from '../../../../objects/paragraph/actions/actions';
       <div class="ms-auto d-flex align-items-center">
         <render-node-host [renderNode]="actions().actions().executionStatus"></render-node-host>
       </div>
+      <action-dropdown [toggleParagraphExecution]="actions().actions().toggleParagraphExecution"></action-dropdown>
     </div>
   `
 })
