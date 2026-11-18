@@ -60,14 +60,19 @@ import {RenderNodeRootView} from '../../../renderNodeRoot/renderNodeRootView';
         <i class="fa-solid fa-ellipsis-vertical"></i>
       </button>
       <ul class="dropdown-menu">
-        <li>
-          <render-node-host [renderNode]="toggleParagraphExecution()"></render-node-host>
-        </li>
+        @for(action of actions(); track $index){
+          <li>
+            @if($index !== 0){
+              <hr>
+            }
+            <render-node-host [renderNode]="action"></render-node-host>
+          </li>
+        }
       </ul>
     </div>
   `
 })
 export class ActionDropdown {
-  toggleParagraphExecution = input.required<RenderNode>();
+  actions = input.required<RenderNode[]>();
 
 }

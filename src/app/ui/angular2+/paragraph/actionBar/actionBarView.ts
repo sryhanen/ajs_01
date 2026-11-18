@@ -63,7 +63,10 @@ import {ActionDropdown} from './dropdown/actionDropdown';
       <div class="ms-auto d-flex align-items-center">
         <render-node-host [renderNode]="actions().actions().executionStatus"></render-node-host>
       </div>
-      <action-dropdown [toggleParagraphExecution]="actions().actions().toggleParagraphExecution"></action-dropdown>
+      @let actionDropDownActions = [
+        actions().actions().toggleParagraphExecution,
+      ];
+      <action-dropdown [actions]="actionDropDownActions"></action-dropdown>
     </div>
   `
 })
