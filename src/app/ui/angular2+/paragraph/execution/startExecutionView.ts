@@ -49,7 +49,8 @@ import {Component, input} from '@angular/core';
   selector:'start-execution',
   template:`
     <button class="btn btn-link btn-sm"
-            (click)="startExecutionCallback()()">
+            (click)="startExecutionCallback()()"
+            [disabled]="disable()">
       <i class="fas fa-play"
          role="button"
          title="Run this paragraph (Shift+Enter)">
@@ -59,4 +60,5 @@ import {Component, input} from '@angular/core';
 })
 export class StartExecutionView {
   startExecutionCallback = input.required<() => void>();
+  disable = input.required<boolean>();
 }

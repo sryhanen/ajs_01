@@ -50,5 +50,6 @@ import {RenderNode} from '../../rendering/renderNode/renderNode';
 export interface Execution extends Respondable {
   executionStatus():RenderNode;
   executor():Signal<RenderNode>;
+  toggler():RenderNode;
   executionIsOngoing():Signal<boolean>;
 }

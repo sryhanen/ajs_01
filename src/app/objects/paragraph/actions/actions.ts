@@ -57,5 +57,6 @@ export interface Actions {
     copyParagraph:RenderNode,
     paragraphLink:RenderNode,
     removeParagraph:RenderNode,
+    toggleParagraphExecution:RenderNode,
   }
 }

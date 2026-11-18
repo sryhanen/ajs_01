@@ -67,15 +67,21 @@ export class ExecutionImpl implements Execution {
   private readonly _executionIsOngoing:Signal<boolean>;
   private readonly _timeInfoText:WritableSignal<string>;
   private readonly _executionStatus:WritableSignal<string>;
+  private readonly _toggler:RenderNode;
+  private readonly _executionIsEnabled:WritableSignal<boolean>;
 
   constructor(requestable: Requestable, paragraphState:WebSocketPayload) {
     this._requestable = requestable;
+    this._executionIsEnabled = signal(true);
     this._startExecutionView = new RenderNodeImpl(RegisteredComponents.START_EXECUTION_VIEW,
-      computed(() => ({startExecutionCallback:() => this.startExecution()}
-      )));
+      computed(() => ({
+        startExecutionCallback:() => this.startExecution(),
+        disable:!this._executionIsEnabled()
+      })));
     this._cancelExecutionView = new RenderNodeImpl(RegisteredComponents.CANCEL_EXECUTION_VIEW,
-      computed(() => ({cancelExecutionCallback:() => this.cancelExecution()}
-      )));
+      computed(() => ({
+        cancelExecutionCallback:() => this.cancelExecution()
+      })));
     const status = paragraphState.stringProperty('status');
     this._executionStatus = signal(status);
     this._executionIsOngoing = computed(() => this.executionIsOnGoing(this._executionStatus()));
@@ -85,6 +91,11 @@ export class ExecutionImpl implements Execution {
       executionIsOngoing:this._executionIsOngoing(),
       timeInfoText:this._timeInfoText(),
       executionStatus: this._executionStatus(),
+    })));
+    this._toggler = new RenderNodeImpl(RegisteredComponents.TOGGLER_VIEW, computed(() => ({
+      isDisabled: !this._executionIsEnabled(),
+      enableCallback: () => this.enableExecution(),
+      disableCallback: () => this.disableExecution()
     })));
   }
 
@@ -98,6 +109,10 @@ export class ExecutionImpl implements Execution {
 
   executionIsOngoing(): Signal<boolean> {
     return this._executionIsOngoing;
+  }
+
+  toggler(): RenderNode {
+    return this._toggler;
   }
 
   response(json: object): void {
@@ -114,6 +129,12 @@ export class ExecutionImpl implements Execution {
         const user = webSocketResponse.dataAsWebSocketPayload().stringProperty('user');
         this._timeInfoText.set(this.calculateExecutionTime(startDate, endDate, user));
       }
+    }
+    else if(webSocketResponse.operation() === 'ENABLE_EXECUTION'){
+      this._executionIsEnabled.set(true);
+    }
+    else if(webSocketResponse.operation() === 'DISABLE_EXECUTION'){
+      this._executionIsEnabled.set(false);
     }
   }
 
@@ -158,5 +179,21 @@ export class ExecutionImpl implements Execution {
       timeInfoText = this.calculateExecutionTime(startDate, endDate, user);
     }
     return timeInfoText;
+  }
+
+  private enableExecution():void{
+    this._requestable.request({
+      op:'ENABLE_EXECUTION',
+      data:{}
+    });
+    this._executionIsEnabled.set(true);
+  }
+
+  private disableExecution():void{
+    this._requestable.request({
+      op:'DISABLE_EXECUTION',
+      data:{}
+    });
+    this._executionIsEnabled.set(false);
   }
 }

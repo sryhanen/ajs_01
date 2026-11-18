@@ -46,7 +46,6 @@
 import {Component, input} from '@angular/core';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
-import {Paragraph} from '../../../objects/paragraph/paragraph';
 import {Actions} from '../../../objects/paragraph/actions/actions';
 import {ActionBarView} from './actionBar/actionBarView';
 

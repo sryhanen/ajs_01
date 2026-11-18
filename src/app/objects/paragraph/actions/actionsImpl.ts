@@ -59,6 +59,7 @@ export class ActionsImpl implements Actions {
   private readonly _copyParagraph:RenderNode;
   private readonly _paragraphLink:RenderNode;
   private readonly _removeParagraph:RenderNode;
+  private readonly _toggleParagraphExecution:RenderNode;
 
   constructor(
     execution:Execution,
@@ -88,6 +89,7 @@ export class ActionsImpl implements Actions {
       }),
       disable:execution.executionIsOngoing()()
     })));
+    this._toggleParagraphExecution = execution.toggler();
   }
 
   actions(): {
@@ -97,6 +99,7 @@ export class ActionsImpl implements Actions {
     copyParagraph:RenderNode,
     paragraphLink:RenderNode,
     removeParagraph:RenderNode,
+    toggleParagraphExecution:RenderNode,
   } {
     return {
       executor: this._executor,
@@ -104,7 +107,8 @@ export class ActionsImpl implements Actions {
       clearOutput: this._clearOutput,
       copyParagraph: this._copyParagraph,
       paragraphLink: this._paragraphLink,
-      removeParagraph:this._removeParagraph
+      removeParagraph:this._removeParagraph,
+      toggleParagraphExecution:this._toggleParagraphExecution
     };
   }
 
