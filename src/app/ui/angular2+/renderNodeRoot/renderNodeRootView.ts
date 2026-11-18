@@ -46,8 +46,8 @@
 import {
   Component,
   inject,
-  input,
-  Type,
+  input, OnInit, TemplateRef,
+  Type, ViewContainerRef,
 } from '@angular/core';
 import {COMPONENT_REGISTRY} from '../componentRegistry/componentRegistry';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
@@ -62,16 +62,26 @@ import {NgComponentOutlet} from '@angular/common';
     @if(!renderNode().isStub()){
       @let component = componentReference(renderNode().componentView());
       @let inputs = renderNode().inputs();
-      <ng-container *ngComponentOutlet="component; inputs: inputs();"></ng-container>
+      <ng-container *ngComponentOutlet="component; inputs: inputs(); content: projectedNodes"></ng-container>
     }
   `
 })
-export class RenderNodeRootView {
+export class RenderNodeRootView implements OnInit {
   renderNode = input.required<RenderNode>();
+  projectableContent = input<TemplateRef<unknown>>();
+  projectedNodes: Node[][] = [];
+  private viewContainerRef = inject(ViewContainerRef);
 
   private readonly componentRegistry = inject(COMPONENT_REGISTRY);
 
   protected componentReference(componentId:string):Type<unknown>{
     return this.componentRegistry.get(componentId);
+  }
+
+  ngOnInit(): void {
+    if(this.projectableContent()){
+      const embeddedView = this.viewContainerRef.createEmbeddedView(this.projectableContent());
+      this.projectedNodes.push(embeddedView.rootNodes);
+    }
   }
 }

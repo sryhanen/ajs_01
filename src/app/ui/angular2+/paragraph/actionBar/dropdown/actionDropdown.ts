@@ -68,6 +68,7 @@ import {RenderNodeRootView} from '../../../renderNodeRoot/renderNodeRootView';
             <render-node-host [renderNode]="action"></render-node-host>
           </li>
         }
+        <ng-content></ng-content>
       </ul>
     </div>
   `

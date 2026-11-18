@@ -63,7 +63,9 @@ import {ActionBarView} from './actionBar/actionBarView';
         <p class="fw-light ms-auto">ID: {{paragraphId()}}</p>
       </div>
       <render-node-host [renderNode]="editor()"></render-node-host>
-      <action-bar [actions]="actions()"></action-bar>
+      <action-bar [actions]="actions()">
+        <ng-content></ng-content>
+      </action-bar>
       <render-node-host [renderNode]="dplLog()"></render-node-host>
       <render-node-host [renderNode]="output()"></render-node-host>
     </div>
