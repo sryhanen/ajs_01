@@ -159,6 +159,20 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   private moveParagraph(index:number, paragraphId:string) {
-
+    this._paragraphs.update(paragraphs => {
+      const paragraphArray = Array.from(paragraphs.values());
+      const originalIndex = paragraphArray.findIndex(p => p.id() === paragraphId);
+      const paragraphArrayCopy = [...paragraphArray];
+      const [movedParagraph] = paragraphArrayCopy.splice(originalIndex, 1);
+      paragraphArrayCopy.splice(index, 0, movedParagraph);
+      return new Map(paragraphArrayCopy.map(p => [p.id(), p]));
+    });
+    this._requestable.request({
+      op: 'MOVE_PARAGRAPH',
+      data: {
+        id: paragraphId,
+        index: index
+      }
+    });
   }
 }
