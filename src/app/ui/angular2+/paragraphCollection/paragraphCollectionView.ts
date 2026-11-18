@@ -57,15 +57,18 @@ import {MoveParagraphView} from '../paragraph/actions/moveParagraph/moveParagrap
     MoveParagraphView
   ],
   template: `
-      @for(paragraph of paragraphs(); track $index){
-        <insert-paragraph [addParagraphCallback]="addParagraphCallback()" [index]="$index"></insert-paragraph>
-        <ng-template #projectedContent>
-          <move-paragraph [paragraphId]="paragraph[0]" [moveParagraphCallback]="moveParagraphCallback()" [currentIndex]="$index"></move-paragraph>
-        </ng-template>
-        <render-node-host [renderNode]="paragraph[1]" [projectableContent]="projectedContent"></render-node-host>
-      }
-      @let index = paragraphs().size;
-      <insert-paragraph [addParagraphCallback]="addParagraphCallback()" [index]="index"></insert-paragraph>
+    @let paragraphsSize = paragraphs().size;
+    @for(paragraph of paragraphs(); track $index){
+      <insert-paragraph [addParagraphCallback]="addParagraphCallback()" [index]="$index"></insert-paragraph>
+      <ng-template #projectedContent>
+        <move-paragraph [paragraphId]="paragraph[0]"
+                        [moveParagraphCallback]="moveParagraphCallback()"
+                        [currentIndex]="$index"
+                        [highestIndex]="paragraphsSize-1"></move-paragraph>
+      </ng-template>
+      <render-node-host [renderNode]="paragraph[1]" [projectableContent]="projectedContent"></render-node-host>
+    }
+    <insert-paragraph [addParagraphCallback]="addParagraphCallback()" [index]="paragraphsSize"></insert-paragraph>
   `
 })
 export class ParagraphCollectionView {

@@ -49,15 +49,38 @@ import {Component, input} from '@angular/core';
   selector: 'move-paragraph',
   template: `
     <div class="vstack">
-      <button class="btn btn-link-secondary btn-sm d-inline-flex gap-2 align-items-center" style="text-transform: none;" (click)="moveParagraph(0)">
-        <i class="fa-solid fa-angles-up"></i>
-        <p class="mb-0">Move to the top</p>
-      </button>
+      @if(currentIndex() !== 1){
+        <button class="btn btn-link-secondary btn-sm d-inline-flex gap-2 align-items-center" style="text-transform: none;" (click)="moveParagraph(0)">
+          <i class="fa-solid fa-angles-up"></i>
+          <p class="mb-0">Move to the top</p>
+        </button>
+      }
+      @if(currentIndex() !== 1){
+        @let newIndex = currentIndex() - 1;
+        <button class="btn btn-link-secondary btn-sm d-inline-flex gap-2 align-items-center" style="text-transform: none;" (click)="moveParagraph(newIndex)">
+          <i class="fa-solid fa-angle-up"></i>
+          <p class="mb-0">Move up</p>
+        </button>
+      }
+      @if(currentIndex() < highestIndex()){
+        @let newIndex = currentIndex() + 1;
+        <button class="btn btn-link-secondary btn-sm d-inline-flex gap-2 align-items-center" style="text-transform: none;" (click)="moveParagraph(newIndex)">
+          <i class="fa-solid fa-angle-down"></i>
+          <p class="mb-0">Move down</p>
+        </button>
+      }
+      @if(currentIndex() < highestIndex()){
+        <button class="btn btn-link-secondary btn-sm d-inline-flex gap-2 align-items-center" style="text-transform: none;" (click)="moveParagraph(highestIndex())">
+          <i class="fa-solid fa-angles-down"></i>
+          <p class="mb-0">Move to the bottom</p>
+        </button>
+      }
     </div>
   `
 })
 export class MoveParagraphView {
   currentIndex = input.required<number>();
+  highestIndex = input.required<number>();
   paragraphId = input.required<string>();
   moveParagraphCallback = input.required<(index:number, paragraphId:string) => void>();
 
