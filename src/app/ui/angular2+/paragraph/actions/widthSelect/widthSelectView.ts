@@ -59,9 +59,11 @@ import {FormsModule} from '@angular/forms';
               (ngModelChange)="selectWidthCallback()($event)" >
         @for(widthOption of widthOptions; track $index) {
           @if(widthOption.value === currentWidth()){
-            <option [ngValue]="widthOption.value" selected></option>
+            <option [ngValue]="widthOption.value" selected>{{widthOption.text}}</option>
           }
-          <option [ngValue]="widthOption.value"></option>
+          @else{
+            <option [ngValue]="widthOption.value">{{widthOption.text}}</option>
+          }
         }
       </select>
     </div>
