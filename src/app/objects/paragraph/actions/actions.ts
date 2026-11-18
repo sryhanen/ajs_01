@@ -58,5 +58,6 @@ export interface Actions {
     paragraphLink:RenderNode,
     removeParagraph:RenderNode,
     toggleParagraphExecution:RenderNode,
+    selectWidth:RenderNode,
   }
 }

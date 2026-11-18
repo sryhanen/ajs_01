@@ -73,6 +73,7 @@ import {CopyParagraphView} from '../paragraph/actions/copyParagraph/copyParagrap
 import {ParagraphLinkView} from '../paragraph/actions/paragraphLink/paragraphLinkView';
 import {RemoveParagraphView} from '../paragraph/actions/removeParagraph/removeParagraphView';
 import {TogglerView} from '../paragraph/execution/togglerView';
+import {WidthSelectView} from '../paragraph/actions/widthSelect/widthSelectView';
 
 export const ComponentRegistryProvider: Provider = {
   provide: COMPONENT_REGISTRY,
@@ -103,6 +104,7 @@ export const ComponentRegistryProvider: Provider = {
     [RegisteredComponents.COPY_PARAGRAPH_VIEW, CopyParagraphView],
     [RegisteredComponents.PARAGRAPH_LINK_VIEW, ParagraphLinkView],
     [RegisteredComponents.REMOVE_PARAGRAPH_VIEW, RemoveParagraphView],
-    [RegisteredComponents.TOGGLER_VIEW, TogglerView]
+    [RegisteredComponents.TOGGLER_VIEW, TogglerView],
+    [RegisteredComponents.WIDTH_SELECT_VIEW, WidthSelectView]
   ])
 };

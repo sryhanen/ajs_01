@@ -44,10 +44,12 @@
  * a licensee so wish it.
  */
 import {Width} from './width';
-import {signal, Signal, WritableSignal} from '@angular/core';
+import {computed, signal, Signal, WritableSignal} from '@angular/core';
 import {RenderNode} from '../../rendering/renderNode/renderNode';
 import {Requestable} from '../../channel/requestable';
 import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
+import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
+import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 
 export class WidthImpl implements Width {
   private readonly _requestable:Requestable;
@@ -56,6 +58,10 @@ export class WidthImpl implements Width {
 
   constructor(requestable:Requestable, paragraphState:WebSocketPayload) {
     this._currentWidth = signal(12);
+    this._selector = new RenderNodeImpl(RegisteredComponents.WIDTH_SELECT_VIEW, computed(() => ({
+      currentWidth: this._currentWidth(),
+      selectWidthCallback: (width:number) => this.updateWidth(width),
+    })));
   }
 
   currentWidth(): Signal<number> {
@@ -66,6 +72,11 @@ export class WidthImpl implements Width {
   }
 
   selector(): RenderNode {
-    return undefined;
+    return this._selector;
+  }
+
+  private updateWidth(width:number):void{
+    this._currentWidth.set(width);
+
   }
 }

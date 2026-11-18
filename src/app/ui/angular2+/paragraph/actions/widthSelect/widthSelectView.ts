@@ -43,14 +43,36 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component} from '@angular/core';
+import {Component, input} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'width-select',
+  imports: [
+    FormsModule
+  ],
   template: `
+    <div class="d-inline-flex align-items-center">
+      <i class="fa fa-arrows-left-right"></i>
+      <p>Width</p>
+      <select [ngModel]="currentWidth()"
+              (ngModelChange)="selectWidthCallback()($event)" >
+        @for(widthOption of widthOptions; track $index) {
+          @if(widthOption.value === currentWidth()){
+            <option [ngValue]="widthOption.value" selected></option>
+          }
+          <option [ngValue]="widthOption.value"></option>
+        }
+      </select>
+    </div>
 
   `
 })
 export class WidthSelectView {
-
+  currentWidth = input.required<number>();
+  selectWidthCallback = input.required<(width:number) => void>();
+  widthOptions:{value:number, text:string}[] = [
+    {value: 12, text: 'Full width'},
+    {value: 4, text: '1/3 width'},
+  ];
 }

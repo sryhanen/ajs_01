@@ -51,6 +51,7 @@ import {Execution} from '../execution/execution';
 import {Actions} from './actions';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
+import {Width} from '../width/width';
 
 export class ActionsImpl implements Actions {
   private readonly _executor:Signal<RenderNode>;
@@ -60,11 +61,13 @@ export class ActionsImpl implements Actions {
   private readonly _paragraphLink:RenderNode;
   private readonly _removeParagraph:RenderNode;
   private readonly _toggleParagraphExecution:RenderNode;
+  private readonly _selectWidth:RenderNode;
 
   constructor(
     execution:Execution,
     output:Output,
     paragraph:Paragraph,
+    width:Width,
   ) {
     this._executor = execution.executor();
     this._executionStatus = execution.executionStatus();
@@ -90,6 +93,7 @@ export class ActionsImpl implements Actions {
       disable:execution.executionIsOngoing()()
     })));
     this._toggleParagraphExecution = execution.toggler();
+    this._selectWidth = width.selector();
   }
 
   actions(): {
@@ -100,6 +104,7 @@ export class ActionsImpl implements Actions {
     paragraphLink:RenderNode,
     removeParagraph:RenderNode,
     toggleParagraphExecution:RenderNode,
+    selectWidth:RenderNode,
   } {
     return {
       executor: this._executor,
@@ -108,7 +113,8 @@ export class ActionsImpl implements Actions {
       copyParagraph: this._copyParagraph,
       paragraphLink: this._paragraphLink,
       removeParagraph:this._removeParagraph,
-      toggleParagraphExecution:this._toggleParagraphExecution
+      toggleParagraphExecution:this._toggleParagraphExecution,
+      selectWidth:this._selectWidth,
     };
   }
 

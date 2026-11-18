@@ -67,6 +67,7 @@ import {ActionDropdown} from './dropdown/actionDropdown';
       </div>
       @let actionDropDownActions = [
         actions().actions().toggleParagraphExecution,
+        actions().actions().selectWidth
       ];
       <action-dropdown [actions]="actionDropDownActions">
         <ng-content></ng-content>

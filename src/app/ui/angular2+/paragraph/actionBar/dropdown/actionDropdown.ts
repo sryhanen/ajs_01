@@ -75,5 +75,4 @@ import {RenderNodeRootView} from '../../../renderNodeRoot/renderNodeRootView';
 })
 export class ActionDropdown {
   actions = input.required<RenderNode[]>();
-
 }
