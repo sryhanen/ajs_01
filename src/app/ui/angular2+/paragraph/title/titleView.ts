@@ -108,7 +108,6 @@ export class TitleView implements OnDestroy {
   }
 
   saveTitle():void{
-    console.debug(this.titleModel());
     this.updateTitleCallback()(this.titleModel());
     Modal.getInstance(this.editTitleView.nativeElement)?.hide();
   }
