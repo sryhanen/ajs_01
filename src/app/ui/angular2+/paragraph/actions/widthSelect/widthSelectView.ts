@@ -52,10 +52,10 @@ import {FormsModule} from '@angular/forms';
     FormsModule
   ],
   template: `
-    <div class="d-inline-flex align-items-center">
-      <i class="fa fa-arrows-left-right"></i>
-      <p>Width</p>
-      <select [ngModel]="currentWidth()"
+    <div class="d-inline-flex align-items-center gap-3 btn-link-secondary">
+      <i class="fas fa-arrows-left-right ms-2"></i>
+      <p class="mb-0 fw-bolder">Width</p>
+      <select class="form-select w-auto flex-shrink-0" [ngModel]="currentWidth()"
               (ngModelChange)="selectWidthCallback()($event)" >
         @for(widthOption of widthOptions; track $index) {
           @if(widthOption.value === currentWidth()){
@@ -67,7 +67,6 @@ import {FormsModule} from '@angular/forms';
         }
       </select>
     </div>
-
   `
 })
 export class WidthSelectView {

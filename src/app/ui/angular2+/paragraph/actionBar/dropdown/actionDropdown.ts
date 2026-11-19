@@ -59,17 +59,13 @@ import {RenderNodeRootView} from '../../../renderNodeRoot/renderNodeRootView';
         class="btn btn-link btn-sm">
         <i class="fa-solid fa-ellipsis-vertical"></i>
       </button>
-      <ul class="dropdown-menu">
-        @for(action of actions(); track $index){
-          <li>
-            @if($index !== 0){
-              <hr>
-            }
-            <render-node-host [renderNode]="action"></render-node-host>
-          </li>
-        }
-        <ng-content></ng-content>
-      </ul>
+      <div class="dropdown-menu w-auto">
+          @for(action of actions(); track $index){
+            <render-node-host class="input-group" [renderNode]="action"></render-node-host>
+            <hr>
+          }
+          <ng-content></ng-content>
+      </div>
     </div>
   `
 })
