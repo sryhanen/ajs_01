@@ -58,7 +58,6 @@ import {MoveParagraphView} from '../paragraph/actions/moveParagraph/moveParagrap
   ],
   template: `
     @let paragraphsSize = paragraphs().size;
-    <insert-paragraph [addParagraphCallback]="addParagraphCallback()" [index]="1"></insert-paragraph>
     @for(paragraph of paragraphs(); track $index){
       @let index = $index+1;
       <insert-paragraph [addParagraphCallback]="addParagraphCallback()" [index]="index"></insert-paragraph>
