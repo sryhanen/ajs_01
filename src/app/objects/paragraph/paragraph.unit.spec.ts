@@ -77,7 +77,7 @@ describe('Paragraph', () => {
       id:paragraphId
     };
     channel = new FakeChannel();
-    paragraph = new ParagraphImpl(channel, paragraphData);
+    paragraph = new ParagraphImpl(channel, new WebSocketPayloadImpl(paragraphData));
   });
 
   it('Should have id', () => {
