@@ -60,7 +60,7 @@ export class WidthImpl implements Width {
 
   constructor(requestable:Requestable, paragraphState:WebSocketPayload) {
     this._requestable = requestable;
-    const width = paragraphState.objectPropertyAsPayload('config').numberProperty('width');
+    const width = paragraphState.objectPropertyAsPayload('config').numberProperty('colWidth');
     this._currentWidth = signal(width);
     this._selector = new RenderNodeImpl(RegisteredComponents.WIDTH_SELECT_VIEW, computed(() => ({
       currentWidth: this._currentWidth(),

@@ -75,6 +75,8 @@ export class WidthSelectView {
   selectWidthCallback = input.required<(width:number) => void>();
   widthOptions:{value:number, text:string}[] = [
     {value: 12, text: 'Full width'},
+    {value: 8, text: '2/3 width'},
+    {value: 6, text: 'Half width'},
     {value: 4, text: '1/3 width'},
   ];
 }
