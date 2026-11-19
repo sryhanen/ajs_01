@@ -59,6 +59,7 @@ import {WebSocketPayload} from '../webSocket/webSocketPayload/webSocketPayload';
 export class ParagraphCollectionImpl implements ParagraphCollection {
   private readonly _requestable: Requestable;
   private readonly _paragraphs: WritableSignal<Map<string,  Paragraph>>;
+  private readonly _paragraphsInput: Signal<Map<string, RenderNode>>;
   private readonly _renderNode: Signal<RenderNode>;
   private readonly _responseEvents:Readonly<Record<string, (webSocketResponse:WebSocketResponse) => void>>;
 
@@ -67,9 +68,15 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     this._paragraphs = signal(new Map(), {
       equal: () => false
     });
+    this._paragraphsInput = computed(() => {
+      const paragraphsArray = Array.from(this._paragraphs().values());
+      paragraphsArray.shift();
+      const paragraphsWithoutSparkParagraph:[string, RenderNode][] = paragraphsArray.map(paragraph => [paragraph.id(), paragraph.print()()]);
+      return new Map(paragraphsWithoutSparkParagraph);
+    });
     this.initializeParagraphs(notebookState, this._paragraphs);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, computed(() => ({
-      paragraphs: new Map(Array.from(this._paragraphs().values()).map(paragraph => [paragraph.id(), paragraph.print()()])),
+      paragraphs: this._paragraphsInput(),
       addParagraphCallback:(index:number) => this.insertParagraphRequest(index),
       moveParagraphCallback:(index:number, paragraphId:string) => this.moveParagraph(index, paragraphId),
     }))));
