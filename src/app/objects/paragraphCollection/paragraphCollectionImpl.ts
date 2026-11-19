@@ -141,7 +141,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
   }
 
   private handleParagraphRemovedResponse(webSocketResponse:WebSocketResponse):void{
-    const paragraphId = webSocketResponse.dataAsWebSocketPayload().stringProperty('id');
+    const paragraphId = webSocketResponse.dataAsWebSocketPayload().stringProperty('paragraphId');
     if(!this._paragraphs().has(paragraphId)){
       throw new Error(`Paragraph "${paragraphId}" does not exist.`);
     }

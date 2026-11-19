@@ -195,7 +195,7 @@ export function WebsocketMessageService($rootScope, websocketEvents) {
     },
 
     removeParagraph: function(paragraphId) {
-      websocketEvents.sendNewEvent({op: 'PARAGRAPH_REMOVE', data: {id: paragraphId}});
+      websocketEvents.sendNewEvent({op: 'PARAGRAPH_REMOVE', data: {paragraphId: paragraphId}});
     },
 
     clearParagraphOutput: function(paragraphId) {

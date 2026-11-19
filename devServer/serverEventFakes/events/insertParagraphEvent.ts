@@ -75,6 +75,6 @@ export default class InsertParagraphEvent implements ServerEventFake{
     notebook.paragraphs.splice(index, 0, paragraph.paragraphState());
     this._noteService.update(notebook);
     const paragraphAddedResponse = new ParagraphAddedServerResponse(paragraph.paragraphState(), index);
-    return this._webSocket.send(paragraphAddedResponse.toJson());
+    this._webSocket.send(paragraphAddedResponse.toJson());
   }
 }
