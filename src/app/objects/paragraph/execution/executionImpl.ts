@@ -130,11 +130,8 @@ export class ExecutionImpl implements Execution {
         this._timeInfoText.set(this.calculateExecutionTime(startDate, endDate, user));
       }
     }
-    else if(webSocketResponse.operation() === 'ENABLE_EXECUTION'){
-      this._executionIsEnabled.set(true);
-    }
-    else if(webSocketResponse.operation() === 'DISABLE_EXECUTION'){
-      this._executionIsEnabled.set(false);
+    else if(webSocketResponse.operation() === 'EXECUTION_CONFIG'){
+      this._executionIsEnabled.set(webSocketResponse.dataAsWebSocketPayload().booleanProperty('enabled'));
     }
   }
 
@@ -183,16 +180,20 @@ export class ExecutionImpl implements Execution {
 
   private enableExecution():void{
     this._requestable.request({
-      op:'ENABLE_EXECUTION',
-      data:{}
+      op:'EXECUTION_CONFIG',
+      data:{
+        enabled:true
+      }
     });
     this._executionIsEnabled.set(true);
   }
 
   private disableExecution():void{
     this._requestable.request({
-      op:'DISABLE_EXECUTION',
-      data:{}
+      op:'EXECUTION_CONFIG',
+      data:{
+        enabled:false
+      }
     });
     this._executionIsEnabled.set(false);
   }

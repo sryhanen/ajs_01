@@ -74,8 +74,8 @@ export class WidthImpl implements Width {
 
   response(json: object): void {
     const responseMessage = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
-    if(responseMessage.operation() === 'PARAGRAPH_WIDTH'){
-      const newWidth = responseMessage.dataAsWebSocketPayload().numberProperty('width');
+    if(responseMessage.operation() === 'PARAGRAPH_CONFIG'){
+      const newWidth = responseMessage.dataAsWebSocketPayload().numberProperty('colWidth');
       this._currentWidth.set(newWidth);
     }
   }
@@ -87,9 +87,9 @@ export class WidthImpl implements Width {
   private updateWidth(width:number):void{
     this._currentWidth.set(width);
     this._requestable.request({
-      op:'PARAGRAPH_WIDTH',
+      op:'PARAGRAPH_CONFIG',
       data:{
-        width:width,
+        colWidth:width,
       }
     });
   }
