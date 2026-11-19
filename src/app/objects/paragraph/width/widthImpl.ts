@@ -50,6 +50,8 @@ import {Requestable} from '../../channel/requestable';
 import {WebSocketPayload} from '../../webSocket/webSocketPayload/webSocketPayload';
 import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
+import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
+import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 
 export class WidthImpl implements Width {
   private readonly _requestable:Requestable;
@@ -57,7 +59,9 @@ export class WidthImpl implements Width {
   private readonly _currentWidth:WritableSignal<number>;
 
   constructor(requestable:Requestable, paragraphState:WebSocketPayload) {
-    this._currentWidth = signal(12);
+    this._requestable = requestable;
+    const width = paragraphState.objectPropertyAsPayload('config').numberProperty('width');
+    this._currentWidth = signal(width);
     this._selector = new RenderNodeImpl(RegisteredComponents.WIDTH_SELECT_VIEW, computed(() => ({
       currentWidth: this._currentWidth(),
       selectWidthCallback: (width:number) => this.updateWidth(width),
@@ -69,6 +73,11 @@ export class WidthImpl implements Width {
   }
 
   response(json: object): void {
+    const responseMessage = new WebSocketResponseImpl(new WebSocketPayloadImpl(json));
+    if(responseMessage.operation() === 'PARAGRAPH_WIDTH'){
+      const newWidth = responseMessage.dataAsWebSocketPayload().numberProperty('width');
+      this._currentWidth.set(newWidth);
+    }
   }
 
   selector(): RenderNode {
@@ -77,6 +86,11 @@ export class WidthImpl implements Width {
 
   private updateWidth(width:number):void{
     this._currentWidth.set(width);
-
+    this._requestable.request({
+      op:'PARAGRAPH_WIDTH',
+      data:{
+        width:width,
+      }
+    });
   }
 }
