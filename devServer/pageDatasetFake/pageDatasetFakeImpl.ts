@@ -103,9 +103,9 @@ export class PageDatasetFakeImpl implements PageDatasetFake {
     const draw = 1;
     const output = outputPayloadFactory.dataTablesOutputPayload(dataTablesDataFactory.paginatedData(rawData, start, length, draw));
     const paragraphWithOutput = new ServerParagraphFakeWithStatus(new ServerParagraphFakeWithOutput(new ServerParagraphFakeImpl(), output), 'FINISHED');
-    const sparkParagraph = new ServerParagraphFakeWithTitle(new ServerParagraphFakeWithText(new ServerParagraphFakeImpl(), '%spark.conf'), 'hideMeSparkPinger');
-    fakeParagraphs.push(paragraphWithOutput.paragraphState());
+    const sparkParagraph = new ServerParagraphFakeWithText(new ServerParagraphFakeImpl(), '%spark.conf');
     fakeParagraphs.push(sparkParagraph.paragraphState());
+    fakeParagraphs.push(paragraphWithOutput.paragraphState());
     return fakeParagraphs;
   }
 }
