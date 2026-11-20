@@ -132,13 +132,17 @@ export class OutputImpl implements Output {
         this.updateOutputAndOutputSwitcher(outputState, this._outputFormats, this._output);
       }
     }
+    else if(webSocketResponse.operation() === 'CLEAR_OUTPUT'){
+      this._output.set(this._renderNodeStub);
+      this._showSwitcher.set(false);
+    }
   }
 
   clear():void{
     this._output.set(this._renderNodeStub);
     this._showSwitcher.set(false);
     this._requestable.request({
-      op:'OUTPUT_CLEARED',
+      op:'CLEAR_OUTPUT',
       data:{}
     });
   }
