@@ -50,13 +50,18 @@ export class ExecutionStatusServerResponse implements WebSocketServerResponse {
   private readonly _user:string;
   private readonly _dateStarted:string;
   private readonly _dateFinished:string;
+  private readonly _noteId:string;
+  private readonly _paragraphId:string;
 
-  constructor(status:string, user:string, dateStarted:string, dateFinished:string) {
+  constructor(status:string, user:string, dateStarted:string, dateFinished:string, noteId:string, paragraphId:string) {
     this._status = status;
     this._user = user;
     this._dateStarted = dateStarted;
     this._dateFinished = dateFinished;
+    this._noteId = noteId;
+    this._paragraphId = paragraphId;
   }
+
   toJson(): string {
     return JSON.stringify(this.toObject());
   }
@@ -68,7 +73,9 @@ export class ExecutionStatusServerResponse implements WebSocketServerResponse {
         status:this._status,
         user:this._user,
         dateStarted:this._dateStarted,
-        dateFinished:this._dateFinished
+        dateFinished:this._dateFinished,
+        noteId:this._noteId,
+        paragraphId:this._paragraphId
       }
     };
   }

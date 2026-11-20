@@ -90,9 +90,9 @@ export class StartExecutionEvent implements ServerEventFake{
     const noteId = webSocketResponseFromClient.dataAsWebSocketPayload().stringProperty('noteId');
     const paragraphId = webSocketResponseFromClient.dataAsWebSocketPayload().stringProperty('paragraphId');
     const batchUpdateCount = 5;
-    this.sendInitialExecutionStatusMessages(dateStarted);
+    this.sendInitialExecutionStatusMessages(dateStarted, noteId, paragraphId);
     this.sendClearOutputMessage(noteId, paragraphId);
-    this.sendFinishedExecutionStateMessage(dateStarted, simulatedEventTimeLength);
+    this.sendFinishedExecutionStateMessage(dateStarted, simulatedEventTimeLength,noteId, paragraphId);
     this.sendDplLogUpdates(batchUpdateCount, simulatedEventTimeLength, paragraphId, noteId);
     this.sendOutputUpdates(batchUpdateCount, simulatedEventTimeLength, paragraphId, noteId);
   }
@@ -104,17 +104,17 @@ export class StartExecutionEvent implements ServerEventFake{
     },1000);
   }
 
-  private sendFinishedExecutionStateMessage(dateStarted:string, simulatedEventTimeLength:number):void{
+  private sendFinishedExecutionStateMessage(dateStarted:string, simulatedEventTimeLength:number, noteId:string, paragraphId:string):void{
     setTimeout(() => {
       const dateFinished = new DateFakeImpl(Date.now()).toString();
-      const finishedStatus = new ExecutionStatusServerResponse('FINISHED', 'anonymous', dateStarted, dateFinished);
+      const finishedStatus = new ExecutionStatusServerResponse('FINISHED', 'anonymous', dateStarted, dateFinished, noteId, paragraphId);
       this._webSocket.send(finishedStatus.toJson());
     },simulatedEventTimeLength);
   }
 
-  private sendInitialExecutionStatusMessages(dateStarted:string):void{
-    const pendingStatus = new ExecutionStatusServerResponse('PENDING', 'anonymous', dateStarted, '');
-    const runningStatus = new ExecutionStatusServerResponse('RUNNING', 'anonymous', dateStarted, '');
+  private sendInitialExecutionStatusMessages(dateStarted:string, noteId:string, paragraphId:string):void{
+    const pendingStatus = new ExecutionStatusServerResponse('PENDING', 'anonymous', dateStarted, '', noteId, paragraphId);
+    const runningStatus = new ExecutionStatusServerResponse('RUNNING', 'anonymous', dateStarted, '', noteId, paragraphId);
     setTimeout(() => {
       this._webSocket.send(pendingStatus.toJson());
     }, 500);

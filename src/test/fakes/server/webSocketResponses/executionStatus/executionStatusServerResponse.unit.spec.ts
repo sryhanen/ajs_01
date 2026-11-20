@@ -55,14 +55,18 @@ describe('ExecutionStatusServerResponse unit test', () => {
     const user = 'user';
     const dateStarted = 'dateStarted';
     const dateFinished = 'dateFinished';
-    executionStatusServerResponse = new ExecutionStatusServerResponse(status, user, dateStarted, dateFinished);
+    const noteId = 'noteId';
+    const paragraphId = 'paragraphId';
+    executionStatusServerResponse = new ExecutionStatusServerResponse(status, user, dateStarted, dateFinished, noteId, paragraphId);
     const expectedObject = {
       op:'EXECUTION_STATUS',
       data:{
         status:status,
         user:user,
         dateStarted:dateStarted,
-        dateFinished:dateFinished
+        dateFinished:dateFinished,
+        noteId:noteId,
+        paragraphId:paragraphId,
       }
     };
     expect(executionStatusServerResponse.toObject()).toEqual(expectedObject);
@@ -73,14 +77,18 @@ describe('ExecutionStatusServerResponse unit test', () => {
     const user = 'user';
     const dateStarted = 'dateStarted';
     const dateFinished = 'dateFinished';
-    executionStatusServerResponse = new ExecutionStatusServerResponse(status, user, dateStarted, dateFinished);
+    const noteId = 'noteId';
+    const paragraphId = 'paragraphId';
+    executionStatusServerResponse = new ExecutionStatusServerResponse(status, user, dateStarted, dateFinished,noteId, paragraphId);
     const expectedJson = JSON.stringify({
       op:'EXECUTION_STATUS',
       data:{
         status:status,
         user:user,
         dateStarted:dateStarted,
-        dateFinished:dateFinished
+        dateFinished:dateFinished,
+        noteId:noteId,
+        paragraphId:paragraphId,
       }
     });
     expect(executionStatusServerResponse.toJson()).toEqual(expectedJson);
