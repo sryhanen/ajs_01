@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {Component, input} from '@angular/core';
+import {Component, input, computed, Signal} from '@angular/core';
 import {RenderNode} from '../../../objects/rendering/renderNode/renderNode';
 import {RenderNodeRootView} from '../renderNodeRoot/renderNodeRootView';
 import {InsertParagraphView} from './insertParagraph/insertParagraphView';
@@ -57,8 +57,8 @@ import {MoveParagraphView} from '../paragraph/actions/moveParagraph/moveParagrap
     MoveParagraphView
   ],
   template: `
-    @let paragraphsSize = paragraphs().size;
-    @for(paragraph of paragraphs(); track paragraph[0]){
+    @let paragraphsSize = paragraphTuple().length;
+    @for(paragraph of paragraphTuple(); track paragraph[0]){
       @let index = $index+1;
       <insert-paragraph [addParagraphCallback]="addParagraphCallback()" [index]="index"></insert-paragraph>
       <ng-template #projectedContent>
@@ -73,7 +73,10 @@ import {MoveParagraphView} from '../paragraph/actions/moveParagraph/moveParagrap
   `
 })
 export class ParagraphCollectionView {
-  paragraphs = input.required<Map<string, RenderNode>>();
+  paragraphs = input.required<Record<string, RenderNode>>();
   addParagraphCallback = input.required<(index:number) => void>();
   moveParagraphCallback = input.required<(index:number, paragraphId:string) => void>();
+  paragraphTuple:Signal<[string, RenderNode][]> = computed(() => {
+    return Object.entries(this.paragraphs());
+  });
 }
