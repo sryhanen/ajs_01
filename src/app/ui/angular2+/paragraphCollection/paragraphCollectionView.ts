@@ -58,7 +58,7 @@ import {MoveParagraphView} from '../paragraph/actions/moveParagraph/moveParagrap
   ],
   template: `
     @let paragraphsSize = paragraphs().size;
-    @for(paragraph of paragraphs(); track $index){
+    @for(paragraph of paragraphs(); track paragraph[0]){
       @let index = $index+1;
       <insert-paragraph [addParagraphCallback]="addParagraphCallback()" [index]="index"></insert-paragraph>
       <ng-template #projectedContent>
