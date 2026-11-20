@@ -77,8 +77,7 @@ export class ParagraphCollectionImpl implements ParagraphCollection {
     });
     this.initializeParagraphs(notebookState, this._paragraphs);
     this._renderNode = signal(new RenderNodeImpl(RegisteredComponents.PARAGRAPH_COLLECTION_VIEW, computed(() => ({
-      paragraphs1: this._paragraphs(),
-      paragraphs2: this._paragraphsInput(),
+      paragraphs: this._paragraphsInput(),
       addParagraphCallback:(index:number) => this.insertParagraphRequest(index),
       moveParagraphCallback:(index:number, paragraphId:string) => this.moveParagraph(index, paragraphId),
     }))));

@@ -121,7 +121,11 @@ describe('ParagraphCollection unit test', () => {
 
   it('Should add paragraph, "PARAGRAPH_ADDED" response', () => {
     requestable = new FakeChannel();
-    const notebookState = new ServerNotebookFakeImpl().notebookState();
+    const fakeParagraph1 = new ServerParagraphFakeImpl().paragraphState();
+    const paragraphs = [
+      fakeParagraph1,
+    ];
+    const notebookState = new ServerNotebookFakeWithParagraphs(new ServerNotebookFakeImpl(), paragraphs).notebookState();
     paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
     const paragraphState  = new ServerParagraphFakeImpl().paragraphState();
     const paragraphAddedResponse = {
@@ -132,12 +136,16 @@ describe('ParagraphCollection unit test', () => {
       }
     };
     paragraphCollection.response(paragraphAddedResponse);
-    expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
+    expect(Object.entries(paragraphCollection.print()().inputs()()['paragraphs'])).toHaveLength(1);
   });
 
   it('Should add paragraph, "PARAGRAPH" response', () => {
     requestable = new FakeChannel();
-    const notebookState = new ServerNotebookFakeImpl().notebookState();
+    const fakeParagraph1 = new ServerParagraphFakeImpl().paragraphState();
+    const paragraphs = [
+      fakeParagraph1,
+    ];
+    const notebookState = new ServerNotebookFakeWithParagraphs(new ServerNotebookFakeImpl(), paragraphs).notebookState();
     paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
     const paragraphState  = new ServerParagraphFakeImpl().paragraphState();
     const paragraphResponse = {
@@ -145,7 +153,7 @@ describe('ParagraphCollection unit test', () => {
       data:paragraphState
     };
     paragraphCollection.response(paragraphResponse);
-    expect(paragraphCollection.print()().inputs()()['paragraphs']).toHaveLength(1);
+    expect(Object.entries(paragraphCollection.print()().inputs()()['paragraphs'])).toHaveLength(1);
   });
 
   it('Should not add paragraph if index is negative', () => {
@@ -181,23 +189,25 @@ describe('ParagraphCollection unit test', () => {
   it('Should remove paragraph', () => {
     requestable = new FakeChannel();
     const paragraphId = 'para1';
-    const fakeParagraph = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    const fakeParagraph1 = new ServerParagraphFakeImpl(new IdFakeImpl(paragraphId)).paragraphState();
+    const fakeParagraph2 = new ServerParagraphFakeImpl().paragraphState();
     const paragraphs = [
-      fakeParagraph
+      fakeParagraph1,
+      fakeParagraph2
     ];
     const notebookState = new ServerNotebookFakeWithParagraphs(new ServerNotebookFakeImpl(), paragraphs).notebookState();
     paragraphCollection = new ParagraphCollectionImpl(requestable, new WebSocketPayloadImpl(notebookState));
     const paragraphRemovedResponse = {
       op:'PARAGRAPH_REMOVED',
       data:{
-        id:paragraphId,
+        paragraphId:paragraphId,
       }
     };
     const paragraphsBeforeRemove = paragraphCollection.print()().inputs()()['paragraphs'];
     paragraphCollection.response(paragraphRemovedResponse);
     const paragraphsAfterRemove = paragraphCollection.print()().inputs()()['paragraphs'];
-    expect(paragraphsBeforeRemove).toHaveLength(1);
-    expect(paragraphsAfterRemove).toHaveLength(0);
+    expect(Object.entries(paragraphsBeforeRemove)).toHaveLength(1);
+    expect(Object.entries(paragraphsAfterRemove)).toHaveLength(0);
   });
 
   it('Should not remove paragraph', () => {
