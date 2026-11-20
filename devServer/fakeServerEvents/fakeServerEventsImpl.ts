@@ -55,7 +55,6 @@ import NoteEvent from '../serverEventFakes/events/noteEvent';
 import NotesInfoEvent from '../serverEventFakes/events/notesInfoEvent';
 import ParagraphOutputRequestEvent from '../serverEventFakes/events/paragraphOutputRequestEvent';
 import PingEvent from '../serverEventFakes/events/pingEvent';
-import RunParagraphEvent from '../serverEventFakes/events/runParagraphEvent';
 import {FileService} from '../services/fileService/fileService';
 import {WebSocketResponse} from '../../src/app/objects/webSocket/response/webSocketResponse';
 import {RemoveParagraphEvent} from '../serverEventFakes/events/removeParagraphEvent';
@@ -75,7 +74,6 @@ export class FakeServerEventsImpl implements FakeServerEvents {
       new NotesInfoEvent(webSocket, noteService),
       new ParagraphOutputRequestEvent(webSocket),
       new PingEvent(webSocket),
-      new RunParagraphEvent(webSocket, noteService),
       new RemoveParagraphEvent(webSocket, noteService),
       new StartExecutionEvent(webSocket, noteService),
     ];
