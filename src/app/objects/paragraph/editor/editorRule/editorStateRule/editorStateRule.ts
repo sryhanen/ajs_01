@@ -56,15 +56,9 @@ export class EditorStateRule implements EditorRule {
 
   applyTo(editor: Ace.Editor): void {
     const config = this._paragraphState.objectPropertyAsPayload('config');
-    const paragraphStatus = this._paragraphState.stringProperty('status');
-    const disableEditor = paragraphStatus === 'PENDING' || paragraphStatus === 'RUNNING';
     editor.setFontSize(config.numberProperty('fontSize'));
     editor.setValue(this._paragraphState.stringProperty('text'));
     editor.clearSelection();
-    editor.setReadOnly(disableEditor);
-    if(disableEditor){
-      editor.setStyle('paragraph-disable');
-    }
     editor.renderer.setShowGutter(config.booleanProperty('lineNumbers'));
     editor.setShowFoldWidgets(false);
     editor.getSession().setUseWrapMode(true);

@@ -59,6 +59,7 @@ export class ExecutionFake implements Execution {
     this._executor = signal(new RenderNodeFake());
   }
 
+
   executionIsOngoing(): Signal<boolean> {
     return this._executionIsOngoing;
   }
@@ -71,5 +72,8 @@ export class ExecutionFake implements Execution {
     return this._executor;
   }
 
+  toggler(): RenderNode {
+    return new RenderNodeFake();
+  }
   response(json: object): void {}
 }

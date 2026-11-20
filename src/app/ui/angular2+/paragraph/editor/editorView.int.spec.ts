@@ -68,7 +68,8 @@ describe('EditorView functional test', () => {
       inputs:{
         editor:editor,
         editorStyle:editorStyle,
-        editorRules:[]
+        editorRules:[],
+        cleanUpEditorCallback: () => {}
       },
       providers: [FakeComponentRegistryProvider]
     });

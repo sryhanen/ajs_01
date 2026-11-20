@@ -70,12 +70,8 @@ describe('KeyBindingsRule unit test', () => {
       bubbles: true
     }));
     const expectedRequest = {
-      op:'RUN_PARAGRAPH',
-      data: {
-        paragraph: '',
-        config: {},
-        params: {},
-      },
+      op:'START_EXECUTION',
+      data: {},
     };
     expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
   });

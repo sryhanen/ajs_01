@@ -298,7 +298,7 @@ describe('Output unit test', () => {
     const requestSpy = vi.spyOn(requestable, 'request');
     output.clear();
     const expectedRequest = {
-      op:'OUTPUT_CLEARED',
+      op:'CLEAR_OUTPUT',
       data:{}
     };
     expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
