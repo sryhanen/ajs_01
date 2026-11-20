@@ -53,18 +53,17 @@ import {DateFakeImpl} from '../date/dateFakeImpl';
 
 export class ServerParagraphFakeImpl implements ServerParagraphFake {
   private readonly _id:IdFake;
-  private readonly _dateNow:string;
   private readonly _defaultConfig: ServerParagraphConfigFake;
 
   constructor(paragraphId:IdFake = new IdFakeImpl()) {
     this._id = paragraphId;
-    this._dateNow = new DateFakeImpl(Date.now()).toString();
     this._defaultConfig = new ServerParagraphConfigFakeImpl();
   }
 
   paragraphState(): ServerParagraphState {
     const text = '';
     const title = '';
+    const dateNow = new DateFakeImpl(Date.now()).toString();
     return {
       id: this._id.id(),
       jobName: 'jobName',
@@ -75,8 +74,8 @@ export class ServerParagraphFakeImpl implements ServerParagraphFake {
       execution:{
         status:'READY',
         user:'anonymous',
-        dateStarted:'',
-        dateFinished:'',
+        dateStarted:dateNow,
+        dateFinished:dateNow,
       }
     };
   }
