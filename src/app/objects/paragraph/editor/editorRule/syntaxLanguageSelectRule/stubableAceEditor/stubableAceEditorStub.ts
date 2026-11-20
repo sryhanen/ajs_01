@@ -44,9 +44,7 @@
  * a licensee so wish it.
  */
 import {StubableAceEditor} from './stubableAceEditor';
-import ace, {Ace} from 'ace-builds';
-import {types} from 'sass';
-import Error = types.Error;
+import {Ace} from 'ace-builds';
 
 export class StubableAceEditorStub implements StubableAceEditor {
   isStub(): boolean {
