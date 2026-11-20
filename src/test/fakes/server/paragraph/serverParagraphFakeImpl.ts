@@ -63,24 +63,21 @@ export class ServerParagraphFakeImpl implements ServerParagraphFake {
   }
 
   paragraphState(): ServerParagraphState {
-    const status = '';
     const text = '';
     const title = '';
-    const progress = 0;
     return {
-      dateCreated: this._dateNow,
-      dateFinished: this._dateNow,
-      dateStarted: this._dateNow,
-      dateUpdated: this._dateNow,
       id: this._id.id(),
       jobName: 'jobName',
-      progress: progress,
       settings: {forms: {}, params: {}},
-      status: status,
       text: text,
       title: title,
-      user: 'user',
-      config: this._defaultConfig.configState()
+      config: this._defaultConfig.configState(),
+      execution:{
+        status:'READY',
+        user:'anonymous',
+        dateStarted:'',
+        dateFinished:'',
+      }
     };
   }
 }

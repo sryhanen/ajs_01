@@ -101,25 +101,74 @@ export class StartExecutionEvent implements ServerEventFake{
     setTimeout(() => {
       const clearOutputMessage = new ClearOutputServerResponse(noteId, paragraphId);
       this._webSocket.send(clearOutputMessage.toJson());
+      const notebook = this._noteService.find(noteId);
+      notebook.paragraphs.map(p => {
+        if(p.id === paragraphId) {
+          p.output = undefined;
+        }
+      });
+      this._noteService.update(notebook);
     },1000);
   }
 
   private sendFinishedExecutionStateMessage(dateStarted:string, simulatedEventTimeLength:number, noteId:string, paragraphId:string):void{
     setTimeout(() => {
       const dateFinished = new DateFakeImpl(Date.now()).toString();
-      const finishedStatus = new ExecutionStatusServerResponse('FINISHED', 'anonymous', dateStarted, dateFinished, noteId, paragraphId);
+      const status = 'FINISHED';
+      const user = 'anonymous';
+      const finishedStatus = new ExecutionStatusServerResponse(status, user, dateStarted, dateFinished, noteId, paragraphId);
       this._webSocket.send(finishedStatus.toJson());
+      const notebook = this._noteService.find(noteId);
+      notebook.paragraphs.map(p => {
+        if(p.id === paragraphId) {
+          p.execution = {
+            status: status,
+            user: user,
+            dateFinished: dateFinished,
+            dateStarted: dateStarted,
+          };
+        }
+      });
+      this._noteService.update(notebook);
     },simulatedEventTimeLength);
   }
 
   private sendInitialExecutionStatusMessages(dateStarted:string, noteId:string, paragraphId:string):void{
-    const pendingStatus = new ExecutionStatusServerResponse('PENDING', 'anonymous', dateStarted, '', noteId, paragraphId);
-    const runningStatus = new ExecutionStatusServerResponse('RUNNING', 'anonymous', dateStarted, '', noteId, paragraphId);
+    const dateFinished = '';
+    const user = 'anonymous';
     setTimeout(() => {
+      const status = 'PENDING';
+      const pendingStatus = new ExecutionStatusServerResponse(status, user, dateStarted, dateFinished, noteId, paragraphId);
       this._webSocket.send(pendingStatus.toJson());
+      const notebook = this._noteService.find(noteId);
+      notebook.paragraphs.map(p => {
+        if(p.id === paragraphId) {
+          p.execution = {
+            status: status,
+            user: user,
+            dateFinished: dateFinished,
+            dateStarted: dateStarted,
+          };
+        }
+      });
+      this._noteService.update(notebook);
     }, 500);
     setTimeout(() => {
+      const status = 'RUNNING';
+      const runningStatus = new ExecutionStatusServerResponse(status, user, dateStarted, dateFinished, noteId, paragraphId);
       this._webSocket.send(runningStatus.toJson());
+      const notebook = this._noteService.find(noteId);
+      notebook.paragraphs.map(p => {
+        if(p.id === paragraphId) {
+          p.execution = {
+            status: status,
+            user: user,
+            dateFinished: dateFinished,
+            dateStarted: dateStarted,
+          };
+        }
+      });
+      this._noteService.update(notebook);
     }, 1000);
   }
 
@@ -148,6 +197,13 @@ export class StartExecutionEvent implements ServerEventFake{
         const interimOutput = this._fakeOutputPayloadFactory.dataTablesOutputPayload(interimOutputData);
         const outputMessage = new ParagraphOutputServerResponse(paragraphId, noteId, interimOutput);
         this._webSocket.send(outputMessage.toJson());
+        const notebook = this._noteService.find(noteId);
+        notebook.paragraphs.map(p => {
+          if(p.id === paragraphId) {
+            p.output = interimOutput;
+          }
+        });
+        this._noteService.update(notebook);
       }, timeout);
     }
     setTimeout(() => {
@@ -157,6 +213,13 @@ export class StartExecutionEvent implements ServerEventFake{
       const finalOutput= this._fakeOutputPayloadFactory.dataTablesOutputPayload(finalOutputData);
       const paragraphOutputResponse = new ParagraphOutputServerResponse(paragraphId, noteId, finalOutput);
       this._webSocket.send(paragraphOutputResponse.toJson());
+      const notebook = this._noteService.find(noteId);
+      notebook.paragraphs.map(p => {
+        if(p.id === paragraphId) {
+          p.output = finalOutput;
+        }
+      });
+      this._noteService.update(notebook);
     }, simulatedEventTimeLength);
   }
 }

@@ -46,21 +46,20 @@
 import {ServerOutputState} from '../output/serverOutputState';
 
 export type ServerParagraphState = {
-  dateCreated: string;
-  dateFinished: string;
-  dateStarted: string;
-  dateUpdated: string;
   id: string;
   jobName: string;
-  progress:number;
-  output?: ServerOutputState;
-  status: string;
   text: string;
   title: string;
-  user: string;
   settings:{
     params:object,
     forms:object
   }
   config:object
+  output?: ServerOutputState;
+  execution:{
+    status:string,
+    user:string,
+    dateStarted:string,
+    dateFinished:string,
+  }
 };
