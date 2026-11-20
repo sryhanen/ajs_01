@@ -60,19 +60,15 @@ export class KeyBindingsRule implements EditorRule {
 
     const requestable = this._requestable;
     editor.commands.addCommand({
-      name: 'Run paragraph',
+      name: 'Start execution',
       bindKey: {
         win: 'Shift-Enter',
         mac: 'Shift-Enter'
       },
       exec: function() {
         requestable.request({
-          op:'RUN_PARAGRAPH',
-          data: {
-            paragraph: editor.getValue(),
-            config: {},
-            params: {},
-          },
+          op:'START_EXECUTION',
+          data: {},
         });
       }
     });
