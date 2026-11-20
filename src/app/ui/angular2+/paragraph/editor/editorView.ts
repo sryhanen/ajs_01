@@ -43,7 +43,17 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, inject, input, OnChanges, Renderer2, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  inject,
+  input,
+  OnChanges,
+  OnDestroy,
+  Renderer2,
+  ViewChild
+} from '@angular/core';
 import ace from 'ace-builds';
 import {EditorRule} from '../../../../objects/paragraph/editor/editorRule/editorRule';
 import {RenderNode} from '../../../../objects/rendering/renderNode/renderNode';
@@ -61,10 +71,12 @@ import {RenderNodeRootView} from '../../renderNodeRoot/renderNodeRootView';
     </div>
   `
 })
-export class EditorView implements AfterViewInit, OnChanges{
+export class EditorView implements AfterViewInit, OnChanges, OnDestroy {
   editorStyle = input.required<RenderNode>();
   editorRules = input.required<EditorRule[]>();
   editor = input.required<ace.Ace.Editor>();
+  cleanUpEditorCallback = input.required<() => void>();
+
   @ViewChild('editorAnchor') editorAnchor: ElementRef;
   private readonly renderer = inject(Renderer2);
 
@@ -80,6 +92,10 @@ export class EditorView implements AfterViewInit, OnChanges{
     if(this.editorAnchor){
       this.initializeEditor();
     }
+  }
+
+  ngOnDestroy():void {
+    this.cleanUpEditorCallback()();
   }
 
   private initializeEditor():void{

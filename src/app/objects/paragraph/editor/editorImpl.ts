@@ -92,7 +92,8 @@ export class EditorImpl implements Editor {
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
       editorStyle:this._editorStyle.print()(),
       editor:this._editor,
-      editorRules:editorRules
+      editorRules:editorRules,
+      cleanUpEditorCallback: () => {this._editor.destroy(); this._editor.container.remove(); }
     }))));
   }
 
