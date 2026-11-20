@@ -59,6 +59,7 @@ import RunParagraphEvent from '../serverEventFakes/events/runParagraphEvent';
 import {FileService} from '../services/fileService/fileService';
 import {WebSocketResponse} from '../../src/app/objects/webSocket/response/webSocketResponse';
 import {RemoveParagraphEvent} from '../serverEventFakes/events/removeParagraphEvent';
+import {StartExecutionEvent} from '../serverEventFakes/events/execution/startExecutionEvent';
 
 export class FakeServerEventsImpl implements FakeServerEvents {
   private readonly _fakeServerEvents: Map<string, ServerEventFake>;
@@ -76,6 +77,7 @@ export class FakeServerEventsImpl implements FakeServerEvents {
       new PingEvent(webSocket),
       new RunParagraphEvent(webSocket, noteService),
       new RemoveParagraphEvent(webSocket, noteService),
+      new StartExecutionEvent(webSocket, noteService),
     ];
     this._fakeServerEvents = new Map(
       fakeServerEventsArray.map((event: ServerEventFake) => [event.eventId(), event])
