@@ -120,12 +120,12 @@ export class ExecutionImpl implements Execution {
     if(webSocketResponse.operation() === 'EXECUTION_STATUS'){
       const status = webSocketResponse.dataAsWebSocketPayload().stringProperty('status');
       this._executionStatus.set(status);
-      const startDate = webSocketResponse.dataAsWebSocketPayload().stringProperty('startDate');
+      const startDate = webSocketResponse.dataAsWebSocketPayload().stringProperty('dateStarted');
       if(this._executionIsOngoing()){
         this._timeInfoText.set(this.calculateElapsedTime(startDate));
       }
       else{
-        const endDate = webSocketResponse.dataAsWebSocketPayload().stringProperty('endDate');
+        const endDate = webSocketResponse.dataAsWebSocketPayload().stringProperty('dateFinished');
         const user = webSocketResponse.dataAsWebSocketPayload().stringProperty('user');
         this._timeInfoText.set(this.calculateExecutionTime(startDate, endDate, user));
       }
