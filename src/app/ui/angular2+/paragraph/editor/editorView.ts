@@ -43,7 +43,7 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AfterViewInit, Component, ElementRef, input, OnChanges, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, input, OnChanges, OnDestroy, ViewChild} from '@angular/core';
 import ace from 'ace-builds';
 import {EditorRule} from '../../../../objects/paragraph/editor/editorRule/editorRule';
 
@@ -55,7 +55,7 @@ import {EditorRule} from '../../../../objects/paragraph/editor/editorRule/editor
     </div>
   `
 })
-export class EditorView implements AfterViewInit, OnChanges{
+export class EditorView implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('editorAnchor') editorAnchor: ElementRef;
   editorRules = input.required<EditorRule[]>();
   private _aceEditor: ace.Ace.Editor;
@@ -75,6 +75,11 @@ export class EditorView implements AfterViewInit, OnChanges{
       this._aceEditor.destroy();
       this.initializeEditor();
     }
+  }
+
+  ngOnDestroy() {
+    this._aceEditor.destroy();
+    this._aceEditor.container.remove();
   }
 
   private initializeEditor():void{
