@@ -85,11 +85,12 @@ export class ExecutionImpl implements Execution {
       computed(() => ({
         cancelExecutionCallback:() => this.cancelExecution()
       })));
-    const status = paragraphState.stringProperty('status');
+    const executionState = paragraphState.objectPropertyAsPayload('execution');
+    const status = executionState.stringProperty('status');
     this._executionStatus = signal(status);
     this._executionIsOngoing = computed(() => this.executionIsOnGoing(this._executionStatus()));
     this._executorView = computed(() => this._executionIsOngoing() ? this._cancelExecutionView : this._startExecutionView);
-    this._timeInfoText = signal(this.initializedTimeInfoText(paragraphState, status));
+    this._timeInfoText = signal(this.initializedTimeInfoText(executionState, status));
     this._executionStatusView = new RenderNodeImpl(RegisteredComponents.EXECUTION_STATUS_VIEW, computed(() => ({
       executionIsOngoing:this._executionIsOngoing(),
       timeInfoText:this._timeInfoText(),
@@ -168,15 +169,15 @@ export class ExecutionImpl implements Execution {
     return `Took ${duration}. Last updated by ${user} at ${formattedEndDate}`;
   }
 
-  private initializedTimeInfoText(paragraphState:WebSocketPayload, status:string):string{
+  private initializedTimeInfoText(executionState:WebSocketPayload, status:string):string{
     let timeInfoText:string;
-    const startDate = paragraphState.stringProperty('dateStarted');
+    const startDate = executionState.stringProperty('dateStarted');
     if(status === 'RUNNING' || status === 'PENDING') {
       timeInfoText = this.calculateElapsedTime(startDate);
     }
     else{
-      const endDate = paragraphState.stringProperty('dateFinished');
-      const user = paragraphState.stringProperty('user');
+      const endDate = executionState.stringProperty('dateFinished');
+      const user = executionState.stringProperty('user');
       timeInfoText = this.calculateExecutionTime(startDate, endDate, user);
     }
     return timeInfoText;
