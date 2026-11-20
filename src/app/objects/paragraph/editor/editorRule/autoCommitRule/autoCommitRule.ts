@@ -44,28 +44,6 @@
  * a licensee so wish it.
  */
 import {EditorRule} from '../editorRule';
-import {Ace} from 'ace-builds';
-import {Requestable} from '../../../../channel/requestable';
+import {Respondable} from '../../../../channel/respondable';
 
-export class AutoCommitRule implements EditorRule {
-  private readonly _requestable:Requestable;
-
-  constructor(requestable:Requestable) {
-    this._requestable = requestable;
-  }
-
-  applyTo(editor: Ace.Editor) {
-    editor.on('change', () => {
-      const commitParagraphRequest = {
-        op:'COMMIT_PARAGRAPH',
-        data:{
-          title: '',
-          paragraph: editor.getValue(),
-          config: '',
-          params: '',
-        }
-      };
-      this._requestable.request(commitParagraphRequest);
-    });
-  }
-}
+export interface AutoCommitRule extends EditorRule, Respondable {}

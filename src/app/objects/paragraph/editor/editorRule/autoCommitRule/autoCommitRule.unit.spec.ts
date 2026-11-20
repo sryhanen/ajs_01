@@ -43,30 +43,42 @@
  * Teragrep, the applicable Commercial License may apply to this file if you as
  * a licensee so wish it.
  */
-import {AutoCommitRule} from './autoCommitRule';
+import {AutoCommitRuleImpl} from './autoCommitRuleImpl';
 import {Requestable} from '../../../../channel/requestable';
 import ace from 'ace-builds';
 import {FakeChannel} from '../../../../channel/fakeChannel';
 
 describe('AutoCommitRule unit test', () => {
-  const requestable:Requestable = new FakeChannel();
-  const autoCommitRule = new AutoCommitRule(requestable);
-  const aceEditor = ace.edit(document.createElement('div'));
-  autoCommitRule.applyTo(aceEditor);
 
   it('Should send request on change', () => {
+    const requestable:Requestable = new FakeChannel();
+    const autoCommitRule = new AutoCommitRuleImpl(requestable);
+    const aceEditor = ace.edit(document.createElement('div'));
+    autoCommitRule.applyTo(aceEditor);
     const text = 'some editor text value';
     const requestSpy = vi.spyOn(requestable, 'request');
     aceEditor.setValue(text);
     const expectedRequest = {
-      op:'COMMIT_PARAGRAPH',
+      op:'EDITOR_TEXT',
       data:{
-        title: '',
-        paragraph: text,
-        config: '',
-        params: '',
+        text: text,
       }
     };
     expect(requestSpy).toHaveBeenCalledExactlyOnceWith(expectedRequest);
+  });
+
+  it('Should set editor value', () => {
+    const requestable:Requestable = new FakeChannel();
+    const autoCommitRule = new AutoCommitRuleImpl(requestable);
+    const aceEditor = ace.edit(document.createElement('div'));
+    autoCommitRule.applyTo(aceEditor);
+    const editorText = 'some editor text value';
+    autoCommitRule.response({
+      op:'EDITOR_TEXT',
+      data:{
+        text: editorText
+      }
+    });
+    expect(aceEditor.getValue()).toEqual(editorText);
   });
 });

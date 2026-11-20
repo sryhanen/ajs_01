@@ -44,14 +44,16 @@
  * a licensee so wish it.
  */
 import {StubableAceEditor} from './stubableAceEditor';
-import ace from 'ace-builds';
+import ace, {Ace} from 'ace-builds';
+import {types} from 'sass';
+import Error = types.Error;
 
 export class StubableAceEditorStub implements StubableAceEditor {
   isStub(): boolean {
     return true;
   }
 
-  getSession(): ace.Ace.EditSession {
+  editor(): Ace.Editor {
     throw new Error('StubableAceEditorStub: Method not implemented.');
   }
 }

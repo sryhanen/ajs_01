@@ -52,7 +52,7 @@ import {RenderNodeImpl} from '../../rendering/renderNode/renderNodeImpl';
 import {RegisteredComponents} from '../../../ui/angular2+/componentRegistry/registeredComponents';
 import {KeyBindingsRule} from './editorRule/keyBindingsRule/keyBindingsRule';
 import {AnnotationsRule} from './editorRule/annotationsRule/annotationsRule';
-import {AutoCommitRule} from './editorRule/autoCommitRule/autoCommitRule';
+import {AutoCommitRuleImpl} from './editorRule/autoCommitRule/autoCommitRuleImpl';
 import {EditorStateRule} from './editorRule/editorStateRule/editorStateRule';
 import {HighlightsRule} from './editorRule/highlightsRule/highlightsRule';
 import {ExcludedCommandsRule} from './editorRule/excludedCommandsRule/excludedCommandsRule';
@@ -64,11 +64,13 @@ import {AutoCompletionsRule} from './editorRule/autoCompletionsRule/autoCompleti
 import ace from 'ace-builds';
 import {EditorStyleImpl} from './editorStyle/editorStyleImpl';
 import {EditorStyle} from './editorStyle/editorStyle';
+import {AutoCommitRule} from './editorRule/autoCommitRule/autoCommitRule';
 
 export class EditorImpl implements Editor {
   private readonly _requestable: Requestable;
   private readonly _editorStyle: EditorStyle;
   private readonly _autoCompleteRule:AutoCompletionsRule;
+  private readonly _autoCommitRule:AutoCommitRule;
   private readonly _syntaxLanguageSelectRule:SyntaxLanguageSelectRule;
   private readonly _printSignal:Signal<RenderNode>;
   private readonly _editor:ace.Editor;
@@ -76,16 +78,17 @@ export class EditorImpl implements Editor {
   constructor(requestable: Requestable, paragraphState: WebSocketPayload, aceEditor:ace.Editor = ace.edit(this.initializePreElement())) {
     this._requestable = requestable;
     this._autoCompleteRule = new AutoCompletionsRuleImpl(new LanguageCompleterImpl(this));
+    this._autoCommitRule = new AutoCommitRuleImpl(this);
     this._syntaxLanguageSelectRule = new SyntaxLanguageSelectRuleImpl(this);
     const editorRules = [
       new AnnotationsRule(),
-      new AutoCommitRule(this),
       new EditorStateRule(paragraphState),
       new ExcludedCommandsRule(),
       new HighlightsRule(),
       new KeyBindingsRule(this),
       this._autoCompleteRule,
-      this._syntaxLanguageSelectRule
+      this._syntaxLanguageSelectRule,
+      this._autoCommitRule
     ];
     this._editor = aceEditor;
     this._editorStyle = new EditorStyleImpl(this._editor, this, paragraphState);
@@ -109,6 +112,7 @@ export class EditorImpl implements Editor {
     this._editorStyle.response(json);
     this._autoCompleteRule.response(json);
     this._syntaxLanguageSelectRule.response(json);
+    this._autoCommitRule.response(json);
   }
 
   configureReadonly(readonly:boolean):void {

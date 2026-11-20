@@ -71,7 +71,7 @@ export class SyntaxLanguageSelectRuleImpl implements SyntaxLanguageSelectRule {
     if(!this._editor.isStub() && webSocketResponse.operation() === 'EDITOR_SETTING') {
       const languagePayload = webSocketResponse.dataAsWebSocketPayload().objectPropertyAsPayload('editor').stringProperty('language');
       const language = `ace/mode/${languagePayload}`;
-      this._editor.getSession().setMode(language);
+      this._editor.editor().getSession().setMode(language);
     }
   }
 

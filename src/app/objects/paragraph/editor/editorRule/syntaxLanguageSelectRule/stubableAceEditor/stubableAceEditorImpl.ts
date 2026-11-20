@@ -44,7 +44,7 @@
  * a licensee so wish it.
  */
 import {StubableAceEditor} from './stubableAceEditor';
-import ace, {Ace} from 'ace-builds';
+import {Ace} from 'ace-builds';
 
 export class StubableAceEditorImpl implements StubableAceEditor {
   private readonly _editor: Ace.Editor;
@@ -53,8 +53,8 @@ export class StubableAceEditorImpl implements StubableAceEditor {
     this._editor = editor;
   }
 
-  getSession(): ace.Ace.EditSession {
-    return this._editor.getSession();
+  editor(): Ace.Editor {
+    return this._editor;
   }
 
   isStub(): boolean {

@@ -46,4 +46,6 @@
 import {Ace} from 'ace-builds';
 import Stubable from '../../../../../../shared/interfaces/stubable';
 
-export interface StubableAceEditor extends Stubable, Pick<Ace.Editor, 'getSession'>{}
+export interface StubableAceEditor extends Stubable {
+  editor():Ace.Editor;
+}
