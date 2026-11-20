@@ -85,7 +85,7 @@ export class ParagraphImpl implements Paragraph {
               editor:Editor = new EditorImpl(this, paragraphState),
               output:Output = new OutputImpl(this, paragraphState),
               dplLog:DplLog = new DplLogImpl(),
-              execution: Execution = new ExecutionImpl(this, paragraphState),
+              execution: Execution = new ExecutionImpl(this, paragraphState, editor),
               title:Title = new TitleImpl(this.titleValue(paragraphState), this),
               width:Width = new WidthImpl(this, paragraphState),
   ) {

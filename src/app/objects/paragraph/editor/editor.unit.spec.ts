@@ -49,6 +49,7 @@ import {Requestable} from '../../channel/requestable';
 import {FakeChannel} from '../../channel/fakeChannel';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
 import {ServerParagraphFakeImpl} from '../../../../test/fakes/server/paragraph/serverParagraphFakeImpl';
+import ace from 'ace-builds';
 
 describe('Editor unit test', () => {
   let requestable:Requestable;
@@ -86,5 +87,43 @@ describe('Editor unit test', () => {
     const requestSpy = vi.spyOn(requestable, 'request');
     editor.request(request);
     expect(requestSpy).toHaveBeenCalledExactlyOnceWith(request);
+  });
+
+  it('Should configure readonly to true', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    const aceEditor = ace.edit(document.createElement('div'));
+    editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState), aceEditor);
+    editor.configureReadonly(true);
+    expect(aceEditor.getReadOnly()).toBe(true);
+  });
+
+  it('Should configure class name', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    const aceEditor = ace.edit(document.createElement('div'));
+    editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState), aceEditor);
+    editor.configureReadonly(true);
+    expect(aceEditor.container.classList).toContain('paragraph-disable');
+  });
+
+  it('Should configure readonly to false', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    const aceEditor = ace.edit(document.createElement('div'));
+    editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState), aceEditor);
+    editor.configureReadonly(true);
+    editor.configureReadonly(false);
+    expect(aceEditor.getReadOnly()).toBe(false);
+  });
+
+  it('Should remove class name', () => {
+    requestable = new FakeChannel();
+    const paragraphState = new ServerParagraphFakeImpl().paragraphState();
+    const aceEditor = ace.edit(document.createElement('div'));
+    editor = new EditorImpl(requestable, new WebSocketPayloadImpl(paragraphState), aceEditor);
+    editor.configureReadonly(true);
+    editor.configureReadonly(false);
+    expect(aceEditor.container.classList).not.toContain('paragraph-disable');
   });
 });

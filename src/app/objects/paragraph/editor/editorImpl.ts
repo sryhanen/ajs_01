@@ -73,7 +73,7 @@ export class EditorImpl implements Editor {
   private readonly _printSignal:Signal<RenderNode>;
   private readonly _editor:ace.Editor;
 
-  constructor(requestable: Requestable, paragraphState: WebSocketPayload) {
+  constructor(requestable: Requestable, paragraphState: WebSocketPayload, aceEditor:ace.Editor = ace.edit(this.initializePreElement())) {
     this._requestable = requestable;
     this._autoCompleteRule = new AutoCompletionsRuleImpl(new LanguageCompleterImpl(this));
     this._syntaxLanguageSelectRule = new SyntaxLanguageSelectRuleImpl(this);
@@ -87,9 +87,7 @@ export class EditorImpl implements Editor {
       this._autoCompleteRule,
       this._syntaxLanguageSelectRule
     ];
-    const preElement = document.createElement('pre');
-    preElement.classList.add('editor-content');
-    this._editor = ace.edit(preElement);
+    this._editor = aceEditor;
     this._editorStyle = new EditorStyleImpl(this._editor, this, paragraphState);
     this._printSignal = signal(new RenderNodeImpl(RegisteredComponents.EDITOR_VIEW, computed(() => ({
       editorStyle:this._editorStyle.print()(),
@@ -110,5 +108,16 @@ export class EditorImpl implements Editor {
     this._editorStyle.response(json);
     this._autoCompleteRule.response(json);
     this._syntaxLanguageSelectRule.response(json);
+  }
+
+  configureReadonly(readonly:boolean):void {
+    this._editor.setStyle('paragraph-disable', readonly);
+    this._editor.setReadOnly(readonly);
+  }
+
+  private initializePreElement(): HTMLPreElement {
+    const preElement = document.createElement('pre');
+    preElement.classList.add('editor-content');
+    return preElement;
   }
 }

@@ -55,6 +55,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import duration from 'dayjs/plugin/duration';
 import {WebSocketResponseImpl} from '../../webSocket/response/webSocketResponseImpl';
 import {WebSocketPayloadImpl} from '../../webSocket/webSocketPayload/webSocketPayloadImpl';
+import {Editor} from '../editor/editor';
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
@@ -69,9 +70,11 @@ export class ExecutionImpl implements Execution {
   private readonly _executionStatus:WritableSignal<string>;
   private readonly _toggler:RenderNode;
   private readonly _executionIsEnabled:WritableSignal<boolean>;
+  private readonly _editor:Editor;
 
-  constructor(requestable: Requestable, paragraphState:WebSocketPayload) {
+  constructor(requestable: Requestable, paragraphState:WebSocketPayload, editor:Editor) {
     this._requestable = requestable;
+    this._editor = editor;
     this._executionIsEnabled = signal(true);
     this._startExecutionView = new RenderNodeImpl(RegisteredComponents.START_EXECUTION_VIEW,
       computed(() => ({
@@ -120,6 +123,7 @@ export class ExecutionImpl implements Execution {
     if(webSocketResponse.operation() === 'EXECUTION_STATUS'){
       const status = webSocketResponse.dataAsWebSocketPayload().stringProperty('status');
       this._executionStatus.set(status);
+      this._editor.configureReadonly(this._executionIsOngoing());
       const startDate = webSocketResponse.dataAsWebSocketPayload().stringProperty('dateStarted');
       if(this._executionIsOngoing()){
         this._timeInfoText.set(this.calculateElapsedTime(startDate));
