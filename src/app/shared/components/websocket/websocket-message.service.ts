@@ -19,6 +19,15 @@ export function WebsocketMessageService($rootScope, websocketEvents) {
 
   return {
 
+    startExecution: function(paragraphId:string, noteId:string):void{
+      websocketEvents.sendNewEvent({
+        op: 'START_EXECUTION',
+        data:{
+          noteId:noteId,
+          paragraphId:paragraphId,
+        }
+      });
+    },
     createNotebook: function(noteName, defaultInterpreterGroup) {
       websocketEvents.sendNewEvent({
         op: 'NEW_NOTE',

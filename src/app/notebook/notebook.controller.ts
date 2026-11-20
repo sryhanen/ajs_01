@@ -1310,8 +1310,7 @@ function NotebookCtrl($scope,
         websocketMsgSrv.copyParagraph(0, 'hideMeSparkPinger', newHiddenParagraph.text, newHiddenParagraph.config, {});
         websocketMsgSrv.getNote($routeParams.noteId);
       }else{
-
-        websocketMsgSrv.runParagraph($scope.note.paragraphs[0].id, $scope.note.paragraphs[0].title, $scope.note.paragraphs[0].text, $scope.note.paragraphs[0].config, {});
+        websocketMsgSrv.startExecution($scope.note.paragraphs[0].id, $scope.note.id);
       }
     }else{
 
