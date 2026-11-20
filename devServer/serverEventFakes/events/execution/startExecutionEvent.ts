@@ -61,6 +61,9 @@ import {
 import {
   ParagraphOutputServerResponse
 } from '../../../../src/test/fakes/server/webSocketResponses/paragraphOutput/paragraphOutputServerResponse';
+import {
+  ClearOutputServerResponse
+} from '../../../../src/test/fakes/server/webSocketResponses/clearOutput/clearOutputServerResponse';
 
 export class StartExecutionEvent implements ServerEventFake{
   private readonly _webSocket: WebSocket;
@@ -88,9 +91,17 @@ export class StartExecutionEvent implements ServerEventFake{
     const paragraphId = webSocketResponseFromClient.dataAsWebSocketPayload().stringProperty('paragraphId');
     const batchUpdateCount = 5;
     this.sendInitialExecutionStatusMessages(dateStarted);
+    this.sendClearOutputMessage(noteId, paragraphId);
     this.sendFinishedExecutionStateMessage(dateStarted, simulatedEventTimeLength);
     this.sendDplLogUpdates(batchUpdateCount, simulatedEventTimeLength, paragraphId, noteId);
     this.sendOutputUpdates(batchUpdateCount, simulatedEventTimeLength, paragraphId, noteId);
+  }
+
+  private sendClearOutputMessage(noteId:string, paragraphId:string):void{
+    setTimeout(() => {
+      const clearOutputMessage = new ClearOutputServerResponse(noteId, paragraphId);
+      this._webSocket.send(clearOutputMessage.toJson());
+    },1000);
   }
 
   private sendFinishedExecutionStateMessage(dateStarted:string, simulatedEventTimeLength:number):void{
