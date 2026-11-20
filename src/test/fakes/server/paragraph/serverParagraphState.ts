@@ -44,18 +44,14 @@
  * a licensee so wish it.
  */
 import {ServerOutputState} from '../output/serverOutputState';
+import {ServerEditorState} from '../editor/serverEditorState';
 
 export type ServerParagraphState = {
   id: string;
-  jobName: string;
-  text: string;
   title: string;
-  settings:{
-    params:object,
-    forms:object
-  }
   config:object
   output?: ServerOutputState;
+  editor: ServerEditorState,
   execution:{
     status:string,
     user:string,

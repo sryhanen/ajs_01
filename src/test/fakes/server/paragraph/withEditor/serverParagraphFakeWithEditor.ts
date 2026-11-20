@@ -45,19 +45,20 @@
  */
 import {ServerParagraphFake} from '../serverParagraphFake';
 import {ServerParagraphState} from '../serverParagraphState';
+import {ServerEditorFake} from '../../editor/serverEditorFake';
 
-export class ServerParagraphFakeWithText implements ServerParagraphFake {
-  private readonly _serverParagraphFake:ServerParagraphFake;
-  private readonly _text:string;
+export class ServerParagraphFakeWithEditor implements ServerParagraphFake {
+  private readonly _serverParagraph: ServerParagraphFake;
+  private readonly _serverEditor:ServerEditorFake;
 
-  constructor(serverParagraphFake:ServerParagraphFake, text:string) {
-    this._serverParagraphFake = serverParagraphFake;
-    this._text = text;
+  constructor(serverParagraph: ServerParagraphFake, serverEditor:ServerEditorFake) {
+    this._serverParagraph = serverParagraph;
+    this._serverEditor = serverEditor;
   }
 
   paragraphState(): ServerParagraphState {
-    const serverParagraphState = this._serverParagraphFake.paragraphState();
-    serverParagraphState.text = this._text;
+    const serverParagraphState = this._serverParagraph.paragraphState();
+    serverParagraphState.editor = this._serverEditor.editorState();
     return serverParagraphState;
   }
 }

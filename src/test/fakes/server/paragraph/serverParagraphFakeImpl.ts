@@ -50,27 +50,28 @@ import {ServerParagraphConfigFakeImpl} from '../paragraphConfig/serverParagraphC
 import {IdFake} from '../id/idFake';
 import {ServerParagraphConfigFake} from '../paragraphConfig/serverParagraphConfigFake';
 import {DateFakeImpl} from '../date/dateFakeImpl';
+import {ServerEditorFake} from '../editor/serverEditorFake';
+import {ServerEditorFakeImpl} from '../editor/serverEditorFakeImpl';
 
 export class ServerParagraphFakeImpl implements ServerParagraphFake {
   private readonly _id:IdFake;
   private readonly _defaultConfig: ServerParagraphConfigFake;
+  private readonly _defaultEditor: ServerEditorFake;
 
   constructor(paragraphId:IdFake = new IdFakeImpl()) {
     this._id = paragraphId;
     this._defaultConfig = new ServerParagraphConfigFakeImpl();
+    this._defaultEditor = new ServerEditorFakeImpl('');
   }
 
   paragraphState(): ServerParagraphState {
-    const text = '';
     const title = '';
     const dateNow = new DateFakeImpl(Date.now()).toString();
     return {
       id: this._id.id(),
-      jobName: 'jobName',
-      settings: {forms: {}, params: {}},
-      text: text,
       title: title,
       config: this._defaultConfig.configState(),
+      editor:this._defaultEditor.editorState(),
       execution:{
         status:'READY',
         user:'anonymous',

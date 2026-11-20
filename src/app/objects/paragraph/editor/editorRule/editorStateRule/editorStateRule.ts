@@ -48,18 +48,17 @@ import {Ace} from 'ace-builds';
 import {WebSocketPayload} from '../../../../webSocket/webSocketPayload/webSocketPayload';
 
 export class EditorStateRule implements EditorRule {
-  private readonly _paragraphState:WebSocketPayload;
+  private readonly _editorState:WebSocketPayload;
 
   constructor(paragraphState:WebSocketPayload) {
-    this._paragraphState = paragraphState;
+    this._editorState = paragraphState.objectPropertyAsPayload('editor');
   }
 
   applyTo(editor: Ace.Editor): void {
-    const config = this._paragraphState.objectPropertyAsPayload('config');
-    editor.setFontSize(config.numberProperty('fontSize'));
-    editor.setValue(this._paragraphState.stringProperty('text'));
+    editor.setFontSize(this._editorState.objectPropertyAsPayload('style').numberProperty('fontSize'));
+    editor.setValue(this._editorState.stringProperty('text'));
     editor.clearSelection();
-    editor.renderer.setShowGutter(config.booleanProperty('lineNumbers'));
+    editor.renderer.setShowGutter(this._editorState.objectPropertyAsPayload('style').booleanProperty('lineNumberVisibility'));
     editor.setShowFoldWidgets(false);
     editor.getSession().setUseWrapMode(true);
     editor.setOption('maxLines', 30);

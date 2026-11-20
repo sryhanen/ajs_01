@@ -1296,7 +1296,7 @@ function NotebookCtrl($scope,
     let sparkConfigPresent = false;
     //checking paragraphs for %spark.conf
     $scope.note.paragraphs.map(paragraph =>{
-      if(paragraph.text !== undefined && paragraph.text.includes('%spark.conf')){
+      if(paragraph.editor.text !== undefined && paragraph.editor.text.includes('%spark.conf')){
         sparkConfigPresent = true;
       }
     });
